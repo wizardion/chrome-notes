@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+	<link rel="stylesheet" type="text/css" href="stylesheets/options.css" />
+    <script type="text/javascript" src="scripts/options.js"></script>
+    <title>Work-Time: Extension Options</title>
+</head>
+
+<body>
+	<div class="options">
+        <div class="header">
+            <img src="/images/Work-Time-Logo-small3.png" /><br/>
+            Extension Options
+        </div>
+        <div class="tabs">
+            <ul>
+                <li><a id="options-tab" href="?page=options">Settings</a></li>
+                <li><a id="help-tab" href="?page=help">Help</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="sign-in">
+                <div>Registration</div>
+                <span>You need to register.</span>
+                <table>
+                    <tr>
+                        <td><b>First Name:</b></td>
+                        <td><input type="text" name="first-name" /></td>
+                        <td><b>Password:</b></td>
+                        <td><input type="password" name="password" /></td>
+                    </tr>
+                    <tr>
+                        <td><b>Last Name:</b></td>
+                        <td><input type="text" name="last-name" /></td>
+                        <td><b>Confirm Password:</b></td>
+                        <td><input type="password" name="confirm" /></td>
+                    </tr>
+                    <tr >
+                        <td><b>Email:</b></td>
+                        <td><input type="text" name="last-name" /></td>
+                        <td></td>
+                        <td style="padding-left: 135px;"><input type="button" value="Register" class="button" style="margin: 5px 0 -5px 0;" onclick="Test()" /></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="view" id="help-view" >
+                <div>
+                    <div>
+                        <b>A)</b>&emsp;"Play" or "Pause" button.<br/>
+                        &emsp;&emsp;Press it to start or pause the timer.<br/>
+                        <img src="/images/Pause.png" />
+                    </div>
+                    <div>
+                        <b>B)</b>&emsp;"Reset time" button.<br/>
+                        &emsp;&emsp;This button will reset the time to: 00:00:00, and time tracking to: 15m.<br/>
+                        <img src="/images/Reset.png" />
+                    </div>
+                    <div>
+                        <b>C)</b>&emsp;"Add" button.<br/>
+                        &emsp;&emsp;This is a control button.<br/>
+                        &emsp;&emsp;When you click on it, a new timer appears.<br/>
+                        &emsp;&emsp;<b style="color: #b50404">Tip: </b><span style="display: inline;">To see controls buttons, you should press "Ctrl" on you keyboard.</span><br/>
+                        <img src="/images/Add.png" />
+                    </div>
+                    <div>
+                        <b>D)</b>&emsp;"Expand" button.<br/>
+                        &emsp;&emsp;Press it to expand timer and show the notes.<br/>
+                        &emsp;&emsp;<b style="color: #b50404">Tip: </b><span style="display: inline;">You can also press "Tab" or "Shift + Tab" on your keyboard.</span><br/>
+                        <img src="/images/Expand.png" />
+                    </div>
+                    <div>
+                        <b>E)</b>&emsp;"Remove" button.<br/>
+                        &emsp;&emsp;This is a control button.<br/>
+                        &emsp;&emsp;Remember, all data including your notes on the selected timer will be removed.<br/>
+                        &emsp;&emsp;<b style="color: #b50404">Tip: </b><span style="display: inline;">To see controls buttons, you should press "Ctrl" on you keyboard.</span><br/>
+                        <img src="/images/Remove.png" />
+                    </div>
+                    <div>
+                        <b>F)</b>&emsp;Started time.<br/>
+                        &emsp;&emsp;This option shows the time when the timer was started.<br/>
+                        &emsp;&emsp;<b style="color: #b50404">Tip: </b><span style="display: inline;">To display this time, press "Ctrl + Alt" on you keyboard.</span><br/>
+                        <img src="/images/Started.png" />
+                    </div>
+                    <div>
+                        <b>G)</b>&emsp;All Started time.<br/>
+                        &emsp;&emsp;This option shows  the time for all timers when they were started.<br/>
+                        &emsp;&emsp;<b style="color: #b50404">Tip: </b><span style="display: inline;">To display this, press "Ctrl + Alt + a" on you keyboard.</span><br/>
+                        <img src="/images/StartAll.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="view" id="options-view" >
+                <table>
+                    <tr>
+                        <td>
+                            <b>Enable Search:</b>
+                        </td>
+                        <td>
+                            <label><input type="checkbox" id="reset-timer" />
+                                Enable or Disable 'Search' functionally on your notes.
+                            </label>
+                            <span>Note: if this setting is disabled, the search button will be hidden.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Sortable areas:</b>
+                        </td>
+                        <td>
+                            <label><input type="checkbox" id="reset-timer" />
+                                Show or Hide sortable areas.
+                            </label>
+                            <span>Note: if this setting is disabled, sort areas will be hidden, but you can see them if you press the CTRL key on your keyboard.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Updated Date:</b>
+                        </td>
+                        <td>
+                            <label><input type="checkbox" id="reset-timer" />
+                                Display or Hide the Date when your note has been updated.
+                            </label>
+                            <span>Note: you can disable this setting, if there is no need to see when the note was updated.</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+	</div>
+</body>
+</html>

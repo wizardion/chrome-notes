@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css" />
+
+    <script type="text/javascript" src="scripts/selector.js"></script>
+
+    <!-- <script type="text/javascript" src="scripts/notes.js"></script> -->
+    <script type="text/javascript" src="scripts/editor.js"></script>
+
+    <script type="text/javascript" src="scripts/main.js"></script>
+    <script type="text/javascript" src="scripts/temp.js"></script>
+    <!-- <script type="text/javascript" src="scripts/background.js"></script> -->
+</head>
+<body>
+    <div id="notes" class="notes">
+        
+        <div class="details-view">
+            <div class="head">
+                <span class="title">Note 1</span>
+                <span class="title">Note 2</span>
+                <input type="button" class="button back" onclick="notes.beckToList()" value="All Notes" />
+                <input type="button" class="button delete" />
+            </div>
+            <!-- <textarea class="fast-note"></textarea> -->
+            <div class="fast-note" contenteditable="true">This is a test <b>Bold</b> text.</div>
+        </div>
+
+        <div class="list-view disable-select">
+            <div class="list-controls"  >
+                <input type="button" class="search-button" />
+                <span>My Notes</span>
+                <input type="button" class="button add-note" value="+" />
+            </div>
+            <div class="list-items" ></div>
+        </div>
+
+        <div class="templates">
+            <div class="list-item" >
+                <input type="button" class="button to-note" />
+            </div>
+        </div>
+
+        <div class="loading disable-select" title="Loading...">
+            <img src="images/Loading.gif" alt="Loading...">
+            <div>Don't worry!<br/>It's just migration to the new structure ... </div>
+        </div>
+
+    </div>
+
+    <div id="text-div" style="border: 1px solid silver;
+    position: fixed;
+    top: 15px;
+    background: white;
+    width: 598px;
+    height: 243px;
+    left: 610px;">
+        <div style="font-family: Consolas, Monaco, monospace;hyphens: none;font-size: 16px;line-height: 24px;margin: 0;"><span class="hl-reserved" style="color: green;">var</span><span class="hl-code" style="color: gray;"> </span><span class="hl-identifier" style="color: blue;">apple</span><span class="hl-code" style="color: gray;"> = </span><span class="hl-reserved" style="color: green;">new</span><span class="hl-code" style="color: gray;"> </span><span class="hl-identifier" style="color: blue;">Apple</span><span class="hl-brackets" style="color: olive;">(</span><span class="hl-quotes" style="color: darkred;">'</span><span class="hl-string" style="color: red;">macintosh</span><span class="hl-quotes" style="color: darkred;">'</span><span class="hl-brackets" style="color: olive;">)</span><span class="hl-code" style="color: gray;">;</span></div>
+    </div>
+</body>
+</html>
