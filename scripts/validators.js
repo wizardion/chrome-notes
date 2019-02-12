@@ -22,4 +22,18 @@ class Validator {
 
     return true;
   }
+
+  static bindRequiredAnimation(control) {
+    return function () {
+      if (!control.classList.contains('required')) {
+        control.classList.add('required');
+      } else {
+        control.style.animation = 'none';
+        control.offsetHeight; // trigger reflow
+        control.style.animation = null;
+      }
+
+      control.focus();
+    };
+  }
 }

@@ -76,12 +76,12 @@ class BaseNotes {
       for(var i = 0; i < notes.length; i++) {
         const element = notes[i].self;
 
-        element.onclick = function(e){
-          this.selectNote(element.index);
-        }.bind(this);
-  
-        // item.onclick = onNoteClick;
-        // item.sortButton.onmousedown = onSortBegin;
+        // element.onclick = function(e){
+        //   this.selectNote(element.index);
+        // }.bind(this);
+
+        element.onclick = this.selectNote.bind(this, element.index);
+        element.sortButton.onmousedown = this.startSorting.bind(this);
       }
 
       // this.controls.listItems.scrollTop = 200;
@@ -139,21 +139,23 @@ class BaseNotes {
   }
 
   selectNote(index) {
-    this.controls.description.index = index;
-    this.controls.listView.style.display = 'None';
-    this.controls.detailsView.style.display = 'inherit';
-
-    this.controls.title.value = this.notes[index].title;
-    this.controls.description.innerHTML = this.notes[index].description;
-    this.controls.description.focus();
-
-    // Selection
-    // const editableDiv = this.controls.description;
-    // const selection = window.getSelection();
-    // selection.collapse(editableDiv.childNodes[editableDiv.childNodes.length - 1], 5);
-
-    this.controls.description.scrollTop = 0;
-    localStorage.rowId = index;
+    if (!this.sortingMode) {
+      this.controls.description.index = index;
+      this.controls.listView.style.display = 'None';
+      this.controls.detailsView.style.display = 'inherit';
+  
+      this.controls.title.value = this.notes[index].title;
+      this.controls.description.innerHTML = this.notes[index].description;
+      this.controls.description.focus();
+  
+      // Selection
+      // const editableDiv = this.controls.description;
+      // const selection = window.getSelection();
+      // selection.collapse(editableDiv.childNodes[editableDiv.childNodes.length - 1], 5);
+  
+      this.controls.description.scrollTop = 0;
+      localStorage.rowId = index;
+    }
   }
 
   // Functions
@@ -179,6 +181,10 @@ class BaseNotes {
     this.controls.listItems.removeChild(this.notes[id].self);
     this.notes[id].self = null;
     this.notes.splice(id, 1);
+
+    this.$valid = true;
+    this.showError = null;
+    this.controls.title.classList.remove('required');
 
     for (var i = id; i < this.notes.length; i++) {
       this.notes[i].self.bulletinSpan.innerText = (i + 1);
@@ -228,7 +234,7 @@ class BaseNotes {
       this.editMode = this.createNewMode();
 
       this.editMode.$valid = false;
-      this.editMode.showError = this.initRequired(this.editMode.titleInput);
+      this.editMode.showError = Validator.bindRequiredAnimation(this.editMode.titleInput);
 
       // ----------------------------------------------------------------------------------------------------
       // Creating event functions to remove: New Note view
@@ -318,12 +324,14 @@ class BaseNotes {
   titleChanged() {
     if (this.controls.title.value.trim().length === 0) {
       this.$valid = false;
-      this.showError = this.initRequired(this.controls.title);
+      this.showError = Validator.bindRequiredAnimation(this.controls.title);
       return;
     }
 
     this.$valid = true;
     this.showError = null;
+    this.controls.title.classList.remove('required');
+
     this.notes[localStorage.rowId].title = this.controls.title.value;
     this.notes[localStorage.rowId].self.titleSpan.innerText = this.notes[localStorage.rowId].title;
 
@@ -428,18 +436,23 @@ class BaseNotes {
     }
   }
 
-  initRequired(control) {
-    return function () {
-      if (!control.classList.contains('required')) {
-        control.classList.add('required');
-      } else {
-        control.style.animation = 'none';
-        control.offsetHeight; // trigger reflow
-        control.style.animation = null;
-      }
+  startSorting(e) {
+    var element = e.path[1];
 
-      control.focus();
-    }.bind(this);
+    if(!this.sortingMode && e.button === 0) {
+      this.sortingMode = {
+        startY: e.pageY + this.controls.listItems.scrollTop,
+        offsetY: e.pageY - element.offsetTop + this.controls.listItems.scrollTop,
+        maxY: this.controls.listItems.scrollHeight - element.offsetHeight
+      };
+      
+      
+      console.log({
+        'sortingMode': this.sortingMode
+      });
+    }
+
+    
   }
 }
 
