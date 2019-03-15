@@ -28,16 +28,17 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // main.init(function(notes){
   //   if(notes.length < 100) {
-  //     var counter = 1000;
+  //     var startFrom = 0;
+  //     var count = 25;
 
-  //     for (let index = counter; index < (counter + 3000); index++) {
+  //     for (let index = startFrom; index < (startFrom + count); index++) {
   //       var number = (index + 1);
 
   //       const element = {
   //         // note.Title, note.Description, note.Order, note.Time
   //         title: 'This is a note number ' + number,
   //         description: 'This is a note decription number ' + number,
-  //         order: number + counter,
+  //         order: number,
   //         time: new Date().getTime(),
   //       };
     

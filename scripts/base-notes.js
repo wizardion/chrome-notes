@@ -22,7 +22,7 @@ class BaseNotes {
       chrome.extension.getBackgroundPage().main : main; /*this.background = main;*/
 
     this.controls.listItems = new ScrollBar(this.controls.listItems);
-    this.controls.description = new ScrollBar(this.controls.description, {background: 'gray'});
+    this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
 
     this.init();
     

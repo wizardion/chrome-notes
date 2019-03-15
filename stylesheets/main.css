@@ -66,10 +66,13 @@ table
   right: 2px;
   background: #07a698;
   border-radius: 4px;
-  opacity: 0.3;
+  /* opacity: 0.3; */
   /* background: rgba(7, 166, 152, 0.1); */
   pointer-events: none;
   /* background: gray; */
+
+
+  background: #b9e6e2;
 }
 
 .list-items
