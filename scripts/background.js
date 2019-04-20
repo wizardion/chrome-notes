@@ -26,18 +26,36 @@ document.addEventListener('DOMContentLoaded', function(){
     // migrate();
   }
 
+// ----------------------------------------------------------------------------------------------------
+// Testing
+// ----------------------------------------------------------------------------------------------------
+  // var dict = {
+  //   1: 'One',
+  //   2: 'Two',
+  //   3: 'Three',
+  //   4: 'Four',
+  //   5: 'Five',
+  //   6: 'Six',
+  //   7: 'Seven',
+  //   8: 'Eight',
+  //   9: 'Nine',
+  //   10: 'Ten',
+  //   11: 'Eleven',
+  //   12: 'Twelve',
+  // }
+
   // main.init(function(notes){
   //   if(notes.length < 100) {
   //     var startFrom = 0;
-  //     var count = 25;
+  //     var count = 12;
 
   //     for (let index = startFrom; index < (startFrom + count); index++) {
   //       var number = (index + 1);
 
   //       const element = {
   //         // note.Title, note.Description, note.Order, note.Time
-  //         title: 'This is a note number ' + number,
-  //         description: 'This is a note decription number ' + number,
+  //         title: 'This is a note number ' + dict[number] || number,
+  //         description: 'This is a note decription number ' + dict[number] || number,
   //         order: number,
   //         time: new Date().getTime(),
   //       };
@@ -52,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function(){
   //     }
   //   }
   // });
+  // ----------------------------------------------------------------------------------------------------
 
   // main.init();
   
