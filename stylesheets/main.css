@@ -20,6 +20,10 @@ html, body
   background: rgb(238, 238, 238);
 }
 
+div[contenteditable] {
+  cursor: text;
+}
+
 .notes {
   position: relative;
   background: white;

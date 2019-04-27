@@ -3,6 +3,7 @@ class ScrollBar {
     this.control = control;
     this.thumb = document.createElement('div');
     this.interval = null;
+    this.freezeScrolling = false;
 
     this.thumb.style.visibility = 'hidden';
 
@@ -20,18 +21,20 @@ class ScrollBar {
   }
 
   onWheel(e) {
-    var scrollTop = this.control.scrollTop + e.deltaY;
-    var max = (this.control.scrollHeight - this.control.offsetHeight);
+    if(!this.freezeScrolling) {
+      var scrollTop = this.control.scrollTop + e.deltaY;
+      var max = (this.control.scrollHeight - this.control.offsetHeight);
 
-    scrollTop = scrollTop < max ? scrollTop : max;
-    scrollTop = scrollTop > 0? scrollTop : 0;
+      scrollTop = scrollTop < max ? scrollTop : max;
+      scrollTop = scrollTop > 0? scrollTop : 0;
 
-    if (scrollTop != this.control.scrollTop && 
-      ((e.deltaY < 0 && this.control.scrollTop >= 0) || (e.deltaY > 0 && this.control.scrollTop < max))) {
-      e.preventDefault();
+      if (scrollTop != this.control.scrollTop && 
+        ((e.deltaY < 0 && this.control.scrollTop >= 0) || (e.deltaY > 0 && this.control.scrollTop < max))) {
+        e.preventDefault();
+      }
+
+      this.control.scrollTop += e.deltaY;
     }
-
-    this.control.scrollTop += e.deltaY;
   }
 
   onScroll() {
