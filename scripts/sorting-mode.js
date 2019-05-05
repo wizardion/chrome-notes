@@ -246,7 +246,7 @@ class SortingHelper {
       }
 
       item.self.index = i;
-      item.DisplayOrder = i;
+      item.order = i;
 
       if(callback) {
         callback(item);

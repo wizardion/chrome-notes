@@ -440,23 +440,38 @@ class BaseNotes {
 
   startSorting(e) {
     var element = e.path[1];
-    var items = [];
+    var items = {};
+    var oldItems = {};
 
     if(!this.sortingHelper.isBusy && e.button === 0) {
       this.sortingHelper.start(e.pageY, element, this.notes);
 
+      for(var key in this.notes) {
+        const item = this.notes[key];
+        oldItems[item.id] = item.order;
+      }
+
       this.sortingHelper.onUpdate = function(item){
         items[item.id] = item;
-
-        console.log({
-          'id': item.id
-        })
       }.bind(this);
 
       this.sortingHelper.onFinish = function(){
-        console.log('finish: ' + items.length);
+        console.log('finish: ' + Object.keys(items).length);
 
-        //this.background.update(item, "DisplayOrder");
+        for(var key in items){
+          const item = items[key];
+
+          if(oldItems[item.id] !== item.order) {
+            console.log({
+              'id': item.id,
+              'order': item.order,
+              'oldOrder': oldItems[item.id]
+            });
+            //this.background.update(item, "DisplayOrder");
+          }
+        }
+
+        
       }.bind(this);
     }
   }
