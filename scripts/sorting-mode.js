@@ -6,6 +6,8 @@ class SortingHelper {
 
     this.padding = 1;
     this.speed = 70;
+
+    this.customEvents = [];
   }
 
   /**
@@ -27,6 +29,26 @@ class SortingHelper {
    */
   set isBusy(value) {
     throw new Error(`The readOnly property cannot be written. ${value} was passed.`);
+  }
+
+  /**
+   * @param {*} callback
+   * The passed in value.
+   * 
+   * Adds event on update
+   */
+  set onUpdate(callback) {
+    this.customEvents['update'] = callback;
+  }
+
+  /**
+   * @param {*} callback
+   * The passed in value.
+   * 
+   * Adds event on finish sorting
+   */
+  set onFinish(callback) {
+    this.customEvents['finish'] = callback;
   }
 
   /**
@@ -68,6 +90,13 @@ class SortingHelper {
    * Ends sorting
    */
   end() {
+    var callback = this.customEvents['finish'];
+
+    if(callback) {
+      callback();
+      callback = null;
+    }
+
     this.notes[this.element.index].self.bulletinSpan.innerText = (this.element.index + 1);
     clearInterval(this.interval);
 
@@ -82,6 +111,7 @@ class SortingHelper {
     this.listItems.removeChild(this.placeholder);
     
     this.placeholder = null;
+    this.customEvents = [];
     this.element = null;
     this.clientY = null;
     this.events = null;
@@ -203,6 +233,7 @@ class SortingHelper {
     var max = (first < second)? second : first;
     var temp = this.notes[first];
     var id = this.notes[this.element.index].id;
+    var callback = this.customEvents['update'];
 
     this.notes.splice(first, 1);
     this.notes.splice(second, 0, temp);
@@ -216,9 +247,10 @@ class SortingHelper {
 
       item.self.index = i;
       item.DisplayOrder = i;
-      // item.self.bulletinSpan.innerText = (i + 1);
 
-      // this.background.saveNote(_notes[i], "DisplayOrder");
+      if(callback) {
+        callback(item);
+      }
     }
   }
 

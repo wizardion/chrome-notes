@@ -440,9 +440,24 @@ class BaseNotes {
 
   startSorting(e) {
     var element = e.path[1];
+    var items = [];
 
     if(!this.sortingHelper.isBusy && e.button === 0) {
       this.sortingHelper.start(e.pageY, element, this.notes);
+
+      this.sortingHelper.onUpdate = function(item){
+        items[item.id] = item;
+
+        console.log({
+          'id': item.id
+        })
+      }.bind(this);
+
+      this.sortingHelper.onFinish = function(){
+        console.log('finish: ' + items.length);
+
+        //this.background.update(item, "DisplayOrder");
+      }.bind(this);
     }
   }
 }

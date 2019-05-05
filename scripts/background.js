@@ -4,6 +4,7 @@ var main = {
 
 // window.addEventListener('load', function(){
 document.addEventListener('DOMContentLoaded', function(){
+  //#region test
   //----------------------------------------------------------------------
   // console.log('load background');
 
@@ -13,10 +14,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // trackSave(traks);
 
-  main.database = openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
+  
 
   // console.log(main.database);
   //----------------------------------------------------------------------
+  //#endregion
+
+  main.database = openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
 
   main.database.transaction(function(tx) {
     tx.executeSql("CREATE TABLE IF NOT EXISTS Notes (Title TEXT, Description TEXT, DisplayOrder UNSIGNED INTEGER, Time REAL)");
@@ -25,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function(){
   if(localStorage.notes){
     // migrate();
   }
-
+//#region testing
 // ----------------------------------------------------------------------------------------------------
 // Testing
 // ----------------------------------------------------------------------------------------------------
@@ -73,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function(){
   // ----------------------------------------------------------------------------------------------------
 
   // main.init();
-  
+//#endregion
 });
 
 main.init = function(callback = function(){}){
@@ -107,8 +111,7 @@ main.update = function(item, key, callback = function(){}){
   }
 
   console.log({
-    'sql': sql.replace(/\?/gi, data),
-    // 'data': item,
+    'sql': sql.replace(/\?/gi, data)
   });
 
   // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){
@@ -116,6 +119,7 @@ main.update = function(item, key, callback = function(){}){
   // }); });
 };
 
+//#region comment
 // main.update2 = function (id, key, value) {
 //   sql = 'UPDATE Notes SET ' + key + '=? WHERE rowid=?';
 //   data = [value, id];
@@ -126,6 +130,7 @@ main.update = function(item, key, callback = function(){}){
 
 //   _database.transaction(function (tx) { tx.executeSql(sql, data); });
 // };
+//#endregion
 
 main.add = function(note, callback = function(){}, error = function(){}){
   var sql = "INSERT INTO Notes(Title, Description, DisplayOrder, Time) VALUES(?,?,?,?)";
