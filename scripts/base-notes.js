@@ -21,6 +21,8 @@ class BaseNotes {
     this.background = (chrome && chrome.extension && chrome.extension.getBackgroundPage)? 
       chrome.extension.getBackgroundPage().main : main; /*this.background = main;*/
 
+    this.background.addEvent('error', this.notify.bind(this));
+
     this.controls.listItems = new ScrollBar(this.controls.listItems);
     this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
     this.sortingHelper = new SortingHelper(this.controls.listItems);
@@ -462,18 +464,20 @@ class BaseNotes {
           const item = items[key];
 
           if(oldItems[item.id] !== item.order) {
-            console.log({
-              'id': item.id,
-              'order': item.order,
-              'oldOrder': oldItems[item.id]
-            });
-            //this.background.update(item, "DisplayOrder");
+            this.background.update(item, "DisplayOrder");
           }
         }
 
         
       }.bind(this);
     }
+  }
+
+  notify(message) {
+    console.log({
+      'notify.message': message
+    })
+
   }
 }
 

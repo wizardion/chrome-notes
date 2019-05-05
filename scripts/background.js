@@ -1,5 +1,6 @@
 var main = {
-  database: null
+  database: null,
+  events: []
 };
 
 // window.addEventListener('load', function(){
@@ -110,9 +111,11 @@ main.update = function(item, key, callback = function(){}){
     data = [item[key], item.id];
   }
 
-  console.log({
-    'sql': sql.replace(/\?/gi, data)
-  });
+  // console.log({
+  //   'sql': sql.replace(/\?/gi, data)
+  // });
+
+  errorNotify(sql.replace(/\?/gi, data));
 
   // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){
   //   callback(data.rowsAffected);
@@ -196,4 +199,16 @@ main.remove = function (id, callback = function(){}){
   // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){
   //   callback(data.rowsAffected);
   // }); });
+};
+
+main.addEvent = function(key, callback) {
+  this.events[key] = callback;
+};
+
+var errorNotify = function(message){
+  var callback = main.events['error'];
+
+  if(callback) {
+    callback(message);
+  }
 };
