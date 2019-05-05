@@ -23,6 +23,7 @@ class BaseNotes {
 
     this.controls.listItems = new ScrollBar(this.controls.listItems);
     this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
+    this.sortingHelper = new SortingHelper(this.controls.listItems);
 
     this.init();
     
@@ -139,7 +140,8 @@ class BaseNotes {
   }
 
   selectNote(index) {
-    if (!this.sortingMode) {
+    // if (!this.sortingMode) {
+    if (!this.sortingHelper.isBusy) {
       this.controls.description.index = index;
       this.controls.listView.style.display = 'None';
       this.controls.detailsView.style.display = 'inherit';
@@ -439,109 +441,9 @@ class BaseNotes {
   startSorting(e) {
     var element = e.path[1];
 
-    if(!this.sortingMode && e.button === 0) {
-      this.sortingMode = {
-        element: element,
-        startY: e.pageY + this.controls.listItems.scrollTop,
-        offsetY: e.pageY - element.offsetTop + this.controls.listItems.scrollTop,
-        maxY: this.controls.listItems.scrollHeight - element.offsetHeight,
-        placeholder: element.cloneNode(true),
-        interval: null
-      };
-
-      this.sortingMode.normalise = function (value, max, min=0) {
-        value = (value >= max)? max : value;
-        value = (value <  min)? min : value;
-        return value;
-      };
-
-      this.sortingMode.move = function(y){
-        var centerPoint = this.sortingMode.element.offsetTop + this.sortingMode.element.offsetHeight/2;
-        var index = this.sortingMode.normalise(parseInt(centerPoint / this.sortingMode.element.offsetHeight), this.notes.length);
-
-        if(index < this.sortingMode.element.index){
-          this.controls.listItems.insertBefore(this.sortingMode.placeholder, this.notes[index].self);
-          this.sortingMode.replaceNotes(this.sortingMode.element.index, index);
-        }
-
-        if(index > this.sortingMode.element.index){
-          this.controls.listItems.insertBefore(this.sortingMode.placeholder, this.notes[index].self.nextSibling);
-          this.sortingMode.replaceNotes(this.sortingMode.element.index, index);
-        }
-
-        this.sortingMode.element.style.top = y;
-      }.bind(this);
-
-      this.sortingMode.replaceNotes = function(first, second){
-        var min = (first < second)? first : second;
-        var max = (first < second)? second : first;
-        var temp = this.notes[first];
-
-        this.notes.splice(first, 1);
-        this.notes.splice(second, 0, temp);
-
-        for(var i = min; i <=  max; i++){
-          const item = this.notes[i];
-
-          item.self.index = i;
-          item.self.bulletinSpan.innerText = (i + 1);
-          item.DisplayOrder = i;
-          // this.background.saveNote(_notes[i], "DisplayOrder");
-        }
-      }.bind(this);
-
-      this.sortingMode.drag = function(){
-        this.controls.listItems.scrollTop++;
-        var y = ((this.controls.listItems.scrollTop + this.controls.listItems.offsetHeight) - 10) - this.sortingMode.element.offsetHeight;
-        this.sortingMode.move(y);
-      }.bind(this);
-      
-      this.sortingMode.onMove = document.onmousemove = function(e) {
-        var pageY = (e.pageY) + this.controls.listItems.scrollTop;
-        var top = this.sortingMode.normalise(pageY - this.sortingMode.offsetY, this.sortingMode.maxY);
-
-        var max = (this.controls.listItems.scrollTop + this.controls.listItems.offsetHeight) - 10;
-
-        clearInterval(this.sortingMode.interval);
-
-        if(top + this.sortingMode.element.offsetHeight > max) {
-          var presure = (pageY - (max - this.sortingMode.element.offsetHeight) - this.sortingMode.offsetY);
-          var speed = this.sortingMode.normalise(70 - presure, 70);
-
-          this.sortingMode.drag();
-          this.sortingMode.interval = setInterval(this.sortingMode.drag, speed);
-          return;
-        }
-
-        this.sortingMode.move(top);
-      }.bind(this);
-
-      this.sortingMode.complete = document.onmouseup = function(){
-        document.onmousemove = document.onmouseup = null;
-        clearInterval(this.sortingMode.interval);
-
-        this.sortingMode.getIndex = null;
-        this.sortingMode.replaceNotes = null;
-        this.sortingMode.onMove = null;
-        this.sortingMode.remove = null;
-
-        // this.controls.listItems.onscroll = null;
-        this.sortingMode.element.classList.remove('drag');
-        this.sortingMode.element.style.top = "";
-        this.controls.listItems.insertBefore(this.sortingMode.element, this.sortingMode.placeholder);
-        this.controls.listItems.removeChild(this.sortingMode.placeholder);
-
-        this.sortingMode = null;
-      }.bind(this);
-      
-      this.sc
-      element.classList.add('drag');
-      element.style.top = e.pageY + this.controls.listItems.scrollTop - this.sortingMode.offsetY;
-      this.sortingMode.placeholder.innerHTML = '';
-      this.controls.listItems.insertBefore(this.sortingMode.placeholder, element);
+    if(!this.sortingHelper.isBusy && e.button === 0) {
+      this.sortingHelper.start(e.pageY, element, this.notes);
     }
-
-    
   }
 }
 

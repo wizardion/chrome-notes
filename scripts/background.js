@@ -80,8 +80,8 @@ main.init = function(callback = function(){}){
   var notes = [];
 
   main.database.transaction(function(tx) {
-    // tx.executeSql("SELECT rowid as Id, * FROM Notes ORDER BY DisplayOrder ASC LIMIT 20", [], function(tx, result) {
-    tx.executeSql("SELECT rowid as Id, * FROM Notes ORDER BY DisplayOrder ASC", [], function(tx, result) {
+    tx.executeSql("SELECT rowid as Id, * FROM Notes ORDER BY DisplayOrder ASC LIMIT 18", [], function(tx, result) {
+    // tx.executeSql("SELECT rowid as Id, * FROM Notes ORDER BY DisplayOrder ASC", [], function(tx, result) {
       for(var i = 0; i < result.rows.length; i++) {
         notes.push({
           id: result.rows.item(i)['Id'],

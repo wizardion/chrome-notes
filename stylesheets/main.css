@@ -81,52 +81,43 @@ table
 
 .list-items
 {
-      /* width: 620px; */
-    width: 100%;
-    /* height: 240px; */
-    /* width: 620px; */
-    /* width: 100%; */
-    /* height: 240px; */
-    /* width: 615px; */
-    /* width: 100%; */
-    /* height: 240px; */
-    height: 244px;
-    overflow-y: scroll;
-    position: relative;
-    /* overflow-y: scroll; */
-    overflow-y: hidden;
-    overflow-x: hidden;
-    /* padding-right: 35px; */
-    /* margin-right: -15px; */
-    /* right: -15px; */
-    /* left: 0; */
+  width: 100%;
+  height: 244px;
+  overflow-y: scroll;
+  position: relative;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .list-items2 {
   width: 100%;
 }
 
-.list-view .list-item
+.list-view .list-item,
+.list-view .hold .list-item:hover
 {
-  border-bottom: 1px solid #DBDBDB;
   border-bottom: 1px solid rgba(7, 166, 152, 0.1);
   line-height: 25px;
   height: 25px;
   padding-left: 10px;
+  background:inherit;
+  color: inherit;
+  cursor: inherit;
+}
+
+.hold {
+  cursor: pointer;
 }
 
 .drag
 {
-  /*position: relative;*/
-  /*margin-left: 5px;*/
-  /*margin-right: 8px;*/
-
   position: absolute;
   left: 5px;
   right: 10px;
 }
 
-.list-view .list-item:hover, .drag
+.list-view .list-item:hover, 
+.hold .list-item.drag, .hold .list-item.drag:hover
 {
   background:rgba(7, 166, 152, 0.1);
   border-bottom: 1px solid transparent;
@@ -357,7 +348,8 @@ table
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAVCAYAAACkCdXRAAAATElEQVR42mNgGFLgsZlZAxD/x4MbSDEMpwaYRcQYQBbGaSCJwfGfPElKDCOVPWrYqGEDbhg1ckADqUUVbklTU3siyjJ4mQZSPzRKaACNXtMph6my1QAAAABJRU5ErkJggg==');
 }
 
-.sort
+.sort,
+.list-view .hold .list-item:hover .sort
 {
   float: left;
   width: 25px;
@@ -379,12 +371,16 @@ table
   opacity: 1.0 !important;
 }
 
-.list-view .list-item:hover .sort, .sort:active
+.list-view .list-item:hover .sort,
+.list-view .hold .list-item.drag:hover .sort,
+.sort:active
 {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAJElEQVR42mNgGAWjYBQMXvDYzOw/uXg0uEaDazS4RsEoGJEAAJd7Z7exMPnIAAAAAElFTkSuQmCC');
 }
 
-.to-note, .list-view .list-item.edit-item:hover .to-note
+.to-note, 
+.list-view .list-item.edit-item:hover .to-note,
+.list-view .hold .list-item:hover .to-note
 {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAG0lEQVR42mNgGJ6AY9m0/yA8ashgMmRU82AHAHUSMcOJ5OQvAAAAAElFTkSuQmCC);
 
