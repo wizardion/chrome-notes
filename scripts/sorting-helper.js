@@ -145,7 +145,7 @@ class SortingHelper {
   }
 
   /**
-   * AnimateUp.
+   * Internal method: AnimateUp.
    * 
    * @param {*} mouseY
    * Mouse possition on the whole page
@@ -169,7 +169,7 @@ class SortingHelper {
   }
 
   /**
-   * AnimateDown.
+   * Internal method: AnimateDown.
    * 
    * @param {*} mouseY
    * Mouse possition on the whole page
@@ -193,7 +193,7 @@ class SortingHelper {
   }
 
   /*
-   * AnimateDown.
+   * Internal method: Move holder.
    * 
    * @param {*} y
    * Top possition on the page
@@ -219,7 +219,7 @@ class SortingHelper {
   }
 
   /*
-   * AnimateDown.
+   * Internal method: Replace.
    * 
    * @param {*} first, second
    * Replaces first element with the second
@@ -248,7 +248,7 @@ class SortingHelper {
   }
 
   /*
-   * AnimateDown.
+   * Internal method: Round.
    * 
    * @param {*} first, second
    * Rounds the value to the maximum or minimum
