@@ -5,7 +5,22 @@ var main = {
 
 // window.addEventListener('load', function(){
 document.addEventListener('DOMContentLoaded', function(){
-  //#region test
+  main.database = openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
+  main.database.transaction(function(tx) {
+    var createSQL = 'CREATE TABLE IF NOT EXISTS Notes (title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, updated REAL, created REAL)'; 
+    tx.executeSql(createSQL, null, function(tx, data){}, function(tx, error){
+      console.log({
+        'error.code': error.code,
+        'error.message': error.message
+      });
+    });
+  });
+
+  if(localStorage.notes){
+    migrate();
+  }
+//#region TEST
+//#region test tracking
   //----------------------------------------------------------------------
   // console.log('load background');
 
@@ -15,22 +30,18 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // trackSave(traks);
 
-  
+  // return;
 
   // console.log(main.database);
   //----------------------------------------------------------------------
   //#endregion
 
-  main.database = openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
 
-  main.database.transaction(function(tx) {
-    tx.executeSql("CREATE TABLE IF NOT EXISTS Notes (Title TEXT, Description TEXT, DisplayOrder UNSIGNED INTEGER, Time REAL)");
-  });
+//#region old notes
+  // testOldNotes(main.database);
+//#endregion
 
-  if(localStorage.notes){
-    // migrate();
-  }
-//#region testing
+//#region test new items
 // ----------------------------------------------------------------------------------------------------
 // Testing
 // ----------------------------------------------------------------------------------------------------
@@ -58,18 +69,18 @@ document.addEventListener('DOMContentLoaded', function(){
   //       var number = (index + 1);
 
   //       const element = {
-  //         // note.Title, note.Description, note.Order, note.Time
+  //         // note.Title, note.Description, note.DisplayOrder, note.Updated
   //         title: 'This is a note number ' + dict[number] || number,
   //         description: 'This is a note decription number ' + dict[number] || number,
-  //         order: number,
-  //         time: new Date().getTime(),
+  //         displayOrder: number,
+  //         updated: new Date().getTime(),
   //       };
     
-  //       main.add(element, function(id){
-  //         console.log({
-  //           'id': id
-  //         });
-  //       });
+  //       // main.add(element, function(id){
+  //       //   console.log({
+  //       //     'id': id
+  //       //   });
+  //       // });
   //       // console.log(element);
     
   //     }
@@ -79,136 +90,68 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // main.init();
 //#endregion
+//#endregion
 });
 
 main.init = function(callback = function(){}){
+  var errorHandler = this.events['error'] || function(){};
   var notes = [];
 
   main.database.transaction(function(tx) {
-    tx.executeSql("SELECT rowid as Id, * FROM Notes ORDER BY DisplayOrder ASC LIMIT 18", [], function(tx, result) {
-    // tx.executeSql("SELECT rowid as Id, * FROM Notes ORDER BY DisplayOrder ASC", [], function(tx, result) {
+    tx.executeSql("SELECT rowid as id, * FROM Notes ORDER BY displayOrder ASC LIMIT 18", [], function(tx, result) {
       for(var i = 0; i < result.rows.length; i++) {
         notes.push({
-          id: result.rows.item(i)['Id'],
-          title: result.rows.item(i)['Title'],
-          description: result.rows.item(i)['Description'],
-          order: result.rows.item(i)['DisplayOrder'],
-          time: result.rows.item(i)['Time']
+          id: result.rows.item(i)['id'],
+          title: result.rows.item(i)['title'],
+          description: result.rows.item(i)['description'],
+          displayOrder: result.rows.item(i)['displayOrder'],
+          updated: result.rows.item(i)['updated'],
+          created: result.rows.item(i)['created']
         });
       }
 
       callback(notes);
-    }, null);
+    }, function(){
+      errorHandler('Oops! Looks like the data is broken.');
+    });
   });
 };
 
-main.update = function(item, key, callback = function(){}){
-  var sql = 'UPDATE Notes SET Title=?, Description=?, DisplayOrder=?, Time=? WHERE rowid=?';
-  var data = [item.title, item.description, item.order, item.time, item.id];
+main.update = function(item, key){
+  var sql = 'UPDATE Notes SET title=?, description=?, displayOrder=?, updated=? WHERE rowid=?';
+  var data = [item.title, item.description, item.displayOrder, item.updated, item.id];
+  var callback = this.events['error'] || function(){};
 
   if(key != null){
     sql = 'UPDATE Notes SET ' + key + '=? WHERE rowid=?';
     data = [item[key], item.id];
   }
 
-  // console.log({
-  //   'sql': sql.replace(/\?/gi, data)
-  // });
-
-  errorNotify(sql.replace(/\?/gi, data));
-
-  // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){
-  //   callback(data.rowsAffected);
-  // }); });
+  main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
+    callback('Oops, data not saved! Please try letter.');
+  }); });
 };
 
-//#region comment
-// main.update2 = function (id, key, value) {
-//   sql = 'UPDATE Notes SET ' + key + '=? WHERE rowid=?';
-//   data = [value, id];
-
-//   console.log({
-//     'update2.data': data
-//   });
-
-//   _database.transaction(function (tx) { tx.executeSql(sql, data); });
-// };
-//#endregion
-
 main.add = function(note, callback = function(){}, error = function(){}){
-  var sql = "INSERT INTO Notes(Title, Description, DisplayOrder, Time) VALUES(?,?,?,?)";
-  var data = [note.title, note.description, note.order, note.time];
+  var sql = "INSERT INTO Notes(title, description, displayOrder, updated, created) VALUES(?,?,?,?,?)";
+  var data = [note.title, note.description, note.displayOrder, note.updated, note.updated];
 
-  console.log({
-    'sql': sql.replace(/\?/gi, data)
-  });
-
-  // main.database.transaction(function (tx) { tx.executeSql(sql, data, function (tx, data) {
-  //     callback(data.insertId);
-  // }, function(){
-  //   callback(data);
-  // }); });
-
-
-  // var promise = {
-  //   onSucceed: null,
-  //   onError: null,
-  //   then: function (call, error) {
-  //     console.log({
-  //       'then': call
-  //     });
-
-  //     if (call) {
-  //       console.log('this.succeed');
-  //       this.onSucceed = call;
-  //     }
-
-  //     if (error) {
-  //       this.onError = error;
-  //     }
-
-  //     this.error = this.then;
-
-  //     return this;
-  //   }
-  // }
-
-  // // main.database.transaction(function (tx) { tx.executeSql(sql, data, function (tx, data) {
-  // //     callback(data.insertId);
-  // // }); });
-
-  // setTimeout(function () {
-  //   promise.onSucceed(123);
-  //   console.log('call succeed!!!');
-
-  //   setTimeout(function () {
-  //     promise.onError(123);
-  //   }, 300);
-
-  // }, 300);
+  main.database.transaction(function (tx) { tx.executeSql(sql, data, function (tx, data) {
+    callback(data.insertId);
+  }, function(tx, error){
+    callback('Oops! Note not added! Please try letter.');
+  }); });
 };
 
 main.remove = function (id, callback = function(){}){
   var sql = "DELETE FROM Notes WHERE rowId = ?";
   var data = [id];
 
-  console.log({
-    'sql': sql.replace(/\?/gi, data)
-  });
-
-  // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){
-  //   callback(data.rowsAffected);
-  // }); });
+  main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){
+    callback(data.rowsAffected);
+  }); });
 };
 
-main.addEvent = function(key, callback) {
+main.addEventListener = function(key, callback) {
   this.events[key] = callback;
-};
-
-var errorNotify = function(message){
-  var callback = main.events['error'];
-
-  if(callback) {
-    callback(message);
-  }
 };

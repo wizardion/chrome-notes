@@ -3,6 +3,7 @@ class BaseNotes {
     this.$valid = true;
     this.showError = null;
     this.notes = [];
+    this.message = null;
 
     this.controls = {
       add: controls.add,
@@ -21,7 +22,8 @@ class BaseNotes {
     this.background = (chrome && chrome.extension && chrome.extension.getBackgroundPage)? 
       chrome.extension.getBackgroundPage().main : main; /*this.background = main;*/
 
-    this.background.addEvent('error', this.notify.bind(this));
+    this.background.addEventListener('error', this.error.bind(this));
+    this.background.addEventListener('warning', this.warning.bind(this));
 
     this.controls.listItems = new ScrollBar(this.controls.listItems);
     this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
@@ -117,7 +119,7 @@ class BaseNotes {
 
         item.bulletinSpan.innerText = (i + 1);
         item.titleSpan.innerText = notes[i].title;
-        item.timeSpan.innerText = new Date(notes[i].time).toDateString();
+        item.timeSpan.innerText = new Date(notes[i].updated).toDateString();
 
         item.appendChild(item.toNoteButton);
         item.appendChild(item.sortButton);
@@ -223,6 +225,8 @@ class BaseNotes {
     this.controls.title.style.display = 'None';
     this.controls.delete.style.display = 'None';
     this.controls.back.style.display = 'None';
+    editMode.saveButton.style.visibility = 'hidden';
+    this.controls.delete.style.visibility = 'hidden';
 
     this.controls.description.innerHTML = '';
 
@@ -240,6 +244,20 @@ class BaseNotes {
       this.editMode.$valid = false;
       this.editMode.showError = Validator.bindRequiredAnimation(this.editMode.titleInput);
 
+      var showButton = function(e) {
+        var y = this.offsetTop;
+        var x = this.offsetLeft;
+        var height = this.offsetHeight;
+        var width = this.offsetWidth;
+
+        if(e.pageY < y || e.pageY > (y + height) || e.pageX < x || e.pageX > (x + width)) {
+          this.style.visibility = '';
+          document.onmousemove = null;
+        }
+      };
+
+      document.onmousemove = showButton.bind(this.editMode.saveButton);
+
       // ----------------------------------------------------------------------------------------------------
       // Creating event functions to remove: New Note view
       // ----------------------------------------------------------------------------------------------------
@@ -252,10 +270,9 @@ class BaseNotes {
 
         this.controls.title.style.display = '';
         this.controls.back.style.display = '';
+        this.controls.delete.style.display = '';
 
-        setTimeout(function () {
-          this.controls.delete.style.display = '';
-        }.bind(this), 700);
+        document.onmousemove = showButton.bind(this.controls.delete);
 
         this.editMode.save = null;
         this.editMode.$valid = true;
@@ -272,8 +289,8 @@ class BaseNotes {
           id: -1,
           title: this.editMode.titleInput.value,
           description: this.controls.description.innerHTML,
-          order: this.notes.length,
-          time: new Date().getTime()
+          displayOrder: this.notes.length,
+          updated: new Date().getTime()
         });
 
         this.controls.title.value = this.editMode.titleInput.value;
@@ -315,14 +332,7 @@ class BaseNotes {
   // EVENTS
   descriptionChanged() {
     this.notes[localStorage.rowId].description = this.controls.description.innerHTML;
-
-    // TODO Need to catch errors
-    this.background.update(this.notes[localStorage.rowId], 'description', function (tx, data) {
-      // console.log({
-      //   'tx': tx,
-      //   'data': data,
-      // });
-    });
+    this.background.update(this.notes[localStorage.rowId], 'description');
   }
 
   titleChanged() {
@@ -443,14 +453,14 @@ class BaseNotes {
   startSorting(e) {
     var element = e.path[1];
     var items = {};
-    var oldItems = {};
+    var oldValues = {};
 
     if(!this.sortingHelper.isBusy && e.button === 0) {
       this.sortingHelper.start(e.pageY, element, this.notes);
 
       for(var key in this.notes) {
         const item = this.notes[key];
-        oldItems[item.id] = item.order;
+        oldValues[item.id] = item.displayOrder;
       }
 
       this.sortingHelper.onUpdate = function(item){
@@ -458,22 +468,40 @@ class BaseNotes {
       }.bind(this);
 
       this.sortingHelper.onFinish = function(){
-        console.log('finish: ' + Object.keys(items).length);
-
         for(var key in items){
           const item = items[key];
 
-          if(oldItems[item.id] !== item.order) {
-            this.background.update(item, "DisplayOrder");
+          if(oldValues[item.id] !== item.displayOrder) {
+            this.background.update(item, "displayOrder");
           }
-        }
-
-        
+        }        
       }.bind(this);
     }
   }
 
-  notify(message) {
+  error(message) {
+    if(!this.message) {
+      this.message = document.createElement('div');
+
+      this.message.style.width = this.controls.listItems.offsetWidth - 20;
+      this.message.style.top = this.controls.listItems.offsetHeight - 5;
+
+      this.message.classList.add('alert');
+      this.message.innerHTML = message;
+      document.body.appendChild(this.message);
+    } else {
+      this.message.innerHTML += '<br>' + message;
+    }
+
+    clearInterval(this.message.interval);
+    
+    this.message.interval = setTimeout(function(){
+      document.body.removeChild(this.message);
+      this.message = null;
+    }.bind(this), 7000);
+  }
+
+  warning(message) {
     console.log({
       'notify.message': message
     })

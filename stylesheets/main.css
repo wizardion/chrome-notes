@@ -116,6 +116,19 @@ table
   right: 10px;
 }
 
+.alert {
+  position: absolute;
+  /* top: 5px; */
+  /* bottom: 5px; */
+  left: 5px;
+  right: 10px;
+  /* background: #e3363699; */
+  background: #f1bebef2;
+  border-radius: 5px;
+  padding: 5px;
+  color: #b50404;
+}
+
 .list-view .list-item:hover, 
 .hold .list-item.drag, .hold .list-item.drag:hover
 {

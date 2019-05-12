@@ -2,21 +2,22 @@
 // This is a temporary migration file needs to migrate to the next data structure.
 //----------------------------------------------------------------------------------------------------
 function migrate() {
+  console.log('Migration started...');
   var notes = fromString(localStorage.notes);
   
   for(var i = 0; i < notes.length; i++){
       var note = notes[i];
 
-      note.order = i;
-      note.time = new Date().getTime();
+      note.displayOrder = i;
+      note.updated = new Date().getTime();
       main.add(note);
+      console.log({title: note.title, description: note.description});
   }
 
-  // localStorage.removeItem("notes");
-  // localStorage.removeItem("selectedID");
-
-  localStorage.rowId = localStorage.Index;
-  localStorage.removeItem("Index");
+  localStorage.rowId = localStorage.selectedID;
+  localStorage.removeItem("notes");
+  localStorage.removeItem("selectedID");
+  console.log('Migration completed!');
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -44,7 +45,8 @@ function toString(a) {
 }
 
 //----------------------------------------------------------------------------------------------------
-function testFN() {
+//#region testing
+function testOldNotes(database) {
   var notes = [
     {
       title: 'Test note One',
@@ -58,6 +60,12 @@ function testFN() {
 
   localStorage.notes = toString(notes);
   localStorage.selectedID = 1;
+
+  database.transaction(function(tx) {
+    tx.executeSql('DROP TABLE Notes');
+  });
+  localStorage.removeItem("rowId");
+  console.log('old notes');
 }
 
 function trackSave(tracks) {
@@ -67,3 +75,4 @@ function trackSave(tracks) {
 function trackGet() {
   return localStorage.tracks? localStorage.tracks.split(';') : [];
 }
+//#endregion

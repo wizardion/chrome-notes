@@ -6,8 +6,7 @@ class SortingHelper {
 
     this.padding = 1;
     this.speed = 70;
-
-    this.customEvents = [];
+    this.customEvents = {};
   }
 
   /**
@@ -76,7 +75,7 @@ class SortingHelper {
 
     this.busy = true;
     this.events = {
-      mousemove: this._onmousemove.bind(this),
+      mousemove: this._mousemovehandler.bind(this),
       mouseup: this.end.bind(this),
     }
 
@@ -90,15 +89,11 @@ class SortingHelper {
    * Ends sorting
    */
   end() {
-    var callback = this.customEvents['finish'];
-
-    if(callback) {
-      callback();
-      callback = null;
-    }
+    var callback = this.customEvents['finish'] || Function.prototype;
 
     this.notes[this.element.index].self.bulletinSpan.innerText = (this.element.index + 1);
     clearInterval(this.interval);
+    callback();
 
     document.removeEventListener('mousemove', this.events.mousemove);
     document.removeEventListener('mouseup', this.events.mouseup);
@@ -117,6 +112,7 @@ class SortingHelper {
     this.events = null;
     this.notes = null;
     this.maxY = null;
+    callback = null;
 
     this.busy = false;
   }
@@ -127,7 +123,7 @@ class SortingHelper {
    * @param {*} e
    * Mouse event
    */
-  _onmousemove(e) {
+  _mousemovehandler(e) {
     var pageY = (e.pageY - this.listItems.offsetTop) + this.listItems.scrollTop;
     var top = this._round(pageY - this.clientY, this.maxY);
     var max = (this.listItems.scrollTop + this.listItems.offsetHeight - this.element.offsetHeight) - 0;
@@ -233,7 +229,7 @@ class SortingHelper {
     var max = (first < second)? second : first;
     var temp = this.notes[first];
     var id = this.notes[this.element.index].id;
-    var callback = this.customEvents['update'];
+    var callback = this.customEvents['update'] || Function.prototype;
 
     this.notes.splice(first, 1);
     this.notes.splice(second, 0, temp);
@@ -246,11 +242,8 @@ class SortingHelper {
       }
 
       item.self.index = i;
-      item.order = i;
-
-      if(callback) {
-        callback(item);
-      }
+      item.displayOrder = i;
+      callback(item);
     }
   }
 
