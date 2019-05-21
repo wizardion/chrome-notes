@@ -6,7 +6,7 @@
 html, body
 {
   width: 600px;
-  /*height: 275px;*/
+  /* height: 275px; */
   height: 270px;
   border:0;
   margin: 0px;
@@ -248,7 +248,7 @@ table
   /* width: 620px; */
   /* width: 100%; */
   /* height: 240px; */
-  height: 229px;
+  height: 228px;
   overflow-y: scroll;
   overflow-y: hidden;
   overflow-x: hidden;

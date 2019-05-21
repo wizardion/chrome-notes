@@ -6,6 +6,7 @@ class ScrollBar {
     this.freezeScrolling = false;
 
     this.thumb.style.visibility = 'hidden';
+    this.thumb.style.top = 0;
 
     this.thumb.classList.add('scroll');
     this.control.parentNode.appendChild(this.thumb);
