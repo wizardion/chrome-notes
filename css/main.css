@@ -1,7 +1,7 @@
-@font-face {
+/* @font-face {
   font-family: Calibri Light TTF;
   src: url("/stylesheets/fonts/calibri_light.ttf");
-}
+} */
 
 html, body
 {
@@ -375,13 +375,14 @@ table
 .sort[disabled]
 {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAJ0lEQVR42mNgGAWjYBQMXtDS0vK/ubmZLDwaXKPBNRpco2AUjEgAAPYRcfL0crxuAAAAAElFTkSuQmCC') !important;
-  opacity: 1.0 !important;
+  /* opacity: 1.0 !important; */
+  opacity: 0.5 !important;
 }
 
 .sort[disabled]:hover, .sort[disabled]:active, .list-view .list-item:hover .sort[disabled]
 {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAJElEQVR42mNgGAWjYBQMXsCxbNp/cvFocI0G12hwjYJRMCIBANVlZcjB6F8FAAAAAElFTkSuQmCC') !important;
-  opacity: 1.0 !important;
+  opacity: 0.5 !important;
 }
 
 .list-view .list-item:hover .sort,
@@ -543,6 +544,7 @@ table
   font: 15px sans-serif;
   color: #07a698;
   padding-bottom: 3px;
+  text-decoration: underline;
   /* margin-left: -40px; */
 }
 
