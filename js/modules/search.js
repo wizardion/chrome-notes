@@ -1,26 +1,29 @@
 class SearchModule extends Module {
-  constructor(listControls) {
+  constructor(input) {
     super();
 
     this.notes = null;
-    this.element = null;
-    this.listControls = listControls;
+    this.element = input;
+    this.value = '';
+    // this.listControls = listControls;
+
+    this.init();
   }
 
   init(value=null) {
-    this.element = document.createElement('input');
+    // this.element = document.createElement('input');
 
-    this.element.type = 'text';
-    this.element.className = 'search-notes';
-    this.element.placeholder = 'Enter keyword';
-    this.element.maxLength = 30;
+    // this.element.type = 'text';
+    // this.element.className = 'search-notes';
+    // this.element.placeholder = 'Enter keyword';
+    // this.element.maxLength = 30;
     this.element.value = value;
     
-    this.listControls.appendChild(this.element);
-    this.element.focus();
+    // this.listControls.appendChild(this.element);
+    // this.element.focus();
 
-    if(this.element.value) {
-      this.value = this.element.value.trim().toLowerCase();
+    if(value) {
+      this.value = value.trim().toLowerCase();
     }
 
     this.events = {
@@ -33,7 +36,7 @@ class SearchModule extends Module {
     document.addEventListener('keyup', this.events.onkeyup);
     document.addEventListener('blur', this.events.onblur);
 
-    this.$busy = true;
+    this.$busy = this.value.length > 0;
   }
 
   start() {
@@ -57,6 +60,10 @@ class SearchModule extends Module {
     for (var i = 0; i < this.notes.length; i++) {
       const item = this.notes[i];
 
+      if (this.$busy) {
+        this.lockItem(item.self);
+      }
+      
       item.self.style.display = this.matched(item)? '' : 'none';
     }
   }
@@ -71,7 +78,7 @@ class SearchModule extends Module {
     document.removeEventListener('keyup', this.events.onkeyup);
     document.removeEventListener('blur', this.events.blur);
   
-    this.listControls.removeChild(this.element);
+    // this.listControls.removeChild(this.element);
     localStorage.removeItem('searching');
   
     for (var i = 0; i < this.notes.length; i++) {
@@ -81,7 +88,8 @@ class SearchModule extends Module {
       item.self.sortButton.removeAttribute('disabled');
     }
 
-    this.element = null;
+    // this.element = null;
+    this.element.value = '';
     this.events = null;
     this.$busy = false;
   }
@@ -96,11 +104,14 @@ class SearchModule extends Module {
   _cancel() {
     for (var i = 0; i < this.notes.length; i++) {
       this.notes[i].self.style.display = '';
+      this.notes[i].self.sortButton.disabled = false;
+      this.notes[i].self.sortButton.removeAttribute('disabled');
     }
   }
 
   _inputhandler(){
     this.value = this.element.value.trim().toLowerCase();
+    this.$busy = this.value.length > 0;
 
     if (this.value.length > 0) {
       this.search();

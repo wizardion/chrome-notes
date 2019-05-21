@@ -40,6 +40,7 @@ window.addEventListener('load', function(){
     description: document.getElementById('description-note'),
 
     search: document.getElementById('search-button'),
+    searchInput: document.getElementById('search-notes'),
     listControls: document.getElementById('list-controls')
 
     // templates: {
