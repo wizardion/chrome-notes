@@ -24,8 +24,8 @@ class SimpleNotes extends BaseNotes {
 
     localStorage.removeItem('rowId');
 
-    if (this.searchMode) {
-      this.searchMode.input.focus();
+    if (this.searchModule.busy) {
+      this.searchModule.focus();
     }
   }
   

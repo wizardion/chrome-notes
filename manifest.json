@@ -5,18 +5,18 @@
 
   "description": "Work-Note - save your notes where you are.",
   "icons": {
-    "128": "/images/Notes_128.png"
+    "128": "/img/Notes_128.png"
   },
 
   "browser_action": {
-    "default_icon": "images/Notes_n2.png",
+    "default_icon": "img/Notes_n2.png",
     "default_title": "My-Notes",
     "default_popup": "popup.html"
   },
   "background": {
     "scripts": [
-      "scripts/background.js",
-      "scripts/migration.js"
+      "js/background.js",
+      "js/migration.js"
     ],
     "persistent": true
   },

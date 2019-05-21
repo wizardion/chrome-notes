@@ -49,6 +49,10 @@ class SearchModule extends Module {
     }
   }
 
+  focus() {
+    this.element.focus();
+  }
+
   search() {
     for (var i = 0; i < this.notes.length; i++) {
       const item = this.notes[i];

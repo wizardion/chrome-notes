@@ -129,7 +129,7 @@ table
   color: #b50404;
 }
 
-.list-view .list-item:hover, 
+.list-view .list-item:hover,
 .hold .list-item.drag, .hold .list-item.drag:hover
 {
   background:rgba(7, 166, 152, 0.1);
