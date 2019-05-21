@@ -32,9 +32,9 @@ class SearchModule extends Module {
       onblur: this._blurhandler.bind(this),
     };
 
-    document.addEventListener('input', this.events.oninput);
-    document.addEventListener('keyup', this.events.onkeyup);
-    document.addEventListener('blur', this.events.onblur);
+    this.element.addEventListener('input', this.events.oninput);
+    this.element.addEventListener('keyup', this.events.onkeyup);
+    this.element.addEventListener('blur', this.events.onblur);
 
     this.$busy = this.value.length > 0;
   }
@@ -133,8 +133,15 @@ class SearchModule extends Module {
   }
 
   _blurhandler(e) {
-    if (this.searchMode.input.value.trim().length === 0) {
-      this.complete();
-    }
+    // if (this.searchMode.input.value.trim().length === 0) {
+    //   this.complete();
+    // }
+
+    console.log('blur');
+
+    setTimeout(function(){
+      console.log('blur.focus');
+      this.element.focus();
+    }.bind(this));
   }
 }

@@ -382,7 +382,9 @@ class BaseNotes {
           if(oldValues[item.id] !== item.displayOrder) {
             // this.background.update(item, "displayOrder");
           }
-        }        
+        }
+        
+        this.searchModule.focus();
       }.bind(this);
     }
   }
