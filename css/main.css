@@ -545,6 +545,7 @@ table
   color: #07a698;
   padding-bottom: 3px;
   text-decoration: underline;
+  display: none;
   /* margin-left: -40px; */
 }
 

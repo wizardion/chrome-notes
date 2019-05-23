@@ -14,9 +14,7 @@ class BaseNotes {
       listItems: controls.listItems,
       title: controls.title,
       description: controls.description,
-      search: controls.search,
-      listControls: controls.listControls,
-      searchInput: controls.searchInput
+      listControls: controls.listControls
     };
 
     this.background = (chrome && chrome.extension && chrome.extension.getBackgroundPage)? 
@@ -26,7 +24,7 @@ class BaseNotes {
     this.controls.listItems = new ScrollBar(this.controls.listItems);
     this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
     this.sortingHelper = new SortingHelper(this.controls.listItems);
-    this.searchModule = new SearchModule(this.controls.searchInput);
+    this.searchModule = new SearchModule(controls.search, controls.searchInput);
     
     // init background
     this.background.addEventListener('error', this.error.bind(this));
@@ -35,8 +33,6 @@ class BaseNotes {
     
     // Add global events
     this.controls.add.addEventListener('click', this.newNote.bind(this));
-    // this.controls.search.addEventListener('click', this.startSearch.bind(this));
-    // this.controls.search.addEventListener('click', this.searchModule.start.bind(this.searchModule));
     this.controls.delete.addEventListener('click', function () {
       this.deleteNote(parseInt(localStorage.rowId));
     }.bind(this));
@@ -55,9 +51,7 @@ class BaseNotes {
   }
 
   init(notes) {
-    if (localStorage.searching) {
-      this.searchModule.init(localStorage.searching);
-    }
+    this.searchModule.init();
 
     this.build(notes);
     this.notes = notes;
@@ -347,14 +341,6 @@ class BaseNotes {
 
     // TODO Need to catch errors
     this.background.update(this.notes[localStorage.rowId], 'title');
-  }
-
-  startSearch() {
-    if (!this.searchModule.busy) {
-      this.searchModule.start();
-    } else {
-      this.searchModule.focus();
-    }
   }
 
   startSorting(e) {

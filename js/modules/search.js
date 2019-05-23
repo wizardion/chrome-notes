@@ -1,50 +1,63 @@
-class SearchModule extends Module {
-  constructor(input) {
+class SearchModule extends Controller {
+  constructor(button, element) {
     super();
 
-    this.notes = null;
-    this.element = input;
-    this.value = '';
-    // this.listControls = listControls;
+    this.$notes = null;
 
-    this.init();
+    this.button = button;
+    this.element = element;
+    this.settings = localStorage.searching? JSON.parse(localStorage.searching) : {
+      value: '',
+      visible: false
+    };
   }
 
-  init(value=null) {
-    // this.element = document.createElement('input');
+  /**
+   * Property: Notes.
+   * 
+   * @param {*} value
+   * The passed in value.
+   * 
+   * Sets notes to the controller.
+   */
+  set notes(value) {
+    this.$notes = value;
+  }
 
-    // this.element.type = 'text';
-    // this.element.className = 'search-notes';
-    // this.element.placeholder = 'Enter keyword';
-    // this.element.maxLength = 30;
-    this.element.value = value;
-    
-    // this.listControls.appendChild(this.element);
-    // this.element.focus();
+  /**
+   * Init the controller
+   * 
+   * Init controlls and events  
+   */
+  init() {
+    if (this.settings.visible) {
+      this.element.style.display = 'inherit';
+      this.element.focus();
+    }
 
-    if(value) {
-      this.value = value.trim().toLowerCase();
+    if (this.settings.value) {
+      this.element.value = this.settings.value;
+      this.$busy = this.settings.visible && this.settings.value.length > 0;
     }
 
     this.events = {
-      oninput: this._inputhandler.bind(this),
-      onkeyup: this._keyuphandler.bind(this),
-      onblur: this._blurhandler.bind(this),
+      oninput: this._inputeventhandler.bind(this),
+      keydown: this._keydowneventhandler.bind(this),
+      onblur: this._blureventhandler.bind(this),
     };
 
     this.element.addEventListener('input', this.events.oninput);
-    this.element.addEventListener('keyup', this.events.onkeyup);
+    this.element.addEventListener('keydown', this.events.keydown);
     this.element.addEventListener('blur', this.events.onblur);
-
-    this.$busy = this.value.length > 0;
+    this.button.addEventListener('click', this._toggleVisibility.bind(this));
   }
 
   start() {
     if (!this.$busy) {
       this.init();
 
-      for (var i = 0; i < this.notes.length; i++) {
-        const item = this.notes[i].self;
+      for (var i = 0; i < this.$notes.length; i++) {
+        const item = this.$notes[i].self;
         this.lockItem(item);
       }
     } else {
@@ -56,9 +69,14 @@ class SearchModule extends Module {
     this.element.focus();
   }
 
+  /**
+   * Search notes withing the key
+   * 
+   * Do search notes living visible only found notes.
+   */
   search() {
-    for (var i = 0; i < this.notes.length; i++) {
-      const item = this.notes[i];
+    for (var i = 0; i < this.$notes.length; i++) {
+      const item = this.$notes[i];
 
       if (this.$busy) {
         this.lockItem(item.self);
@@ -68,80 +86,108 @@ class SearchModule extends Module {
     }
   }
 
+  /**
+   * Lock the Item
+   * 
+   * It disables the sorting functionality to prevent unnecessary bad dependencies
+   */
   lockItem(item) {
-    item.sortButton.disabled = true;
+    // item.sortButton.disabled = true;
     item.sortButton.setAttribute('disabled', 'disabled');
   }
 
   complete() {
-    document.removeEventListener('input', this.events.oninput);
-    document.removeEventListener('keyup', this.events.onkeyup);
-    document.removeEventListener('blur', this.events.blur);
-  
-    // this.listControls.removeChild(this.element);
     localStorage.removeItem('searching');
-  
-    for (var i = 0; i < this.notes.length; i++) {
-      const item = this.notes[i];
 
-      item.self.sortButton.disabled = false;
-      item.self.sortButton.removeAttribute('disabled');
-    }
-
-    // this.element = null;
     this.element.value = '';
     this.events = null;
     this.$busy = false;
   }
 
+  /**
+   * Is Matched
+   * 
+   * Checks if the item is matched searching functionality
+   */
   matched(item) {
-    var t_index = item.title.toLowerCase().indexOf(this.value);
-    var d_index = item.description.toLowerCase().indexOf(this.value);
+    var t_index = item.title.toLowerCase().indexOf(this.settings.value);
+    var d_index = item.description.toLowerCase().indexOf(this.settings.value);
   
     return (t_index !== -1 || d_index !== -1);
   }
 
-  _cancel() {
-    for (var i = 0; i < this.notes.length; i++) {
-      this.notes[i].self.style.display = '';
-      this.notes[i].self.sortButton.disabled = false;
-      this.notes[i].self.sortButton.removeAttribute('disabled');
+  //#region Privat Methods
+  _toggleVisibility() {
+    if (this.settings.visible) {
+      this._hide();
+      this._cancel();
+    } else {
+      this._show();
     }
+
+    localStorage.searching = JSON.stringify(this.settings);
   }
 
-  _inputhandler(){
-    this.value = this.element.value.trim().toLowerCase();
-    this.$busy = this.value.length > 0;
+  _show(){
+    this.$busy = this.settings.value.length > 0;
+    this.settings.visible = true;
+    this.element.style.display = 'inherit';
+    this.element.focus();
+    this.search();
+  }
 
-    if (this.value.length > 0) {
+  _hide() {
+    this.settings.visible = false;
+    this.element.style.display = 'none';
+  }
+
+  _cancel() {
+    this.$busy = false;
+    this._hide();
+
+    for (var i = 0; i < this.$notes.length; i++) {
+      const item = this.$notes[i];
+
+      item.self.style.display = '';
+      item.self.sortButton.disabled = false;
+      item.self.sortButton.removeAttribute('disabled');
+    }
+  }
+  //#endregion
+
+  //#region Event Handlers
+  _inputeventhandler(){
+    this.settings.value = this.element.value.trim().toLowerCase();
+    this.$busy = this.settings.value.length > 0;
+
+    if (this.settings.value.length > 0) {
       this.search();
     } else {
       this._cancel();
     }
-  
-    localStorage.searching = this.element.value;
+
+    localStorage.searching = JSON.stringify(this.settings);
   }
 
-  _keyuphandler(e){
-    e.preventDefault();
+  _keydowneventhandler(e){
+    // Escape pressed
+    if (e.keyCode == 27) {  
+      e.stopImmediatePropagation();
+      e.preventDefault();
 
-    if (e.keyCode == 27) {
       this._cancel();
       this.complete();
       return false;
     }
   }
 
-  _blurhandler(e) {
-    // if (this.searchMode.input.value.trim().length === 0) {
-    //   this.complete();
-    // }
+  _blureventhandler(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
 
-    console.log('blur');
-
-    setTimeout(function(){
-      console.log('blur.focus');
-      this.element.focus();
-    }.bind(this));
+    if (this.settings.visible) {
+      setTimeout(this.element.focus.bind(this.element), 10);
+    }
   }
+  //#endregion
 }

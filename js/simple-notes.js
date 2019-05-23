@@ -23,11 +23,11 @@ class SimpleNotes extends BaseNotes {
     this.controls.listView.style.display = 'inherit';
 
     localStorage.removeItem('rowId');
+    this.searchModule.focus();
 
     // if (this.searchModule.busy) {
     //   this.searchModule.focus();
     // }
-    this.searchModule.focus();
   }
   
   deleteNote(id) {

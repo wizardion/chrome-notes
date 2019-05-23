@@ -1,7 +1,14 @@
-class Module {
+class Controller {
   constructor() {
     this.$busy = false;
   }
+
+  /**
+   * Init the controller
+   * 
+   * Init controlls and events 
+   */
+  init() {}
 
   /**
    * Is Busy.

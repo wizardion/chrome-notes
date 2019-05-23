@@ -1,5 +1,5 @@
-window.addEventListener('load', function(){
-// document.addEventListener('DOMContentLoaded', function(){
+// window.addEventListener('load', function(){
+document.addEventListener('DOMContentLoaded', function(){
   // var editor = new Editor('.fast-note[0]');
   // var details = new HtmlElement('.details-view[0]');
 
