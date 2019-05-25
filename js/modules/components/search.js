@@ -136,10 +136,8 @@ class SearchModule extends Module {
     localStorage.removeItem('searching');
 
     this.element.value = '';
-    this.events = null;
+    this.settings.value = '';
     this.$busy = false;
-
-    this._hide();
 
     for (var i = 0; i < this.$notes.length; i++) {
       const item = this.$notes[i];
@@ -202,6 +200,7 @@ class SearchModule extends Module {
       e.preventDefault();
 
       this._cancel();
+      this._hide();
       return false;
     }
   }
