@@ -1,17 +1,20 @@
 class SimpleNotes extends BaseNotes {
   constructor(controls=new Object) {
     super(controls);
-
+    
     this.controls.back = controls.back;
     this.controls.templates = controls.templates;
-
+  
     this.controls.back.addEventListener('click', function () {
       if (!this.$valid) {
         return this.showError();
       }
-
       this.backToList();
     }.bind(this));
+  }
+
+  init(notes) {
+    super.init(notes);
 
     if (!localStorage.rowId) {
       this.backToList();
@@ -23,10 +26,7 @@ class SimpleNotes extends BaseNotes {
     this.controls.listView.style.display = 'inherit';
 
     localStorage.removeItem('rowId');
-
-    if (this.searchMode) {
-      this.searchMode.input.focus();
-    }
+    this.searchModule.focus();
   }
   
   deleteNote(id) {

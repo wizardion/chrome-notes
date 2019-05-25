@@ -3,6 +3,7 @@ class BaseNotes {
     this.$valid = true;
     this.showError = null;
     this.notes = [];
+    this.message = null;
 
     this.controls = {
       add: controls.add,
@@ -13,36 +14,35 @@ class BaseNotes {
       listItems: controls.listItems,
       title: controls.title,
       description: controls.description,
-      search: controls.search,
-
       listControls: controls.listControls
     };
 
     this.background = (chrome && chrome.extension && chrome.extension.getBackgroundPage)? 
       chrome.extension.getBackgroundPage().main : main; /*this.background = main;*/
 
+    // init modules
     this.controls.listItems = new ScrollBar(this.controls.listItems);
-    this.controls.description = new ScrollBar(this.controls.description, {background: 'gray'});
+    this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
+    this.sortHelper = new SortHelper(this.controls.listItems);
+    this.searchModule = new SearchModule(controls.search, controls.searchInput);
 
-    this.init();
+    // init background
+    this.background.addEventListener('error', this.error.bind(this));
+    this.background.addEventListener('warning', this.warning.bind(this));
+    this.background.init(this.init.bind(this));
     
     // Add global events
     this.controls.add.addEventListener('click', this.newNote.bind(this));
-    this.controls.search.addEventListener('click', this.startSearch.bind(this));
-
     this.controls.delete.addEventListener('click', function () {
       this.deleteNote(parseInt(localStorage.rowId));
     }.bind(this));
-
     this.controls.title.addEventListener('change', this.titleChanged.bind(this));
-
     this.controls.description.addEventListener('focus', function (e) {
       if (!this.$valid) {
         e.preventDefault();
         return this.showError();
       }
     }.bind(this));
-
     this.controls.description.addEventListener('blur', function(){
       if (!this.editMode && this.controls.description.innerHTML != this.notes[localStorage.rowId].description) {
         this.descriptionChanged();
@@ -50,21 +50,16 @@ class BaseNotes {
     }.bind(this));
   }
 
-  init() {
-    if (localStorage.searching) {
-      this.startSearch();
-      this.searchMode.value = localStorage.searching;
-      this.searchMode.input.value = this.searchMode.value;
+  init(notes) {
+    this.searchModule.init();
+
+    this.build(notes);
+    this.notes = notes;
+    this.searchModule.notes = notes;
+
+    if (localStorage.rowId) {
+      this.selectNote(parseInt(localStorage.rowId));
     }
-
-    this.background.init(function(notes) {
-      this.build(notes);
-      this.notes = notes;
-
-      if (localStorage.rowId) {
-        this.selectNote(localStorage.rowId);
-      }
-    }.bind(this));
   }
 
   build(notes) {
@@ -89,9 +84,9 @@ class BaseNotes {
   }
 
   // TODO Need to optimize
-  render(notes, limit=0){
+  render(notes, limit=0) {
     var fragment = document.createDocumentFragment();
-    var length = limit && notes.length > 10? limit : notes.length;
+    var length = limit && notes.length > limit? limit : notes.length;
 
     for(var i = 0; i < length; i++) {
       if(!notes[i].self){
@@ -114,7 +109,7 @@ class BaseNotes {
 
         item.bulletinSpan.innerText = (i + 1);
         item.titleSpan.innerText = notes[i].title;
-        item.timeSpan.innerText = new Date(notes[i].time).toDateString();
+        item.timeSpan.innerText = new Date(notes[i].updated).toDateString();
 
         item.appendChild(item.toNoteButton);
         item.appendChild(item.sortButton);
@@ -126,9 +121,9 @@ class BaseNotes {
         item.index = i;
         notes[i].self = item;
 
-        if (this.searchMode) {
-          this.searchMode.lockItem(item);
-          item.style.display = this.searchMode.isMatched(notes[i]) ? '' : 'none';
+        if (this.searchModule.busy) {
+          this.searchModule.lockItem(item);
+          item.style.display = this.searchModule.matched(notes[i]) ? '' : 'none';
         }
 
         fragment.appendChild(item);
@@ -139,7 +134,7 @@ class BaseNotes {
   }
 
   selectNote(index) {
-    if (!this.sortingMode) {
+    if (!this.sortHelper.busy) {
       this.controls.description.index = index;
       this.controls.listView.style.display = 'None';
       this.controls.detailsView.style.display = 'inherit';
@@ -147,11 +142,25 @@ class BaseNotes {
       this.controls.title.value = this.notes[index].title;
       this.controls.description.innerHTML = this.notes[index].description;
       this.controls.description.focus();
-  
-      // Selection
-      // const editableDiv = this.controls.description;
-      // const selection = window.getSelection();
-      // selection.collapse(editableDiv.childNodes[editableDiv.childNodes.length - 1], 5);
+
+      //#region SET Selection
+      // SET Selection https://developer.mozilla.org/en-US/docs/Web/API/Range
+      // var contaier = this.controls.description;
+      // var range = document.createRange();
+      // range.selectNode(contaier);
+      // range.setStart(contaier.firstChild, 2);
+      // range.setEnd(contaier.firstChild, 7);
+      // window.getSelection().removeAllRanges();
+      // window.getSelection().addRange(range);
+
+      // document.execCommand('selectAll',false,null)
+
+      if (this.controls.description.innerHTML.length > 10) {
+        var selection = window.getSelection();
+        selection.collapse(this.controls.description.firstChild, 2);
+        selection.extend(this.controls.description.firstChild, 8);
+      }
+      //#endregion
   
       this.controls.description.scrollTop = 0;
       localStorage.rowId = index;
@@ -219,6 +228,8 @@ class BaseNotes {
     this.controls.title.style.display = 'None';
     this.controls.delete.style.display = 'None';
     this.controls.back.style.display = 'None';
+    editMode.saveButton.style.visibility = 'hidden';
+    this.controls.delete.style.visibility = 'hidden';
 
     this.controls.description.innerHTML = '';
 
@@ -236,6 +247,20 @@ class BaseNotes {
       this.editMode.$valid = false;
       this.editMode.showError = Validator.bindRequiredAnimation(this.editMode.titleInput);
 
+      var showButton = function(e) {
+        var y = this.offsetTop;
+        var x = this.offsetLeft;
+        var height = this.offsetHeight;
+        var width = this.offsetWidth;
+
+        if(e.pageY < y || e.pageY > (y + height) || e.pageX < x || e.pageX > (x + width)) {
+          this.style.visibility = '';
+          document.onmousemove = null;
+        }
+      };
+
+      document.onmousemove = showButton.bind(this.editMode.saveButton);
+
       // ----------------------------------------------------------------------------------------------------
       // Creating event functions to remove: New Note view
       // ----------------------------------------------------------------------------------------------------
@@ -248,10 +273,9 @@ class BaseNotes {
 
         this.controls.title.style.display = '';
         this.controls.back.style.display = '';
+        this.controls.delete.style.display = '';
 
-        setTimeout(function () {
-          this.controls.delete.style.display = '';
-        }.bind(this), 700);
+        document.onmousemove = showButton.bind(this.controls.delete);
 
         this.editMode.save = null;
         this.editMode.$valid = true;
@@ -268,8 +292,8 @@ class BaseNotes {
           id: -1,
           title: this.editMode.titleInput.value,
           description: this.controls.description.innerHTML,
-          order: this.notes.length,
-          time: new Date().getTime()
+          displayOrder: this.notes.length,
+          updated: new Date().getTime()
         });
 
         this.controls.title.value = this.editMode.titleInput.value;
@@ -311,14 +335,7 @@ class BaseNotes {
   // EVENTS
   descriptionChanged() {
     this.notes[localStorage.rowId].description = this.controls.description.innerHTML;
-
-    // TODO Need to catch errors
-    this.background.update(this.notes[localStorage.rowId], 'description', function (tx, data) {
-      // console.log({
-      //   'tx': tx,
-      //   'data': data,
-      // });
-    });
+    this.background.update(this.notes[localStorage.rowId], 'description');
   }
 
   titleChanged() {
@@ -339,120 +356,64 @@ class BaseNotes {
     this.background.update(this.notes[localStorage.rowId], 'title');
   }
 
-  startSearch() {
-    if (!this.searchMode) {
-      this.searchMode = {
-        input: document.createElement('input')
-      };
+  startSorting(e) {
+    var element = e.path[1];
+    var items = {};
+    var oldValues = {};
 
-      this.searchMode.input.type = 'text';
-      this.searchMode.input.className = 'search-notes';
-      this.searchMode.input.placeholder = 'Enter keyword';
-      this.searchMode.input.maxLength = 30;
+    if(!this.searchModule.busy && !this.sortHelper.busy && e.button === 0) {
+      this.sortHelper.start(e.pageY, element, this.notes);
 
-      this.searchMode.lockItem = function (item) {
-        item.sortButton.disabled = true;
-        item.sortButton.setAttribute('disabled', 'disabled');
-      };
-
-      this.searchMode.isMatched = function (item) {
-        var searchKey = this.searchMode.value.toLowerCase();
-        var t_index = item.title.toLowerCase().indexOf(searchKey);
-        var d_index = item.description.toLowerCase().indexOf(searchKey);
-
-        return (t_index !== -1 || d_index !== -1);
-      }.bind(this);
-
-      this.searchMode.search = function () {
-        for (var i = 0; i < this.notes.length; i++) {
-          this.notes[i].self.style.display = this.searchMode.isMatched(this.notes[i]) ? '' : 'none';
-        }
-      }.bind(this);
-
-      this.searchMode.cancelSearch = function () {
-        for (var i = 0; i < this.notes.length; i++) {
-          this.notes[i].self.style.display = '';
-        }
-      }.bind(this);
-
-      this.searchMode.remove = function () {
-        this.searchMode.input.oninput = null;
-        this.searchMode.input.onkeyup = null;
-        this.searchMode.input.onblur = null;
-        this.searchMode.cancelSearch = null;
-        this.searchMode.search = null;
-        this.searchMode.remove = null;
-
-        this.controls.listControls.removeChild(this.searchMode.input);
-        localStorage.removeItem('searching');
-        
-        this.searchMode.input = null;
-        this.searchMode = null;
-
-        for (var i = 0; i < this.notes.length; i++) {
-          const item = this.notes[i];
-
-          item.self.sortButton.disabled = false;
-          item.self.sortButton.removeAttribute('disabled');
-        }
-      }.bind(this);
-
-      this.searchMode.input.oninput = function () {
-        this.searchMode.value = this.searchMode.input.value.trim();
-
-        if (this.searchMode.value.length > 0) {
-          this.searchMode.search();
-        } else {
-          this.searchMode.cancelSearch();
-        }
-
-        localStorage.searching = this.searchMode.value;
-      }.bind(this);
-
-      this.searchMode.input.onkeyup = function (e) {
-        e.preventDefault();
-
-        if (e.keyCode == 27) {
-          this.searchMode.cancelSearch();
-          this.searchMode.remove();
-          return false;
-        }
-      }.bind(this);
-
-      this.searchMode.input.onblur = function (e) {
-        if (this.searchMode.input.value.trim().length === 0) {
-          this.searchMode.remove();
-        }
-      }.bind(this);
-
-      for (var i = 0; i < this.notes.length; i++) {
-        this.searchMode.lockItem(this.notes[i].self);
+      for(var key in this.notes) {
+        const item = this.notes[key];
+        oldValues[item.id] = item.displayOrder;
       }
 
-      this.controls.listControls.appendChild(this.searchMode.input);
-      this.searchMode.input.focus();
-    } else {
-      this.searchMode.input.focus();
+      this.sortHelper.onUpdate = function(item){
+        items[item.id] = item;
+      }.bind(this);
+
+      this.sortHelper.onFinish = function(){
+        for(var key in items){
+          const item = items[key];
+
+          if(oldValues[item.id] !== item.displayOrder) {
+            this.background.update(item, "displayOrder");
+          }
+        }
+        
+        this.searchModule.focus();
+      }.bind(this);
     }
   }
 
-  startSorting(e) {
-    var element = e.path[1];
+  error(message) {
+    if(!this.message) {
+      this.message = document.createElement('div');
 
-    if(!this.sortingMode && e.button === 0) {
-      this.sortingMode = {
-        startY: e.pageY + this.controls.listItems.scrollTop,
-        offsetY: e.pageY - element.offsetTop + this.controls.listItems.scrollTop,
-        maxY: this.controls.listItems.scrollHeight - element.offsetHeight
-      };
-      
-      
-      console.log({
-        'sortingMode': this.sortingMode
-      });
+      this.message.style.width = this.controls.listItems.offsetWidth - 20;
+      this.message.style.top = this.controls.listItems.offsetHeight - 5;
+
+      this.message.classList.add('alert');
+      this.message.innerHTML = message;
+      document.body.appendChild(this.message);
+    } else {
+      this.message.innerHTML += '<br>' + message;
     }
 
+    clearInterval(this.message.interval);
     
+    this.message.interval = setTimeout(function(){
+      document.body.removeChild(this.message);
+      this.message = null;
+    }.bind(this), 7000);
+  }
+
+  warning(message) {
+    console.log({
+      'notify.message': message
+    })
+
   }
 }
 
