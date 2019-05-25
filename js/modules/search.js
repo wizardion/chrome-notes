@@ -52,10 +52,13 @@ class SearchModule extends Controller {
     this.button.addEventListener('click', this._toggleVisibility.bind(this));
   }
 
+  /**
+   * Start
+   * 
+   * Starts searching notes.
+   */
   start() {
     if (!this.$busy) {
-      this.init();
-
       for (var i = 0; i < this.$notes.length; i++) {
         const item = this.$notes[i].self;
         this.lockItem(item);
@@ -65,6 +68,11 @@ class SearchModule extends Controller {
     }
   }
 
+  /**
+   * Focus
+   * 
+   * Focuses input searchable element
+   */
   focus() {
     this.element.focus();
   }
@@ -72,7 +80,7 @@ class SearchModule extends Controller {
   /**
    * Search notes withing the key
    * 
-   * Do search notes living visible only found notes.
+   * Does search notes living visible only found notes.
    */
   search() {
     for (var i = 0; i < this.$notes.length; i++) {
@@ -96,14 +104,6 @@ class SearchModule extends Controller {
     item.sortButton.setAttribute('disabled', 'disabled');
   }
 
-  complete() {
-    localStorage.removeItem('searching');
-
-    this.element.value = '';
-    this.events = null;
-    this.$busy = false;
-  }
-
   /**
    * Is Matched
    * 
@@ -117,32 +117,28 @@ class SearchModule extends Controller {
   }
 
   //#region Privat Methods
-  _toggleVisibility() {
-    if (this.settings.visible) {
-      this._hide();
-      this._cancel();
-    } else {
-      this._show();
-    }
-
-    localStorage.searching = JSON.stringify(this.settings);
-  }
-
-  _show(){
-    this.$busy = this.settings.value.length > 0;
-    this.settings.visible = true;
-    this.element.style.display = 'inherit';
-    this.element.focus();
-    this.search();
-  }
-
+  /**
+   * Hide Input
+   * 
+   * Hides input searchable element.
+   */
   _hide() {
     this.settings.visible = false;
     this.element.style.display = 'none';
   }
 
+  /**
+   * Cancel Search
+   * 
+   * Cancels search and hides input searchable element.
+   */
   _cancel() {
+    localStorage.removeItem('searching');
+
+    this.element.value = '';
+    this.events = null;
     this.$busy = false;
+
     this._hide();
 
     for (var i = 0; i < this.$notes.length; i++) {
@@ -153,9 +149,34 @@ class SearchModule extends Controller {
       item.self.sortButton.removeAttribute('disabled');
     }
   }
+
+  /**
+   * Toggle Visibility
+   * 
+   * Does toggle the visibility of input searchable element.
+   */
+  _toggleVisibility() {
+    if (this.settings.visible) {
+      this._hide();
+      this._cancel();
+    } else {
+      this.$busy = this.settings.value.length > 0;
+      this.settings.visible = true;
+      this.element.style.display = 'inherit';
+      this.element.focus();
+      this.search();
+    }
+
+    localStorage.searching = JSON.stringify(this.settings);
+  }
   //#endregion
 
   //#region Event Handlers
+  /**
+   * Handler: On Input
+   * 
+   * Handel's event on input for searchable element.
+   */
   _inputeventhandler(){
     this.settings.value = this.element.value.trim().toLowerCase();
     this.$busy = this.settings.value.length > 0;
@@ -169,18 +190,28 @@ class SearchModule extends Controller {
     localStorage.searching = JSON.stringify(this.settings);
   }
 
+  /**
+   * Handler: On Key Down
+   * 
+   * Handel's event on key down for searchable element.
+   */
   _keydowneventhandler(e){
     // Escape pressed
-    if (e.keyCode == 27) {  
+    if (e.keyCode == 27) {
       e.stopImmediatePropagation();
       e.preventDefault();
 
       this._cancel();
-      this.complete();
       return false;
     }
   }
 
+  
+  /**
+   * Handler: On Blur
+   * 
+   * Handel's event on blur for searchable element.
+   */
   _blureventhandler(e) {
     e.stopImmediatePropagation();
     e.preventDefault();

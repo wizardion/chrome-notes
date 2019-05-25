@@ -25,7 +25,7 @@ class BaseNotes {
     this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
     this.sortingHelper = new SortingHelper(this.controls.listItems);
     this.searchModule = new SearchModule(controls.search, controls.searchInput);
-    
+
     // init background
     this.background.addEventListener('error', this.error.bind(this));
     this.background.addEventListener('warning', this.warning.bind(this));
@@ -58,7 +58,7 @@ class BaseNotes {
     this.searchModule.notes = notes;
 
     if (localStorage.rowId) {
-      this.selectNote(localStorage.rowId);
+      this.selectNote(parseInt(localStorage.rowId));
     }
   }
 
@@ -143,11 +143,27 @@ class BaseNotes {
       this.controls.title.value = this.notes[index].title;
       this.controls.description.innerHTML = this.notes[index].description;
       this.controls.description.focus();
-  
-      // Selection
-      // const editableDiv = this.controls.description;
-      // const selection = window.getSelection();
-      // selection.collapse(editableDiv.childNodes[editableDiv.childNodes.length - 1], 5);
+
+      //#region SET Selection
+      // SET Selection https://developer.mozilla.org/en-US/docs/Web/API/Range
+      // var contaier = this.controls.description;
+      // var range = document.createRange();
+      // range.selectNode(contaier);
+      // range.setStart(contaier.firstChild, 2);
+      // range.setEnd(contaier.firstChild, 7);
+      // window.getSelection().removeAllRanges();
+      // window.getSelection().addRange(range);
+
+      // document.execCommand('selectAll',false,null)
+
+      if (this.controls.description.innerHTML.length > 10) {
+        var selection = window.getSelection();
+        selection.collapse(this.controls.description.firstChild, 2);
+        selection.extend(this.controls.description.firstChild, 8);
+      }
+      
+
+      //#endregion
   
       this.controls.description.scrollTop = 0;
       localStorage.rowId = index;
