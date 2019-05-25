@@ -125,6 +125,9 @@ main.update = function(item, key){
   if(key != null){
     sql = 'UPDATE Notes SET ' + key + '=? WHERE rowid=?';
     data = [item[key], item.id];
+
+    pritSQL(sql, data);
+    return;
   }
 
   main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
@@ -155,3 +158,12 @@ main.remove = function (id, callback = function(){}){
 main.addEventListener = function(key, callback) {
   this.events[key] = callback;
 };
+
+function pritSQL(sql, data) {
+  var sqlText = sql;
+  for(var i=0; i < data.length; i++) {
+    sqlText = sqlText.replace(/\?/, data[i]);
+  }
+  console.log();
+  console.log(`%c ${sqlText}`, 'background: white; color: red;');
+}

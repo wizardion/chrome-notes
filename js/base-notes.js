@@ -23,7 +23,7 @@ class BaseNotes {
     // init modules
     this.controls.listItems = new ScrollBar(this.controls.listItems);
     this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
-    this.sortingHelper = new SortingHelper(this.controls.listItems);
+    this.sortHelper = new SortHelper(this.controls.listItems);
     this.searchModule = new SearchModule(controls.search, controls.searchInput);
 
     // init background
@@ -134,8 +134,7 @@ class BaseNotes {
   }
 
   selectNote(index) {
-    // if (!this.sortingMode) {
-    if (!this.sortingHelper.isBusy) {
+    if (!this.sortHelper.busy) {
       this.controls.description.index = index;
       this.controls.listView.style.display = 'None';
       this.controls.detailsView.style.display = 'inherit';
@@ -161,8 +160,6 @@ class BaseNotes {
         selection.collapse(this.controls.description.firstChild, 2);
         selection.extend(this.controls.description.firstChild, 8);
       }
-      
-
       //#endregion
   
       this.controls.description.scrollTop = 0;
@@ -363,26 +360,25 @@ class BaseNotes {
     var element = e.path[1];
     var items = {};
     var oldValues = {};
-    var notes = this.notes;
 
-    if(!this.searchModule.busy && !this.sortingHelper.isBusy && e.button === 0) {
-      this.sortingHelper.start(e.pageY, element, notes);
+    if(!this.searchModule.busy && !this.sortHelper.busy && e.button === 0) {
+      this.sortHelper.start(e.pageY, element, this.notes);
 
-      for(var key in notes) {
-        const item = notes[key];
+      for(var key in this.notes) {
+        const item = this.notes[key];
         oldValues[item.id] = item.displayOrder;
       }
 
-      this.sortingHelper.onUpdate = function(item){
+      this.sortHelper.onUpdate = function(item){
         items[item.id] = item;
       }.bind(this);
 
-      this.sortingHelper.onFinish = function(){
+      this.sortHelper.onFinish = function(){
         for(var key in items){
           const item = items[key];
 
           if(oldValues[item.id] !== item.displayOrder) {
-            // this.background.update(item, "displayOrder");
+            this.background.update(item, "displayOrder");
           }
         }
         

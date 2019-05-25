@@ -1,4 +1,4 @@
-class SearchModule extends Controller {
+class SearchModule extends Module {
   constructor(button, element) {
     super();
 

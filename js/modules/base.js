@@ -1,4 +1,4 @@
-class Controller {
+class Module {
   constructor() {
     this.$busy = false;
   }

@@ -1,55 +1,16 @@
-class SortingHelper {
+class SortHelper extends Module {
   constructor(listItems=new Object) {
+    super();
+
     this.element = null;
     this.listItems = listItems;
-    this.busy = false;
 
     this.padding = 1;
     this.speed = 70;
     this.customEvents = {};
   }
 
-  /**
-   * Is Busy.
-   *
-   * @return {boolean}
-   * Returns the status of sorting process.
-   */
-  get isBusy() {
-    return this.busy;
-  }
-
-  /**
-   * @param {*} value
-   * The passed in value.
-   * 
-   * @throws {Error}
-   * Inconditionally
-   */
-  set isBusy(value) {
-    throw new Error(`The readOnly property cannot be written. ${value} was passed.`);
-  }
-
-  /**
-   * @param {*} callback
-   * The passed in value.
-   * 
-   * Adds event on update
-   */
-  set onUpdate(callback) {
-    this.customEvents['update'] = callback;
-  }
-
-  /**
-   * @param {*} callback
-   * The passed in value.
-   * 
-   * Adds event on finish sorting
-   */
-  set onFinish(callback) {
-    this.customEvents['finish'] = callback;
-  }
-
+  //#region Public Methods
   /**
    * Start.
    * 
@@ -73,7 +34,7 @@ class SortingHelper {
     this.element.classList.add('drag');
     document.body.classList.add('hold');
 
-    this.busy = true;
+    this.$busy = true;
     this.events = {
       mousemove: this._mousemovehandler.bind(this),
       mouseup: this.end.bind(this),
@@ -114,36 +75,33 @@ class SortingHelper {
     this.maxY = null;
     callback = null;
 
-    this.busy = false;
+    this.$busy = false;
+  }
+  //#endregion
+
+  //#region Public Events
+  /**
+   * @param {*} callback
+   * The passed in value.
+   * 
+   * Adds event on update
+   */
+  set onUpdate(callback) {
+    this.customEvents['update'] = callback;
   }
 
   /**
-   * Event: OnMouseMove.
+   * @param {*} callback
+   * The passed in value.
    * 
-   * @param {*} e
-   * Mouse event
+   * Adds event on finish sorting
    */
-  _mousemovehandler(e) {
-    var pageY = (e.pageY - this.listItems.offsetTop) + this.listItems.scrollTop;
-    var top = this._round(pageY - this.clientY, this.maxY);
-    var max = (this.listItems.scrollTop + this.listItems.offsetHeight - this.element.offsetHeight) - 0;
-    var min = (this.listItems.scrollTop + this.listItems.offsetTop - this.element.offsetHeight) - 0;
-
-    clearInterval(this.interval);
-
-    if(top >= max && this.element.offsetTop < this.maxY) {
-      this._animateUp(e.pageY);
-      return;
-    }
-
-    if(top <= min && this.element.offsetTop > 0) {
-      this._animateDown(e.pageY);
-      return;
-    }
-
-    this._moveHolder(top);
+  set onFinish(callback) {
+    this.customEvents['finish'] = callback;
   }
+  //#endregion
 
+  //#region Privat Methods
   /**
    * Internal method: AnimateUp.
    * 
@@ -258,4 +216,34 @@ class SortingHelper {
     value = (value <  min)? min : value;
     return value;
   }
+  //#endregion
+
+  //#region Event Handlers
+  /**
+   * Event: OnMouseMove.
+   * 
+   * @param {*} e
+   * Mouse event
+   */
+  _mousemovehandler(e) {
+    var pageY = (e.pageY - this.listItems.offsetTop) + this.listItems.scrollTop;
+    var top = this._round(pageY - this.clientY, this.maxY);
+    var max = (this.listItems.scrollTop + this.listItems.offsetHeight - this.element.offsetHeight) - 0;
+    var min = (this.listItems.scrollTop + this.listItems.offsetTop - this.element.offsetHeight) - 0;
+
+    clearInterval(this.interval);
+
+    if(top >= max && this.element.offsetTop < this.maxY) {
+      this._animateUp(e.pageY);
+      return;
+    }
+
+    if(top <= min && this.element.offsetTop > 0) {
+      this._animateDown(e.pageY);
+      return;
+    }
+
+    this._moveHolder(top);
+  }
+  //#endregion
 }
