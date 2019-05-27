@@ -141,8 +141,8 @@ main.add = function(note, callback = function(){}, error = function(){}){
 
   main.database.transaction(function (tx) { tx.executeSql(sql, data, function (tx, data) {
     callback(data.insertId);
-  }, function(tx, error){
-    callback('Oops! Note not added! Please try letter.');
+  }, function(tx, data){
+    error('Oops! Note not added! Please try letter.');
   }); });
 };
 

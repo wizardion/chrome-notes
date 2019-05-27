@@ -41,13 +41,12 @@ class SimpleNotes extends BaseNotes {
       this.controls.listView.style.display = 'None';
       this.controls.detailsView.style.display = 'inherit';
 
-      this.editMode.cancelButton.className = 'button back';
-      this.editMode.titleInput.focus();
+      this.editMode.controls.cancel.className = 'button back';
+      this.editMode.controls.title.focus();
 
-      this.editMode.cancelButton.onmouseup = function (e) {
-        e.preventDefault();
-        this.editMode.remove();
+      this.editMode.onCancel = function () {
         this.backToList();
+        delete this.editMode;
       }.bind(this);
     }
   }
