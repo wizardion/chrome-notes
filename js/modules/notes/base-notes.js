@@ -37,6 +37,12 @@ class BaseNotes {
       this.deleteNote(parseInt(localStorage.rowId));
     }.bind(this));
     this.controls.title.addEventListener('change', this.titleChanged.bind(this));
+    this.controls.title.addEventListener('keydown', function (e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        this.controls.description.focus();
+      }
+    }.bind(this));
     this.controls.description.addEventListener('focus', function (e) {
       if (!this.$valid) {
         e.preventDefault();
@@ -44,7 +50,9 @@ class BaseNotes {
       }
     }.bind(this));
     this.controls.description.addEventListener('blur', function(){
-      if (!this.editMode && this.controls.description.innerHTML != this.notes[localStorage.rowId].description) {
+      var rowId = localStorage.rowId;
+
+      if (!this.editMode && rowId && this.controls.description.innerHTML != this.notes[rowId].description) {
         this.descriptionChanged();
       }
     }.bind(this));
@@ -172,19 +180,16 @@ class BaseNotes {
     this.notes.push(note);
     this.controls.listItems.appendChild(this.render(this.notes));
 
-    note.self.onclick = function(e){
-      this.selectNote(note.self.index);
-    }.bind(this)
+    note.displayOrder = this.notes.length;
+    note.self.onclick = this.selectNote.bind(this, note.self.index);
 
     this.background.add(note, function(id){
       note.id = id;
-    }, function () {
-      console.log('ERROR!');
     });
   }
 
+  // TODO Need to catch errors
   deleteNote(id) {
-    // TODO Need to catch errors
     this.background.remove(this.notes[id].id);
 
     this.controls.listItems.removeChild(this.notes[id].self);
@@ -206,8 +211,10 @@ class BaseNotes {
       this.editMode = new NewNote(this.controls);
 
       this.editMode.onSave = function (note) {
-        this.addnote(note);
+        this.addNote(note);
         delete this.editMode;
+        // localStorage.rowId = (this.notes.length - 1);
+        this.selectNote(note.self.index);
       }.bind(this);
 
       this.editMode.onCancel = function () {

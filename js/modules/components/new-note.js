@@ -23,7 +23,7 @@ class NewNote extends Module {
   }
 
   /**
-   * @param {*} callback
+   * @param {*} value
    * The passed in value.
    * 
    * Adds event on save
@@ -33,7 +33,7 @@ class NewNote extends Module {
   }
 
   /**
-   * @param {*} callback
+   * @param {*} value
    * The passed in value.
    * 
    * Adds event on cancel
@@ -53,6 +53,9 @@ class NewNote extends Module {
     this.events.showSaveButton = this._bindHandler(this.controls.save, this._showbuttonhandler);
     document.addEventListener('mousemove', this.events.showSaveButton.event);
 
+    this.events.keyDown = this._inputhandler.bind(this);
+    document.addEventListener('keydown', this.events.keyDown);
+
     this.showError = Validator.bindRequiredAnimation(this.controls.title);
     this.controls.save.onclick = this._savebuttonhandler.bind(this);
     this.controls.cancel.onclick = this._cancelbuttonhandler.bind(this);
@@ -65,11 +68,11 @@ class NewNote extends Module {
    * 
    * Removes controlls and events.
    */
-  remove() {
+  remove(force=false) {
     var callback = this.events.onCancel;
     var parent = this.controls.title.parentNode;
 
-    if (callback) {
+    if (force && callback) {
       callback();
     }
 
@@ -83,8 +86,10 @@ class NewNote extends Module {
 
     this.events.deleteButton = this._bindHandler(this.parent.delete, this._showbuttonhandler);
     document.addEventListener('mousemove', this.events.deleteButton.event);
+    document.removeEventListener('keydown', this.events.keyDown);
 
     this.showError = null;
+    this.events.keyDown = null;
   }
 
   /**
@@ -154,7 +159,7 @@ class NewNote extends Module {
         id: -1,
         title: this.controls.title.value,
         description: this.parent.description.innerHTML,
-        displayOrder: this.notes.length,
+        displayOrder: -1,
         updated: new Date().getTime()
       });
     }
@@ -162,7 +167,6 @@ class NewNote extends Module {
     this.parent.title.value = this.controls.title.value;
     this.remove();
     this.parent.description.focus();
-    // localStorage.rowId = (this.notes.length - 1);
   }
 
   /**
@@ -192,10 +196,6 @@ class NewNote extends Module {
    * Chaches the keydown event for saving canceling and move focus.
    */
   _titleinputhandler(e) {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      this.remove();
-    }
     if (e.key === 'Tab') {
       e.preventDefault();
       this.parent.description.focus();
@@ -203,6 +203,19 @@ class NewNote extends Module {
     if (e.key === 'Enter') {
       e.preventDefault();
       this._save();
+    }
+  }
+
+  /**
+   * Handler: Title Key Down
+   * 
+   * @param {*} e
+   * Chaches the keydown event canceling edit.
+   */
+  _inputhandler(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.remove(true);
     }
   }
 
@@ -225,6 +238,6 @@ class NewNote extends Module {
    */
   _cancelbuttonhandler(e) {
     e.preventDefault();
-    this.remove();
+    this.remove(true);
   }
 }
