@@ -1,10 +1,10 @@
-class Editor extends HtmlElement {
-  constructor (selector=new String) {
-    super(selector);
-
+class Editor {
+  constructor (element) {
     const allowedTags = ['a', 'b', 'strong', 'br'];
     const allowedAttributes = ['href'];
 
+    this.element = element;
+    this.controls = {};
     this.rules = [];
 
     // Replace to <br/>
@@ -37,8 +37,65 @@ class Editor extends HtmlElement {
       replacement: '$1'
     });
 
+    // this.init();
+
     // Add events
-    this.event('paste', this.$onPaste.bind(this));
+    this.element.addEventListener('paste', this.$onPaste.bind(this));
+
+    return this.element;
+  }
+
+  init() {
+    var div = document.createElement('div');
+    //https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
+    //https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard
+    //https://bear.app/
+
+    this.controls = {
+      bold: {name: 'B', command: 'bold'},
+      italic: {name: 'I', command: 'italic'},
+      underline: {name: 'U', command: 'underline'},
+      strike: {name: 'A', command: 'strikeThrough'},
+      bullet: {name: '.-', command: 'insertUnorderedList'},
+      ordered: {name: '1-', command: 'insertOrderedList'},
+
+      undo: {name: '<', command: 'undo'},
+      redo: {name: '>', command: 'redo'}
+    };
+
+    for (let key in this.controls) {
+      const control = this.controls[key];
+
+      control.element = document.createElement('input');
+      control.element.type = 'button';
+      control.element.value = control.name;
+
+      control.element.onmousedown = this.precommand.bind(control);
+      control.element.onmouseup = this.command.bind(control);
+
+      div.appendChild(control.element);
+    }
+
+    div.className = 'editor-controlls';
+    this.element.parentNode.insertBefore(div, this.element);
+  }
+
+  makeBold(e) {
+    // document.execCommand('bold', false, data);
+    document.execCommand('bold');
+  }
+
+  precommand(e) {
+    // cancel paste.
+    e.preventDefault();
+  }
+
+  command(e) {
+    // cancel paste.
+    e.preventDefault();
+
+    console.log(`name: ${this.command}`);
+    document.execCommand(this.command);
   }
 
   $onPaste(e) {
@@ -50,7 +107,6 @@ class Editor extends HtmlElement {
 
     for (let index = 0; index < this.rules.length; index++) {
       const rule = this.rules[index];
-      
       data = data.replace(rule.pattern, rule.replacement);
     }
 

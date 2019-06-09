@@ -1,7 +1,8 @@
 // window.addEventListener('load', function(){
 document.addEventListener('DOMContentLoaded', function(){
-  // var editor = new Editor('.fast-note[0]');
-  // var details = new HtmlElement('.details-view[0]');
+  var content = document.getElementById('content');
+
+  content = new ScrollBar(content, {background: '#D6D6D6'});
 
   var notes = new SimpleNotes({
     back: document.getElementById('to-list'),

@@ -22,8 +22,11 @@ class BaseNotes {
 
     // init modules
     this.controls.listItems = new ScrollBar(this.controls.listItems);
-    this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
+    // this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
+    this.controls.description = new Editor(this.controls.description);
+
     this.sortHelper = new SortHelper(this.controls.listItems);
+    this.searchModule = new SearchModule(controls.search, controls.searchInput);
     this.searchModule = new SearchModule(controls.search, controls.searchInput);
 
     // init background
@@ -163,11 +166,11 @@ class BaseNotes {
 
       // document.execCommand('selectAll',false,null)
 
-      if (this.controls.description.innerHTML.length > 10) {
-        var selection = window.getSelection();
-        selection.collapse(this.controls.description.firstChild, 2);
-        selection.extend(this.controls.description.firstChild, 8);
-      }
+      // if (this.controls.description.innerHTML.length > 10) {
+      //   var selection = window.getSelection();
+      //   selection.collapse(this.controls.description.firstChild, 2);
+      //   selection.extend(this.controls.description.firstChild, 8);
+      // }
       //#endregion
   
       this.controls.description.scrollTop = 0;
