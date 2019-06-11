@@ -90,12 +90,16 @@ class Editor {
   }
 
   $onHandleInput(e) {
+    // console.log({
+    //   'e': e
+    // });
+
     if (e.key === 'Tab') {
+      var command = (e.shiftKey)? 'outdent' : 'indent';
+
       e.preventDefault();
-      // this.controls.description.focus();
-      document.execCommand('insertHTML', true, '&emsp;&emsp;&emsp;&emsp;');
-      // document.execCommand('insertHTML', true, '<pre>\tSome </pre>');
-      // document.execCommand('insertHTML', false, '&#9;');
+
+      document.execCommand(command, true, null);
     }
   }
 }
