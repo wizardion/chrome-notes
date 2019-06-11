@@ -23,7 +23,7 @@ class BaseNotes {
     // init modules
     this.controls.listItems = new ScrollBar(this.controls.listItems);
     // this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
-    this.controls.description = new Editor(this.controls.description);
+    this.controls.description = new Editor(this.controls.description, controls.editorControlls);
 
     this.sortHelper = new SortHelper(this.controls.listItems);
     this.searchModule = new SearchModule(controls.search, controls.searchInput);
@@ -40,12 +40,12 @@ class BaseNotes {
       this.deleteNote(parseInt(localStorage.rowId));
     }.bind(this));
     this.controls.title.addEventListener('change', this.titleChanged.bind(this));
-    this.controls.title.addEventListener('keydown', function (e) {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        this.controls.description.focus();
-      }
-    }.bind(this));
+    // this.controls.title.addEventListener('keydown', function (e) {
+    //   if (e.key === 'Tab') {
+    //     e.preventDefault();
+    //     this.controls.description.focus();
+    //   }
+    // }.bind(this));
     this.controls.description.addEventListener('focus', function (e) {
       if (!this.$valid) {
         e.preventDefault();

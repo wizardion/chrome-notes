@@ -1,10 +1,10 @@
 class Editor {
-  constructor (element) {
+  constructor (element, controls) {
     const allowedTags = ['a', 'b', 'strong', 'br'];
     const allowedAttributes = ['href'];
 
     this.element = element;
-    this.controls = {};
+    this.controls = controls;
     this.rules = [];
 
     // Replace to <br/>
@@ -37,52 +37,26 @@ class Editor {
       replacement: '$1'
     });
 
-    // this.init();
+    this.init();
 
     // Add events
     this.element.addEventListener('paste', this.$onPaste.bind(this));
+    this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
 
     return this.element;
   }
 
   init() {
-    var div = document.createElement('div');
     //https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
     //https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard
     //https://bear.app/
 
-    this.controls = {
-      bold: {name: 'B', command: 'bold'},
-      italic: {name: 'I', command: 'italic'},
-      underline: {name: 'U', command: 'underline'},
-      strike: {name: 'A', command: 'strikeThrough'},
-      bullet: {name: '.-', command: 'insertUnorderedList'},
-      ordered: {name: '1-', command: 'insertOrderedList'},
+    for (let i = 0; i < this.controls.length; i++) {
+      const item = this.controls[i];
 
-      undo: {name: '<', command: 'undo'},
-      redo: {name: '>', command: 'redo'}
-    };
-
-    for (let key in this.controls) {
-      const control = this.controls[key];
-
-      control.element = document.createElement('input');
-      control.element.type = 'button';
-      control.element.value = control.name;
-
-      control.element.onmousedown = this.precommand.bind(control);
-      control.element.onmouseup = this.command.bind(control);
-
-      div.appendChild(control.element);
+      item.onmousedown = this.precommand;
+      item.onmouseup = this.command;
     }
-
-    div.className = 'editor-controlls';
-    this.element.parentNode.insertBefore(div, this.element);
-  }
-
-  makeBold(e) {
-    // document.execCommand('bold', false, data);
-    document.execCommand('bold');
   }
 
   precommand(e) {
@@ -91,11 +65,13 @@ class Editor {
   }
 
   command(e) {
-    // cancel paste.
+    let action = this.getAttribute('action');
+
+    // cancel event.
     e.preventDefault();
 
-    console.log(`name: ${this.command}`);
-    document.execCommand(this.command);
+    console.log(`action: ${action}`);
+    document.execCommand(action);
   }
 
   $onPaste(e) {
@@ -111,6 +87,16 @@ class Editor {
     }
 
     document.execCommand('insertHTML', false, data);
+  }
+
+  $onHandleInput(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      // this.controls.description.focus();
+      document.execCommand('insertHTML', true, '&emsp;&emsp;&emsp;&emsp;');
+      // document.execCommand('insertHTML', true, '<pre>\tSome </pre>');
+      // document.execCommand('insertHTML', false, '&#9;');
+    }
   }
 }
 

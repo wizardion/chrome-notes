@@ -70,15 +70,14 @@ class NewNote extends Module {
    */
   remove(force=false) {
     var callback = this.events.onCancel;
-    var parent = this.controls.title.parentNode;
 
     if (force && callback) {
       callback();
     }
 
-    parent.removeChild(this.controls.title);
-    parent.removeChild(this.controls.save);
-    parent.removeChild(this.controls.cancel);
+    this.controls.title.parentNode.removeChild(this.controls.title);
+    this.parent.delete.parentNode.removeChild(this.controls.save);
+    this.parent.delete.parentNode.removeChild(this.controls.cancel);
 
     this.parent.title.style.display = '';
     this.parent.back.style.display = '';
@@ -114,9 +113,11 @@ class NewNote extends Module {
     this.controls.cancel.type = 'button';
     this.controls.cancel.value = 'Cancel';
 
-    this.parent.title.parentNode.appendChild(this.controls.title);
-    this.parent.title.parentNode.appendChild(this.controls.save);
-    this.parent.title.parentNode.appendChild(this.controls.cancel);
+    // this.parent.title.parentNode.insertBefore(this.controls.title);
+    this.parent.title.parentNode.insertBefore(this.controls.title, this.parent.title);
+
+    this.parent.delete.parentNode.appendChild(this.controls.save);
+    this.parent.delete.parentNode.appendChild(this.controls.cancel);
 
     this.parent.title.style.display = 'None';
     this.parent.delete.style.display = 'None';

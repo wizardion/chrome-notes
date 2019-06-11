@@ -1,5 +1,6 @@
 div[contenteditable] {
   cursor: text;
+  /* min-height: 185px; */
 }
 
 .head
@@ -55,13 +56,16 @@ div[contenteditable] {
   text-align: center;
   border: none;
   color: black;
-  font: 17px sans-serif;
+
+  font: 16px sans-serif;
   /* font-weight: bold; */
-  margin-top: -5px;
+  /* margin-top: 0px; */
+
+  /* font-weight: bold; */
   text-decoration: underline;
 }
 
-.fast-note
+.content
 {
   /* https://stackoverflow.com/questions/16670931/hide-scroll-bar-but-while-still-being-able-to-scroll */
   /* width: 620px; */
@@ -111,9 +115,12 @@ div[contenteditable] {
   padding: 6px;
   background: transparent;
   padding-top: 10px;
+
+  display: flex;
+  flex-flow: column;
 }
 
-.fast-note2 {
+.content-description {
   outline: none;
   border: none;
   /* margin: 5px 0 0 0; */
@@ -124,4 +131,7 @@ div[contenteditable] {
   background: transparent;
   /* padding-right: 25px; */
   padding-top: 10px;
+
+  /* background: yellow; */
+  flex: 1 1 auto;
 }
