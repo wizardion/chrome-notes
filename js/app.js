@@ -1,7 +1,13 @@
 // window.addEventListener('load', function(){
 document.addEventListener('DOMContentLoaded', function(){
-  // var editor = new Editor('.fast-note[0]');
-  // var details = new HtmlElement('.details-view[0]');
+  var editorControlls = document.getElementById('editor-controlls');
+
+  var content = document.getElementById('content');
+
+  content = new ScrollBar(content, {background: '#D6D6D6'});
+
+  
+ 
 
   var notes = new SimpleNotes({
     back: document.getElementById('to-list'),
@@ -15,7 +21,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
     search: document.getElementById('search-button'),
     searchInput: document.getElementById('search-notes'),
-    listControls: document.getElementById('list-controls')
+    listControls: document.getElementById('list-controls'),
+    
+    editorControlls: editorControlls.getElementsByClassName('button')
   });
 
 });

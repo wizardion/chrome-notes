@@ -22,8 +22,11 @@ class BaseNotes {
 
     // init modules
     this.controls.listItems = new ScrollBar(this.controls.listItems);
-    this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
+    // this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
+    this.controls.description = new Editor(this.controls.description, controls.editorControlls);
+
     this.sortHelper = new SortHelper(this.controls.listItems);
+    this.searchModule = new SearchModule(controls.search, controls.searchInput);
     this.searchModule = new SearchModule(controls.search, controls.searchInput);
 
     // init background
@@ -37,6 +40,12 @@ class BaseNotes {
       this.deleteNote(parseInt(localStorage.rowId));
     }.bind(this));
     this.controls.title.addEventListener('change', this.titleChanged.bind(this));
+    // this.controls.title.addEventListener('keydown', function (e) {
+    //   if (e.key === 'Tab') {
+    //     e.preventDefault();
+    //     this.controls.description.focus();
+    //   }
+    // }.bind(this));
     this.controls.description.addEventListener('focus', function (e) {
       if (!this.$valid) {
         e.preventDefault();
@@ -44,7 +53,9 @@ class BaseNotes {
       }
     }.bind(this));
     this.controls.description.addEventListener('blur', function(){
-      if (!this.editMode && this.controls.description.innerHTML != this.notes[localStorage.rowId].description) {
+      var rowId = localStorage.rowId;
+
+      if (!this.editMode && rowId && this.controls.description.innerHTML != this.notes[rowId].description) {
         this.descriptionChanged();
       }
     }.bind(this));
@@ -155,11 +166,11 @@ class BaseNotes {
 
       // document.execCommand('selectAll',false,null)
 
-      if (this.controls.description.innerHTML.length > 10) {
-        var selection = window.getSelection();
-        selection.collapse(this.controls.description.firstChild, 2);
-        selection.extend(this.controls.description.firstChild, 8);
-      }
+      // if (this.controls.description.innerHTML.length > 10) {
+      //   var selection = window.getSelection();
+      //   selection.collapse(this.controls.description.firstChild, 2);
+      //   selection.extend(this.controls.description.firstChild, 8);
+      // }
       //#endregion
   
       this.controls.description.scrollTop = 0;
@@ -172,19 +183,16 @@ class BaseNotes {
     this.notes.push(note);
     this.controls.listItems.appendChild(this.render(this.notes));
 
-    note.self.onclick = function(e){
-      this.selectNote(note.self.index);
-    }.bind(this)
+    note.displayOrder = this.notes.length;
+    note.self.onclick = this.selectNote.bind(this, note.self.index);
 
     this.background.add(note, function(id){
       note.id = id;
-    }, function () {
-      console.log('ERROR!');
     });
   }
 
+  // TODO Need to catch errors
   deleteNote(id) {
-    // TODO Need to catch errors
     this.background.remove(this.notes[id].id);
 
     this.controls.listItems.removeChild(this.notes[id].self);
@@ -201,133 +209,19 @@ class BaseNotes {
     }
   }
 
-  createNewMode() {
-    var editMode = {
-      titleInput: document.createElement('input'),
-      saveButton: document.createElement('input'),
-      cancelButton: document.createElement('input')
-    };
-
-    editMode.saveButton.className = 'button save-note';
-    editMode.saveButton.type = 'button';
-
-    editMode.titleInput.type = 'text';
-    editMode.titleInput.maxLength = 70;
-    editMode.titleInput.className = 'edit-title details';
-    editMode.titleInput.placeholder = 'Enter a Title of Note';
-
-    // editMode.cancelButton.className = 'button back';
-    editMode.cancelButton.className = 'button left';
-    editMode.cancelButton.type = 'button';
-    editMode.cancelButton.value = 'Cancel';
-
-    this.controls.title.parentNode.appendChild(editMode.titleInput);
-    this.controls.title.parentNode.appendChild(editMode.saveButton);
-    this.controls.title.parentNode.appendChild(editMode.cancelButton);
-
-    this.controls.title.style.display = 'None';
-    this.controls.delete.style.display = 'None';
-    this.controls.back.style.display = 'None';
-    editMode.saveButton.style.visibility = 'hidden';
-    this.controls.delete.style.visibility = 'hidden';
-
-    this.controls.description.innerHTML = '';
-
-    return editMode;
-  }
-
-  // TODO Need to optimize
   newNote() {
     if (!this.editMode) {
-      // ----------------------------------------------------------------------------------------------------
-      // Creating new view: New Note
-      // ----------------------------------------------------------------------------------------------------
-      this.editMode = this.createNewMode();
+      this.editMode = new NewNote(this.controls);
 
-      this.editMode.$valid = false;
-      this.editMode.showError = Validator.bindRequiredAnimation(this.editMode.titleInput);
-
-      var showButton = function(e) {
-        var y = this.offsetTop;
-        var x = this.offsetLeft;
-        var height = this.offsetHeight;
-        var width = this.offsetWidth;
-
-        if(e.pageY < y || e.pageY > (y + height) || e.pageX < x || e.pageX > (x + width)) {
-          this.style.visibility = '';
-          document.onmousemove = null;
-        }
-      };
-
-      document.onmousemove = showButton.bind(this.editMode.saveButton);
-
-      // ----------------------------------------------------------------------------------------------------
-      // Creating event functions to remove: New Note view
-      // ----------------------------------------------------------------------------------------------------
-      this.editMode.remove = function () {
-        var parent = this.editMode.titleInput.parentNode;
-
-        parent.removeChild(this.editMode.titleInput);
-        parent.removeChild(this.editMode.saveButton);
-        parent.removeChild(this.editMode.cancelButton);
-
-        this.controls.title.style.display = '';
-        this.controls.back.style.display = '';
-        this.controls.delete.style.display = '';
-
-        document.onmousemove = showButton.bind(this.controls.delete);
-
-        this.editMode.save = null;
-        this.editMode.$valid = true;
-        this.editMode.showError = null;
-        this.editMode = null;
+      this.editMode.onSave = function (note) {
+        this.addNote(note);
+        delete this.editMode;
+        // localStorage.rowId = (this.notes.length - 1);
+        this.selectNote(note.self.index);
       }.bind(this);
 
-      this.editMode.save = function () {
-        if (this.editMode.titleInput.value.trim().length === 0) {
-          return this.editMode.showError();
-        }
-
-        this.addNote({
-          id: -1,
-          title: this.editMode.titleInput.value,
-          description: this.controls.description.innerHTML,
-          displayOrder: this.notes.length,
-          updated: new Date().getTime()
-        });
-
-        this.controls.title.value = this.editMode.titleInput.value;
-        this.editMode.remove();
-        this.controls.description.focus();
-        localStorage.rowId = (this.notes.length - 1);
-      }.bind(this);
-
-      // ----------------------------------------------------------------------------------------------------
-      // Assing event listeners to: New Note
-      // ----------------------------------------------------------------------------------------------------
-      this.editMode.titleInput.onkeydown = function (e) {
-        if (e.key === 'Tab') {
-          e.preventDefault();
-          this.controls.description.focus();
-        }
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          this.editMode.save();
-        }
-      }.bind(this);
-
-      this.editMode.saveButton.onmousedown = function (e) {
-        e.preventDefault();
-      };
-
-      this.editMode.saveButton.onmouseup = function (e) {
-        e.preventDefault();
-        this.editMode.save();
-      }.bind(this);
-
-      this.editMode.cancelButton.onmouseup = function (e) {
-        e.preventDefault();
-        this.editMode.remove();
+      this.editMode.onCancel = function () {
+        delete this.editMode;
       }.bind(this);
     }
   }

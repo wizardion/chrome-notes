@@ -127,7 +127,7 @@ main.update = function(item, key){
     data = [item[key], item.id];
 
     pritSQL(sql, data);
-    return;
+    // return;
   }
 
   main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
@@ -135,14 +135,15 @@ main.update = function(item, key){
   }); });
 };
 
-main.add = function(note, callback = function(){}, error = function(){}){
+main.add = function(note, callback = function(){}){
   var sql = "INSERT INTO Notes(title, description, displayOrder, updated, created) VALUES(?,?,?,?,?)";
   var data = [note.title, note.description, note.displayOrder, note.updated, note.updated];
+  var error = this.events['error'] || function(){};
 
   main.database.transaction(function (tx) { tx.executeSql(sql, data, function (tx, data) {
     callback(data.insertId);
-  }, function(tx, error){
-    callback('Oops! Note not added! Please try letter.');
+  }, function(tx, data){
+    error('Oops! Note not added! Please try letter.');
   }); });
 };
 
@@ -162,7 +163,13 @@ main.addEventListener = function(key, callback) {
 function pritSQL(sql, data) {
   var sqlText = sql;
   for(var i=0; i < data.length; i++) {
-    sqlText = sqlText.replace(/\?/, data[i]);
+    let value = data[i];
+
+    if (typeof(value) === 'string') {
+      value = `'${value}'`;
+    }
+
+    sqlText = sqlText.replace(/\?/, value);
   }
   console.log();
   console.log(`%c ${sqlText}`, 'background: white; color: red;');
