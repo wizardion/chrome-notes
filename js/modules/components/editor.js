@@ -75,31 +75,36 @@ class Editor {
   }
 
   $onPaste(e) {
-    // cancel paste.
-    e.preventDefault();
+    var clipboard = (e.originalEvent || e).clipboardData;
+    // var data = clipboard.getData('text/html') || clipboard.getData('text/plain');
+    var data = clipboard.getData('text/html');
 
-    // Get html data from clipboard.
-    var data = (e.originalEvent || e).clipboardData.getData('text/html').toString();
+    if (data) {
+      // cancel paste.
+      e.preventDefault();
 
-    for (let index = 0; index < this.rules.length; index++) {
-      const rule = this.rules[index];
-      data = data.replace(rule.pattern, rule.replacement);
+      for (let index = 0; index < this.rules.length; index++) {
+        const rule = this.rules[index];
+        data = data.replace(rule.pattern, rule.replacement);
+      }
+
+      document.execCommand('insertHTML', false, data);
     }
-
-    document.execCommand('insertHTML', false, data);
   }
 
   $onHandleInput(e) {
-    // console.log({
-    //   'e': e
-    // });
-
     if (e.key === 'Tab') {
-      var command = (e.shiftKey)? 'outdent' : 'indent';
+      var selection = window.getSelection();
+      // var selectionLength = selection.extentOffset - selection.anchorOffset;
+      var selectionLines = selection.getRangeAt(0).getClientRects().length;
 
       e.preventDefault();
 
-      document.execCommand(command, true, null);
+      if(selectionLines > 1) {
+        document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
+      } else {
+        document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
+      }
     }
   }
 }
