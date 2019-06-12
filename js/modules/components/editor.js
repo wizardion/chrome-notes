@@ -37,6 +37,12 @@ class Editor {
       replacement: '$1'
     });
 
+    // Add tab space
+    this.rules.push({
+      pattern: '\t',
+      replacement: '<span style="white-space:pre">\t</span>'
+    });
+
     this.init();
 
     // Add events
@@ -87,8 +93,6 @@ class Editor {
         const rule = this.rules[index];
         data = data.replace(rule.pattern, rule.replacement);
       }
-
-      data = data.replace('\t', '<span style="white-space:pre">\t</span>');
 
       document.execCommand('insertHTML', false, data);
     }
