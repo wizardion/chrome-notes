@@ -1,6 +1,6 @@
 class Editor {
   constructor (element, controls) {
-    const allowedTags = ['a', 'b', 'strong', 'br'];
+    const allowedTags = ['a', 'b', 'i', 'u', 'strong', 'br', 'strike'];
     const allowedAttributes = ['href'];
 
     this.element = element;
@@ -87,6 +87,8 @@ class Editor {
         const rule = this.rules[index];
         data = data.replace(rule.pattern, rule.replacement);
       }
+
+      data = data.replace('\t', '<span style="white-space:pre">\t</span>');
 
       document.execCommand('insertHTML', false, data);
     }
