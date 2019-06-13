@@ -38,10 +38,10 @@ class Editor {
     this.rules.push({
       // pattern: new RegExp('(<\/?(?:' + allowedTags.join('|') + ')[^>]*>)|<[^>]+>', 'gi'),
       // pattern: new RegExp('(<\s?(\/?)\s?(a|b|i|u|strong|br|strike)(>|\s[^>]+>))', 'igm'),
-      pattern: /(<\s?(\/?)\s?(a|b|i|u|strong|br|strike)(>|\s[^>]+>))/igm,
+      pattern: /(<\s?(\/?)\s?(a|b|i|u|strong|br|strike)(>|(\s[^>]+)>))/igm,
       // pattern: new RegExp('(<?(?:a|b|i|u|strong|br|strike)>)([^<>]+<\/)|(<?(?:a|b|i|u|strong|br|strike)\\s[^>]+>)([^<>]+<\/)|<[^>]+>', 'igm'),
       // pattern: new RegExp('((<(?:a|b|i|u|strong|br|strike)>)|(<(?:a|b|i|u|strong|br|strike)\s[^>]*>))([^<>]+)', 'igm'),
-      replacement: '<$2$3>'
+      replacement: '<$2$3$5>'
     });
 
     // // Add tab space
