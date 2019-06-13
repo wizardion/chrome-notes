@@ -8,42 +8,45 @@ class Editor {
     this.rules = [];
 
     // Replace to <br/>
-    this.rules.push({
-      pattern: new RegExp('<\/(li|p|h[0-9])>', 'gi'),
-      replacement: '<br/>'
-    });
+    // this.rules.push({
+    //   pattern: new RegExp('<\/(li|p|h[0-9])>', 'gi'),
+    //   replacement: '<br/>'
+    // });
 
-    // Remove all attributes except allowed.
-    var replacements = ['$1'];
-    var attrPatterns = [];
+    // // Remove all attributes except allowed.
+    // var replacements = ['$1'];
+    // var attrPatterns = [];
 
-    for(var i = 0; i < allowedAttributes.length; i++){
-      replacements.push('$' + (i + 2));
+    // for(var i = 0; i < allowedAttributes.length; i++){
+    //   replacements.push('$' + (i + 2));
 
-      attrPatterns.push(
-          '(?:(?:(?:(?!' + allowedAttributes.join('=|') + '=)[^>]))*((?:' + 
-          allowedAttributes.join('|') + ')=[\'"][^\'"]*[\'"]\\s*)?)'
-      );
-    }
+    //   attrPatterns.push(
+    //       '(?:(?:(?:(?!' + allowedAttributes.join('=|') + '=)[^>]))*((?:' + 
+    //       allowedAttributes.join('|') + ')=[\'"][^\'"]*[\'"]\\s*)?)'
+    //   );
+    // }
 
-    this.rules.push({
-      pattern: new RegExp('<(\\w+)\\s*' + attrPatterns.join('') + '[^>]*>', 'gi'),
-      replacement: '<' + replacements.join(' ') + '>'
-    });
+    // this.rules.push({
+    //   pattern: new RegExp('<(\\w+)\\s*' + attrPatterns.join('') + '[^>]*>', 'gi'),
+    //   replacement: '<' + replacements.join(' ') + '>'
+    // });
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
     this.rules.push({
       // pattern: new RegExp('(<\/?(?:' + allowedTags.join('|') + ')[^>]*>)|<[^>]+>', 'gi'),
-      pattern: new RegExp('(<\/?(?:a|b|i|u|strong|br|strike)(>|(\\s)[^>]+>))|<[^>]+>', 'igm'),
-      replacement: '$1'
+      // pattern: new RegExp('(<\s?(\/?)\s?(a|b|i|u|strong|br|strike)(>|\s[^>]+>))', 'igm'),
+      pattern: /(<\s?(\/?)\s?(a|b|i|u|strong|br|strike)(>|\s[^>]+>))/igm,
+      // pattern: new RegExp('(<?(?:a|b|i|u|strong|br|strike)>)([^<>]+<\/)|(<?(?:a|b|i|u|strong|br|strike)\\s[^>]+>)([^<>]+<\/)|<[^>]+>', 'igm'),
+      // pattern: new RegExp('((<(?:a|b|i|u|strong|br|strike)>)|(<(?:a|b|i|u|strong|br|strike)\s[^>]*>))([^<>]+)', 'igm'),
+      replacement: '<$2$3>'
     });
 
-    // Add tab space
-    this.rules.push({
-      pattern: '\t',
-      replacement: '<span style="white-space:pre">\t</span>'
-    });
+    // // Add tab space
+    // this.rules.push({
+    //   pattern: '\t',
+    //   replacement: '<span style="white-space:pre">\t</span>'
+    // });
 
     this.init();
 
@@ -84,8 +87,8 @@ class Editor {
 
   $onPaste(e) {
     var clipboard = (e.originalEvent || e).clipboardData;
-    // var data = clipboard.getData('text/html') || clipboard.getData('text/plain');
-    var data = clipboard.getData('text/html');
+    var data = clipboard.getData('text/html') || clipboard.getData('text/plain');
+    // var data = clipboard.getData('text/html');
 
     if (data) {
       // cancel paste.
@@ -96,7 +99,8 @@ class Editor {
         data = data.replace(rule.pattern, rule.replacement);
       }
 
-      document.execCommand('insertHTML', false, data);
+      console.log(`${data}`);
+      // document.execCommand('insertHTML', false, data);
     }
   }
 
