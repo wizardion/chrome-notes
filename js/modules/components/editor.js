@@ -30,6 +30,8 @@ class Editor {
     //   pattern: new RegExp('<(\\w+)\\s*' + attrPatterns.join('') + '[^>]*>', 'gi'),
     //   replacement: '<' + replacements.join(' ') + '>'
     // });
+
+    // this is a test and <b>Bold</b> and <b style="color: red;">Red-bold</b> and <strike>Strike</strike> < b>Bold2</b> < b>Bold3</ b> < b>Bold3< / b> 
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
