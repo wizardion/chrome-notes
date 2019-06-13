@@ -32,8 +32,10 @@ class Editor {
     });
     
     // Remove all tags except allowed.
+    // https://www.regextester.com/93930
     this.rules.push({
-      pattern: new RegExp('(<\/?(?:' + allowedTags.join('|') + ')[^>]*>)|<[^>]+>', 'gi'),
+      // pattern: new RegExp('(<\/?(?:' + allowedTags.join('|') + ')[^>]*>)|<[^>]+>', 'gi'),
+      pattern: new RegExp('(<\/?(?:a|b|i|u|strong|br|strike)(>|(\\s)[^>]+>))|<[^>]+>', 'igm'),
       replacement: '$1'
     });
 
