@@ -32,6 +32,7 @@ class Editor {
     // });
 
     // this is a test and <b>Bold</b> and <b style="color: red;">Red-bold</b> and <strike>Strike</strike> < b>Bold2</b> < b>Bold3</ b> < b>Bold3< / b> 
+    // (<\s?(a|b(\s?[^>]{0,}class="[^<>"']+"[^>]{0,})?|i|u|strong|br|strike)>)
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
