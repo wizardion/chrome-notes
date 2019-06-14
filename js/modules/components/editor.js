@@ -1,7 +1,7 @@
 class Editor {
   constructor (element, controls) {
     const allowedTags = ['a', 'b', 'i', 'u', 'strong', 'br', 'strike'];
-    const allowedAttributes = ['href'];
+    const allowedAttributes = ['href', 'class'];
 
     this.element = element;
     this.controls = controls;
@@ -14,6 +14,7 @@ class Editor {
     // });
 
     // // Remove all attributes except allowed.
+    // --------------------------------------------------
     var replacements = ['$1'];
     var attrPatterns = [];
 
@@ -30,6 +31,7 @@ class Editor {
       pattern: new RegExp('<(\\w+)\\s*' + attrPatterns.join('') + '[^>]*>', 'gi'),
       replacement: '<' + replacements.join(' ') + '>'
     });
+    // --------------------------------------------------
 
     // this is a test and <b>Bold</b> and <b style="color: red;">Red-bold</b> and <strike>Strike</strike> < b>Bold2</b> < b>Bold3</ b> < b>Bold3< / b> 
     // (<\s?(a|b|i|u|strong|br|strike)\s?>)
@@ -43,6 +45,13 @@ class Editor {
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
+    this.rules.push({
+      // pattern: new RegExp('((<)\\s?(a|b|i|u|strong|br|strike)([^<>]*)(>)([^<>]*)(<[^<>]*(\/)[^<>]*>))', 'igm'),
+      pattern: /((<)\s?(a|b|i|u|strong|br|strike)(\s*[^<>]*)(>)([^<>]*)(<[^<>]*(\/)[^<>]*>))|<[^>]+>/igm,
+      replacement: '$2$3$4$5$6$2$8$3$5'
+    });
+
+
     // this.rules.push({
     //   // pattern: new RegExp('(<\/?(?:' + allowedTags.join('|') + ')[^>]*>)|<[^>]+>', 'gi'),
     //   // pattern: new RegExp('(<\s?(\/?)\s?(a|b|i|u|strong|br|strike)(>|\s[^>]+>))', 'igm'),
@@ -50,6 +59,8 @@ class Editor {
     //   // pattern: new RegExp('(<?(?:a|b|i|u|strong|br|strike)>)([^<>]+<\/)|(<?(?:a|b|i|u|strong|br|strike)\\s[^>]+>)([^<>]+<\/)|<[^>]+>', 'igm'),
     //   // pattern: new RegExp('((<(?:a|b|i|u|strong|br|strike)>)|(<(?:a|b|i|u|strong|br|strike)\s[^>]*>))([^<>]+)', 'igm'),
     //   replacement: '<$2$3$5>'
+    // ((<)\s?(a|b|i|u|strong|br|strike)([^<>]*)(>)([^<>]*)(<[^<>]*(\/)[^<>]*>))
+    // $2$3$4$5$6 - $2$8$3$4$5
     // });
 
     // // Add tab space
@@ -109,9 +120,10 @@ class Editor {
         data = data.replace(rule.pattern, rule.replacement);
 
         console.log(`${rule.pattern}\n ${rule.replacement}`);
+        console.log(`     ${data}`);
       }
 
-      console.log(`${data}`);
+      
       // document.execCommand('insertHTML', false, data);
     }
   }
