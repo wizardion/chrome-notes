@@ -48,6 +48,7 @@ class Editor {
     // \b(?!href|class)\b\S+="[^"]+"
     // \b(?!href|class)\b\S+="[^"]+"(?=\s*(>|\s[^>]+\s*>))
     // ---!!!!   (?<=<\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*)\b(?!href|class)\b\S+="[^"]+"(?=\s*(>|\s[^>]+\s*>))
+    // => (<[^<>]+)(\b(?!href|class)\b\S+=("[^"]*"|'[^']*')(?=\s*(>|\s[^>]+\s*>)))
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
