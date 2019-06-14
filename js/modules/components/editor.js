@@ -42,12 +42,17 @@ class Editor {
 
     // (<\s?(a|b)\s?[^>]*((class|href)="[^<>"']*")[^>]{0,}\s?>)
     //<(\w+)[^<>]*((?:href)="[^'"]*")[^<>]*>
+
+    // Remove all attributes except allowed.
+    // ^((?!badword1).)*=1$
+    // \b(?!href|class)\b\S+="[^"]+"
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
     this.rules.push({
       // pattern: new RegExp('((<)\\s?(a|b|i|u|strong|br|strike)([^<>]*)(>)([^<>]*)(<[^<>]*(\/)[^<>]*>))', 'igm'),
-      pattern: /((<)\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*((>)|(\s[^>]+)(>)))/igm,
+      // pattern: /((<)\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*((>)|(\s[^>]+)(>)))/igm,/\
+      // tmp: ((<)\s?(\/?)\s?(a|b|i|u|strong|br|strike)(\s+[^>]+)?(>))
       pattern: /((<)\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*(>|\s[^>]+\s*>))/igm,
       replacement: '$2$3$4$5'
     });
