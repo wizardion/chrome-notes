@@ -1,7 +1,7 @@
 class Editor {
   constructor (element, controls) {
     const allowedTags = ['a', 'b', 'i', 'u', 'strong', 'br', 'strike'];
-    const allowedAttributes = ['href', 'class'];
+    const allowedAttributes = ['href', 'style'];
 
     this.element = element;
     this.controls = controls;
@@ -47,8 +47,9 @@ class Editor {
     // https://www.regextester.com/93930
     this.rules.push({
       // pattern: new RegExp('((<)\\s?(a|b|i|u|strong|br|strike)([^<>]*)(>)([^<>]*)(<[^<>]*(\/)[^<>]*>))', 'igm'),
-      pattern: /((<)\s?(a|b|i|u|strong|br|strike)(\s*[^<>]*)(>)([^<>]*)(<[^<>]*(\/)[^<>]*>))|<[^>]+>/igm,
-      replacement: '$2$3$4$5$6$2$8$3$5'
+      pattern: /((<)\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*((>)|(\s[^>]+)(>)))/igm,
+      pattern: /((<)\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*(>|\s[^>]+\s*>))/igm,
+      replacement: '$2$3$4$5'
     });
 
 
@@ -111,6 +112,9 @@ class Editor {
     var data = clipboard.getData('text/html') || clipboard.getData('text/plain');
     // var data = clipboard.getData('text/html');
 
+    var logs = [];
+    logs.push(`     ${data}`)
+
     if (data) {
       // cancel paste.
       e.preventDefault();
@@ -119,8 +123,16 @@ class Editor {
         const rule = this.rules[index];
         data = data.replace(rule.pattern, rule.replacement);
 
-        console.log(`${rule.pattern}\n ${rule.replacement}`);
-        console.log(`     ${data}`);
+        // console.log(`${rule.pattern}\n ${rule.replacement}`);
+        // console.log(`     ${data}`);
+
+        logs.push(`     ${data}`)
+      }
+
+
+      for(let i = 0; i < logs.length; i++) {
+        console.log('----------');
+        console.log(logs[i]);
       }
 
       
