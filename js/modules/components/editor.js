@@ -46,6 +46,8 @@ class Editor {
     // Remove all attributes except allowed.
     // ^((?!badword1).)*=1$
     // \b(?!href|class)\b\S+="[^"]+"
+    // \b(?!href|class)\b\S+="[^"]+"(?=\s*(>|\s[^>]+\s*>))
+    // ---!!!!   (?<=<\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*)\b(?!href|class)\b\S+="[^"]+"(?=\s*(>|\s[^>]+\s*>))
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
