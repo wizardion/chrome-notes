@@ -32,6 +32,14 @@ class Editor {
       replacement: '<' + replacements.join(' ') + '>'
     });
     // --------------------------------------------------
+    /*
+     <div class="ExternalClassA8E10E5413D0442BB59893D3788B95B9"style=""> financiers, consultants or suppliers); and must ensure the information is kept confidential by these third parties.<br class="k-br"></div>
+
+this is a test and <b>Bold</b> and <b style="color: red;">Red-bold</b> and <strike>Strike</strike> < b>Bold2</b> < b>Bold3</ b> < b>Bold3< / b > 
+<b style="color: red;" >Red-bold</b> <b class="k-br" style='color: red;' name='1'>Red-bold</b> <a href="#" style="T"></a>
+href=1 style='' > 1
+    */
+    // --------------------------------------------------
 
     // this is a test and <b>Bold</b> and <b style="color: red;">Red-bold</b> and <strike>Strike</strike> < b>Bold2</b> < b>Bold3</ b> < b>Bold3< / b> 
     // (<\s?(a|b|i|u|strong|br|strike)\s?>)
@@ -49,6 +57,8 @@ class Editor {
     // \b(?!href|class)\b\S+="[^"]+"(?=\s*(>|\s[^>]+\s*>))
     // ---!!!!   (?<=<\s?(\/?)\s?(a|b|i|u|strong|br|strike)\s*)\b(?!href|class)\b\S+="[^"]+"(?=\s*(>|\s[^>]+\s*>))
     // => (<[^<>]+)(\b(?!href|class)\b\S+=("[^"]*"|'[^']*')(?=\s*(>|\s[^>]+\s*>)))
+    // tml: (\b(?!href|class)\b\S+=("[^"]*"|'[^']*')(?=\s*(>|\s[^>]+\s*>)))
+    // tml2: (?!<[^<>]+)(\s+\b(?!href|class)\b\S+=("[^"]*"|'[^']*')(?=\W*(>|\s[^>]+\s*>)))
     
     // Remove all tags except allowed.
     // https://www.regextester.com/93930
