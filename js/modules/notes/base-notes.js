@@ -1,5 +1,5 @@
 class BaseNotes {
-  constructor(controls=new Object) {
+  constructor(controls) {
     this.$valid = true;
     this.showError = null;
     this.notes = [];
@@ -11,9 +11,7 @@ class BaseNotes {
       template: controls.template,
       listView: controls.listView,
       detailsView: controls.detailsView,
-      listItems: controls.listItems,
       title: controls.title,
-      description: controls.description,
       listControls: controls.listControls
     };
 
@@ -21,9 +19,9 @@ class BaseNotes {
       chrome.extension.getBackgroundPage().main : main; /*this.background = main;*/
 
     // init modules
-    this.controls.listItems = new ScrollBar(this.controls.listItems);
-    // this.controls.description = new ScrollBar(this.controls.description, {background: '#D6D6D6'});
-    this.controls.description = new Editor(this.controls.description, controls.editorControlls);
+    this.controls.listItems = new ScrollBar(controls.listItems);
+    this.controls.content = new ScrollBar(controls.content, {background: '#D6D6D6'});
+    this.controls.description = new Editor(controls.description, controls.editorControlls);
 
     this.sortHelper = new SortHelper(this.controls.listItems);
     this.searchModule = new SearchModule(controls.search, controls.searchInput);
@@ -40,12 +38,6 @@ class BaseNotes {
       this.deleteNote(parseInt(localStorage.rowId));
     }.bind(this));
     this.controls.title.addEventListener('change', this.titleChanged.bind(this));
-    // this.controls.title.addEventListener('keydown', function (e) {
-    //   if (e.key === 'Tab') {
-    //     e.preventDefault();
-    //     this.controls.description.focus();
-    //   }
-    // }.bind(this));
     this.controls.description.addEventListener('focus', function (e) {
       if (!this.$valid) {
         e.preventDefault();
@@ -55,7 +47,7 @@ class BaseNotes {
     this.controls.description.addEventListener('blur', function(){
       var rowId = localStorage.rowId;
 
-      if (!this.editMode && rowId && this.controls.description.innerHTML != this.notes[rowId].description) {
+      if (!this.editMode && rowId && this.controls.description.value != this.notes[rowId].description) {
         this.descriptionChanged();
       }
     }.bind(this));
@@ -146,12 +138,12 @@ class BaseNotes {
 
   selectNote(index) {
     if (!this.sortHelper.busy) {
-      this.controls.description.index = index;
+      this.controls.description.element.index = index;
       this.controls.listView.style.display = 'None';
       this.controls.detailsView.style.display = 'inherit';
   
       this.controls.title.value = this.notes[index].title;
-      this.controls.description.innerHTML = this.notes[index].description;
+      this.controls.description.value = this.notes[index].description;
       this.controls.description.focus();
 
       //#region SET Selection
@@ -173,7 +165,7 @@ class BaseNotes {
       // }
       //#endregion
   
-      this.controls.description.scrollTop = 0;
+      // this.controls.description.scrollTop = 0;
       localStorage.rowId = index;
     }
   }
@@ -228,7 +220,7 @@ class BaseNotes {
 
   // EVENTS
   descriptionChanged() {
-    this.notes[localStorage.rowId].description = this.controls.description.innerHTML;
+    this.notes[localStorage.rowId].description = this.controls.description.value;
     this.background.update(this.notes[localStorage.rowId], 'description');
   }
 

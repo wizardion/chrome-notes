@@ -2,13 +2,6 @@
 document.addEventListener('DOMContentLoaded', function(){
   var editorControlls = document.getElementById('editor-controlls');
 
-  var content = document.getElementById('content');
-
-  content = new ScrollBar(content, {background: '#D6D6D6'});
-
-  
- 
-
   var notes = new SimpleNotes({
     back: document.getElementById('to-list'),
     add: document.getElementById('add-note'),
@@ -23,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function(){
     searchInput: document.getElementById('search-notes'),
     listControls: document.getElementById('list-controls'),
     
-    editorControlls: editorControlls.getElementsByClassName('button')
+    editorControlls: editorControlls.getElementsByClassName('button'),
+    content: document.getElementById('content')
   });
 
 });

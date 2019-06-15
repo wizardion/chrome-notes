@@ -26,13 +26,51 @@ class Editor {
 
     this.init();
 
-    // Add events
+    // Add global events
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
-
-    return this.element;
   }
 
+  /**
+   * @param {*} value
+   * 
+   * Sets html value
+   */
+  set value(value) {
+    this.element.innerHTML = value;
+  }
+
+  /**
+   * Gets html value
+   */
+  get value() {
+    return this.element.innerHTML;
+  }
+
+  /**
+   * @param {*} name
+   * @param {*} callback
+   * 
+   * Sets html event listener
+   */
+  addEventListener(name, callback) {
+    this.element.addEventListener(name, callback);
+  }
+
+  /**
+   * Focus
+   * 
+   * Sets focus of element
+   */
+  focus() {
+    this.element.focus();
+  }
+
+  /**
+   * Init the controller
+   * 
+   * Init controlls and events.
+   */
   init() {
     //https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
     //https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard
@@ -41,23 +79,21 @@ class Editor {
     for (let i = 0; i < this.controls.length; i++) {
       const item = this.controls[i];
 
-      item.onmousedown = this.precommand;
-      item.onmouseup = this.command;
+      item.onmousedown = this.$precommand;
+      item.onmouseup = this.$command;
     }
   }
 
-  precommand(e) {
+  $precommand(e) {
     // cancel paste.
     e.preventDefault();
   }
 
-  command(e) {
+  $command(e) {
     let action = this.getAttribute('action');
 
     // cancel event.
     e.preventDefault();
-
-    console.log(`action: ${action}`);
     document.execCommand(action);
   }
 
