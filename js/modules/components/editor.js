@@ -152,10 +152,12 @@ class Editor {
   }
 
   $onChange() {
-    this.$onCancelHandling({type: 'changed'});
+    setTimeout(function () {
+      this.$onCancelHandling({type: 'changed'});
+    }.bind(this), 150);
 
     if (this.customEvents['descriptionChanged']) {
-      this.customEvents['descriptionChanged']();
+      this.customEvents['descriptionChanged'](this.element.innerHTML.replace(/contentEditable=["']\w+["']/igm, ''));
     }
   }
 

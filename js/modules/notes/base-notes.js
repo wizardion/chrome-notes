@@ -213,11 +213,11 @@ class BaseNotes {
   }
 
   // EVENTS
-  descriptionChanged() {
+  descriptionChanged(value) {
     var rowId = localStorage.rowId;
 
-    if (!this.editMode && rowId && this.controls.description.value != this.notes[rowId].description) {
-      this.notes[localStorage.rowId].description = this.controls.description.value;
+    if (!this.editMode && rowId && value != this.notes[rowId].description) {
+      this.notes[localStorage.rowId].description = value;
       this.background.update(this.notes[localStorage.rowId], 'description');
     }
   }
