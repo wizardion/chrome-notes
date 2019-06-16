@@ -44,13 +44,7 @@ class BaseNotes {
         return this.showError();
       }
     }.bind(this));
-    this.controls.description.addEventListener('blur', function(){
-      var rowId = localStorage.rowId;
-
-      if (!this.editMode && rowId && this.controls.description.value != this.notes[rowId].description) {
-        this.descriptionChanged();
-      }
-    }.bind(this));
+    this.controls.description.addEventListener('descriptionChanged', this.descriptionChanged.bind(this));
   }
 
   init(notes) {
@@ -220,8 +214,12 @@ class BaseNotes {
 
   // EVENTS
   descriptionChanged() {
-    this.notes[localStorage.rowId].description = this.controls.description.value;
-    this.background.update(this.notes[localStorage.rowId], 'description');
+    var rowId = localStorage.rowId;
+
+    if (!this.editMode && rowId && this.controls.description.value != this.notes[rowId].description) {
+      this.notes[localStorage.rowId].description = this.controls.description.value;
+      this.background.update(this.notes[localStorage.rowId], 'description');
+    }
   }
 
   titleChanged() {

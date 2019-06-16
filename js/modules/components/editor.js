@@ -5,8 +5,9 @@ class Editor {
 
     this.element = element;
     this.controls = controls;
+    this.customEvents = {'descriptionChanged': null}
     this.rules = [
-      { // Replace paragraph to <br/>
+      { // Replace paragraph to <br/> // https://www.regextester.com/93930
         pattern: '<\/(li|p|h[0-9])>', 
         replacement: '<br/>'
       },
@@ -27,8 +28,12 @@ class Editor {
     this.init();
 
     // Add global events
+    this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
+    this.element.addEventListener('keyup', this.$onCancelHandling.bind(this));
+    // this.element.addEventListener('focus', this.$onCancelHandling.bind(this));
+    // this.element.addEventListener('blur', this.$onCancelHandling.bind(this));
   }
 
   /**
@@ -54,6 +59,13 @@ class Editor {
    * Sets html event listener
    */
   addEventListener(name, callback) {
+    var event = this.customEvents[name];
+    
+    if (name in this.customEvents) {
+      this.customEvents[name] = callback;
+      return;
+    }
+
     this.element.addEventListener(name, callback);
   }
 
@@ -78,9 +90,15 @@ class Editor {
 
     for (let i = 0; i < this.controls.length; i++) {
       const item = this.controls[i];
+      const action = item.getAttribute('action');
 
       item.onmousedown = this.$precommand;
-      item.onmouseup = this.$command;
+
+      if (['link'].indexOf(action) === -1) {
+        item.onmouseup = this.$command;
+      } else {
+        item.onmouseup = this.$link.bind(this);
+      }
     }
   }
 
@@ -95,6 +113,50 @@ class Editor {
     // cancel event.
     e.preventDefault();
     document.execCommand(action);
+  }
+
+  
+
+  $link() {
+    
+    // document.execCommand('createLink');
+    var selection = window.getSelection();
+    var text = selection.toString();
+
+    console.log({
+      '': text.match(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i),
+      'text': text,
+      'selection': selection.focusNode
+    });
+
+    if (text.match(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i)) {
+      // text = text.replace(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i, '$1<a href="$2">$2<a>$4');
+      let url = text.replace(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i, '$2');
+
+      console.log(`${text}`);
+
+      // document.execCommand('insertHTML', false, text);
+      // document.execCommand('unlink', false, text);
+      document.execCommand('createLink', false, url);
+
+
+    }
+
+    // this.popup = document.createElement('input');
+
+    // this.popup.classList.add('url-popup');
+
+    // this.element.parentNode.appendChild(this.popup);
+
+    // this.popup.focus();
+  }
+
+  $onChange() {
+    this.$onCancelHandling({type: 'changed'});
+
+    if (this.customEvents['descriptionChanged']) {
+      this.customEvents['descriptionChanged']();
+    }
   }
 
   $onPaste(e) {
@@ -115,9 +177,27 @@ class Editor {
   }
 
   $onHandleInput(e) {
-    if (e.key === 'Tab') {
+    if (e.keyCode === 91) { // when ctrl is pressed
+      var links = this.element.getElementsByTagName('a');
+
+      for (let i = 0; i < links.length; i++) {
+        const link = links[i];
+
+        link.contentEditable = false;
+
+        console.log({
+          'contentEditable': link.contentEditable
+        });
+      }
+    }
+
+    // if (e.keyCode === 32) { // 'Space' \bhttp(s?)\:\/\/[^\s]+\b
+    //   var selection = window.getSelection();
+    //   var selectionLines = selection.getRangeAt(0).getClientRects().length;
+    // }
+
+    if (e.keyCode === 9) { // 'Tab'
       var selection = window.getSelection();
-      // var selectionLength = selection.extentOffset - selection.anchorOffset;
       var selectionLines = selection.getRangeAt(0).getClientRects().length;
 
       e.preventDefault();
@@ -126,6 +206,22 @@ class Editor {
         document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
       } else {
         document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
+      }
+    }
+  }
+
+  $onCancelHandling(e) {
+    if (e.keyCode === 91 || e.type === 'changed') { // when ctrl is pressed
+      // var links = this.element.getElementsByTagName('a');
+      var links = this.element.querySelectorAll('[contentEditable]');
+
+      for (let i = 0; i < links.length; i++) {
+        const link = links[i];
+        link.removeAttribute('contentEditable');
+
+        console.log({
+          'contentEditable': link.contentEditable
+        });
       }
     }
   }

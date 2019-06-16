@@ -21,6 +21,7 @@ div[contenteditable] {
   height: 26px;
   background: transparent;
   margin: 0px 0px 0px 0px;
+
   /* padding-left: 40px; */
 
   /* position: absolute; */
@@ -33,11 +34,6 @@ div[contenteditable] {
   transform: translateX(-50%); */
 }
 
-.edit-title:focus
-{
-  outline: none;
-}
-
 .edit-title.details
 {
   width: 100%;
@@ -47,9 +43,6 @@ div[contenteditable] {
   font: 15px sans-serif;
   color: #07a698;
   padding-bottom: 3px;
-  /* margin-left: -40px; */
-  padding-left: 75px;
-  padding-right: 60px;
 
   width: 100%;
   left: 0px;
@@ -59,7 +52,6 @@ div[contenteditable] {
 
   font: 16px sans-serif;
   /* font-weight: bold; */
-  /* margin-top: 0px; */
 
   /* font-weight: bold; */
   text-decoration: underline;

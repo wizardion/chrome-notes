@@ -21,6 +21,7 @@ html, body
 
 input {
   font-size: 12px;
+  outline: none;
 }
 
 table

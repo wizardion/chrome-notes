@@ -80,3 +80,12 @@ div.button {
 .editor-controlls .button:active {
   background: #b9e6e2;
 }
+
+.url-popup {
+  color: #e33636;
+  width: 300px;
+  border: 1px solid #e33636;
+  position: fixed;
+  top: 25px;
+  left: 10%;
+}
