@@ -138,9 +138,11 @@ class Editor {
           var div = document.createElement('div');
           div.appendChild(clonedSelection);
 
-    if (text.match(/(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)/ig)) {
-      console.log('"$1[$3$6]$5$8"')
-    }
+    // if (text.match(/(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig)) {
+    //   console.log('"$1[$3$6]$5$8"')
+    // }
+
+    regex = /(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig
 
     // console.log({
     //   '': text.match(regex),
@@ -167,7 +169,7 @@ class Editor {
       let linkHtml = text.replace(regex, '$1<a href="$3$6">$3$6</a>$5$8');
       let url = text.replace(regex, '$3$6');
 
-      console.log(`[${linkHtml}]`);
+      console.log(`insertHTML: [${linkHtml}]`);
 
       // document.execCommand('insertHTML', false, linkHtml);
       // document.execCommand('unlink', false, text);
