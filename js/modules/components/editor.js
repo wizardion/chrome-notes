@@ -116,25 +116,56 @@ class Editor {
   }
 
   $link() {
-    
-    // document.execCommand('createLink');
     var selection = window.getSelection();
     var text = selection.toString();
     var regex = /^(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s*)|((https?\:\/\/|www\.)[^\s]+)(\s*))$/i
+    var range = selection.getRangeAt(0);
+
+    var focusNode = selection.focusNode;
+    
+    var parentElement = selection.focusNode.parentElement;
+    var previousSibling = selection.focusNode.previousSibling;
+    var nextSibling = selection.focusNode.nextSibling;
+
+    var siblings = [
+      focusNode.previousSibling && focusNode.previousSibling.tagName,
+      focusNode.parentElement && focusNode.parentElement.tagName,
+      focusNode.nextSibling && focusNode.nextSibling.tagName,
+    ]
+
+
+    var clonedSelection = range.cloneContents();
+          var div = document.createElement('div');
+          div.appendChild(clonedSelection);
+
+    // console.log({
+    //   '': text.match(regex),
+    //   'innerHTML': div.innerHTML,
+    //   'text': text,
+    //   'selection': selection,
+    //   'tagName': parentElement.tagName,
+    //   'range': range,
+    // });
 
     console.log({
-      '': text.match(regex),
+      'siblings': siblings.indexOf('A') > -1,
       'text': text,
-      'selection': selection.focusNode
+      'hasLink': (parentElement && parentElement.tagName === 'A') || (previousSibling && previousSibling.tagName === 'A') || (nextSibling && nextSibling.tagName === 'A')
     });
 
-    if (text.match(regex)) {
+    if (siblings.indexOf('A') > -1) {
+      console.log('unlink...');
+      // document.execCommand("unlink", false, false); 
+    }
+
+    // Create link
+    if (siblings.indexOf('A') === -1 && text.match(regex)) {
       let linkHtml = text.replace(regex, '$1<a href="$3$6">$3$6</a>$5$8');
       let url = text.replace(regex, '$3$6');
 
       console.log(`[${linkHtml}]`);
 
-      document.execCommand('insertHTML', false, linkHtml);
+      // document.execCommand('insertHTML', false, linkHtml);
       // document.execCommand('unlink', false, text);
       // document.execCommand('createLink', false, url);
     }
