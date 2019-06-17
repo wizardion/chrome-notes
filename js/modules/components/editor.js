@@ -138,6 +138,10 @@ class Editor {
           var div = document.createElement('div');
           div.appendChild(clonedSelection);
 
+    if (text.match(/(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)/ig)) {
+      console.log('"$1[$3$6]$5$8"')
+    }
+
     // console.log({
     //   '': text.match(regex),
     //   'innerHTML': div.innerHTML,
