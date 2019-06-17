@@ -118,71 +118,96 @@ class Editor {
   $link() {
     var selection = window.getSelection();
     var text = selection.toString();
-    var regex = /^(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s*)|((https?\:\/\/|www\.)[^\s]+)(\s*))$/i
-    var range = selection.getRangeAt(0);
+    var regex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i
 
-    var focusNode = selection.focusNode;
-    
-    var parentElement = selection.focusNode.parentElement;
-    var previousSibling = selection.focusNode.previousSibling;
-    var nextSibling = selection.focusNode.nextSibling;
-
-    var siblings = [
-      focusNode.previousSibling && focusNode.previousSibling.tagName,
-      focusNode.parentElement && focusNode.parentElement.tagName,
-      focusNode.nextSibling && focusNode.nextSibling.tagName,
-    ]
-
-
-    var clonedSelection = range.cloneContents();
-          var div = document.createElement('div');
-          div.appendChild(clonedSelection);
-
-    // if (text.match(/(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig)) {
-    //   console.log('"$1[$3$6]$5$8"')
-    // }
-
-    regex = /(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig
-
-    // console.log({
-    //   '': text.match(regex),
-    //   'innerHTML': div.innerHTML,
-    //   'text': text,
-    //   'selection': selection,
-    //   'tagName': parentElement.tagName,
-    //   'range': range,
-    // });
-
-    console.log({
-      'siblings': siblings.indexOf('A') > -1,
-      'text': text,
-      'hasLink': (parentElement && parentElement.tagName === 'A') || (previousSibling && previousSibling.tagName === 'A') || (nextSibling && nextSibling.tagName === 'A')
-    });
-
-    if (siblings.indexOf('A') > -1) {
-      console.log('unlink...');
-      // document.execCommand("unlink", false, false); 
-    }
-
-    // Create link
-    if (siblings.indexOf('A') === -1 && text.match(regex)) {
-      let linkHtml = text.replace(regex, '$1<a href="$3$6">$3$6</a>$5$8');
-      let url = text.replace(regex, '$3$6');
+    if (text.match(regex)) {
+      let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
+      let url = text.replace(regex, '$1');
 
       console.log(`insertHTML: [${linkHtml}]`);
 
       // document.execCommand('insertHTML', false, linkHtml);
-      // document.execCommand('unlink', false, text);
       // document.execCommand('createLink', false, url);
+      return;
     }
 
-    // this.popup = document.createElement('input');
+    if ('hasLink') {
+      console.log('unlink...');
+      // document.execCommand("unlink", false, false); 
+    }
 
-    // this.popup.classList.add('url-popup');
+    // var selection = window.getSelection();
+    // var text = selection.toString();
+    // var regex = /^(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s*)|((https?\:\/\/|www\.)[^\s]+)(\s*))$/i
+    // var range = selection.getRangeAt(0);
 
-    // this.element.parentNode.appendChild(this.popup);
+    // var focusNode = selection.focusNode;
+    
+    // var parentElement = selection.focusNode.parentElement;
+    // var previousSibling = selection.focusNode.previousSibling;
+    // var nextSibling = selection.focusNode.nextSibling;
 
-    // this.popup.focus();
+    // var siblings = [
+    //   focusNode.previousSibling && focusNode.previousSibling.tagName,
+    //   focusNode.parentElement && focusNode.parentElement.tagName,
+    //   focusNode.nextSibling && focusNode.nextSibling.tagName,
+    // ]
+
+
+    // var clonedSelection = range.cloneContents();
+    // var div = document.createElement('div');
+
+    // div.appendChild(clonedSelection);
+    // var innerHTML = div.innerHTML;
+
+    // // if (text.match(/(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig)) {
+    // //   console.log('"$1[$3$6]$5$8"')
+    // // }
+
+    // regex = /(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig
+    // var hasLink = siblings.indexOf('A') > -1;
+
+    // // console.log({
+    // //   '': text.match(regex),
+    // //   'innerHTML': div.innerHTML,
+    // //   'text': text,
+    // //   'selection': selection,
+    // //   'tagName': parentElement.tagName,
+    // //   'range': range,
+    // // });
+
+    // console.log({
+    //   'selection': document.selection,
+    //   'innerHTML': innerHTML,
+    //   'siblings': hasLink,
+    //   'text': text,
+    //   'hasLink': (parentElement && parentElement.tagName === 'A') || (previousSibling && previousSibling.tagName === 'A') || (nextSibling && nextSibling.tagName === 'A')
+    // });
+
+    // if (hasLink) {
+    //   console.log('unlink...');
+    //   // document.execCommand("unlink", false, false); 
+    // }
+
+    // // Create link
+    // if (!hasLink && text.match(regex)) {
+    //   let linkHtml = text.replace(regex, '$1<a href="$3$6">$3$6</a>$5$8');
+    //   let url = text.replace(regex, '$3$6');
+
+    //   console.log(`insertHTML: [${linkHtml}]`);
+
+    //   // document.execCommand('insertHTML', false, linkHtml);
+    //   // document.execCommand('unlink', false, text);
+    //   // document.execCommand('createLink', false, url);
+    // }
+
+    // // this.popup = document.createElement('input');
+
+    // // this.popup.classList.add('url-popup');
+
+    // // this.element.parentNode.appendChild(this.popup);
+
+    // // this.popup.focus();
   }
 
   $onChange() {
