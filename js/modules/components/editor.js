@@ -115,31 +115,28 @@ class Editor {
     document.execCommand(action);
   }
 
-  
-
   $link() {
     
     // document.execCommand('createLink');
     var selection = window.getSelection();
     var text = selection.toString();
+    var regex = /^(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s*)|((https?\:\/\/|www\.)[^\s]+)(\s*))$/i
 
     console.log({
-      '': text.match(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i),
+      '': text.match(regex),
       'text': text,
       'selection': selection.focusNode
     });
 
-    if (text.match(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i)) {
-      // text = text.replace(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i, '$1<a href="$2">$2<a>$4');
-      let url = text.replace(/^(\s*)\b(http(s?)\:\/\/[^\s]+)\b(\S*\s*)$/i, '$2');
+    if (text.match(regex)) {
+      let linkHtml = text.replace(regex, '$1<a href="$3$6">$3$6</a>$5$8');
+      let url = text.replace(regex, '$3$6');
 
-      console.log(`${text}`);
+      console.log(`[${linkHtml}]`);
 
-      // document.execCommand('insertHTML', false, text);
+      document.execCommand('insertHTML', false, linkHtml);
       // document.execCommand('unlink', false, text);
-      document.execCommand('createLink', false, url);
-
-
+      // document.execCommand('createLink', false, url);
     }
 
     // this.popup = document.createElement('input');
@@ -152,9 +149,7 @@ class Editor {
   }
 
   $onChange() {
-    setTimeout(function () {
-      this.$onCancelHandling({type: 'changed'});
-    }.bind(this), 150);
+    // this.$onCancelHandling({type: 'changed'});
 
     if (this.customEvents['descriptionChanged']) {
       this.customEvents['descriptionChanged'](this.element.innerHTML.replace(/contentEditable=["']\w+["']/igm, ''));
@@ -179,8 +174,12 @@ class Editor {
   }
 
   $onHandleInput(e) {
-    if (e.keyCode === 91) { // when ctrl is pressed
+    // console.log({'keyCode': e.keyCode})
+
+    if (e.keyCode === 91 || e.keyCode == 17) { // when ctrl is pressed
       var links = this.element.getElementsByTagName('a');
+
+      e.preventDefault();
 
       for (let i = 0; i < links.length; i++) {
         const link = links[i];
@@ -192,11 +191,6 @@ class Editor {
         });
       }
     }
-
-    // if (e.keyCode === 32) { // 'Space' \bhttp(s?)\:\/\/[^\s]+\b
-    //   var selection = window.getSelection();
-    //   var selectionLines = selection.getRangeAt(0).getClientRects().length;
-    // }
 
     if (e.keyCode === 9) { // 'Tab'
       var selection = window.getSelection();
@@ -213,7 +207,7 @@ class Editor {
   }
 
   $onCancelHandling(e) {
-    if (e.keyCode === 91 || e.type === 'changed') { // when ctrl is pressed
+    if (e.keyCode === 91 || e.keyCode == 17 || e.type === 'changed') { // when ctrl is pressed
       // var links = this.element.getElementsByTagName('a');
       var links = this.element.querySelectorAll('[contentEditable]');
 

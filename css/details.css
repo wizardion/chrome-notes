@@ -127,3 +127,20 @@ div[contenteditable] {
   /* background: yellow; */
   flex: 1 1 auto;
 }
+
+.content-description a {
+  color: dodgerblue;
+  text-decoration: none;
+  /* color: blue; */
+}
+
+.content-description a[contentEditable]:hover {
+  text-decoration: underline;
+  /* color: blue; */
+}
+
+.content-description a:visited,
+.content-description a:active {
+  color: dodgerblue;
+  /* color: blue; */
+}
