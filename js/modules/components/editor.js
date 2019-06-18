@@ -172,7 +172,7 @@ class Editor {
     // unlink
     if (containsLink) {
       console.log(`1. unlink`);
-      // return document.execCommand("unlink", false);
+      return document.execCommand("unlink", false);
     }
 
     // create an auto link
@@ -180,7 +180,7 @@ class Editor {
       let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
 
       console.log(`2. insertHTML`);
-      // return document.execCommand('insertHTML', false, linkHtml);
+      return document.execCommand('insertHTML', false, linkHtml);
     }
 
     // create a custom link
@@ -249,8 +249,78 @@ class Editor {
     }
   }
 
+  $exec(selection) {
+    var text = selection.focusNode.data.substr(0, selection.focusOffset);
+    var focusNode = selection.focusNode;
+    // var range = selection.getRangeAt(0);
+
+    console.log({
+      'text': text
+    })
+
+    // console.log({
+    //   // 'text': text.replace(/\[([^()]+)\]\(([^()]+)\)/ig, '<a $2>$1</a>'),
+    //   'text': text,
+    //   // 'range.substr': text.substr(0, range.endOffset),
+    //   'substr': text.substr(0, selection.focusOffset),
+    //   'toString': selection.toString(),
+    //   'selection': selection,
+    //   // 'range': range,
+    // })
+
+    if (text[text.length - 1] === ')') {
+      // selection.
+
+      var link = text.replace(/\[([^()]+)\]\(([^()]+)\)/ig, '&nbsp;<a href="$2"> $1</a> ');
+
+      setTimeout(function() {
+        // var link = text.replace(/\[([^()]+)\]\(([^()]+)\)/ig, ' <a href="$2"> $1</a> ');
+
+        selection.collapse(focusNode, 0);
+        selection.extend(focusNode, text.length);
+
+        document.execCommand('insertHTML', false, link);
+      }.bind(this), 1000)
+
+      // selection.collapse(selection.focusNode, 0);
+      // selection.extend(selection.focusNode, text.length);
+      // 
+
+      // selection.focusNode.data = link;
+
+      console.log({
+        'text': link,
+        'selection': selection,
+      });
+
+      // return document.execCommand('insertHTML', false, link);
+
+      return true;
+    }
+  }
+
   $onHandleInput(e) {
     // console.log({'keyCode': e.keyCode})
+
+    // if (e.keyCode === 13) { // 'Enter'
+    //   e.preventDefault();
+
+    //   document.execCommand('insertHTML', false, '<br/>');
+    // }
+
+    if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
+      var selection = window.getSelection();
+
+      if (this.$exec(selection)) {
+        // e.preventDefault();
+      }
+
+      // e.preventDefault();
+
+      // document.execCommand('insertHTML', false, '<br/>');
+
+      // this.$exec(selection);
+    }
 
     if (e.keyCode === 91 || e.keyCode == 17) { // when ctrl is pressed
       var links = this.element.getElementsByTagName('a');
