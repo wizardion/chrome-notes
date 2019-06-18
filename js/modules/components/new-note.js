@@ -125,7 +125,7 @@ class NewNote extends Module {
     this.controls.save.style.visibility = 'hidden';
     this.parent.delete.style.visibility = 'hidden';
 
-    this.parent.description.innerHTML = '';
+    this.parent.description.value = '';
   }
 
   /**
@@ -159,7 +159,7 @@ class NewNote extends Module {
       callback({
         id: -1,
         title: this.controls.title.value,
-        description: this.parent.description.innerHTML,
+        description: this.parent.description.value,
         displayOrder: -1,
         updated: new Date().getTime()
       });

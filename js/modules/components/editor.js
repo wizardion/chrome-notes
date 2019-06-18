@@ -9,14 +9,14 @@ class Editor {
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
         pattern: '<\/(li|p|h[0-9])>', 
-        replacement: '<br/>'
+        replacement: '<br/><br/>'
       },
       { // Remove all attributes except allowed.
         pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
         replacement: ''
       },
       { // Remove all tags except allowed.
-        pattern: `((<)\\s?(\/?)\\s?(${tags})\\s*(>|\\s[^>]+\\s*>))|<[^>]+>`,
+        pattern: `((<)\\s?(\/?)\\s?(${tags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
       { // Replace tab space
@@ -118,8 +118,21 @@ class Editor {
   $containsLink(selection) {
     var container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
 
-    return (container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
-           (container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
+    return (container && container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
+           (container && container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
+  }
+
+  $getHtml(selection) {
+    var content = selection.rangeCount > 0 && selection.getRangeAt(0).cloneContents();
+
+    if (content) {
+      let div = document.createElement('div');
+
+      div.appendChild(content);
+      return div.innerHTML;
+    }
+
+    return '';
   }
 
   $createPopup() {
@@ -171,7 +184,25 @@ class Editor {
     }
 
     // create a custom link
-    this.popup = this.$createPopup();
+    // let customHtml = text.replace(/\b(.*)\b/im, '[$1](url)');
+    // let html = this.$getHtml(selection);
+    // let customLink = `[${html}](url)`;
+    let customLink = `[${text.replace(/\n/ig, '<br>')}](url)`;
+
+    // console.log({
+    //   'html': this.$getHtml(selection),
+    //   // 'container': selection.getRangeAt(0).commonAncestorContainer,
+    //   'text': text,
+    // });
+
+    // console.log(`2. insertCustomLink${customLink}`);
+    // \[([^()]+)\]\(([^()]+)\) // find url
+    return document.execCommand('insertHTML', false, customLink);
+
+    
+
+    // create a custom link
+    // this.popup = this.$createPopup();
     
     // if (!containsLink && text.match(regex)) {
     //   let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
@@ -201,6 +232,8 @@ class Editor {
     var clipboard = (e.originalEvent || e).clipboardData;
     var data = clipboard.getData('text/html'); // || clipboard.getData('text/plain');
 
+    console.log(`${data}`)
+
     if (data) {
       // cancel paste.
       e.preventDefault();
@@ -208,6 +241,8 @@ class Editor {
       for (let index = 0; index < this.rules.length; index++) {
         const rule = this.rules[index];
         data = data.replace(new RegExp(rule.pattern, 'igm'), rule.replacement);
+
+        console.log(`${data}`)
       }
 
       document.execCommand('insertHTML', false, data);
