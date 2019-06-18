@@ -250,36 +250,19 @@ class Editor {
   }
 
   $exec(selection) {
-    var regex = /(\[([^()]+)\]\(([^()]+)\))/ig;
-    var text = selection.focusNode.data.substr(0, selection.focusOffset);
     var focusNode = selection.focusNode;
-    // var range = selection.getRangeAt(0);
+    var text = focusNode.data.substr(0, selection.focusOffset);
+    
+    var regex = /(\[([^()]+)\]\(([^()]+)\))/ig;
+    var links = text.match(regex);
+    
+    if (text[text.length - 1] === ')' && links) {
+      let link = links[0];
+      
+      selection.collapse(focusNode, text.length - link.length);
+      selection.extend(focusNode, text.length);
 
-    if (text[text.length - 1] === ')') {
-      // var link = text.replace(/(\[([^()]+)\]\(([^()]+)\))/ig, '<a href="$3"> $2</a> ');
-      var link = text;
-      text = text.replace(regex, '');
-      link = link.replace(text, '')
-
-      // setTimeout(function() {
-      //   selection.collapse(focusNode, text.length);
-      //   selection.extend(focusNode, text.length + link.length);
-
-      //   document.execCommand('insertHTML', false, link.replace(regex, '<a href="$3">$2</a> '));
-      // }.bind(this), 1000)
-
-      selection.collapse(focusNode, text.length);
-      selection.extend(focusNode, text.length + link.length);
-
-      document.execCommand('insertHTML', false, link.replace(regex, '<a href="$3">$2</a> '));
-
-      console.log({
-        'link': link,
-        'text': text,
-        'selection': selection,
-      });
-
-      return true;
+      return document.execCommand('insertHTML', false, link.replace(regex, '<a href="$3">$2</a> '));
     }
   }
 
