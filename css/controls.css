@@ -82,10 +82,25 @@ div.button {
 }
 
 .url-popup {
-  color: #e33636;
-  width: 300px;
-  border: 1px solid #e33636;
+  color: #07a698;
+  background: white;
+  font-size: 12px;
+  width: 580px;
+  border-bottom: 1px solid rgba(7, 166, 152, 0.1);
   position: fixed;
-  top: 25px;
-  left: 10%;
+  top: 26px;
+  left: 1px;
+  padding: 0 5px 0 10px;
+}
+
+.url-popup input[type=text] {
+  color: dodgerblue;
+  font: 13px sans-serif;
+  width: 475px;
+  border: none;
+  /* background: yellow; */
+  height: 22px;
+  margin-top: 1px;
+  margin-left: 7px;
+  text-decoration: underline;
 }

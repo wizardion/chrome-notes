@@ -115,99 +115,78 @@ class Editor {
     document.execCommand(action);
   }
 
+  $containsLink(selection) {
+    var container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+
+    return (container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
+           (container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
+  }
+
+  $createPopup() {
+    var popup = {
+      element: document.createElement('div'),
+      input: document.createElement('input'),
+      save: document.createElement('input'),
+    }
+
+    popup.element.className = 'url-popup';
+    popup.save.className = 'button save-note';
+    
+    popup.input.type = 'text';
+    popup.save.type = 'button';
+
+    popup.element.appendChild(document.createTextNode('Enter URL: '));
+    popup.element.appendChild(popup.save);
+    popup.element.appendChild(popup.input);
+    
+    this.element.parentNode.appendChild(popup.element);
+    popup.input.focus();
+
+    return popup;
+  }
+
   $link() {
     var selection = window.getSelection();
     var text = selection.toString();
-    var regex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i
+    var containsLink = this.$containsLink(selection);
+    var regex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
 
-    if (text.match(regex)) {
-      let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
-      let url = text.replace(regex, '$1');
-
-      console.log(`insertHTML: [${linkHtml}]`);
-
-      // document.execCommand('insertHTML', false, linkHtml);
-      // document.execCommand('createLink', false, url);
+    // selection is empty
+    if (!text.length) {
       return;
     }
 
-    if ('hasLink') {
-      console.log('unlink...');
-      // document.execCommand("unlink", false, false); 
+    // unlink
+    if (containsLink) {
+      console.log(`1. unlink`);
+      // return document.execCommand("unlink", false);
     }
 
-    // var selection = window.getSelection();
-    // var text = selection.toString();
-    // var regex = /^(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s*)|((https?\:\/\/|www\.)[^\s]+)(\s*))$/i
-    // var range = selection.getRangeAt(0);
+    // create an auto link
+    if (!containsLink && text.match(regex)) {
+      let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
 
-    // var focusNode = selection.focusNode;
+      console.log(`2. insertHTML`);
+      // return document.execCommand('insertHTML', false, linkHtml);
+    }
+
+    // create a custom link
+    this.popup = this.$createPopup();
     
-    // var parentElement = selection.focusNode.parentElement;
-    // var previousSibling = selection.focusNode.previousSibling;
-    // var nextSibling = selection.focusNode.nextSibling;
+    // if (!containsLink && text.match(regex)) {
+    //   let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
+    //   // let url = text.replace(regex, '$1');
 
-    // var siblings = [
-    //   focusNode.previousSibling && focusNode.previousSibling.tagName,
-    //   focusNode.parentElement && focusNode.parentElement.tagName,
-    //   focusNode.nextSibling && focusNode.nextSibling.tagName,
-    // ]
-
+    //   console.log(`insertHTML: [${linkHtml}]`);
+      
+    //   // document.execCommand('createLink', false, url);
+    //   return document.execCommand('insertHTML', false, linkHtml);
+    // }
 
     // var clonedSelection = range.cloneContents();
     // var div = document.createElement('div');
-
     // div.appendChild(clonedSelection);
     // var innerHTML = div.innerHTML;
-
-    // // if (text.match(/(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig)) {
-    // //   console.log('"$1[$3$6]$5$8"')
-    // // }
-
-    // regex = /(?!\w+)(\s*)(((https?\:\/\/|www\.)[^\s]+)([\,\.]+\s+)|((https?\:\/\/|www\.)[^\s]+)(\s*))(?=\w+)?/ig
-    // var hasLink = siblings.indexOf('A') > -1;
-
-    // // console.log({
-    // //   '': text.match(regex),
-    // //   'innerHTML': div.innerHTML,
-    // //   'text': text,
-    // //   'selection': selection,
-    // //   'tagName': parentElement.tagName,
-    // //   'range': range,
-    // // });
-
-    // console.log({
-    //   'selection': document.selection,
-    //   'innerHTML': innerHTML,
-    //   'siblings': hasLink,
-    //   'text': text,
-    //   'hasLink': (parentElement && parentElement.tagName === 'A') || (previousSibling && previousSibling.tagName === 'A') || (nextSibling && nextSibling.tagName === 'A')
-    // });
-
-    // if (hasLink) {
-    //   console.log('unlink...');
-    //   // document.execCommand("unlink", false, false); 
-    // }
-
-    // // Create link
-    // if (!hasLink && text.match(regex)) {
-    //   let linkHtml = text.replace(regex, '$1<a href="$3$6">$3$6</a>$5$8');
-    //   let url = text.replace(regex, '$3$6');
-
-    //   console.log(`insertHTML: [${linkHtml}]`);
-
-    //   // document.execCommand('insertHTML', false, linkHtml);
-    //   // document.execCommand('unlink', false, text);
-    //   // document.execCommand('createLink', false, url);
-    // }
-
-    // // this.popup = document.createElement('input');
-
-    // // this.popup.classList.add('url-popup');
-
-    // // this.element.parentNode.appendChild(this.popup);
-
-    // // this.popup.focus();
   }
 
   $onChange() {
