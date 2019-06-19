@@ -1,6 +1,6 @@
 class Editor {
   constructor (element, controls) {
-    const tags = ['a', 'b', 'i', 'u', 'strong', 'br', 'strike'].join('|'); // Allowed tags
+    const tags = ['a', 'b', 'i', 'u', 'strong', 'br', 'strike', 'div'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.element = element;
@@ -220,11 +220,25 @@ class Editor {
     // var innerHTML = div.innerHTML;
   }
 
+  $removeHtml(data) {
+    for (let index = 0; index < this.rules.length; index++) {
+      const rule = this.rules[index];
+      data = data.replace(new RegExp(rule.pattern, 'igm'), rule.replacement);
+    }
+
+    return data;
+  }
+
   $onChange() {
+    // ----------Remove all----------
+    let data = this.$removeHtml(this.element.innerHTML);
+    // ------------------------------
+
     // this.$onCancelHandling({type: 'changed'});
 
     if (this.customEvents['descriptionChanged']) {
-      this.customEvents['descriptionChanged'](this.element.innerHTML.replace(/contentEditable=["']\w+["']/igm, ''));
+      // this.customEvents['descriptionChanged'](this.element.innerHTML.replace(/contentEditable=["']\w+["']/igm, ''));
+      this.customEvents['descriptionChanged'](data);
     }
   }
 
@@ -249,18 +263,54 @@ class Editor {
     }
   }
 
+  $getHtmlLink(){
+    
+  }
+
   $exec(selection) {
     var focusNode = selection.focusNode;
     var source = focusNode.data.substr(0, selection.focusOffset);
     var character = source[source.length - 1];
 
+    // focusNode.previousSibling.outerHTML
+    // focusNode.previousSibling.previousSibling.data
+    // focusNode.previousSibling.previousSibling.previousSibling: null;
+
     // console.log({
-    //   'character': character,
-    //   'selection': selection
+    //   'selection': focusNode
     // });
 
     if (character === ')') {
       let regex = /(\[([^()]+)\]\(([^()]+)\))/i;
+      let node = focusNode;
+      // let sourceHtml = [];
+      let sourceHtml = '';
+
+      console.log({
+        'node': node
+      })
+
+      while(node) {
+        sourceHtml = (node.data || node.outerHTML) + sourceHtml;
+        
+        node = node.previousSibling? node.previousSibling : 
+          node.parentNode !== this.element? node.parentNode.previousSibling : null;
+
+        console.log({
+          'node': node
+        });
+
+        if (regex.test(sourceHtml)) {
+          console.log('===FOUND===')
+          break;
+        }
+      }
+
+      console.log({
+        'sourceHtml': sourceHtml,
+        'insertHtml': this.$removeHtml(sourceHtml),
+      });
+
       let [text, link] = source.split(regex, 2);
 
       // console.log({
