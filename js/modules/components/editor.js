@@ -254,28 +254,35 @@ class Editor {
     var source = focusNode.data.substr(0, selection.focusOffset);
     var character = source[source.length - 1];
 
-    console.log({
-      'character': character,
-      'selection': selection
-    });
+    // console.log({
+    //   'character': character,
+    //   'selection': selection
+    // });
 
     if (character === ')') {
       let regex = /(\[([^()]+)\]\(([^()]+)\))/i;
       let [text, link] = source.split(regex, 2);
 
-      console.log({
-        'text': text,
-        'link': link,
-        'split': source.split(regex),
-        'source': source,
-      });
+      // console.log({
+      //   'text': text,
+      //   'link': link,
+      //   'split': source.split(regex),
+      //   'source': source,
+      // });
 
       if (link) {
-        // document.execCommand('insertText', false, ' ');
+        let linkHtml = link.replace(regex, '<a href="$3">$2</a>');
+        document.execCommand('insertText', false, ' ');
+
         selection.collapse(focusNode, text.length);
         selection.extend(focusNode, text.length + link.length);
 
-        return document.execCommand('insertHTML', false, link.replace(regex, '<a href="$3">$2</a> '));
+        document.execCommand('insertHTML', false, linkHtml);
+
+        selection.collapse(focusNode, 1);
+        selection.extend(focusNode, 1);
+
+        return true;
       }
     }
   }
@@ -296,9 +303,9 @@ class Editor {
       
       // var br = this.element.innerHTML.substr(-4) === '<br>'? '<br>' : '<br><br>'
 
-      e.preventDefault();
-      // return document.execCommand('insertHTML', false, br);
-      return document.execCommand('insertHTML', false, '<p></p>');
+      // e.preventDefault();
+      // // return document.execCommand('insertHTML', false, br);
+      // return document.execCommand('insertHTML', false, '<p></p>');
     }
 
     if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
