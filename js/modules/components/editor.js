@@ -251,29 +251,62 @@ class Editor {
 
   $exec(selection) {
     var focusNode = selection.focusNode;
-    var text = focusNode.data.substr(0, selection.focusOffset);
-    
-    var regex = /(\[([^()]+)\]\(([^()]+)\))/ig;
-    var links = text.match(regex);
-    
-    if (text[text.length - 1] === ')' && links) {
-      let link = links[0];
-      
-      selection.collapse(focusNode, text.length - link.length);
-      selection.extend(focusNode, text.length);
+    var source = focusNode.data.substr(0, selection.focusOffset);
+    var character = source[source.length - 1];
 
-      return document.execCommand('insertHTML', false, link.replace(regex, '<a href="$3">$2</a> '));
+    console.log({
+      'character': character,
+      'selection': selection
+    });
+
+    if (character === ')') {
+      let regex = /(\[([^()]+)\]\(([^()]+)\))/i;
+      let [text, link] = source.split(regex, 2);
+
+      console.log({
+        'text': text,
+        'link': link,
+        'split': source.split(regex),
+        'source': source,
+      });
+
+      if (link) {
+        // document.execCommand('insertText', false, ' ');
+        selection.collapse(focusNode, text.length);
+        selection.extend(focusNode, text.length + link.length);
+
+        return document.execCommand('insertHTML', false, link.replace(regex, '<a href="$3">$2</a> '));
+      }
     }
   }
 
   $onHandleInput(e) {
     // console.log({'keyCode': e.keyCode})
 
+    if (e.keyCode === 13) { // 'Enter'
+      // var selection = window.getSelection();
+      // var count = selection.rangeCount;
+      // var range = count && selection.getRangeAt(0);
+
+      // console.log({
+      //   'count': count,
+      //   'endOffset': range && range,
+      // });
+
+      
+      // var br = this.element.innerHTML.substr(-4) === '<br>'? '<br>' : '<br><br>'
+
+      e.preventDefault();
+      // return document.execCommand('insertHTML', false, br);
+      return document.execCommand('insertHTML', false, '<p></p>');
+    }
+
     if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
       var selection = window.getSelection();
 
       if (this.$exec(selection)) {
         e.preventDefault();
+        return;
       }
     }
 

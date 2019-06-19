@@ -126,7 +126,9 @@ main.update = function(item, key){
     sql = 'UPDATE Notes SET ' + key + '=? WHERE rowid=?';
     data = [item[key], item.id];
 
-    pritSQL(sql, data);
+    // pritSQL(sql, data);
+    
+    console.log(`"%c${item[key]}%c"`, 'color: red;', 'color: black;');
     // return;
   }
 
