@@ -437,12 +437,19 @@ class Editor {
     var tags = encodedStr.match(tagRegex);
     var sTags = encodedStr.match(symbRegex);
     
-    logDiv.innerHTML = ('"' + encodedStr.replace(/[ ]/ig, '&nbsp;').
-                             replace(tagRegex, '<span style="background: yellow; border: 1px solid palegoldenrod; border-bottom: 2px solid #e33636;">$1</span>').
-                             replace(symbRegex, '<span style="border-bottom: 2px solid #f1bebe;">$1</span>').
-                             replace(/(\n|\r)/ig, '<span style="border-bottom: 2px solid #b9e6e2;">\\n</span>') + '"');
+    // logDiv.innerHTML = '"' + encodedStr.replace(/[ ]/ig, '&nbsp;').
+    //                          replace(tagRegex, '<span class="error">$1</span>').
+    //                          replace(symbRegex, '<span class="html-symbol">$1</span>').
+    //                          replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
 
+    logDiv.innerHTML = '"' + encodedStr.replace(tagRegex, '<span class="error">$1</span>').
+                                        replace(symbRegex, '<span class="html-symbol">$1</span>').
+                                        replace(/( )( )/ig, '$1&nbsp;').
+                                        replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
 
+    console.log({
+      'encodedStr': encodedStr.replace(tagRegex, '<span class="error">$1</span>')
+    });
     var logDiv = document.getElementById('expression-result').innerHTML = `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
   }
 

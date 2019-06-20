@@ -157,6 +157,8 @@ div[contenteditable] {
   /* border: 1px solid #07a698; */
   border: 1px solid #07a69857;
   background: white;
+  /* white-space: pre-wrap;
+  word-wrap: break-word; */
 }
 
 .expression-logs.statistic {
@@ -164,3 +166,19 @@ div[contenteditable] {
   height: 13px;
   font-size: 13px;
 }
+
+/* LOG */
+.expression-logs .error {
+  background: yellow; 
+  border: 1px solid palegoldenrod; 
+  border-bottom: 2px solid #e33636;
+}
+
+.expression-logs .html-symbol {
+  border-bottom: 2px solid #f1bebe;
+}
+
+.expression-logs .symbol {
+  border-bottom: 2px solid #b9e6e2;
+}
+/* END LOG */
