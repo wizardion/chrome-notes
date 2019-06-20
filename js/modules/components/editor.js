@@ -34,6 +34,7 @@ class Editor {
     this.element.addEventListener('keyup', this.$onCancelHandling.bind(this));
     // this.element.addEventListener('focus', this.$onCancelHandling.bind(this));
     // this.element.addEventListener('blur', this.$onCancelHandling.bind(this));
+    this.element.addEventListener('input', this.log.bind(this));
   }
 
   /**
@@ -269,8 +270,12 @@ class Editor {
 
   $exec(selection) {
     var focusNode = selection.focusNode;
-    var source = focusNode.data.substr(0, selection.focusOffset);
-    var character = source[source.length - 1];
+    var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
+    var character = source && source[source.length - 1];
+
+    if (!source) {
+      return;
+    }
 
     // focusNode.previousSibling.outerHTML
     // focusNode.previousSibling.previousSibling.data
@@ -338,6 +343,7 @@ class Editor {
   }
 
   $onHandleInput(e) {
+    
     // console.log({'keyCode': e.keyCode})
 
     if (e.keyCode === 13) { // 'Enter'
@@ -395,6 +401,23 @@ class Editor {
         document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
       }
     }
+  }
+
+  log() {
+    var logDiv = document.getElementById('expression');
+    var tagsToReplace = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;'
+    };
+
+    let encodedStr = this.element.innerHTML.replace(/[&<>]/g, function (tag) {
+      return tagsToReplace[tag] || tag;
+    });
+    
+    logDiv.innerHTML = encodedStr.replace(/(&lt;\/?\w+&gt;)/ig, '<span style="background: yellow; border: 1px solid palegoldenrod;">$1</span>').
+                             replace(/(&amp;\w+;)/ig, '<span style="background: lightyellow; border: 1px solid lightgoldenrodyellow;">$1</span>');
+  
   }
 
   $onCancelHandling(e) {
