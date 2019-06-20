@@ -415,9 +415,10 @@ class Editor {
       return tagsToReplace[tag] || tag;
     });
     
-    logDiv.innerHTML = encodedStr.replace(/(&lt;\/?\w+&gt;)/ig, '<span style="background: yellow; border: 1px solid palegoldenrod;">$1</span>').
-                             replace(/(&amp;\w+;)/ig, '<span style="background: lightyellow; border: 1px solid lightgoldenrodyellow;">$1</span>');
-  
+    logDiv.innerHTML = encodedStr.replace(/(&lt;\/?[^&]+&gt;)/ig, '<span style="background: yellow; border: 1px solid palegoldenrod; border-bottom: 2px solid #e33636;">$1</span>').
+                             replace(/(&amp;\w+;)/ig, '<span style="border-bottom: 2px solid #f1bebe;">$1</span>');
+
+    console.log(encodedStr)
   }
 
   $onCancelHandling(e) {
