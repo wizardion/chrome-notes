@@ -342,26 +342,43 @@ class Editor {
     }
   }
 
+
+  $isLast(selection) {
+    var focusNode = selection.focusNode;
+
+    console.log({
+      // 'focusOffset': selection.focusOffset,
+      'length': focusNode,
+    })
+
+    return selection.focusOffset === focusNode.length && focusNode.nextSibling === null;
+  }
+
   $onHandleInput(e) {
     
     // console.log({'keyCode': e.keyCode})
 
+    if (e.keyCode === 8) { // 'Backspace'
+      e.preventDefault();
+      document.execCommand('delete', false);
+    }
+
     if (e.keyCode === 13) { // 'Enter'
-      // var selection = window.getSelection();
+      var selection = window.getSelection();
       // var count = selection.rangeCount;
       // var range = count && selection.getRangeAt(0);
 
       // console.log({
-      //   'count': count,
-      //   'endOffset': range && range,
+      //   'selection': selection,
+      //   'isLast': this.$isLast(selection),
       // });
 
       
-      // var br = this.element.innerHTML.substr(-4) === '<br>'? '<br>' : '<br><br>'
+      var br = this.$isLast(selection)? '<br><br>' : '<br>'
 
-      // e.preventDefault();
-      // // return document.execCommand('insertHTML', false, br);
-      // return document.execCommand('insertHTML', false, '<p></p>');
+      e.preventDefault();
+      // return document.execCommand('insertHTML', false, br);
+      return document.execCommand('insertHTML', false, '\n');
     }
 
     if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
@@ -420,15 +437,13 @@ class Editor {
     var tags = encodedStr.match(tagRegex);
     var sTags = encodedStr.match(symbRegex);
     
-    logDiv.innerHTML = encodedStr.replace(tagRegex, '<span style="background: yellow; border: 1px solid palegoldenrod; border-bottom: 2px solid #e33636;">$1</span>').
-                             replace(symbRegex, '<span style="border-bottom: 2px solid #f1bebe;">$1</span>');
+    logDiv.innerHTML = ('"' + encodedStr.replace(/[ ]/ig, '&nbsp;').
+                             replace(tagRegex, '<span style="background: yellow; border: 1px solid palegoldenrod; border-bottom: 2px solid #e33636;">$1</span>').
+                             replace(symbRegex, '<span style="border-bottom: 2px solid #f1bebe;">$1</span>').
+                             replace(/(\n)/ig, '<span style="border-bottom: 2px solid #b9e6e2;">\\n</span>') + '"');
 
 
-    var logDiv = document.getElementById('expression-result').innerHTML = `<i style="color: #e33636;">html tags: - <b>${(tags && tags.length / 2) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i style="color: #f1bebe;">symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
-    // console.log({
-    //   'tags': (tags && tags.length / 2) || 0,
-    //   'sTags': sTags && sTags.length || 0,
-    // })
+    var logDiv = document.getElementById('expression-result').innerHTML = `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
   }
 
   $onCancelHandling(e) {

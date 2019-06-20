@@ -126,6 +126,7 @@ div[contenteditable] {
 
   /* background: yellow; */
   flex: 1 1 auto;
+  font-family: sans-serif;
 }
 
 .content-description a {
@@ -146,13 +147,20 @@ div[contenteditable] {
 }
 
 .expression-logs {
+  font-size: 14px;
   position: fixed;
-
   padding: 5px;
   width: 500px;
-  height: 230px;
-  top: 25px;
-  right: 25px;
-  border: 1px solid green;
+  height: 232px;
+  top: 27px;
+  left: 605px;
+  /* border: 1px solid #07a698; */
+  border: 1px solid #07a69857;
   background: white;
+}
+
+.expression-logs.statistic {
+  top: 0px;
+  height: 13px;
+  font-size: 13px;
 }
