@@ -404,6 +404,8 @@ class Editor {
   }
 
   log() {
+    var tagRegex = /(&lt\;\/?[^&]+&gt\;)/ig;
+    var symbRegex = /(&amp\;\w+\;)/ig;
     var logDiv = document.getElementById('expression');
     var tagsToReplace = {
       '&': '&amp;',
@@ -414,11 +416,19 @@ class Editor {
     let encodedStr = this.element.innerHTML.replace(/[&<>]/g, function (tag) {
       return tagsToReplace[tag] || tag;
     });
-    
-    logDiv.innerHTML = encodedStr.replace(/(&lt;\/?[^&]+&gt;)/ig, '<span style="background: yellow; border: 1px solid palegoldenrod; border-bottom: 2px solid #e33636;">$1</span>').
-                             replace(/(&amp;\w+;)/ig, '<span style="border-bottom: 2px solid #f1bebe;">$1</span>');
 
-    console.log(encodedStr)
+    var tags = encodedStr.match(tagRegex);
+    var sTags = encodedStr.match(symbRegex);
+    
+    logDiv.innerHTML = encodedStr.replace(tagRegex, '<span style="background: yellow; border: 1px solid palegoldenrod; border-bottom: 2px solid #e33636;">$1</span>').
+                             replace(symbRegex, '<span style="border-bottom: 2px solid #f1bebe;">$1</span>');
+
+
+    var logDiv = document.getElementById('expression-result').innerHTML = `<i style="color: #e33636;">html tags: - <b>${(tags && tags.length / 2) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i style="color: #f1bebe;">symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
+    // console.log({
+    //   'tags': (tags && tags.length / 2) || 0,
+    //   'sTags': sTags && sTags.length || 0,
+    // })
   }
 
   $onCancelHandling(e) {

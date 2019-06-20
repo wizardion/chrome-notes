@@ -144,3 +144,15 @@ div[contenteditable] {
   color: dodgerblue;
   /* color: blue; */
 }
+
+.expression-logs {
+  position: fixed;
+
+  padding: 5px;
+  width: 500px;
+  height: 230px;
+  top: 25px;
+  right: 25px;
+  border: 1px solid green;
+  background: white;
+}
