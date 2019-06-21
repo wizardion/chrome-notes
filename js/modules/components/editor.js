@@ -433,6 +433,20 @@ class Editor {
       return document.execCommand('insertHTML', false, br);
     }
 
+    if (e.keyCode === 32) { // 'Enter'
+      var data = selection.focusNode.data || selection.focusNode.innerHTML;
+      data = data.substr(0, selection.focusOffset);
+
+      // console.log({
+      //   'selection': selection.focusNode,
+      // });
+
+      // if (data.length > 1 && data[data.length - 2] === ' ') {
+        // e.preventDefault();
+        // return document.execCommand('insertHTML', false, '&nbsp;');
+      // }
+    }
+
     //#region Rest
     // if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
     //   var selection = window.getSelection();

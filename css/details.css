@@ -162,11 +162,13 @@ div[contenteditable] {
   background: white;
   /* white-space: pre-wrap;
   word-wrap: break-word; */
+  word-break: break-word;
+  overflow: auto;
 }
 
 .expression-logs.statistic {
   top: 0px;
-  height: 13px;
+  height: 14px;
   font-size: 13px;
 }
 
