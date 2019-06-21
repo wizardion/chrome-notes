@@ -347,7 +347,9 @@ class Editor {
   $isLast(selection) {
     var focusNode = selection.focusNode;
 
-    console.log(selection);
+    // console.log(selection);
+
+    
 
     return selection.focusOffset === selection.focusNode.length && 
           (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR' || 
@@ -355,26 +357,41 @@ class Editor {
   }
 
   $onHandleInput(e) {
+    var selection = window.getSelection();
+
+    console.log({
+      'isLast': selection,
+    });
+
+    if (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR') {
+      console.log('removeChild');
+      this.element.removeChild(selection.focusNode.nextSibling);
+    }
+
+    // if (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR') {
+    //   console.log('removeChild');
+    //   this.element.removeChild(selection.focusNode.nextSibling);
+    // }
     
     // console.log({'keyCode': e.keyCode})
 
-    if (e.keyCode === 8) { // 'Backspace'
-      e.preventDefault();
-      document.execCommand('delete', false);
-    }
+    // if (e.keyCode === 8) { // 'Backspace'
+    //   e.preventDefault();
+    //   document.execCommand('delete', false);
+    // }
 
     if (e.keyCode === 13) { // 'Enter'
       var selection = window.getSelection();
       var last = this.$isLast(selection);
       var br = last? '\n\n' : '\n';
 
-      console.log({
-        'isLast': last
-      });
+      // console.log({
+      //   'isLast': last,
+      // });
 
       e.preventDefault();
       // return document.execCommand('insertHTML', false, br);
-      // return document.execCommand('insertHTML', false, '\n');
+      return document.execCommand('insertHTML', false, '\n');
     }
 
     if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
@@ -417,6 +434,25 @@ class Editor {
   }
 
   log() {
+
+    // if (selection.focusNode === this.element) {
+      console.log('log.removeChild2');
+      
+      var children = this.element.children;
+
+      for(let i = 0; i < children.length; i++) {
+        const item = children[i];
+
+        if (item.nodeName === 'BR') {
+          console.log(item)
+          this.element.removeChild(item);
+          // this.log()
+        }
+      }
+
+    // }
+
+
     var tagRegex = /(&lt\;\/?[^&]+&gt\;)/ig;
     var symbRegex = /(&amp\;\w+\;)/ig;
     var logDiv = document.getElementById('expression');
