@@ -386,7 +386,7 @@ class Editor {
         'focusNode': selection.focusNode.data,
       });
 
-      if (data[data.length - 1] === ' ' && data[data.length - 2] === '\n') {
+      if (data.length > 1 && data[data.length - 1] === ' ' && data[data.length - 2] === '\n') {
         selection.collapse(selection.focusNode, data.length);
         selection.extend(selection.focusNode, data.length - 1 );
         document.execCommand('insertHTML', false, '\n');
