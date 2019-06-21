@@ -437,14 +437,10 @@ class Editor {
       var data = selection.focusNode.data || selection.focusNode.innerHTML;
       data = data.substr(0, selection.focusOffset);
 
-      // console.log({
-      //   'selection': selection.focusNode,
-      // });
-
-      // if (data.length > 1 && data[data.length - 2] === ' ') {
-        // e.preventDefault();
-        // return document.execCommand('insertHTML', false, '&nbsp;');
-      // }
+      if (data.length > 0 && data[data.length - 1] === ' ') {
+        e.preventDefault();
+        return document.execCommand('insertHTML', false, '&nbsp;');
+      }
     }
 
     //#region Rest
