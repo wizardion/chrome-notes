@@ -359,13 +359,14 @@ class Editor {
   $onHandleInput(e) {
     var selection = window.getSelection();
 
-    console.log({
-      'isLast': selection,
-    });
+    // console.log({
+    //   'isLast': selection,
+    // });
 
     if (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR') {
       console.log('removeChild');
       this.element.removeChild(selection.focusNode.nextSibling);
+      this.log();
     }
 
     // if (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR') {
@@ -375,10 +376,26 @@ class Editor {
     
     // console.log({'keyCode': e.keyCode})
 
-    // if (e.keyCode === 8) { // 'Backspace'
-    //   e.preventDefault();
-    //   document.execCommand('delete', false);
-    // }
+    if (e.keyCode === 8) { // 'Backspace'
+      var data = selection.focusNode.data;
+      e.preventDefault();
+      
+      console.log({
+        'data': data[data.length - 2] === '\n',
+        'focusOffset': selection.focusOffset,
+        'focusNode': selection.focusNode.data,
+      });
+
+      if (data[data.length - 1] === ' ' && data[data.length - 2] === '\n') {
+        selection.collapse(selection.focusNode, data.length);
+        selection.extend(selection.focusNode, data.length - 1 );
+        document.execCommand('insertHTML', false, '\n');
+      } else {
+        document.execCommand('delete', false);
+      }
+
+      // document.execCommand('delete', false);
+    }
 
     if (e.keyCode === 13) { // 'Enter'
       var selection = window.getSelection();
@@ -436,19 +453,19 @@ class Editor {
   log() {
 
     // if (selection.focusNode === this.element) {
-      console.log('log.removeChild2');
+      // console.log('log.removeChild2');
       
-      var children = this.element.children;
+      // var children = this.element.children;
 
-      for(let i = 0; i < children.length; i++) {
-        const item = children[i];
+      // for(let i = 0; i < children.length; i++) {
+      //   const item = children[i];
 
-        if (item.nodeName === 'BR') {
-          console.log(item)
-          this.element.removeChild(item);
-          // this.log()
-        }
-      }
+      //   if (item.nodeName === 'BR') {
+      //     console.log(item)
+      //     this.element.removeChild(item);
+      //     // this.log()
+      //   }
+      // }
 
     // }
 
