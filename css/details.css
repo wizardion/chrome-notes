@@ -127,6 +127,9 @@ div[contenteditable] {
   /* background: yellow; */
   flex: 1 1 auto;
   font-family: sans-serif;
+
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .content-description a {
