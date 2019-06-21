@@ -44,6 +44,7 @@ class Editor {
    */
   set value(value) {
     this.element.innerHTML = value;
+    this.log();
   }
 
   /**
@@ -346,39 +347,34 @@ class Editor {
   $isLast(selection) {
     var focusNode = selection.focusNode;
 
-    console.log({
-      // 'focusOffset': selection.focusOffset,
-      'length': focusNode,
-    })
+    console.log(selection);
 
-    return selection.focusOffset === focusNode.length && focusNode.nextSibling === null;
+    return selection.focusOffset === selection.focusNode.length && 
+          (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR' || 
+           !selection.focusNode.nextSibling);
   }
 
   $onHandleInput(e) {
     
     // console.log({'keyCode': e.keyCode})
 
-    // if (e.keyCode === 8) { // 'Backspace'
-    //   e.preventDefault();
-    //   document.execCommand('delete', false);
-    // }
+    if (e.keyCode === 8) { // 'Backspace'
+      e.preventDefault();
+      document.execCommand('delete', false);
+    }
 
     if (e.keyCode === 13) { // 'Enter'
       var selection = window.getSelection();
-      // var count = selection.rangeCount;
-      // var range = count && selection.getRangeAt(0);
+      var last = this.$isLast(selection);
+      var br = last? '\n\n' : '\n';
 
-      // console.log({
-      //   'selection': selection,
-      //   'isLast': this.$isLast(selection),
-      // });
-
-      
-      var br = this.$isLast(selection)? '<br><br>' : '<br>'
+      console.log({
+        'isLast': last
+      });
 
       e.preventDefault();
       // return document.execCommand('insertHTML', false, br);
-      return document.execCommand('insertHTML', false, '\n');
+      // return document.execCommand('insertHTML', false, '\n');
     }
 
     if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
@@ -447,9 +443,9 @@ class Editor {
                                         replace(/( )( )/ig, '$1&nbsp;').
                                         replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
 
-    console.log({
-      'encodedStr': encodedStr.replace(tagRegex, '<span class="error">$1</span>')
-    });
+    // console.log({
+    //   'encodedStr': encodedStr.replace(tagRegex, '<span class="error">$1</span>')
+    // });
     var logDiv = document.getElementById('expression-result').innerHTML = `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
   }
 
