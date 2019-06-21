@@ -31,7 +31,7 @@ class Editor {
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
-    this.element.addEventListener('keyup', this.$onCancelHandling.bind(this));
+    // this.element.addEventListener('keyup', this.$onCancelHandling.bind(this));
     // this.element.addEventListener('focus', this.$onCancelHandling.bind(this));
     // this.element.addEventListener('blur', this.$onCancelHandling.bind(this));
     this.element.addEventListener('input', this.log.bind(this));
@@ -265,10 +265,6 @@ class Editor {
     }
   }
 
-  $getHtmlLink(){
-    
-  }
-
   $exec(selection) {
     var focusNode = selection.focusNode;
     var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
@@ -344,110 +340,138 @@ class Editor {
   }
 
 
-  $isLast(selection) {
+  $isLast(selection, offset) {
     var focusNode = selection.focusNode;
+    var focusOffset = offset || selection.focusOffset;
 
-    // console.log(selection);
+    if (focusNode === this.element) {
+      console.log(focusNode);
+    }
 
-    
-
-    return selection.focusOffset === selection.focusNode.length && 
-          (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR' || 
-           !selection.focusNode.nextSibling);
+    return focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling;
   }
 
   $onHandleInput(e) {
+    console.log({'keyCode': e.keyCode})
+
     var selection = window.getSelection();
 
+    //#region test1
     // console.log({
     //   'isLast': selection,
     // });
 
-    if (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR') {
-      console.log('removeChild');
-      this.element.removeChild(selection.focusNode.nextSibling);
-      this.log();
-    }
-
+    // Remove <br>
     // if (selection.focusNode.nextSibling && selection.focusNode.nextSibling.nodeName === 'BR') {
     //   console.log('removeChild');
     //   this.element.removeChild(selection.focusNode.nextSibling);
+    //   this.log();
     // }
     
-    // console.log({'keyCode': e.keyCode})
+    
+
+    // if (e.keyCode === 8) { // 'Backspace'
+    //   var data = selection.focusNode.data;
+    //   e.preventDefault();
+      
+    //   console.log({
+    //     'data': data[data.length - 2] === '\n',
+    //     'focusOffset': selection.focusOffset,
+    //     'focusNode': selection.focusNode.data,
+    //   });
+
+    //   if (data.length > 1 && data[data.length - 1] === ' ' && data[data.length - 2] === '\n') {
+    //     selection.collapse(selection.focusNode, data.length);
+    //     selection.extend(selection.focusNode, data.length - 1 );
+    //     document.execCommand('insertHTML', false, '\n');
+    //   } else {
+    //     document.execCommand('delete', false);
+    //   }
+
+    //   // document.execCommand('delete', false);
+    // }
+    //#endregion
 
     if (e.keyCode === 8) { // 'Backspace'
-      var data = selection.focusNode.data;
-      e.preventDefault();
-      
-      console.log({
-        'data': data[data.length - 2] === '\n',
-        'focusOffset': selection.focusOffset,
-        'focusNode': selection.focusNode.data,
-      });
+      var data = selection.focusNode.data || selection.focusNode.innerHTML;
 
-      if (data.length > 1 && data[data.length - 1] === ' ' && data[data.length - 2] === '\n') {
+      e.preventDefault();
+
+      // if (data.length === selection.focusOffset && data.length > 1 && data[data.length - 1] !== '\n' && data[data.length - 2] === '\n') {
+      if (this.$isLast(selection) && data[data.length - 1] !== '\n' && data[data.length - 2] === '\n') {
         selection.collapse(selection.focusNode, data.length);
         selection.extend(selection.focusNode, data.length - 1 );
         document.execCommand('insertHTML', false, '\n');
       } else {
         document.execCommand('delete', false);
       }
+    }
 
-      // document.execCommand('delete', false);
+    if (e.keyCode === 46) { // 'Delete'
+      var data = selection.focusNode.data || selection.focusNode.innerHTML;
+      data = data.substr(selection.focusOffset - 1);
+
+      if (this.$isLast(selection, selection.focusOffset + 1) && 
+          data[1] !== '\n' && data[0] === '\n' && data.length === 2) {
+        e.preventDefault();
+
+        selection.collapse(selection.focusNode, selection.focusOffset);
+        selection.extend(selection.focusNode,selection.focusOffset + 1);
+        document.execCommand('insertHTML', false, '\n');
+      }
     }
 
     if (e.keyCode === 13) { // 'Enter'
-      var selection = window.getSelection();
       var last = this.$isLast(selection);
       var br = last? '\n\n' : '\n';
 
-      // console.log({
-      //   'isLast': last,
-      // });
+      console.log({
+        'isLast': last,
+      });
 
       e.preventDefault();
-      // return document.execCommand('insertHTML', false, br);
-      return document.execCommand('insertHTML', false, '\n');
+      return document.execCommand('insertHTML', false, br);
     }
 
-    if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
-      var selection = window.getSelection();
+    //#region Rest
+    // if (e.keyCode === 32 || e.keyCode === 13) { // 'Enter'
+    //   var selection = window.getSelection();
 
-      if (this.$exec(selection)) {
-        e.preventDefault();
-        return;
-      }
-    }
+    //   if (this.$exec(selection)) {
+    //     e.preventDefault();
+    //     return;
+    //   }
+    // }
 
-    if (e.keyCode === 91 || e.keyCode == 17) { // when ctrl is pressed
-      var links = this.element.getElementsByTagName('a');
+    // if (e.keyCode === 91 || e.keyCode == 17) { // when ctrl is pressed
+    //   var links = this.element.getElementsByTagName('a');
 
-      e.preventDefault();
+    //   e.preventDefault();
 
-      for (let i = 0; i < links.length; i++) {
-        const link = links[i];
+    //   for (let i = 0; i < links.length; i++) {
+    //     const link = links[i];
 
-        link.contentEditable = false;
+    //     link.contentEditable = false;
 
-        console.log({
-          'contentEditable': link.contentEditable
-        });
-      }
-    }
+    //     console.log({
+    //       'contentEditable': link.contentEditable
+    //     });
+    //   }
+    // }
 
-    if (e.keyCode === 9) { // 'Tab'
-      var selection = window.getSelection();
-      var selectionLines = selection.getRangeAt(0).getClientRects().length;
+    // if (e.keyCode === 9) { // 'Tab'
+    //   var selection = window.getSelection();
+    //   var selectionLines = selection.getRangeAt(0).getClientRects().length;
 
-      e.preventDefault();
+    //   e.preventDefault();
 
-      if(selectionLines > 1) {
-        document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
-      } else {
-        document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
-      }
-    }
+    //   if(selectionLines > 1) {
+    //     document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
+    //   } else {
+    //     document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
+    //   }
+    // }
+    //#endregion Rest
   }
 
   log() {
@@ -502,21 +526,21 @@ class Editor {
     var logDiv = document.getElementById('expression-result').innerHTML = `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
   }
 
-  $onCancelHandling(e) {
-    if (e.keyCode === 91 || e.keyCode == 17 || e.type === 'changed') { // when ctrl is pressed
-      // var links = this.element.getElementsByTagName('a');
-      var links = this.element.querySelectorAll('[contentEditable]');
+  // $onCancelHandling(e) {
+  //   if (e.keyCode === 91 || e.keyCode == 17 || e.type === 'changed') { // when ctrl is pressed
+  //     // var links = this.element.getElementsByTagName('a');
+  //     var links = this.element.querySelectorAll('[contentEditable]');
 
-      for (let i = 0; i < links.length; i++) {
-        const link = links[i];
-        link.removeAttribute('contentEditable');
+  //     for (let i = 0; i < links.length; i++) {
+  //       const link = links[i];
+  //       link.removeAttribute('contentEditable');
 
-        console.log({
-          'contentEditable': link.contentEditable
-        });
-      }
-    }
-  }
+  //       console.log({
+  //         'contentEditable': link.contentEditable
+  //       });
+  //     }
+  //   }
+  // }
 }
 
 
