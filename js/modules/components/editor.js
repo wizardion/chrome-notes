@@ -23,6 +23,11 @@ class Editor {
         pattern: '\t',
         replacement: '<span style="white-space:pre">\t</span>'
       },
+      { // Replace double spaces
+        types: [1, 2],
+        pattern: '([ ])([ ]{0,1})',
+        replacement: '&nbsp;$2'
+      },
     ];
 
     this.init();
@@ -246,22 +251,42 @@ class Editor {
 
   $onPaste(e) {
     var clipboard = (e.originalEvent || e).clipboardData;
-    var data = clipboard.getData('text/html'); // || clipboard.getData('text/plain');
+    var html = clipboard.getData('text/html');
+    var text = clipboard.getData('text/plain');
 
-    console.log(`${data}`)
+    console.log(`${html}`)
 
-    if (data) {
+    if (html) {
       // cancel paste.
       e.preventDefault();
 
       for (let index = 0; index < this.rules.length; index++) {
         const rule = this.rules[index];
-        data = data.replace(new RegExp(rule.pattern, 'igm'), rule.replacement);
+        html = html.replace(new RegExp(rule.pattern, 'igm'), rule.replacement);
 
-        console.log(`${data}`)
+        console.log(`${html}`)
       }
 
-      document.execCommand('insertHTML', false, data);
+      document.execCommand('insertHTML', false, html);
+    }
+
+    if (text) {
+      e.preventDefault();
+
+      for (let index = 0; index < this.rules.length; index++) {
+        const rule = this.rules[index];
+
+        if (rule.types && rule.types.indexOf(2) > -1) {
+          text = text.replace(new RegExp(rule.pattern, 'igm'), rule.replacement);
+
+
+          console.log(`"${text}"`)
+        }
+        
+        
+      }
+
+      document.execCommand('insertHTML', false, text);
     }
   }
 
