@@ -28,7 +28,7 @@ class Editor {
     this.init();
 
     // Add global events
-    this.element.addEventListener('blur', this.$onChange.bind(this));
+    // this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
     // this.element.addEventListener('keyup', this.$onCancelHandling.bind(this));
