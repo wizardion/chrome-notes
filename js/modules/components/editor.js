@@ -33,11 +33,7 @@ class Editor extends BaseEditor {
       var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
       var data = selection.focusNode.innerHTML || selection.focusNode.data;
       var selected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
-      var index = Math.min(selection.focusOffset, selection.baseOffset);
-
-      if (!selected) {
-        index = Math.max(0, index - 1);
-      }
+      var index = Math.max(0, Math.min(selection.focusOffset, selection.baseOffset) - (!selected && 1 || 0));
 
       if (data && last && data[index] !== '\n' && data[Math.max(0, index - 1)] === '\n') {
         e.preventDefault();
