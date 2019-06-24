@@ -32,17 +32,17 @@ class Editor extends BaseEditor {
     if (e.keyCode === 8) { // 'Backspace'
       var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
       var data = selection.focusNode.innerHTML || selection.focusNode.data;
-      var length = Math.abs(selection.focusOffset - selection.baseOffset);
+      var selected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
       var index = Math.min(selection.focusOffset, selection.baseOffset);
 
-      if (!length) {
+      if (!selected) {
         index = Math.max(0, index - 1);
       }
 
-      if (data && last && data[index] !== '\n' && data[Math.max(0, (index - 1))] === '\n') {
+      if (data && last && data[index] !== '\n' && data[Math.max(0, index - 1)] === '\n') {
         e.preventDefault();
 
-        if (!length) {
+        if (!selected) {
           selection.collapse(selection.focusNode, index + 1);
           selection.extend(selection.focusNode, index);
         }
