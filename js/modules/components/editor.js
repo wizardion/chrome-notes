@@ -39,27 +39,15 @@ class Editor extends BaseEditor {
         index = Math.max(0, index - 1);
       }
 
-      if (data) {
-        console.log({
-          'last': last,
-          'current': data[index],
-          'prev': data[Math.max(0, (index - 1))],
-        });
-      } else {
-        console.log('Empty')
-      }
-
       if (data && last && data[index] !== '\n' && data[Math.max(0, (index - 1))] === '\n') {
+        e.preventDefault();
+
         if (!length) {
           selection.collapse(selection.focusNode, index + 1);
           selection.extend(selection.focusNode, index);
         }
         document.execCommand('insertHTML', false, '\n');
-      } else {
-        document.execCommand('delete', false);
       }
-
-      e.preventDefault();
     }
 
     // if (e.keyCode === 8) { // 'Backspace'
