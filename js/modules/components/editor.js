@@ -7,7 +7,6 @@ class Editor extends BaseEditor {
   }
 
   $isLast(selection, offset) {
-    var focusNode = selection.focusNode;
     var focusOffset = offset || selection.focusOffset;
 
     return focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling;
@@ -45,8 +44,7 @@ class Editor extends BaseEditor {
     }
 
     if (e.keyCode === 13) { // 'Enter'
-      var offset = (selection.focusOffset >= selection.baseOffset)? selection.focusOffset : selection.baseOffset;
-      var last = this.$isLast(selection, offset);
+      var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
 
       e.preventDefault();
       return document.execCommand('insertHTML', false, last? '\n\n' : '\n');
