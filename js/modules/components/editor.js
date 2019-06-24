@@ -30,17 +30,41 @@ class Editor extends BaseEditor {
     }
 
     if (e.keyCode === 8) { // 'Backspace'
-      var data = selection.focusNode.data || selection.focusNode.innerHTML;
+      var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
+      var length = Math.abs(selection.focusOffset - selection.baseOffset);
+      var index = Math.min(selection.focusOffset, selection.baseOffset)
+      var data = selection.focusNode.innerHTML || selection.focusNode.data;
+
+      console.log({
+        // 'data': data,
+        // // 'isLast': last,
+        // 'length': data.length,
+        // 'current': data[index],
+        // 'prev': data[Math.max(0, (index - 1))],
+        'index': index,
+        // 'first': Math.max(0, (index - 1)),
+      });
 
       e.preventDefault();
 
-      if (this.$isLast(selection) && data[data.length - 1] !== '\n' && data[data.length - 2] === '\n') {
-        selection.collapse(selection.focusNode, data.length);
-        selection.extend(selection.focusNode, data.length - 1 );
-        document.execCommand('insertHTML', false, '\n');
-      } else {
-        document.execCommand('delete', false);
-      }
+      // if (last && data[index] !== '\n' && data[Math.max(0, (index - 1))] === '\n') {
+      //   if (!length) {
+      //     console.log('select');
+      //     selection.collapse(selection.focusNode, data.length);
+      //     selection.extend(selection.focusNode, data.length - 1);
+      //   }
+      //   // document.execCommand('insertHTML', false, '\n');
+      // } else {
+      //   // document.execCommand('delete', false);
+      // }
+
+      // if (last && data.length > 1 && data[data.length - 1] !== '\n' && data[data.length - 2] === '\n') {
+      //   selection.collapse(selection.focusNode, data.length);
+      //   selection.extend(selection.focusNode, data.length - 1 );
+      //   document.execCommand('insertHTML', false, '\n');
+      // } else {
+      //   document.execCommand('delete', false);
+      // }
     }
 
     if (e.keyCode === 13) { // 'Enter'
