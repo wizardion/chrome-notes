@@ -16,15 +16,19 @@ class Editor extends BaseEditor {
     var selection = window.getSelection();
 
     if (e.keyCode === 46) { // 'Delete'
-      var data = selection.focusNode.data || selection.focusNode.innerHTML;
-      data = data.substr(selection.focusOffset - 1);
+      var selected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+      var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset) + (!selected && 1 || 0));
+      var data = selection.focusNode.innerHTML || selection.focusNode.data;
+      var index = Math.min(selection.focusOffset, selection.baseOffset);
 
-      if (this.$isLast(selection, selection.focusOffset + 1) && 
-          data[1] !== '\n' && data[0] === '\n' && data.length === 2) {
+      if (data && last && data[index] !== '\n' && data[Math.max(0, index - 1)] === '\n') {
         e.preventDefault();
 
-        selection.collapse(selection.focusNode, selection.focusOffset);
-        selection.extend(selection.focusNode,selection.focusOffset + 1);
+        if (!selected) {
+          selection.collapse(selection.focusNode, index + 1);
+          selection.extend(selection.focusNode, index);
+        }
+
         document.execCommand('insertHTML', false, '\n');
       }
     }
@@ -42,6 +46,7 @@ class Editor extends BaseEditor {
           selection.collapse(selection.focusNode, index + 1);
           selection.extend(selection.focusNode, index);
         }
+
         document.execCommand('insertHTML', false, '\n');
       }
     }
