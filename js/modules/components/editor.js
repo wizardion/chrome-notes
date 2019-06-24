@@ -31,41 +31,87 @@ class Editor extends BaseEditor {
 
     if (e.keyCode === 8) { // 'Backspace'
       var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
-      var length = Math.abs(selection.focusOffset - selection.baseOffset);
-      var index = Math.min(selection.focusOffset, selection.baseOffset)
       var data = selection.focusNode.innerHTML || selection.focusNode.data;
+      var length = Math.abs(selection.focusOffset - selection.baseOffset);
+      var index = Math.min(selection.focusOffset, selection.baseOffset);
 
-      console.log({
-        // 'data': data,
-        // // 'isLast': last,
-        // 'length': data.length,
-        // 'current': data[index],
-        // 'prev': data[Math.max(0, (index - 1))],
-        'index': index,
-        // 'first': Math.max(0, (index - 1)),
-      });
+      if (!length) {
+        index = Math.max(0, index - 1);
+      }
+
+      if (data) {
+        console.log({
+          'last': last,
+          'current': data[index],
+          'prev': data[Math.max(0, (index - 1))],
+        });
+      } else {
+        console.log('Empty')
+      }
+
+      if (data && last && data[index] !== '\n' && data[Math.max(0, (index - 1))] === '\n') {
+        if (!length) {
+          selection.collapse(selection.focusNode, index + 1);
+          selection.extend(selection.focusNode, index);
+        }
+        document.execCommand('insertHTML', false, '\n');
+      } else {
+        document.execCommand('delete', false);
+      }
 
       e.preventDefault();
-
-      // if (last && data[index] !== '\n' && data[Math.max(0, (index - 1))] === '\n') {
-      //   if (!length) {
-      //     console.log('select');
-      //     selection.collapse(selection.focusNode, data.length);
-      //     selection.extend(selection.focusNode, data.length - 1);
-      //   }
-      //   // document.execCommand('insertHTML', false, '\n');
-      // } else {
-      //   // document.execCommand('delete', false);
-      // }
-
-      // if (last && data.length > 1 && data[data.length - 1] !== '\n' && data[data.length - 2] === '\n') {
-      //   selection.collapse(selection.focusNode, data.length);
-      //   selection.extend(selection.focusNode, data.length - 1 );
-      //   document.execCommand('insertHTML', false, '\n');
-      // } else {
-      //   document.execCommand('delete', false);
-      // }
     }
+
+    // if (e.keyCode === 8) { // 'Backspace'
+    //   var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
+    //   var length = Math.abs(selection.focusOffset - selection.baseOffset);
+
+    //   var index = Math.max(0, Math.min(selection.focusOffset, selection.baseOffset) - 1);
+    //   var data = selection.focusNode.innerHTML || selection.focusNode.data;
+
+    //   // console.log({
+    //   //   'current': data[data.length - 1],
+    //   //   'prev': data[data.length - 2],
+        
+    //   //   'n.current': data[index],
+    //   //   'n.prev': data[Math.max(0, (index - 1))],
+    //   //   'index': index,
+    //   //   // 'first': Math.max(0, (index - 1)),
+    //   // });
+
+    //   e.preventDefault();
+
+    //   if (data) {
+    //     console.log({
+    //       'last': last,
+    //       'current': data[index],
+    //       'prev': data[Math.max(0, (index - 1))],
+    //     });
+    //   } else {
+    //     console.log('Empty')
+    //   }
+
+      
+
+    //   if (data && last && data[index] !== '\n' && data[Math.max(0, (index - 1))] === '\n') {
+    //     // if (!length) {
+    //       console.log('select');
+    //       selection.collapse(selection.focusNode, index + 1);
+    //       selection.extend(selection.focusNode, index);
+    //     // }
+    //     // document.execCommand('insertHTML', false, '\n');
+    //   } else {
+    //     // document.execCommand('delete', false);
+    //   }
+
+    //   // if (last && data.length > 1 && data[data.length - 1] !== '\n' && data[data.length - 2] === '\n') {
+    //   //   selection.collapse(selection.focusNode, data.length);
+    //   //   selection.extend(selection.focusNode, data.length - 1 );
+    //   //   document.execCommand('insertHTML', false, '\n');
+    //   // } else {
+    //   //   document.execCommand('delete', false);
+    //   // }
+    // }
 
     if (e.keyCode === 13) { // 'Enter'
       var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
