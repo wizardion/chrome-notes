@@ -87,8 +87,8 @@ class Editor extends BaseEditor {
 
       document.execCommand('insertText', false, last? 'nn' : 'n');
 
-      selection.collapse(selection.focusNode, cursor);
-      selection.extend(selection.focusNode, cursor + 1);
+      // selection.collapse(selection.focusNode, cursor);
+      // selection.extend(selection.focusNode, cursor + 1);
 
       var output = [data.slice(0, cursor), last? '\n\n' : '\n', data.slice(cursor)].join('');
 
