@@ -3,6 +3,8 @@ class Editor extends BaseEditor {
     super(element, controls);
 
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
+    this.element.addEventListener('cut', this.$onCut.bind(this));
+
     this.element.addEventListener('input', this.log.bind(this));
   }
 
@@ -10,6 +12,23 @@ class Editor extends BaseEditor {
     var focusOffset = offset || selection.focusOffset;
 
     return focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling;
+  }
+
+  $onCut(e) {
+    var selection = window.getSelection();
+    var selected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+
+    if (selected) {
+      var data = selection.focusNode.innerHTML || selection.focusNode.data;
+      var index = Math.min(selection.focusOffset, selection.baseOffset);
+      var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
+
+      if (data && last && data[index] !== '\n' && data[Math.max(0, index - 1)] === '\n') {
+        e.preventDefault();
+        document.execCommand('copy');
+        document.execCommand('insertHTML', false, '\n');
+      }
+    }
   }
 
   $preProcessInput(e) {
