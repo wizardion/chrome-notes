@@ -149,6 +149,11 @@ div[contenteditable] {
   /* color: blue; */
 }
 
+.content-description::selection {
+  /* background: #07a69857; */
+  background: #07a6983d; /* WebKit/Blink Browsers */
+}
+
 .expression-logs {
   font-size: 14px;
   position: fixed;
