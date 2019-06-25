@@ -72,12 +72,38 @@ class Editor extends BaseEditor {
     }
 
     if (e.keyCode === 13) { // 'Enter'
+      // var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
+      // // https://stackoverflow.com/questions/12251629/is-there-something-better-than-document-execcommand
+      // // https://trix-editor.org/
+      
+      // e.preventDefault();
+      // return document.execCommand('insertHTML', false, last? '\n\n' : '\n');
+
       var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
-      // https://stackoverflow.com/questions/12251629/is-there-something-better-than-document-execcommand
-      // https://trix-editor.org/
+      var cursor = Math.max(selection.focusOffset, selection.baseOffset);
+      var data = selection.focusNode.innerHTML || selection.focusNode.data;
       
       e.preventDefault();
-      return document.execCommand('insertHTML', false, last? '\n\n' : '\n');
+
+      document.execCommand('insertText', false, last? 'nn' : 'n');
+
+      selection.collapse(selection.focusNode, cursor);
+      selection.extend(selection.focusNode, cursor + 1);
+
+      var output = [data.slice(0, cursor), last? '\n\n' : '\n', data.slice(cursor)].join('');
+
+      selection.focusNode.data = output;
+
+      selection.collapse(selection.focusNode, cursor + 1);
+      selection.extend(selection.focusNode, cursor + 1);
+
+      var event = new Event('input', {
+          'bubbles': true,
+          'cancelable': true,
+          'composed': true,
+      });
+    
+      this.element.dispatchEvent(event);
     }
   }
 
