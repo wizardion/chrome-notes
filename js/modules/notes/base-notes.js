@@ -44,7 +44,7 @@ class BaseNotes {
         return this.showError();
       }
     }.bind(this));
-    this.controls.description.addEventListener('descriptionChanged', this.descriptionChanged.bind(this));
+    this.controls.description.addEventListener('change', this.descriptionChanged.bind(this));
   }
 
   init(notes) {
