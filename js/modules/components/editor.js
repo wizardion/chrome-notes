@@ -11,10 +11,8 @@ class Editor extends BaseEditor {
   $isLast(selection, offset) {
     var focusOffset = offset || selection.focusOffset;
 
-    // console.log(selection.focusNode.parentNode === this.element)
-    console.log(selection.focusNode)
-
-    return focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling;
+    return focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling &&
+           (selection.focusNode.parentNode === this.element || !selection.focusNode.parentNode.nextSibling);
   }
 
   $onCut(e) {
