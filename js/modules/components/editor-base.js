@@ -1,6 +1,6 @@
 class BaseEditor {
   constructor (element, controls) {
-    const tags = ['a', 'b', 'i', 'u', 'strong', 'strike', 'div'].join('|'); // Allowed tags
+    const tags = ['a', 'b', 'i', 'u', 'strong', 'strike'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.element = element;
