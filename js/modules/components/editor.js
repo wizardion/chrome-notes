@@ -73,6 +73,8 @@ class Editor extends BaseEditor {
 
     if (e.keyCode === 13) { // 'Enter'
       var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
+      // https://stackoverflow.com/questions/12251629/is-there-something-better-than-document-execcommand
+      // https://trix-editor.org/
       
       e.preventDefault();
       return document.execCommand('insertHTML', false, last? '\n\n' : '\n');
