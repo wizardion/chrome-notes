@@ -73,38 +73,8 @@ class Editor extends BaseEditor {
 
     if (e.keyCode === 13) { // 'Enter'
       var last = this.$isLast(selection, Math.max(selection.focusOffset, selection.baseOffset));
-      // var cursor = Math.max(selection.focusOffset, selection.baseOffset);
-      // var data = selection.focusNode.innerHTML || selection.focusNode.data;
       
       e.preventDefault();
-
-      
-
-      // var output = [data.slice(0, cursor), last? '\n\n' : '\n', data.slice(cursor)].join('');
-
-
-      // console.log({
-      //   'data': data,
-      //   'cursor': cursor,
-      //   'focusNode': selection.focusNode,
-      //   'oninput': this.element.fireEvent
-      // });
-
-      // selection.focusNode.data = output;
-
-      // selection.collapse(selection.focusNode, cursor + 1);
-      // selection.extend(selection.focusNode, cursor + 1);
-
-      // var event = new Event('input', {
-      //     'bubbles': true,
-      //     'cancelable': true,
-      //     'composed': true,
-      // });
-    
-      // this.element.dispatchEvent(event);
-
-      // this.element.oninput();
-
       return document.execCommand('insertHTML', false, last? '\n\n' : '\n');
     }
   }
