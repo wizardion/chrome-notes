@@ -1,6 +1,6 @@
 class BaseEditor {
   constructor (element, controls) {
-    const tags = ['a', 'b', 'i', 'u', 'strong', 'strike'].join('|'); // Allowed tags
+    const tags = ['a', 'li', 'ul', 'b', 'i', 'u', 'strong', 'strike'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.element = element;
@@ -8,9 +8,10 @@ class BaseEditor {
     this.customEvents = {'change': null};
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
-        pattern: '<\/(li|p|h[0-9])>', 
+        // pattern: '<\/(li|p|h[0-9])>', 
         // replacement: '<br/><br/>'
-        replacement: ''
+        pattern: '<\/(div|p|h[0-9])>', 
+        replacement: '\n'
       },
       { // Remove all attributes except allowed.
         pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
@@ -20,10 +21,10 @@ class BaseEditor {
         pattern: `((<)\\s?(\/?)\\s?(${tags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
-      { // Replace tab space
-        pattern: '\t',
-        replacement: '<span style="white-space:pre">\t</span>'
-      },
+      // { // Replace tab space
+      //   pattern: '\t',
+      //   replacement: '<span style="white-space:pre">\t</span>'
+      // },
       // { // Replace double spaces
       //   types: [1, 2],
       //   pattern: '([ ])([ ])',
@@ -31,10 +32,36 @@ class BaseEditor {
       // },
     ];
 
+    this.init();
+
     // Global events
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
+  }
+
+  /**
+   * Init the controller
+   * 
+   * Init controlls and events.
+   */
+  init() {
+    //https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
+    //https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard
+    //https://bear.app/
+
+    for (let i = 0; i < this.controls.length; i++) {
+      const item = this.controls[i];
+      const action = item.getAttribute('action');
+
+      item.onmousedown = this.$precommand;
+
+      if (['link'].indexOf(action) === -1) {
+        item.onmouseup = this.$command;
+      } else {
+        // item.onmouseup = this.$link.bind(this);
+      }
+    }
   }
   
   /**
@@ -80,6 +107,19 @@ class BaseEditor {
     this.element.focus();
   }
 
+  $precommand(e) {
+    // cancel paste.
+    e.preventDefault();
+  }
+
+  $command(e) {
+    let action = this.getAttribute('action');
+
+    // cancel event.
+    e.preventDefault();
+    document.execCommand(action);
+  }
+
   /**
    * Internal method: RemoveHtml.
    * 
@@ -98,11 +138,13 @@ class BaseEditor {
   $onPaste(e) {
     var clipboard = (e.originalEvent || e).clipboardData;
     var html = clipboard.getData('text/html');
+    // var html = clipboard.getData('text/plain');
     // var text = clipboard.getData('text/plain');
 
     if (html) {
       e.preventDefault();
       document.execCommand('insertHTML', false, this.$removeHtml(html));
+      // document.execCommand('insertHTML', false, html);
     }
   }
 
