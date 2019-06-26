@@ -139,12 +139,16 @@ class BaseEditor {
     var clipboard = (e.originalEvent || e).clipboardData;
     var html = clipboard.getData('text/html');
     // var html = clipboard.getData('text/plain');
-    // var text = clipboard.getData('text/plain');
+    var text = clipboard.getData('text/plain');
 
     if (html) {
       e.preventDefault();
-      document.execCommand('insertHTML', false, this.$removeHtml(html));
-      // document.execCommand('insertHTML', false, html);
+      return document.execCommand('insertHTML', false, this.$removeHtml(html));
+    }
+
+    if (text) {
+      e.preventDefault();
+      return document.execCommand('insertHTML', false, text.replace(/\n/ig, '<br>'));
     }
   }
 

@@ -129,8 +129,9 @@ div[contenteditable] {
   font-family: sans-serif;
   font-size: 15px;
 
-  /* white-space: pre-wrap;
-  word-break: break-word; */
+  white-space: pre-wrap;
+  word-break: break-word;
+  /* white-space: inherit; */
 }
 
 .content-description b {
@@ -140,15 +141,21 @@ div[contenteditable] {
 .content-description ul {
   /* margin: 3px 0px 3px 0px; */
   margin: 0px;
+  padding-left: 30px;
 }
+
+/* .content-description ul li:first-child::selection {
+  background: red;
+  height: 30px;
+} */
 
 .content-description ul li:first-child {
   /* background: #e8b600; */
-  padding-top: 5px;
+  padding-top: 2px;
 }
 
 .content-description ul li:last-child {
-  padding-bottom: 5px;
+  padding-bottom: 2px;
 }
 
 .content-description a {
