@@ -1,6 +1,6 @@
 class BaseEditor {
   constructor (element, controls) {
-    const tags = ['a', 'li', 'ul', 'b', 'i', 'u', 'strong', 'strike'].join('|'); // Allowed tags
+    const tags = ['a', 'li', 'ul', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.element = element;
@@ -10,8 +10,8 @@ class BaseEditor {
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
         // pattern: '<\/(li|p|h[0-9])>', 
         // replacement: '<br/><br/>'
-        pattern: '<\/(div|p|h[0-9])>', 
-        replacement: '\n'
+        pattern: '<\/(p|h[0-9])>', 
+        replacement: '<br>'
       },
       { // Remove all attributes except allowed.
         pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
