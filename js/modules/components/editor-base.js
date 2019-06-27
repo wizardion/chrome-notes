@@ -142,7 +142,7 @@ class BaseEditor {
 
     e.preventDefault();
 
-    if (localStorage.pasteHtml || true) {
+    if (localStorage.allowPasteHtml || true) {
       var html = clipboard.getData('text/html');
 
       if (html) {
