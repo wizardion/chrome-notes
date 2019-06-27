@@ -36,6 +36,7 @@ class BaseEditor {
 
     // Global events
     this.element.addEventListener('paste', this.$onPaste.bind(this));
+    this.element.addEventListener('copy', this.$onCopy.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
   }
@@ -137,18 +138,41 @@ class BaseEditor {
 
   $onPaste(e) {
     var clipboard = (e.originalEvent || e).clipboardData;
-    var html = clipboard.getData('text/html');
-    // var html = clipboard.getData('text/plain');
     var text = clipboard.getData('text/plain');
 
-    if (html) {
-      e.preventDefault();
-      return document.execCommand('insertHTML', false, this.$removeHtml(html));
+    if (localStorage.pasteHtml) {
+      var html = clipboard.getData('text/html');
+
+      console.log('HTML')
+
+      if (html) {
+        e.preventDefault();
+        return document.execCommand('insertHTML', false, this.$removeHtml(html));
+      }
     }
 
     if (text) {
       e.preventDefault();
       return document.execCommand('insertHTML', false, text.replace(/\n/ig, '<br>'));
+    }
+  }
+
+  $onCopy(e) {
+    var selection = window.getSelection();
+    var data = selection.focusNode.innerHTML || selection.focusNode.data;
+
+    if (selection.rangeCount > 0) {
+      var range = selection.getRangeAt(0);
+      var clonedSelection = range.cloneContents();
+      var div = document.createElement('div');
+
+      div.appendChild(clonedSelection);
+      
+      console.log({
+        'html': div.innerHTML,
+        'range': range,
+        'clonedSelection': clonedSelection,
+      });
     }
   }
 
@@ -160,8 +184,6 @@ class BaseEditor {
   $onChange() {
     if (this.customEvents['change']) {
       let data = this.$removeHtml(this.element.innerHTML);
-
-      // this.customEvents['descriptionChanged'](this.element.innerHTML.replace(/contentEditable=["']\w+["']/igm, ''));
       this.customEvents['change'](data);
     }
   }
