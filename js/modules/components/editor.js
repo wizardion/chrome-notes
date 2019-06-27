@@ -29,6 +29,11 @@ class Editor extends BaseEditor {
         return document.execCommand('insertHTML', false, '&nbsp;');
       }
     }
+
+    // if (e.keyCode === 13) {
+    //   e.preventDefault();
+    //   document.execCommand('insertHTML', false, '<br/>');
+    // }
   }
 
 

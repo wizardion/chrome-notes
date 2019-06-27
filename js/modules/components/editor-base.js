@@ -130,7 +130,7 @@ class BaseEditor {
   $removeHtml(data) {
     for (let index = 0; index < this.rules.length; index++) {
       const rule = this.rules[index];
-      data = data.replace(new RegExp(rule.pattern, 'igm'), rule.replacement);
+      data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
     }
 
     return data;
@@ -140,20 +140,18 @@ class BaseEditor {
     var clipboard = (e.originalEvent || e).clipboardData;
     var text = clipboard.getData('text/plain');
 
+    e.preventDefault();
+
     if (localStorage.pasteHtml) {
       var html = clipboard.getData('text/html');
 
-      console.log('HTML')
-
       if (html) {
-        e.preventDefault();
         return document.execCommand('insertHTML', false, this.$removeHtml(html));
       }
     }
 
     if (text) {
-      e.preventDefault();
-      return document.execCommand('insertHTML', false, text.replace(/\n/ig, '<br>'));
+      return document.execCommand('insertText', false, text.replace(/^\n|\n$/ig, ''));
     }
   }
 
