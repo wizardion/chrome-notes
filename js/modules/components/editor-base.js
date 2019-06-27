@@ -1,11 +1,26 @@
 class BaseEditor {
   constructor (element, controls) {
     const tags = ['a', 'li', 'ul', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
+    const pasteTags = ['li', 'ul', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.element = element;
     this.controls = controls;
     this.customEvents = {'change': null};
+    this.pasteRules = [
+      { // Replace paragraph to <br/> // https://www.regextester.com/93930
+        pattern: '<\/(p|h[0-9])>', 
+        replacement: '<br>'
+      },
+      { // Remove all attributes except allowed.
+        pattern: `((<)\\s*(\/*)(\\w+)[^>]*\\s*(>))`, 
+        replacement: '$2$3$4$5'
+      },
+      { // Remove all tags except allowed.
+        pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
+        replacement: '$2$3$4$5'
+      },
+    ];
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
         // pattern: '<\/(li|p|h[0-9])>', 
@@ -127,9 +142,11 @@ class BaseEditor {
    * @param {*} data
    * Removes html exept allowed tags and attributes.
    */
-  $removeHtml(data) {
-    for (let index = 0; index < this.rules.length; index++) {
-      const rule = this.rules[index];
+  $removeHtml(data, paste) {
+    var rules = paste? this.pasteRules : this.rules;
+
+    for (let index = 0; index < rules.length; index++) {
+      const rule = rules[index];
       data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
     }
 
@@ -146,7 +163,8 @@ class BaseEditor {
       var html = clipboard.getData('text/html');
 
       if (html) {
-        return document.execCommand('insertHTML', false, this.$removeHtml(html));
+        console.log(this.$removeHtml(html, true))
+        return document.execCommand('insertHTML', false, this.$removeHtml(html, true));
       }
     }
 
