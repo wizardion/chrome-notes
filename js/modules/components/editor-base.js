@@ -24,6 +24,10 @@ class BaseEditor {
         pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
+      { // Replace extra
+        pattern: `((<)\\s?(\/)?\\s?(${pasteTags})\\s?(>))(<\\s?\/?\\s?(${pasteTags})\\s?>)+`, 
+        replacement: '$2$3$4$5'
+      },
     ];
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
