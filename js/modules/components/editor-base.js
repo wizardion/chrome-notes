@@ -22,7 +22,7 @@ class BaseEditor {
       },
       {
         name: 'Replace paragraph',
-        pattern: '(?!^)(<)\\s*(\/)?\\s*(dt|p|h[0-9])((\\s[^>]*>|>))',
+        pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p|h[0-9])((\\s[^>]*>|>))',
         replacement: '<br>'
       },
       {
