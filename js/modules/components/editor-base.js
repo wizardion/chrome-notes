@@ -1,20 +1,24 @@
 class BaseEditor {
   constructor (element, controls) {
-    const tags = ['a', 'li', 'ul', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
-    const pasteTags = ['li', 'ul', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
+    const tags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
+    const pasteTags = ['li', 'ul', 'ol', 'b', 'i', 'u', 'div', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.element = element;
     this.controls = controls;
     this.customEvents = {'change': null};
     this.pasteRules = [
-      { // Replace paragraph to <br/> // https://www.regextester.com/93930
-        pattern: '<\/(p|h[0-9])>', 
+      { // Replace styles and scripts
+        pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>', 
+        replacement: ''
+      },
+      { // Replace paragraph
+        pattern: '(?!^)(<)\\s*(\/)?\\s*(dt|p|h[0-9])(\\s[^>]*>)',
         replacement: '<br>'
       },
       { // Remove all attributes except allowed.
-        pattern: `((<)\\s*(\/*)(\\w+)[^>]*\\s*(>))`, 
-        replacement: '$2$3$4$5'
+        pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
+        replacement: ''
       },
       { // Remove all tags except allowed.
         pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
@@ -163,7 +167,7 @@ class BaseEditor {
       var html = clipboard.getData('text/html');
 
       if (html) {
-        console.log(this.$removeHtml(html, true))
+        console.log(html);
         return document.execCommand('insertHTML', false, this.$removeHtml(html, true));
       }
     }
@@ -174,22 +178,22 @@ class BaseEditor {
   }
 
   $onCopy(e) {
-    var selection = window.getSelection();
-    var data = selection.focusNode.innerHTML || selection.focusNode.data;
+    // var selection = window.getSelection();
+    // var data = selection.focusNode.innerHTML || selection.focusNode.data;
 
-    if (selection.rangeCount > 0) {
-      var range = selection.getRangeAt(0);
-      var clonedSelection = range.cloneContents();
-      var div = document.createElement('div');
+    // if (selection.rangeCount > 0) {
+    //   var range = selection.getRangeAt(0);
+    //   var clonedSelection = range.cloneContents();
+    //   var div = document.createElement('div');
 
-      div.appendChild(clonedSelection);
+    //   div.appendChild(clonedSelection);
       
-      console.log({
-        'html': div.innerHTML,
-        'range': range,
-        'clonedSelection': clonedSelection,
-      });
-    }
+    //   console.log({
+    //     'html': div.innerHTML,
+    //     'range': range,
+    //     'clonedSelection': clonedSelection,
+    //   });
+    // }
   }
 
   /**
