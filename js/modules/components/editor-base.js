@@ -47,7 +47,7 @@ class BaseEditor {
       },
       {
         name: 'Replace empty tags',
-        pattern: `<\w+><\/\w+>`, 
+        pattern: `<\\w+><\/\\w+>`, 
         replacement: ''
       },
     ];
