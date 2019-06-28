@@ -172,6 +172,11 @@ class BaseEditor {
 
       if (html) {
         console.log(html);
+        
+        // if (!text.match(/(\\n){2,}/ig) && html.match(/(\\n){2,}/ig)) {
+        //   html = html.replace(/(\\n){2,}/ig, '$1');
+        // }
+
         return document.execCommand('insertHTML', false, this.$removeHtml(html, true));
       }
     }
