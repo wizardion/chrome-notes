@@ -35,12 +35,16 @@ class BaseEditor {
         pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
-      // {
-      //   name: 'Replace extra',
-      //   // pattern: `((<)\\s?(\/)?\\s?(div|b)\\s?(>)){2,}`, 
-      //   pattern: `((<)\\s?(\/)?\\s?(div)\\s?(>)){2,}|((<)\\s?(\/)?\\s?(b)\\s?(>)){2,}`, 
-      //   replacement: '$2$3$4$5'
-      // },
+      {
+        name: 'Replace extra {3}',
+        pattern: `(<(div)>){3}([^<>]*)(<\/(div)>){3}|(<(b)>){3}([^<>]*)(<\/(b)>)`, 
+        replacement: '$1$3$4'
+      },
+      {
+        name: 'Replace extra {2}',
+        pattern: `(<(div)>){2}([^<>]*)(<\/(div)>){2}|(<(b)>){2}([^<>]*)(<\/(b)>)`, 
+        replacement: '$1$3$4'
+      },
     ];
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
