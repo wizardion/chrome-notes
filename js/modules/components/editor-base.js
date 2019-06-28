@@ -37,13 +37,13 @@ class BaseEditor {
       },
       {
         name: 'Replace extra {3}',
-        pattern: `(<(div)>){3}([^<>]*)(<\/(div)>){3}|(<(b)>){3}([^<>]*)(<\/(b)>)`, 
-        replacement: '$1$3$4'
+        pattern: `(<(div)>){3}([^<>]*)(<\/(div)>){3}|(<(b)>){3}([^<>]*)(<\/(b)>){3}`, 
+        replacement: '$1$3$4$6$8$9'
       },
       {
         name: 'Replace extra {2}',
-        pattern: `(<(div)>){2}([^<>]*)(<\/(div)>){2}|(<(b)>){2}([^<>]*)(<\/(b)>)`, 
-        replacement: '$1$3$4'
+        pattern: `(<(div)>){2}([^<>]*)(<\/(div)>){2}|(<(b)>){2}([^<>]*)(<\/(b)>){2}`, 
+        replacement: '$1$3$4$6$8$9'
       },
     ];
     this.rules = [
