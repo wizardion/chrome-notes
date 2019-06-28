@@ -9,22 +9,27 @@ class BaseEditor {
     this.customEvents = {'change': null};
     this.pasteRules = [
       { // Replace styles and scripts
+        name: 'Replace styles and scripts',
         pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>', 
         replacement: ''
       },
       { // Replace paragraph
+        name: 'Replace paragraph',
         pattern: '(?!^)(<)\\s*(\/)?\\s*(dt|p|h[0-9])(\\s[^>]*>)',
         replacement: '<br>'
       },
       { // Remove all attributes except allowed.
+        name: 'Remove all attributes except allowed',
         pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
         replacement: ''
       },
       { // Remove all tags except allowed.
+        name: 'Remove all tags except allowed',
         pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
       { // Replace extra
+        name: 'Replace extra',
         pattern: `((<)\\s?(\/)?\\s?(${pasteTags})\\s?(>))(<\\s?\/?\\s?(${pasteTags})\\s?>)+`, 
         replacement: '$2$3$4$5'
       },
@@ -155,15 +160,17 @@ class BaseEditor {
 
     console.log('----------------------------------------------------------------------------------------------------');
     console.log(data);
-    console.log('----------------------------------------------------------------------------------------------------');
+    
 
     for (let index = 0; index < rules.length; index++) {
       const rule = rules[index];
       data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
 
+      console.log(`----------------------------${rule.name}--------------------------------------------`);
       console.log(data);
-      console.log('----------------------------------------------------------------------------------------------------');
     }
+
+    console.log('----------------------------------------------------------------------------------------------------');
 
     return data;
   }
