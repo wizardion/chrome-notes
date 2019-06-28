@@ -45,6 +45,11 @@ class BaseEditor {
         pattern: `(<(div)>){2}([^<>]*)(<\/(div)>){2}|(<(b)>){2}([^<>]*)(<\/(b)>){2}`, 
         replacement: '$1$3$4$6$8$9'
       },
+      {
+        name: 'Replace empty tags',
+        pattern: `<\w+><\/\w+>`, 
+        replacement: ''
+      },
     ];
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
