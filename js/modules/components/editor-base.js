@@ -4,7 +4,7 @@ class BaseEditor {
     const pasteTags = ['li', 'ul', 'ol', 'b', 'i', 'u', 'div', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
-    console.log(pasteTags)
+    // console.log(pasteTags)
 
     this.element = element;
     this.controls = controls;
