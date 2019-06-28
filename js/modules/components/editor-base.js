@@ -170,7 +170,7 @@ class BaseEditor {
   $removeHtml(data) {
     var rules = this.pasteRules;
 
-    console.log('----------------------------------------------------------------------------------------------------');
+    console.log(`%c${Array(200).fill('-').join('')}`, 'color: darkgreen;');
     console.log(data);
     
 
@@ -178,11 +178,11 @@ class BaseEditor {
       const rule = rules[index];
       data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
 
-      console.log(`----------------------------${rule.name}--------------------------------------------`);
+      console.log(`%c${Array(30).fill('-').join('')} ${rule.name} ${Array(170 - (rule.name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
       console.log(data);
     }
 
-    console.log('----------------------------------------------------------------------------------------------------');
+    console.log(`%c${Array(200).fill('-').join('')}`, 'color: darkgreen;');
 
     return data;
   }
