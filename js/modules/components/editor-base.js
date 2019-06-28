@@ -10,12 +10,12 @@ class BaseEditor {
     this.pasteRules = [
       { // Replace styles and scripts
         name: 'Replace styles and scripts',
-        pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>', 
+        pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>\\n?',
         replacement: ''
       },
       { // Replace paragraph
         name: 'Replace paragraph',
-        pattern: '(?!^)(<)\\s*(\/)?\\s*(dt|p|h[0-9])(\\s[^>]*>)',
+        pattern: '(?!^)(<)\\s*(\/)?\\s*(dt|p|h[0-9])(\\s[^>]*>)\\n?',
         replacement: '<br>'
       },
       { // Remove all attributes except allowed.
@@ -25,7 +25,7 @@ class BaseEditor {
       },
       { // Remove all tags except allowed.
         name: 'Remove all tags except allowed',
-        pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
+        pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>\\n?`,
         replacement: '$2$3$4$5'
       },
       { // Replace extra
