@@ -153,9 +153,16 @@ class BaseEditor {
   $removeHtml(data, paste) {
     var rules = paste? this.pasteRules : this.rules;
 
+    console.log('----------------------------------------------------------------------------------------------------');
+    console.log(data);
+    console.log('----------------------------------------------------------------------------------------------------');
+
     for (let index = 0; index < rules.length; index++) {
       const rule = rules[index];
       data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
+
+      console.log(data);
+      console.log('----------------------------------------------------------------------------------------------------');
     }
 
     return data;
@@ -171,7 +178,9 @@ class BaseEditor {
       var html = clipboard.getData('text/html');
 
       if (html) {
-        console.log(html);
+        // console.log('----------');
+        // console.log(html);
+        // console.log('----------');
         
         // if (!text.match(/(\\n){2,}/ig) && html.match(/(\\n){2,}/ig)) {
         //   html = html.replace(/(\\n){2,}/ig, '$1');
