@@ -92,7 +92,7 @@ class Editor extends BaseEditor {
   }
 
   $onChange() {
-    console.log(`"%c${this.$removeHtml(this.element.innerHTML)}%c"`, 'color: red', 'color: black')
+    // console.log(`"%c${this.$removeHtml(this.element.innerHTML)}%c"`, 'color: red', 'color: black')
   }
 }
 

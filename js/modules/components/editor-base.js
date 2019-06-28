@@ -4,35 +4,43 @@ class BaseEditor {
     const pasteTags = ['li', 'ul', 'ol', 'b', 'i', 'u', 'div', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
+    console.log(pasteTags)
+
     this.element = element;
     this.controls = controls;
     this.customEvents = {'change': null};
     this.pasteRules = [
-      { // Replace styles and scripts
+      {
+        name: 'Trim html before cutting',
+        pattern: '(<[^>]+>)\\s+(?=<[^>]+>)',
+        replacement: '$1'
+      },
+      {
         name: 'Replace styles and scripts',
-        pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>\\n?',
+        pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>',
         replacement: ''
       },
-      { // Replace paragraph
+      {
         name: 'Replace paragraph',
-        pattern: '(?!^)(<)\\s*(\/)?\\s*(dt|p|h[0-9])(\\s[^>]*>)\\n?',
+        pattern: '(?!^)(<)\\s*(\/)?\\s*(dt|p|h[0-9])((\\s[^>]*>|>))',
         replacement: '<br>'
       },
-      { // Remove all attributes except allowed.
+      {
         name: 'Remove all attributes except allowed',
         pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
         replacement: ''
       },
-      { // Remove all tags except allowed.
+      {
         name: 'Remove all tags except allowed',
-        pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>\\n?`,
+        pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
-      { // Replace extra
-        name: 'Replace extra',
-        pattern: `((<)\\s?(\/)?\\s?(${pasteTags})\\s?(>))(<\\s?\/?\\s?(${pasteTags})\\s?>)+`, 
-        replacement: '$2$3$4$5'
-      },
+      // {
+      //   name: 'Replace extra',
+      //   // pattern: `((<)\\s?(\/)?\\s?(div|b)\\s?(>)){2,}`, 
+      //   pattern: `((<)\\s?(\/)?\\s?(div)\\s?(>)){2,}|((<)\\s?(\/)?\\s?(b)\\s?(>)){2,}`, 
+      //   replacement: '$2$3$4$5'
+      // },
     ];
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
@@ -155,8 +163,8 @@ class BaseEditor {
    * @param {*} data
    * Removes html exept allowed tags and attributes.
    */
-  $removeHtml(data, paste) {
-    var rules = paste? this.pasteRules : this.rules;
+  $removeHtml(data) {
+    var rules = this.pasteRules;
 
     console.log('----------------------------------------------------------------------------------------------------');
     console.log(data);
@@ -182,23 +190,19 @@ class BaseEditor {
     e.preventDefault();
 
     if (localStorage.allowPasteHtml || true) {
-      var html = clipboard.getData('text/html');
+      var html = clipboard.getData('text/html') || text;
 
       if (html) {
-        // console.log('----------');
-        // console.log(html);
-        // console.log('----------');
-        
         // if (!text.match(/(\\n){2,}/ig) && html.match(/(\\n){2,}/ig)) {
         //   html = html.replace(/(\\n){2,}/ig, '$1');
         // }
 
-        return document.execCommand('insertHTML', false, this.$removeHtml(html, true));
+        return document.execCommand('insertHTML', false, this.$removeHtml(html));
       }
     }
 
     if (text) {
-      return document.execCommand('insertText', false, text.replace(/^\n|\n$/ig, ''));
+      return document.execCommand('insertText', false, text.replace(/^\s|\s$/ig, ''));
     }
   }
 
@@ -227,10 +231,10 @@ class BaseEditor {
    * Fires on content blur
    */
   $onChange() {
-    if (this.customEvents['change']) {
-      let data = this.$removeHtml(this.element.innerHTML);
-      this.customEvents['change'](data);
-    }
+    // if (this.customEvents['change']) {
+    //   let data = this.$removeHtml(this.element.innerHTML);
+    //   this.customEvents['change'](data);
+    // }
   }
 
   $onHandleInput(e) {}
