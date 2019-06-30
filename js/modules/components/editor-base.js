@@ -16,14 +16,9 @@ class BaseEditor {
         replacement: '$1'
       },
       {
-        name: 'Replace styles and scripts',
+        name: 'Remove styles and scripts',
         pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>',
         replacement: ''
-      },
-      {
-        name: 'Replace paragraph',
-        pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p|h[0-9])((\\s[^>]*>|>))',
-        replacement: '<br>'
       },
       {
         name: 'Remove all attributes except allowed',
@@ -31,8 +26,23 @@ class BaseEditor {
         replacement: ''
       },
       {
+        name: 'Replace headers',
+        pattern: `(<\\s*)(h[0-9])(\\s*>)`,
+        replacement: '$1b$3'
+      },
+      {
+        name: 'Replace headers ends',
+        pattern: `(<\\s*\/\\s*)(h[0-9])(\\s*>)`,
+        replacement: '$1b$3\n\n'
+      },
+      {
+        name: 'Replace paragraph',
+        pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
+        replacement: '\n\n'
+      },
+      {
         name: 'Replace unsopported bold tags',
-        pattern: `(<\s*\/?)(strong|h[0-9])(\s*>)`,
+        pattern: `(<\\s*\/?)(strong)(\\s*>)`,
         replacement: '$1b$3'
       },
       {
