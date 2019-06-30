@@ -35,16 +35,11 @@ class BaseEditor {
         pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
-      {
-        name: 'Replace extra {3}',
-        pattern: `(<(div)>){3}([^<>]*)(<\/(div)>){3}|(<(b)>){3}([^<>]*)(<\/(b)>){3}`, 
-        replacement: '$1$3$4$6$8$9'
-      },
-      {
-        name: 'Replace extra {2}',
-        pattern: `(<(div)>){2}([^<>]*)(<\/(div)>){2}|(<(b)>){2}([^<>]*)(<\/(b)>){2}`, 
-        replacement: '$1$3$4$6$8$9'
-      },
+      // {
+      //   name: 'Replace extra {2}',
+      //   pattern: `(<(div)>){2}([^<>]*)(<\/(div)>){2}|(<(b)>){2}([^<>]*)(<\/(b)>){2}`, 
+      //   replacement: '$1$3$4$6$8$9'
+      // },
       {
         name: 'Replace empty tags',
         pattern: `<\\w+><\/\\w+>`, 
@@ -175,7 +170,8 @@ class BaseEditor {
   $removeHtml(data) {
     var rules = this.pasteRules;
 
-    console.log(`%c${Array(200).fill('-').join('')}`, 'color: darkgreen;');
+    var len = 155
+    console.log(`%c${Array(len).fill('-').join('')}`, 'color: darkgreen;');
     console.log(data);
     
 
@@ -183,11 +179,37 @@ class BaseEditor {
       const rule = rules[index];
       data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
 
-      console.log(`%c${Array(30).fill('-').join('')} ${rule.name} ${Array(170 - (rule.name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
+      console.log(`%c${Array(30).fill('-').join('')} ${rule.name} ${Array((len - 30) - (rule.name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
       console.log(data);
     }
 
-    console.log(`%c${Array(200).fill('-').join('')}`, 'color: darkgreen;');
+    var extra = data.match(/(<(div)>){2,}/ig);
+
+    if (extra) {
+      let longest = 0;
+      let max;
+      let count = 0;
+
+      for(let i = 0; i < extra.length; i++) {
+        
+        if (extra[i].length > longest) {
+          max = i;
+          longest = extra[i].length;
+        }
+      }
+
+      count = extra[max].split(/\w+/ig).length - 1;
+
+      for(let i = count; i > 1; i--) {
+        let name = `Replace extra {${i}}`;
+        data = data.replace(new RegExp(`(<(div)>){${i}}([^<>]*)(<\/(div)>){${i}}`, 'ig'), '$1$3$4');
+
+        console.log(`%c${Array(30).fill('-').join('')} ${name} ${Array((len - 30) - (name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
+        console.log(data);
+      }
+    }
+
+    console.log(`%c${Array(len).fill('-').join('')}`, 'color: darkgreen;');
 
     return data;
   }
