@@ -12,7 +12,7 @@ class BaseEditor {
     this.pasteRules = [
       {
         name: 'Trim html before cutting',
-        pattern: '(<[^>]+>)\\s+(?=<[^>]+>)',
+        pattern: '(<[^>]+>)[\\r\\n]+(?=<[^>]+>)',
         replacement: '$1'
       },
       {
@@ -35,11 +35,6 @@ class BaseEditor {
         pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
       },
-      // {
-      //   name: 'Replace extra {2}',
-      //   pattern: `(<(div)>){2}([^<>]*)(<\/(div)>){2}|(<(b)>){2}([^<>]*)(<\/(b)>){2}`, 
-      //   replacement: '$1$3$4$6$8$9'
-      // },
       {
         name: 'Replace empty tags',
         pattern: `<\\w+><\/\\w+>`, 
@@ -218,6 +213,7 @@ class BaseEditor {
   }
 
   $onPaste(e) {
+    // https://www.freecodecamp.org/news/three-ways-to-find-the-longest-word-in-a-string-in-javascript-a2fb04c9757c/
     var clipboard = (e.originalEvent || e).clipboardData;
     var text = clipboard.getData('text/plain');
 
