@@ -33,12 +33,12 @@ class BaseEditor {
       {
         name: 'Replace headers ends',
         pattern: `(<\\s*\/\\s*)(h[0-9])(\\s*>)`,
-        replacement: '$1b$3\n\n'
+        replacement: '$1b$3<br><br>'
       },
       {
         name: 'Replace paragraph',
         pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
-        replacement: '\n\n'
+        replacement: '<br><br>'
       },
       {
         name: 'Replace unsopported bold tags',
