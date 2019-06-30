@@ -31,6 +31,11 @@ class BaseEditor {
         replacement: ''
       },
       {
+        name: 'Replace unsopported bold tags',
+        pattern: `(<\s*\/?)(strong|h[0-9])(\s*>)`,
+        replacement: '$1b$3'
+      },
+      {
         name: 'Remove all tags except allowed',
         pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
         replacement: '$2$3$4$5'
