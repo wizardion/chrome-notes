@@ -40,6 +40,11 @@ class BaseEditor {
         pattern: `<\\w+><\/\\w+>`, 
         replacement: ''
       },
+      {
+        name: 'Replace innesessary html symbols',
+        pattern: `\\S(&nbsp;)\\S`, 
+        replacement: ' '
+      },
     ];
     this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
