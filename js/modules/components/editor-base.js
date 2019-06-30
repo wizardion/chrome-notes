@@ -161,6 +161,21 @@ class BaseEditor {
     document.execCommand(action);
   }
 
+  $findMax(data) {
+    let longest = 0;
+    let max;
+
+    for(let i = 0; i < data.length; i++) {
+      
+      if (data[i].length > longest) {
+        max = i;
+        longest = data[i].length;
+      }
+    }
+
+    return data[max].split(/\w+/ig).length - 1;
+  }
+
   /**
    * Internal method: RemoveHtml.
    * 
@@ -186,19 +201,7 @@ class BaseEditor {
     var extra = data.match(/(<(div)>){2,}/ig);
 
     if (extra) {
-      let longest = 0;
-      let max;
-      let count = 0;
-
-      for(let i = 0; i < extra.length; i++) {
-        
-        if (extra[i].length > longest) {
-          max = i;
-          longest = extra[i].length;
-        }
-      }
-
-      count = extra[max].split(/\w+/ig).length - 1;
+      let count = this.$findMax(extra);
 
       for(let i = count; i > 1; i--) {
         let name = `Replace extra {${i}}`;
