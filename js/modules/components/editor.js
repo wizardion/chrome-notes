@@ -91,9 +91,9 @@ class Editor extends BaseEditor {
     var logDiv = document.getElementById('expression-result').innerHTML = `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
   }
 
-  $onChange() {
-    // console.log(`"%c${this.$removeHtml(this.element.innerHTML)}%c"`, 'color: red', 'color: black')
-  }
+  // $onChange() {
+  //   // console.log(`"%c${this.$removeHtml(this.element.innerHTML)}%c"`, 'color: red', 'color: black')
+  // }
 }
 
 

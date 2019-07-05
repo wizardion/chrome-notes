@@ -1,15 +1,14 @@
 class BaseEditor {
   constructor (element, controls) {
-    const tags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
-    const pasteTags = ['li', 'ul', 'ol', 'b', 'i', 'u', 'div', 'br'].join('|'); // Allowed tags
+    // const tags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
+    const pasteTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'div', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
-
-    // console.log(pasteTags)
 
     this.element = element;
     this.controls = controls;
     this.customEvents = {'change': null};
-    this.pasteRules = [
+    // https://www.regextester.com/93930
+    this.rules = [
       {
         name: 'Trim html before cutting',
         pattern: '(<[^>]+>)[\\r\\n]+(?=<[^>]+>)',
@@ -52,16 +51,17 @@ class BaseEditor {
       },
       {
         name: 'Replace empty tags',
-        pattern: `<\\w+><\/\\w+>`, 
+        pattern: `<div><\/div>|<b><\/b>|<i><\/i>`,
         replacement: ''
       },
       {
         name: 'Replace innesessary html symbols',
-        pattern: `\\S(&nbsp;)\\S`, 
-        replacement: ' '
+        pattern: `(\\S)(&nbsp;)(\\S)`, 
+        replacement: '$1 $3'
       },
     ];
-    this.rules = [
+    //#region Old
+    /* this.rules = [
       { // Replace paragraph to <br/> // https://www.regextester.com/93930
         // pattern: '<\/(li|p|h[0-9])>', 
         // replacement: '<br/><br/>'
@@ -85,7 +85,8 @@ class BaseEditor {
       //   pattern: '([ ])([ ])',
       //   replacement: '$1&nbsp;'
       // },
-    ];
+    ]; */
+    //#endregion
 
     this.init();
 
@@ -94,6 +95,13 @@ class BaseEditor {
     this.element.addEventListener('copy', this.$onCopy.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
+
+    // this.element.addEventListener('contextmenu', this.$onHandlerContextMenu.bind(this));
+    // this.element.addEventListener('mousedown', this.$hideContextMenu.bind(this));
+    // this.element.addEventListener('touchstart', this.$hideContextMenu.bind(this));
+    // this.element.addEventListener('touchmove', this.$hideContextMenu.bind(this));
+    // this.element.addEventListener('touchend', this.$hideContextMenu.bind(this));
+    // this.element.addEventListener('touchcancel', this.$hideContextMenu.bind(this));
   }
 
   /**
@@ -113,7 +121,10 @@ class BaseEditor {
       item.onmousedown = this.$precommand;
 
       if (['link'].indexOf(action) === -1) {
-        item.onmouseup = this.$command;
+        item.onmouseup = this.$command.bind({
+          item: item,
+          class: this
+        });
       } else {
         // item.onmouseup = this.$link.bind(this);
       }
@@ -169,11 +180,16 @@ class BaseEditor {
   }
 
   $command(e) {
-    let action = this.getAttribute('action');
+    let action = this.item.getAttribute('action');
+
+    console.log({
+      'action': action
+    });
 
     // cancel event.
     e.preventDefault();
     document.execCommand(action);
+    this.class.$hideContextMenu();
   }
 
   $findMax(data) {
@@ -181,8 +197,7 @@ class BaseEditor {
     let max;
 
     for(let i = 0; i < data.length; i++) {
-      
-      if (data[i].length > longest) {
+      if (data[i].length > longest) { 
         max = i;
         longest = data[i].length;
       }
@@ -198,15 +213,13 @@ class BaseEditor {
    * Removes html exept allowed tags and attributes.
    */
   $removeHtml(data) {
-    var rules = this.pasteRules;
-
     var len = 155
     console.log(`%c${Array(len).fill('-').join('')}`, 'color: darkgreen;');
     console.log(data);
     
 
-    for (let index = 0; index < rules.length; index++) {
-      const rule = rules[index];
+    for (let index = 0; index < this.rules.length; index++) {
+      const rule = this.rules[index];
       data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
 
       console.log(`%c${Array(30).fill('-').join('')} ${rule.name} ${Array((len - 30) - (rule.name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
@@ -243,10 +256,6 @@ class BaseEditor {
       var html = clipboard.getData('text/html') || text;
 
       if (html) {
-        // if (!text.match(/(\\n){2,}/ig) && html.match(/(\\n){2,}/ig)) {
-        //   html = html.replace(/(\\n){2,}/ig, '$1');
-        // }
-
         return document.execCommand('insertHTML', false, this.$removeHtml(html));
       }
     }
@@ -281,13 +290,38 @@ class BaseEditor {
    * Fires on content blur
    */
   $onChange() {
-    // if (this.customEvents['change']) {
-    //   let data = this.$removeHtml(this.element.innerHTML);
-    //   this.customEvents['change'](data);
-    // }
+    this.$hideContextMenu();
+
+    if (this.customEvents['change']) {
+      let data = this.$removeHtml(this.element.innerHTML);
+      this.customEvents['change'](data);
+      // this.customEvents['change'](this.element.innerHTML);
+    }
   }
 
-  $onHandleInput(e) {}
+  $onHandlerContextMenu(e) {
+    if (!this.context) {
+      e.preventDefault();
+
+      var menu = document.getElementById('editor-controlls');
+      var x = e.clientX;
+      var y = e.clientY - 5;
+  
+      menu.style.display = 'inherit';
+      menu.style.left = x;
+      menu.style.top = y;
+      this.context = true;
+    }
+  }
+
+  $hideContextMenu() {
+    document.getElementById('editor-controlls').style.display = 'none';
+    this.context = false;
+  }
+
+  $onHandleInput(e) {
+    this.$hideContextMenu();
+  }
 }
 
 
