@@ -95,13 +95,6 @@ class BaseEditor {
     this.element.addEventListener('copy', this.$onCopy.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
-
-    // this.element.addEventListener('contextmenu', this.$onHandlerContextMenu.bind(this));
-    // this.element.addEventListener('mousedown', this.$hideContextMenu.bind(this));
-    // this.element.addEventListener('touchstart', this.$hideContextMenu.bind(this));
-    // this.element.addEventListener('touchmove', this.$hideContextMenu.bind(this));
-    // this.element.addEventListener('touchend', this.$hideContextMenu.bind(this));
-    // this.element.addEventListener('touchcancel', this.$hideContextMenu.bind(this));
   }
 
   /**
@@ -121,10 +114,7 @@ class BaseEditor {
       item.onmousedown = this.$precommand;
 
       if (['link'].indexOf(action) === -1) {
-        item.onmouseup = this.$command.bind({
-          item: item,
-          class: this
-        });
+        item.onmouseup = this.$command;
       } else {
         // item.onmouseup = this.$link.bind(this);
       }
@@ -180,16 +170,11 @@ class BaseEditor {
   }
 
   $command(e) {
-    let action = this.item.getAttribute('action');
-
-    console.log({
-      'action': action
-    });
+    let action = this.getAttribute('action');
 
     // cancel event.
     e.preventDefault();
     document.execCommand(action);
-    this.class.$hideContextMenu();
   }
 
   $findMax(data) {
@@ -290,8 +275,6 @@ class BaseEditor {
    * Fires on content blur
    */
   $onChange() {
-    this.$hideContextMenu();
-
     if (this.customEvents['change']) {
       let data = this.$removeHtml(this.element.innerHTML);
       this.customEvents['change'](data);
@@ -299,29 +282,9 @@ class BaseEditor {
     }
   }
 
-  $onHandlerContextMenu(e) {
-    if (!this.context) {
-      e.preventDefault();
-
-      var menu = document.getElementById('editor-controlls');
-      var x = e.clientX;
-      var y = e.clientY - 5;
   
-      menu.style.display = 'inherit';
-      menu.style.left = x;
-      menu.style.top = y;
-      this.context = true;
-    }
-  }
 
-  $hideContextMenu() {
-    document.getElementById('editor-controlls').style.display = 'none';
-    this.context = false;
-  }
-
-  $onHandleInput(e) {
-    this.$hideContextMenu();
-  }
+  $onHandleInput(e) {}
 }
 
 
