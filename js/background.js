@@ -4,6 +4,7 @@ var main = {
 };
 
 // window.addEventListener('load', function(){
+  
 document.addEventListener('DOMContentLoaded', function(){
   main.database = openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
   main.database.transaction(function(tx) {
@@ -132,8 +133,6 @@ main.update = function(item, key){
     // return;
   }
 
-  console.log(sql);
-
   main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
     callback('Oops, data not saved! Please try letter.');
   }); });
@@ -144,10 +143,7 @@ main.add = function(note, callback = function(){}){
   var data = [note.title, note.description, note.displayOrder, note.updated, note.updated];
   var error = this.events['error'] || function(){};
 
-  console.log(`background.add: ${sql}`);
-
   main.database.transaction(function (tx) { tx.executeSql(sql, data, function (tx, data) {
-    console.log(`callback.insertId: ${data.insertId}`);
     callback(data.insertId);
   }, function(tx, data){
     error('Oops! Note not added! Please try letter.');

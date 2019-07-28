@@ -171,7 +171,6 @@ table
   position: absolute;
   top: 0px;
   left: 5px;
-  line-height: 27px;
 }
 
 .back:hover
@@ -193,7 +192,7 @@ table
   position: absolute;
   /* width: 21px; */
   width: 30px;
-  right: 5px;
+  right: 7px;
 }
 
 .delete svg {

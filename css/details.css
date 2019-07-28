@@ -46,7 +46,7 @@
   color: black;
 
   /* font: 15px "Open Sans", sans-serif; */
-  font: 14px "Open Sans", sans-serif;
+  font: 15px "Open Sans", sans-serif;
   /* font-weight: bold; */
   /* font-family: inherit;
   font-size: 15px; */
@@ -185,7 +185,8 @@ div[contenteditable] {
 }
 
 .content-description::selection,
-.content-description ::selection {
+.content-description ::selection,
+.edit-title.details::selection {
   /* background: #07a69857; */
   background: #07a6983d; /* WebKit/Blink Browsers */
 }
@@ -210,7 +211,7 @@ div[contenteditable] {
 .expression-logs.statistic {
   top: 0px;
   height: 14px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* LOG */
