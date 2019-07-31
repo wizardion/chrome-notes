@@ -2,6 +2,7 @@ class TextProcessor {
   constructor (element, controls) {
     this.element = element;
     this.controls = controls;
+    this.customEvents = {'change': null};
   }
 
   $isLast(selection, offset) {

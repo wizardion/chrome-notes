@@ -1,4 +1,4 @@
-class Editor extends BaseEditor {
+class Editor extends TextProcessor {
   constructor (element, controls) {
     super(element, controls);
 
@@ -130,7 +130,7 @@ class Editor extends BaseEditor {
    */
   set value(value) {
     this.element.innerHTML = value;
-    this.log();
+    // this.log();
   }
 
   /**
@@ -278,8 +278,8 @@ class Editor extends BaseEditor {
    */
   $onChange() {
     if (this.customEvents['change']) {
-      let data = this.$removeHtml(this.element.innerHTML);
-      this.customEvents['change'](data);
+      // let data = this.$removeHtml(this.element.innerHTML);
+      // this.customEvents['change'](data);
       // this.customEvents['change'](this.element.innerHTML);
     }
   }

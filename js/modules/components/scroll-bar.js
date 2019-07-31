@@ -49,9 +49,12 @@ class ScrollBar {
       return;
     }
 
+    var height = parseInt(max / (this.control.scrollHeight / max));
+    var top = parseInt(this.control.scrollTop * ((max - height) / scrollHeight));
+
     this.thumb.style.marginTop = this.control.offsetTop;
-    this.thumb.style.height = this.control.offsetHeight / (this.control.scrollHeight / this.control.offsetHeight);
-    this.thumb.style.top = (this.control.scrollTop * ((max - this.thumb.offsetHeight) / scrollHeight));
+    this.thumb.style.height = height;
+    this.thumb.style.top = top;
 
     this.thumb.style.visibility = '';
 
