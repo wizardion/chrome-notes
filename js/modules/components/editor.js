@@ -1,100 +1,15 @@
 class Editor extends TextProcessor {
   constructor (element, controls) {
-    super(element, controls);
+    super(element);
 
-    // const tags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'strong', 'strike', 'div', 'br'].join('|'); // Allowed tags
-    const pasteTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'div', 'br'].join('|'); // Allowed tags
-    const attributes = ['href'].join('|'); // Allowed attributes
+    this.$value = this.element.innerHTML;
+    this.controls = controls;
 
-    
-    // https://www.regextester.com/93930
-    this.rules = [
-      {
-        name: 'Trim html before cutting',
-        pattern: '(<[^>]+>)[\\r\\n]+(?=<[^>]+>)',
-        replacement: '$1'
-      },
-      {
-        name: 'Remove styles and scripts',
-        pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>',
-        replacement: ''
-      },
-      {
-        name: 'Remove all attributes except allowed',
-        pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
-        replacement: ''
-      },
-      {
-        name: 'Replace headers',
-        pattern: `(<\\s*)(h[0-9])(\\s*>)`,
-        replacement: '$1b$3'
-      },
-      {
-        name: 'Replace headers ends',
-        pattern: `(<\\s*\/\\s*)(h[0-9])(\\s*>)`,
-        replacement: '$1b$3<br><br>'
-      },
-      {
-        name: 'Replace paragraph',
-        pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
-        replacement: '<br><br>'
-      },
-      {
-        name: 'Replace unsopported bold tags',
-        pattern: `(<\\s*\/?)(strong)(\\s*>)`,
-        replacement: '$1b$3'
-      },
-      {
-        name: 'Remove all tags except allowed',
-        pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
-        replacement: '$2$3$4$5'
-      },
-      {
-        name: 'Replace empty tags',
-        pattern: `<div><\/div>|<b><\/b>|<i><\/i>`,
-        replacement: ''
-      },
-      {
-        name: 'Replace innesessary html symbols',
-        pattern: `(\\S)(&nbsp;)(\\S)`, 
-        replacement: '$1 $3'
-      },
-    ];
-    //#region Old
-    /* this.rules = [
-      { // Replace paragraph to <br/> // https://www.regextester.com/93930
-        // pattern: '<\/(li|p|h[0-9])>', 
-        // replacement: '<br/><br/>'
-        pattern: '<\/(p|h[0-9])>', 
-        replacement: '<br>'
-      },
-      { // Remove all attributes except allowed.
-        pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
-        replacement: ''
-      },
-      { // Remove all tags except allowed.
-        pattern: `((<)\\s?(\/?)\\s?(${tags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
-        replacement: '$2$3$4$5'
-      },
-      // { // Replace tab space
-      //   pattern: '\t',
-      //   replacement: '<span style="white-space:pre">\t</span>'
-      // },
-      // { // Replace double spaces
-      //   types: [1, 2],
-      //   pattern: '([ ])([ ])',
-      //   replacement: '$1&nbsp;'
-      // },
-    ]; */
-    //#endregion
+    this.customEvents = {'change': null};
 
     this.init();
 
-    // Global events
-    this.element.addEventListener('paste', this.$onPaste.bind(this));
-    this.element.addEventListener('copy', this.$onCopy.bind(this));
-    this.element.addEventListener('blur', this.$onChange.bind(this));
-    this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
+    this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
   }
 
   /**
@@ -103,34 +18,198 @@ class Editor extends TextProcessor {
    * Init controlls and events.
    */
   init() {
-    //https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
-    //https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard
-    //https://bear.app/
-
-    var i = 123;
-
     for (let i = 0; i < this.controls.length; i++) {
       const item = this.controls[i];
       const action = item.getAttribute('action');
 
-      item.onmousedown = this.$precommand;
+      item.onmousedown = this.$preCommand;
 
       if (['link'].indexOf(action) === -1) {
         item.onmouseup = this.$command;
       } else {
-        // item.onmouseup = this.$link.bind(this);
+        item.onmouseup = this.$link.bind(this);
       }
     }
   }
-  
+
+  $preCommand(e) {
+    e.preventDefault();
+  }
+
+  $command(e) {
+    let action = this.getAttribute('action');
+
+    // cancel event.
+    e.preventDefault();
+    document.execCommand(action);
+  }
+
+  $containsLink(selection) {
+    var container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+
+    return (container && container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
+           (container && container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
+  }
+
+  $link() {
+    var selection = window.getSelection();
+    var text = selection.toString();
+    var containsLink = this.$containsLink(selection);
+    var regex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
+
+    // selection is empty
+    if (!text.length) {
+      return;
+    }
+
+    // unlink
+    if (containsLink) {
+      console.log(`1. unlink`);
+      return document.execCommand("unlink", false);
+    }
+
+    // create an auto link
+    if (!containsLink && text.match(regex)) {
+      let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
+
+      console.log(`2. insertHTML`);
+      return document.execCommand('insertHTML', false, linkHtml);
+    }
+
+    // create a custom link
+    let customLink = `[${text.replace(/\n/ig, '<br>')}](url)`;
+
+    // console.log(`2. insertCustomLink${customLink}`);
+    document.execCommand('insertHTML', false, customLink);
+    selection.collapse(selection.focusNode, selection.focusOffset - 1);
+    selection.extend(selection.focusNode, selection.focusOffset - 3);
+  }
+
+  $makeLink() {
+
+  }
+
+  $preProcessInput(e) {
+    var selection = window.getSelection();
+
+    // 'Space'
+    if (e.keyCode === 32) {
+      var focusNode = selection.focusNode;
+      var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
+      var character = source && source[source.length - 1];
+
+      console.log({
+        'source': source
+      });
+      
+      if (character === ')') {
+        e.preventDefault();
+        this.$exec(selection);
+      }
+    }
+    // if (e.keyCode === 32) {
+    //   var data = selection.focusNode.data || selection.focusNode.innerHTML;
+    //   var selected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+      
+    //   data = data.substr(0, selection.focusOffset);
+
+    //   // console.log({
+    //   //   'data': data,
+    //   //   'data2': data2,
+    //   // });
+
+    //   if (!selected && data.length > 0 && data[data.length - 1] === ')') {
+    //     e.preventDefault();
+    //     // return document.execCommand('insertHTML', false, '!');
+    //     this.$exec(selection);
+    //   }
+    // }
+  }
+
+  $exec(selection) {
+    var focusNode = selection.focusNode;
+    var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
+    var character = source && source[source.length - 1];
+
+    if (!source) {
+      return;
+    }
+
+    // focusNode.previousSibling.outerHTML
+    // focusNode.previousSibling.previousSibling.data
+    // focusNode.previousSibling.previousSibling.previousSibling: null;
+
+    // console.log({
+    //   'selection': focusNode
+    // });
+
+    if (character === ')') {
+      let regex = /(\[([^()]+)\]\(([^()]+)\))/i;
+      let node = focusNode;
+      // let sourceHtml = [];
+      let sourceHtml = '';
+
+      console.log({
+        'node': node
+      })
+
+      while(node) {
+        sourceHtml = (node.data || node.outerHTML) + sourceHtml;
+        
+        node = node.previousSibling? node.previousSibling : 
+          node.parentNode !== this.element? node.parentNode.previousSibling : null;
+
+        console.log({
+          'node': node
+        });
+
+        if (regex.test(sourceHtml)) {
+          console.log('===FOUND===')
+          break;
+        }
+      }
+
+      console.log({
+        'sourceHtml': sourceHtml,
+        'insertHtml': this.$removeHtml(sourceHtml),
+      });
+
+      let [text, link] = source.split(regex, 2);
+
+      console.log({
+        'text': text,
+        'link': link,
+        'split': source.split(regex),
+        'source': source,
+      });
+
+      if (link) {
+        let linkHtml = link.replace(regex, '<a href="$3">$2</a> ');
+        // document.execCommand('insertText', false, ' ');
+
+        selection.collapse(focusNode, text.length);
+        selection.extend(focusNode, text.length + link.length);
+
+        document.execCommand('insertHTML', false, linkHtml);
+
+        // document.execCommand('insertText', false, ' ');
+
+        // selection.collapse(focusNode, 1);
+        // selection.extend(focusNode, 1);
+
+        return true;
+      }
+    }
+  }
+
   /**
    * @param {*} value
    * 
    * Sets html value
    */
   set value(value) {
-    this.element.innerHTML = value;
-    // this.log();
+    this.$value = value;
+    this.element.innerHTML = this.$value;
   }
 
   /**
@@ -166,127 +245,17 @@ class Editor extends TextProcessor {
     this.element.focus();
   }
 
-  $precommand(e) {
-    // cancel paste.
-    e.preventDefault();
-  }
-
-  $command(e) {
-    let action = this.getAttribute('action');
-
-    // cancel event.
-    e.preventDefault();
-    document.execCommand(action);
-  }
-
-  $findMax(data) {
-    let longest = 0;
-    let max;
-
-    for(let i = 0; i < data.length; i++) {
-      if (data[i].length > longest) { 
-        max = i;
-        longest = data[i].length;
-      }
-    }
-
-    return data[max].split(/\w+/ig).length - 1;
-  }
-
-  /**
-   * Internal method: RemoveHtml.
-   * 
-   * @param {*} data
-   * Removes html exept allowed tags and attributes.
-   */
-  $removeHtml(data) {
-    var len = 155
-    console.log(`%c${Array(len).fill('-').join('')}`, 'color: darkgreen;');
-    console.log(data);
-    
-
-    for (let index = 0; index < this.rules.length; index++) {
-      const rule = this.rules[index];
-      data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
-
-      console.log(`%c${Array(30).fill('-').join('')} ${rule.name} ${Array((len - 30) - (rule.name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
-      console.log(data);
-    }
-
-    var extra = data.match(/(<(div)>){2,}/ig);
-
-    if (extra) {
-      let count = this.$findMax(extra);
-
-      for(let i = count; i > 1; i--) {
-        let name = `Replace extra {${i}}`;
-        data = data.replace(new RegExp(`(<(div)>){${i}}([^<>]*)(<\/(div)>){${i}}`, 'ig'), '$1$3$4');
-
-        console.log(`%c${Array(30).fill('-').join('')} ${name} ${Array((len - 30) - (name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
-        console.log(data);
-      }
-    }
-
-    console.log(`%c${Array(len).fill('-').join('')}`, 'color: darkgreen;');
-
-    return data;
-  }
-
-  $onPaste(e) {
-    // https://www.freecodecamp.org/news/three-ways-to-find-the-longest-word-in-a-string-in-javascript-a2fb04c9757c/
-    var clipboard = (e.originalEvent || e).clipboardData;
-    var text = clipboard.getData('text/plain');
-
-    e.preventDefault();
-
-    if (localStorage.allowPasteHtml || true) {
-      var html = clipboard.getData('text/html') || text;
-
-      if (html) {
-        return document.execCommand('insertHTML', false, this.$removeHtml(html));
-      }
-    }
-
-    if (text) {
-      return document.execCommand('insertText', false, text.replace(/^\s|\s$/ig, ''));
-    }
-  }
-
-  $onCopy(e) {
-    // var selection = window.getSelection();
-    // var data = selection.focusNode.innerHTML || selection.focusNode.data;
-
-    // if (selection.rangeCount > 0) {
-    //   var range = selection.getRangeAt(0);
-    //   var clonedSelection = range.cloneContents();
-    //   var div = document.createElement('div');
-
-    //   div.appendChild(clonedSelection);
-      
-    //   console.log({
-    //     'html': div.innerHTML,
-    //     'range': range,
-    //     'clonedSelection': clonedSelection,
-    //   });
-    // }
-  }
-
   /**
    * Internal method: OnChange.
    * 
    * Fires on content blur
    */
   $onChange() {
-    if (this.customEvents['change']) {
-      // let data = this.$removeHtml(this.element.innerHTML);
-      // this.customEvents['change'](data);
-      // this.customEvents['change'](this.element.innerHTML);
+    if (this.element.innerHTML != this.$value && this.customEvents['change']) {
+      this.customEvents['change'](super.$onChange());
+      this.$value = this.element.innerHTML;
     }
   }
-
-  
-
-  $onHandleInput(e) {}
 }
 
 

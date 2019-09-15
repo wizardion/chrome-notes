@@ -12,6 +12,10 @@ html, body
   background: white;
   background: rgb(238, 238, 238);
 }
+/* 
+b {
+  font-weight: 500;
+} */
 
 .notes {
   position: relative;
@@ -76,6 +80,8 @@ table
   background:inherit;
   color: inherit;
   cursor: inherit;
+
+  border-bottom: 1px dotted rgba(7, 166, 152, 0.15);
 }
 
 .hold {
@@ -106,9 +112,10 @@ table
 .hold .list-item.drag, .hold .list-item.drag:hover
 {
   background:rgba(7, 166, 152, 0.1);
-  border-bottom: 1px solid transparent;
+  /* border-bottom: 1px solid transparent; */
   cursor: pointer;
   color: #07a698;
+  background: rgba(7, 166, 152, 0.02);
 }
 
 .list-view .list-item.edit-item:hover
@@ -171,6 +178,7 @@ table
   position: absolute;
   top: 0px;
   left: 5px;
+  line-height: 26px;
 }
 
 .back:hover
@@ -192,7 +200,7 @@ table
   position: absolute;
   /* width: 21px; */
   width: 30px;
-  right: 7px;
+  right: 5px;
 }
 
 .delete svg {
@@ -268,8 +276,10 @@ table
   width: 25px;
   float: right;
   cursor: pointer;
-  position: relative;
+  /* position: relative; */
+  position: absolute;
   z-index: 1;
+  right: 5px;
 }
 
 .save-note:hover, .save-note:active
@@ -436,7 +446,7 @@ table
 ::-webkit-input-placeholder
 {
   /* color: rgba(7, 166, 152, 0.2); */
-  font: 13px sans-serif;
+  font: 13px 'Quicksand2', sans-serif;
   /* color: #07a698; */
   color: #07a69857;
    /* opacity: 0.2;

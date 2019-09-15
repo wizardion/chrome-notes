@@ -7,6 +7,8 @@
   position: relative;
   line-height: 23px;
   border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+  border-bottom: 1px dashed #07a69857;
+  border-bottom: 1px dashed rgba(7, 166, 152, 0.1);
 }
 
 .edit-title
@@ -37,23 +39,31 @@
   border-bottom: 1px solid transparent;
   /* font: 15px sans-serif; */
   color: #07a698;
+  color: #088e82;
+  color: #06736a;
   padding-bottom: 3px;
 
   width: 100%;
   left: 0px;
   text-align: center;
   border: none;
-  color: black;
+  /* color: black; */
 
   /* font: 15px "Open Sans", sans-serif; */
-  font: 15px "Open Sans", sans-serif;
+  /* font: 16px sans-serif; */
+  /* font: 15px "Open Sans", sans-serif; */
   /* font-weight: bold; */
-  /* font-family: inherit;
-  font-size: 15px; */
+  font-family: inherit;
+  
+  /* color: darkgrey; */
 
-
-  font-weight: bold;
+  /* font-weight: bold; */
   /* text-decoration: underline; */
+  font-size: 17px;
+  font-weight: 600;
+
+  /* font-family: 'Nunito2', sans-serif; */
+  font-family: 'Quicksand2', sans-serif;
 }
 
 .content
@@ -131,13 +141,23 @@ div[contenteditable] {
 
   /* background: yellow; */
   flex: 1 1 auto;
-  font: 13px "Open Sans", sans-serif;
-  /* font-family: inherit; */
-  /* font-size: 14px; */
+  /* font: 13.5px "Open Sans", sans-serif; */
+  font-family: inherit;
+  
+  /* font-family: sans-serif;
+  font-size: 15px; */
 
   white-space: pre-wrap;
   word-break: break-word;
+
   /* white-space: inherit; */
+
+  font-size: 15px;
+  /* font-weight: 300; */
+  /* font-family: 'Karla', sans-serif; */
+  /* font-family: 'Nunito2', sans-serif; */
+  font-family: 'Quicksand2', sans-serif;
+  font-weight: 500;
 }
 
 /* .content-description b {

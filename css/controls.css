@@ -28,6 +28,7 @@ fieldset div:last-child {
   margin: 0px;
   height:24px;
   width:24px;
+  line-height: 24px;
   background: transparent;
   border: none;
   border: none;
@@ -43,7 +44,8 @@ fieldset div:last-child {
   /* background-color: red; */
 }
 
-.button:hover
+.button:hover,
+.button:active
 {
   color: #e33636;
   fill:#e33636;
@@ -68,17 +70,50 @@ div.button {
   width: 28px;
   height: 17px;
   margin: 3px 1px 0 0;
-  background: rgba(7, 166, 152, 0.025);
+  background: rgba(7, 166, 152, 0.015);
+  border: 1px solid rgba(7, 166, 152, 0.025);
+  border-color: transparent;
+
+  /* the new */
+  /* background: rgba(7, 166, 152, 0.025);
+  border: 1px solid rgba(7, 166, 152, 0.025);
+  border-bottom-color: rgba(7, 166, 152, 0.055); */
+  background: rgba(7, 166, 152, 0.015);
   border: 1px solid rgba(7, 166, 152, 0.025);
 }
 
 .editor-controlls .button:hover {
-  background: rgba(7, 166, 152, 0.1);
+  background: rgba(7, 166, 152, 0.035);
 
+  /* the new */
+  /* background: rgba(7, 166, 152, 0.1);
+  border-bottom-color: rgba(7, 166, 152, 0.15); */
+  /* background: rgba(7, 166, 152, 0.055);
+  border: 1px solid rgba(7, 166, 152, 0.035);
+  border-bottom-color: rgba(7, 166, 152, 0.055); */
+  background: rgba(7, 166, 152, 0.035);
+  color: #07a698;
+  fill:#07a698;
 }
 
 .editor-controlls .button:active {
-  background: #b9e6e2;
+  /* background: #b9e6e2; */
+
+  /* the new */
+  /* background: #b9e6e2; */
+  /* background: rgba(7, 166, 152, 0.025);
+  border: 1px solid rgba(7, 166, 152, 0.025); */
+
+  /* background: rgba(7, 166, 152, 0.2);
+  border: 1px solid rgba(7, 166, 152, 0.155); */
+
+  background: rgba(7, 166, 152, 0.1);
+  border: 1px solid rgba(7, 166, 152, 0.065);
+  /* background: #b9e6e2; */
+  /* color: #e33636;
+  fill:#e33636; */
+  color: #07a698;
+  fill:#07a698;
 }
 
 .url-popup {

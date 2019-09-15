@@ -129,13 +129,15 @@ main.update = function(item, key){
 
     // pritSQL(sql, data);
     
-    console.log(`"%c${item[key]}%c"`, 'color: red;', 'color: black;');
+    // console.log(`"%c${item[key]}%c"`, 'color: red;', 'color: black;');
     // return;
   }
 
-  main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
-    callback('Oops, data not saved! Please try letter.');
-  }); });
+  console.log(`%c "${data[0]}"`, 'background: transparent; color: red;');
+
+  // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
+  //   callback('Oops, data not saved! Please try letter.');
+  // }); });
 };
 
 main.add = function(note, callback = function(){}){
