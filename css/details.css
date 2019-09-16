@@ -8,7 +8,7 @@
   line-height: 23px;
   border-bottom: 1px solid rgba(7, 166, 152, 0.1);
   border-bottom: 1px dashed #07a69857;
-  border-bottom: 1px dashed rgba(7, 166, 152, 0.1);
+  border-bottom: 1px dotted rgba(7, 166, 152, 0.15);
 }
 
 .edit-title

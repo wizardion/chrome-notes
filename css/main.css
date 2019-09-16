@@ -115,7 +115,7 @@ table
   /* border-bottom: 1px solid transparent; */
   cursor: pointer;
   color: #07a698;
-  background: rgba(7, 166, 152, 0.02);
+  background: rgba(7, 166, 152, 0.05);
 }
 
 .list-view .list-item.edit-item:hover
