@@ -111,11 +111,17 @@ table
 .list-view .list-item:hover,
 .hold .list-item.drag, .hold .list-item.drag:hover
 {
-  background:rgba(7, 166, 152, 0.1);
+  /* background:rgba(7, 166, 152, 0.1); */
   /* border-bottom: 1px solid transparent; */
   cursor: pointer;
   color: #07a698;
   background: rgba(7, 166, 152, 0.05);
+}
+
+.list-view .list-item:active {
+  background: rgba(7, 166, 152, 0.1);
+  margin-left: 2px;
+  margin-right: 2px;
 }
 
 .list-view .list-item.edit-item:hover
