@@ -93,6 +93,7 @@ table
   position: absolute;
   left: 5px;
   right: 10px;
+  opacity: 1 !important;
 }
 
 .alert {
@@ -120,8 +121,8 @@ table
 
 .list-view .list-item:active {
   background: rgba(7, 166, 152, 0.1);
-  /* margin-left: -2px;
-  margin-right: -2px; */
+  /* margin-left: -2px; */
+  /* margin-right: -2px; */
   opacity: 0.5;
 }
 
