@@ -63,7 +63,7 @@
   font-weight: 600;
 
   /* font-family: 'Nunito2', sans-serif; */
-  font-family: 'Quicksand2', sans-serif;
+  font-family: 'Quicksand2', 'Ubuntu2', sans-serif;
 }
 
 .content
@@ -152,11 +152,11 @@ div[contenteditable] {
 
   /* white-space: inherit; */
 
-  font-size: 15px;
+  font-size: 14px;
   /* font-weight: 300; */
   /* font-family: 'Karla', sans-serif; */
   /* font-family: 'Nunito2', sans-serif; */
-  font-family: 'Quicksand2', sans-serif;
+  font-family: 'Quicksand2', 'Ubuntu2', sans-serif;
   font-weight: 400;
 }
 
