@@ -54,6 +54,8 @@ fieldset div:last-child {
 .button:active
 {
   opacity: 0.5;
+  /* margin-left: -1px;
+  margin-right: -1px; */
 }
 
 div.button {

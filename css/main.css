@@ -110,7 +110,8 @@ table
 }
 
 .list-view .list-item:hover,
-.hold .list-item.drag, .hold .list-item.drag:hover
+.hold .list-item.drag, .hold .list-item.drag:hover,
+.list-view .list-item:active
 {
   /* background:rgba(7, 166, 152, 0.1); */
   /* border-bottom: 1px solid transparent; */
@@ -121,9 +122,9 @@ table
 
 .list-view .list-item:active {
   background: rgba(7, 166, 152, 0.1);
-  margin-left: -1px;
-  margin-right: -1px;
-  /* opacity: 0.5; */
+  /* margin-left: 1px;
+  margin-right: -1px; */
+  opacity: 0.75;
 }
 
 .list-view .list-item.edit-item:hover
@@ -193,6 +194,11 @@ table
 {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVR42mNgGBngsZnZfxAe1UwPzaOG0NgQmgEAyyoytXm7VbsAAAAASUVORK5CYII=);
 }
+
+/* .back:active {
+  margin-left: -1px;
+  margin-right: 1px;
+} */
 
 .delete
 {
