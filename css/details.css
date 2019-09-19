@@ -65,6 +65,8 @@
   /* font-family: 'Nunito2', sans-serif; */
   /* font-family: 'Quicksand2', 'Ubuntu2', sans-serif; */
   font-family: 'Ubuntu2', sans-serif;
+  border-bottom: 1px solid transparent;
+  margin-top: 10px;
 }
 
 .content
@@ -120,6 +122,9 @@
 
   display: flex;
   flex-flow: column;
+
+  padding: 0px;
+  height: 244px;
 }
 
 div[contenteditable] {
