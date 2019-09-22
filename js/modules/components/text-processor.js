@@ -147,10 +147,11 @@ class TextProcessor {
   $onPaste(e) {
     var clipboard = (e.originalEvent || e).clipboardData;
     var text = clipboard.getData('text/plain');
+    let linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
 
     e.preventDefault();
 
-    if (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true) {
+    if (!linkRegex.test(text) && localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true) {
       var html = clipboard.getData('text/html') || text;
 
       if (html) {
@@ -158,9 +159,7 @@ class TextProcessor {
       }
     }
 
-    if (text) {
-      return document.execCommand('insertText', false, text.replace(/^\s|\s$/ig, ''));
-    }
+    return document.execCommand('insertText', false, text.replace(/^\s|\s$/ig, ''));
   }
 
   /**
