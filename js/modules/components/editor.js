@@ -85,24 +85,16 @@ class Editor extends TextProcessor {
     selection.extend(selection.focusNode, selection.focusOffset - 3);
   }
 
-  $makeLink() {
-
-  }
-
   $preProcessInput(e) {
     var selection = window.getSelection();
     var hasSelection = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
 
-    // 'Space'
-    if (!hasSelection && e.keyCode === 32) {
+    // 'Space' or 'Enter'
+    if (!hasSelection && (e.keyCode === 32 || e.keyCode === 13)) {
       var focusNode = selection.focusNode;
       
       var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
       var character = source && source[source.length - 1];
-
-      // console.log({
-      //   'source': source,
-      // });
       
       if (character === ')') {
         e.preventDefault();
@@ -139,18 +131,18 @@ class Editor extends TextProcessor {
       }
     }
 
-    let [html, text, link] = sourceHtml.split(regex, 3);
+    let [html, text, url] = sourceHtml.split(regex, 3);
 
     var lastText = (lastNode == focusNode)? focusNode.data.substr(0, selection.focusOffset) : lastNode.data;
     lastText = lastText.substr(0, lastText.lastIndexOf('['));
 
-    if (text && link) {
-      let linkHtml = `<a href="${text}">${link}</a> `;
+    if (text && url) {
+      let linkHtml = `<a href="${url}">${text}</a> `;
 
       selection.collapse(focusNode, source.length);
       selection.extend(lastNode, lastText.length);
 
-      // document.execCommand('insertHTML', false, linkHtml);
+      document.execCommand('insertHTML', false, linkHtml);
     }
   }
 
