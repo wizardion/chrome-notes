@@ -91,114 +91,66 @@ class Editor extends TextProcessor {
 
   $preProcessInput(e) {
     var selection = window.getSelection();
+    var hasSelection = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
 
     // 'Space'
-    if (e.keyCode === 32) {
+    if (!hasSelection && e.keyCode === 32) {
       var focusNode = selection.focusNode;
+      
       var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
       var character = source && source[source.length - 1];
 
-      console.log({
-        'source': source
-      });
+      // console.log({
+      //   'source': source,
+      // });
       
       if (character === ')') {
         e.preventDefault();
         this.$exec(selection);
       }
     }
-    // if (e.keyCode === 32) {
-    //   var data = selection.focusNode.data || selection.focusNode.innerHTML;
-    //   var selected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
-      
-    //   data = data.substr(0, selection.focusOffset);
-
-    //   // console.log({
-    //   //   'data': data,
-    //   //   'data2': data2,
-    //   // });
-
-    //   if (!selected && data.length > 0 && data[data.length - 1] === ')') {
-    //     e.preventDefault();
-    //     // return document.execCommand('insertHTML', false, '!');
-    //     this.$exec(selection);
-    //   }
-    // }
   }
 
   $exec(selection) {
     var focusNode = selection.focusNode;
     var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    var character = source && source[source.length - 1];
 
     if (!source) {
       return;
     }
 
-    // focusNode.previousSibling.outerHTML
-    // focusNode.previousSibling.previousSibling.data
-    // focusNode.previousSibling.previousSibling.previousSibling: null;
+    let node = focusNode;
+    let lastNode = focusNode;
+    let sourceHtml = source;
+    let regex = /\[([^()]+)\]\(([-a-zA-Z0-9()@:%_\+.~#?&//=]+)\)/gi;
 
-    // console.log({
-    //   'selection': focusNode
-    // });
+    while(node) {
+      if (regex.test(sourceHtml)) {
+        lastNode = node;
+        console.log('===FOUND===')
+        break;
+      }
 
-    if (character === ')') {
-      let regex = /(\[([^()]+)\]\(([^()]+)\))/i;
-      let node = focusNode;
-      // let sourceHtml = [];
-      let sourceHtml = '';
+      node = node.previousSibling? node.previousSibling :
+        node.parentNode !== this.element? node.parentNode.previousSibling : null;
 
-      console.log({
-        'node': node
-      })
-
-      while(node) {
+      if(node) {
         sourceHtml = (node.data || node.outerHTML) + sourceHtml;
-        
-        node = node.previousSibling? node.previousSibling : 
-          node.parentNode !== this.element? node.parentNode.previousSibling : null;
-
-        console.log({
-          'node': node
-        });
-
-        if (regex.test(sourceHtml)) {
-          console.log('===FOUND===')
-          break;
-        }
       }
+    }
 
-      console.log({
-        'sourceHtml': sourceHtml,
-        'insertHtml': this.$removeHtml(sourceHtml),
-      });
+    let [html, text, link] = sourceHtml.split(regex, 3);
 
-      let [text, link] = source.split(regex, 2);
+    var lastText = (lastNode == focusNode)? focusNode.data.substr(0, selection.focusOffset) : lastNode.data;
+    lastText = lastText.substr(0, lastText.lastIndexOf('['));
 
-      console.log({
-        'text': text,
-        'link': link,
-        'split': source.split(regex),
-        'source': source,
-      });
+    if (text && link) {
+      let linkHtml = `<a href="${text}">${link}</a> `;
 
-      if (link) {
-        let linkHtml = link.replace(regex, '<a href="$3">$2</a> ');
-        // document.execCommand('insertText', false, ' ');
+      selection.collapse(focusNode, source.length);
+      selection.extend(lastNode, lastText.length);
 
-        selection.collapse(focusNode, text.length);
-        selection.extend(focusNode, text.length + link.length);
-
-        document.execCommand('insertHTML', false, linkHtml);
-
-        // document.execCommand('insertText', false, ' ');
-
-        // selection.collapse(focusNode, 1);
-        // selection.extend(focusNode, 1);
-
-        return true;
-      }
+      // document.execCommand('insertHTML', false, linkHtml);
     }
   }
 
