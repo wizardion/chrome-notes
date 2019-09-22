@@ -2,7 +2,7 @@ class LinkAdapter extends Helper {
   constructor () {
     super();
 
-    this.commandRegex = /\[([^()]+)\]\(([-a-zA-Z0-9()@:%_\+.~#?&//=]+)\)/gi;
+    this.commandRegex = /\[([^()]+)\]\(([\S]+)\)$/i;
     this.linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
   }
 
@@ -21,6 +21,38 @@ class LinkAdapter extends Helper {
   }
 
   /**
+   * Internal method: RemoveHtml.
+   * 
+   * @param {*} node
+   * @param {*} source
+   * 
+   * checks all node behind and extracts the command link
+   */
+  $findLink(node, source) {
+    let lastNode = node;
+
+    do {
+      let test = this.commandRegex.test(source);
+
+      if (test === true) {
+        lastNode = node;
+        break;
+      }
+
+      node = node.previousSibling? node.previousSibling :
+        node.parentNode !== this.element? node.parentNode.previousSibling : null;
+
+      if(node) {
+        source = (node.data || node.outerHTML) + source;
+      }
+    } while(node);
+
+    let [html, text, url] = source.split(this.commandRegex, 3);
+
+    return [lastNode, text, url];
+  }
+
+  /**
    * @param {*} selection
    * 
    * Returns the executed test of selection if it can contain the link formated text.
@@ -28,7 +60,7 @@ class LinkAdapter extends Helper {
   test(selection) {
     let focusNode = selection.focusNode;
     let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    let regex = /\[([^()]+)\]\(([-a-zA-Z0-9()@:%_\+.~#?&//=]+)\)$/gi;
+    let regex = /([^()]+)\]\(([\S]+)\)$/i;
 
     return regex.test(source);
   }
@@ -79,26 +111,9 @@ class LinkAdapter extends Helper {
       return;
     }
 
-    let node = focusNode;
-    let lastNode = focusNode;
-    let sourceHtml = source;
-
-    while(node) {
-      if (this.commandRegex.test(sourceHtml)) {
-        lastNode = node;
-        break;
-      }
-
-      node = node.previousSibling? node.previousSibling :
-        node.parentNode !== this.element? node.parentNode.previousSibling : null;
-
-      if(node) {
-        sourceHtml = (node.data || node.outerHTML) + sourceHtml;
-      }
-    }
-
-    let [html, text, url] = sourceHtml.split(this.commandRegex, 3);
+    let [lastNode, text, url] = this.$findLink(focusNode, source);
     let lastText = (lastNode == focusNode)? focusNode.data.substr(0, selection.focusOffset) : lastNode.data;
+
     lastText = lastText.substr(0, lastText.lastIndexOf('['));
 
     if (text && url) {
@@ -108,6 +123,7 @@ class LinkAdapter extends Helper {
       selection.extend(lastNode, lastText.length);
 
       document.execCommand('insertHTML', false, linkHtml);
+      return true;
     }
   }
 }
