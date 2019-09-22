@@ -50,10 +50,10 @@ class Editor extends TextProcessor {
 
   $preProcessInput(e) {
     var selection = window.getSelection();
-    var hasSelection = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+    var textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
 
     // 'Space' or 'Enter'
-    if (!hasSelection && (e.keyCode === 32 || e.keyCode === 13)) {
+    if (!textSelected && (e.keyCode === 32 || e.keyCode === 13)) {
       const helper = this.$helpers['link'];
       
       if (helper.test(selection)) {

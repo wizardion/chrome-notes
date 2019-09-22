@@ -3,6 +3,25 @@ class LinkAdapter extends Helper {
     super();
   }
 
+  /**
+   * Internal method: RemoveHtml.
+   * 
+   * @param {*} selection
+   * 
+   * checks if selection contains an HTML Link element
+   */
+  $containsLink(selection) {
+    var container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+
+    return (container && container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
+           (container && container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
+  }
+
+  /**
+   * @param {*} selection
+   * 
+   * Returns the executed test of selection if it can contain the link formated text.
+   */
   test(selection) {
     var focusNode = selection.focusNode;
       
@@ -12,13 +31,9 @@ class LinkAdapter extends Helper {
     return (character === ')');
   }
 
-  $containsLink(selection) {
-    var container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
-
-    return (container && container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
-           (container && container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
-  }
-
+  /**
+   * Executes command, replaces selection into command link format [text](url)
+   */
   command() {
     var selection = window.getSelection();
     var text = selection.toString();
@@ -53,6 +68,11 @@ class LinkAdapter extends Helper {
     selection.extend(selection.focusNode, selection.focusOffset - 3);
   }
 
+  /**
+   * @param {*} selection
+   * 
+   * Replace selection into HTML Link Element
+   */
   exec(selection) {
     var focusNode = selection.focusNode;
     var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);

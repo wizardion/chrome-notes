@@ -1,9 +1,22 @@
 class Helper {
   constructor () {}
 
-  test() {}
+  /**
+   * @param {*} selection
+   * 
+   * Returns the executed test of selection
+   */
+  test(selection) {}
 
+  /**
+   * Executes command
+   */
   command() {}
 
-  exec() {}
+  /**
+   * @param {*} selection
+   * 
+   * Replaces selection into HTML element
+   */
+  exec(selection) {}
 }
