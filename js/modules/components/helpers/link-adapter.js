@@ -1,6 +1,9 @@
 class LinkAdapter extends Helper {
   constructor () {
     super();
+
+    this.commandRegex = /\[([^()]+)\]\(([-a-zA-Z0-9()@:%_\+.~#?&//=]+)\)/gi;
+    this.linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
   }
 
   /**
@@ -11,7 +14,7 @@ class LinkAdapter extends Helper {
    * checks if selection contains an HTML Link element
    */
   $containsLink(selection) {
-    var container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+    let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
 
     return (container && container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
            (container && container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
@@ -23,22 +26,20 @@ class LinkAdapter extends Helper {
    * Returns the executed test of selection if it can contain the link formated text.
    */
   test(selection) {
-    var focusNode = selection.focusNode;
-      
-    var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    var character = source && source[source.length - 1];
+    let focusNode = selection.focusNode;
+    let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
+    let regex = /\[([^()]+)\]\(([-a-zA-Z0-9()@:%_\+.~#?&//=]+)\)$/gi;
 
-    return (character === ')');
+    return regex.test(source);
   }
 
   /**
    * Executes command, replaces selection into command link format [text](url)
    */
   command() {
-    var selection = window.getSelection();
-    var text = selection.toString();
-    var containsLink = this.$containsLink(selection);
-    var regex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
+    let selection = window.getSelection();
+    let text = selection.toString();
+    let containsLink = this.$containsLink(selection);
 
     // selection is empty
     if (!text.length) {
@@ -47,22 +48,19 @@ class LinkAdapter extends Helper {
 
     // unlink
     if (containsLink) {
-      console.log(`1. unlink`);
       return document.execCommand("unlink", false);
     }
 
     // create an auto link
-    if (!containsLink && text.match(regex)) {
-      let linkHtml = text.replace(regex, '$1<a href="$2">$2</a>$4');
+    if (!containsLink && text.match(this.linkRegex)) {
+      let linkHtml = text.replace(this.linkRegex, '$1<a href="$2">$2</a>$4');
 
-      console.log(`2. insertHTML`);
       return document.execCommand('insertHTML', false, linkHtml);
     }
 
     // create a custom link
     let customLink = `[${text.replace(/\n/ig, '<br>')}](url)`;
 
-    // console.log(`2. insertCustomLink${customLink}`);
     document.execCommand('insertHTML', false, customLink);
     selection.collapse(selection.focusNode, selection.focusOffset - 1);
     selection.extend(selection.focusNode, selection.focusOffset - 3);
@@ -74,8 +72,8 @@ class LinkAdapter extends Helper {
    * Replace selection into HTML Link Element
    */
   exec(selection) {
-    var focusNode = selection.focusNode;
-    var source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
+    let focusNode = selection.focusNode;
+    let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
 
     if (!source) {
       return;
@@ -84,12 +82,10 @@ class LinkAdapter extends Helper {
     let node = focusNode;
     let lastNode = focusNode;
     let sourceHtml = source;
-    let regex = /\[([^()]+)\]\(([-a-zA-Z0-9()@:%_\+.~#?&//=]+)\)/gi;
 
     while(node) {
-      if (regex.test(sourceHtml)) {
+      if (this.commandRegex.test(sourceHtml)) {
         lastNode = node;
-        console.log('===FOUND===')
         break;
       }
 
@@ -101,9 +97,8 @@ class LinkAdapter extends Helper {
       }
     }
 
-    let [html, text, url] = sourceHtml.split(regex, 3);
-
-    var lastText = (lastNode == focusNode)? focusNode.data.substr(0, selection.focusOffset) : lastNode.data;
+    let [html, text, url] = sourceHtml.split(this.commandRegex, 3);
+    let lastText = (lastNode == focusNode)? focusNode.data.substr(0, selection.focusOffset) : lastNode.data;
     lastText = lastText.substr(0, lastText.lastIndexOf('['));
 
     if (text && url) {
