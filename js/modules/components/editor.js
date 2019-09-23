@@ -29,7 +29,7 @@ class Editor extends TextProcessor {
       item.onmousedown = this.$preCommand;
 
       if (helper) {
-        item.onmouseup = helper.command.bind(helper);
+        item.onmouseup = this.$customCommand.bind(this, helper);
       } else {
         item.onmouseup = this.$command;
       }
@@ -60,6 +60,19 @@ class Editor extends TextProcessor {
     // cancel event.
     e.preventDefault();
     document.execCommand(action);
+  }
+
+  /**
+   * Internal event: CustomCommand.
+   * 
+   * @param {*} e
+   * 
+   * Executes the custom command handling the specified helper in editor.
+   */
+  $customCommand(helper) {
+    if (this.hasFocus()) {
+      helper.command(helper);
+    }
   }
 
   /**
@@ -122,6 +135,15 @@ class Editor extends TextProcessor {
    */
   focus() {
     this.element.focus();
+  }
+
+  /**
+   * HasFocus
+   * 
+   * Gets the result if the editor is in focus.
+   */
+  hasFocus() {
+    return document.activeElement === this.element;
   }
 
   /**
