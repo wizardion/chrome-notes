@@ -36,10 +36,24 @@ class Editor extends TextProcessor {
     }
   }
 
+  /**
+   * Internal event: PreCommand.
+   * 
+   * @param {*} e
+   * 
+   * Executes before the command to cancel the original event
+   */
   $preCommand(e) {
     e.preventDefault();
   }
 
+  /**
+   * Internal event: Command.
+   * 
+   * @param {*} e
+   * 
+   * Executes the command in editor.
+   */
   $command(e) {
     let action = this.getAttribute('action');
 
@@ -48,9 +62,16 @@ class Editor extends TextProcessor {
     document.execCommand(action);
   }
 
+  /**
+   * Internal event: Command.
+   * 
+   * @param {*} e
+   * 
+   * Executes before the keyboard input, handels the commands text format.
+   */
   $preProcessInput(e) {
-    var selection = window.getSelection();
-    var textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+    let selection = window.getSelection();
+    let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
 
     // 'Space' or 'Enter'
     if (!textSelected && (e.keyCode === 32 || e.keyCode === 13)) {
@@ -86,8 +107,6 @@ class Editor extends TextProcessor {
    * Sets html event listener
    */
   addEventListener(name, callback) {
-    var event = this.customEvents[name];
-    
     if (name in this.customEvents) {
       this.customEvents[name] = callback;
       return;
@@ -99,7 +118,7 @@ class Editor extends TextProcessor {
   /**
    * Focus
    * 
-   * Sets focus of element
+   * Sets focus to element
    */
   focus() {
     this.element.focus();
@@ -108,11 +127,13 @@ class Editor extends TextProcessor {
   /**
    * Internal method: OnChange.
    * 
-   * Fires on content blur
+   * Fires onChange handler if custom event is configured.
    */
   $onChange() {
-    if (this.element.innerHTML != this.$value && this.customEvents['change']) {
-      this.customEvents['change'](super.$onChange());
+    let event = this.customEvents['change'];
+
+    if (this.element.innerHTML != this.$value && event) {
+      event(super.$onChange());
       this.$value = this.element.innerHTML;
     }
   }
