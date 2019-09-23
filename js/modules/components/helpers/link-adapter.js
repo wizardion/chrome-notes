@@ -73,10 +73,6 @@ class LinkAdapter extends Helper {
     let text = selection.toString();
     let containsLink = this.$containsLink(selection);
 
-    console.log({
-      'selection': selection
-    })
-
     // selection is empty
     if (!text.length) {
       return;
