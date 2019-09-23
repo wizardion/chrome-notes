@@ -2,7 +2,7 @@ class LinkAdapter extends Helper {
   constructor () {
     super();
 
-    this.commandRegex = /\[([^()]+)\]\(([\S]+)\)$/i;
+    this.commandRegex = /\[([^\[\]]+)\]\(([\S]+)\)$/i;
     this.linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
   }
 
@@ -60,7 +60,7 @@ class LinkAdapter extends Helper {
   test(selection) {
     let focusNode = selection.focusNode;
     let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    let regex = /([^()]+)\]\(([\S]+)\)$/i;
+    let regex = /([^\[\]]+)\]\(([\S]+)\)$/i;
 
     return regex.test(source);
   }
