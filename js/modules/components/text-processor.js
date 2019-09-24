@@ -73,12 +73,6 @@ class TextProcessor {
   $isLast(selection, offset) {
     var focusOffset = offset || selection.focusOffset;
 
-    var a = {
-      test: 123
-    };
-
-    console.log(a);
-
     return focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling &&
            (selection.focusNode.parentNode === this.element || !selection.focusNode.parentNode.nextSibling);
   }
@@ -151,7 +145,7 @@ class TextProcessor {
 
     e.preventDefault();
 
-    if (!linkRegex.test(text) && localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true) {
+    if (!linkRegex.test(text) && (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
       var html = clipboard.getData('text/html') || text;
 
       if (html) {
