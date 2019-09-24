@@ -97,6 +97,7 @@ class Editor extends TextProcessor {
 
     let problems_with_enter = [
       'list',
+      'list_end_string',
       'end_string', // '\n\n' vs '\n'
     ]
 
@@ -106,10 +107,19 @@ class Editor extends TextProcessor {
     //   return document.execCommand('insertHTML', false, '<br>');
     // }
 
-    if (e.keyCode === 13) {
-      e.preventDefault();
-      return document.execCommand('insertHTML', false, '\n');
-    }
+    // if (e.keyCode === 13) {
+    //   let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+    //   let li = (container && container.nodeName === 'LI' || container.parentNode.nodeName === 'LI');
+
+    //   console.log({
+    //     'container': container
+    //   })
+
+    //   if (!li) {
+    //     e.preventDefault();
+    //     return document.execCommand('insertHTML', false, '\n');
+    //   }
+    // }
   }
 
   /**
