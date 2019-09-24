@@ -91,8 +91,24 @@ class Editor extends TextProcessor {
       const helper = this.$helpers['link'];
       
       if (helper.test(selection) && helper.exec(selection)) {
-        e.preventDefault();
+        return e.preventDefault();
       }
+    }
+
+    let problems_with_enter = [
+      'list',
+      'end_string', // '\n\n' vs '\n'
+    ]
+
+    // 'Enter'
+    // if (e.keyCode === 13) {
+    //   e.preventDefault();
+    //   return document.execCommand('insertHTML', false, '<br>');
+    // }
+
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      return document.execCommand('insertHTML', false, '\n');
     }
   }
 
