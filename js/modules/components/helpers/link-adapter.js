@@ -2,8 +2,8 @@ class LinkAdapter extends Helper {
   constructor () {
     super();
 
-    this.commandRegex = /\[([^\[\]]+)\]\(([\S]+)\)$/i;
-    this.linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
+    this.$commandRegex = /\[([^\[\]]+)\]\(([\S]+)\)$/i;
+    this.$linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
   }
 
   /**
@@ -32,9 +32,7 @@ class LinkAdapter extends Helper {
     let lastNode = node;
 
     do {
-      let test = this.commandRegex.test(source);
-
-      if (test === true) {
+      if (this.$commandRegex.test(source)) {
         lastNode = node;
         break;
       }
@@ -47,7 +45,7 @@ class LinkAdapter extends Helper {
       }
     } while(node);
 
-    let [html, text, url] = source.split(this.commandRegex, 3);
+    let [html, text, url] = source.split(this.$commandRegex, 3);
 
     return [lastNode, text, url];
   }
@@ -84,8 +82,8 @@ class LinkAdapter extends Helper {
     }
 
     // create an auto link
-    if (!containsLink && text.match(this.linkRegex)) {
-      let linkHtml = text.replace(this.linkRegex, '$1<a href="$2">$2</a>$4');
+    if (!containsLink && text.match(this.$linkRegex)) {
+      let linkHtml = text.replace(this.$linkRegex, '$1<a href="$2">$2</a>$4');
 
       return document.execCommand('insertHTML', false, linkHtml);
     }
@@ -112,15 +110,13 @@ class LinkAdapter extends Helper {
     }
 
     let [lastNode, text, url] = this.$findLink(focusNode, source);
-    let lastText = (lastNode == focusNode)? focusNode.data.substr(0, selection.focusOffset) : lastNode.data;
-
-    lastText = lastText.substr(0, lastText.lastIndexOf('['));
 
     if (text && url) {
       let linkHtml = `<a href="${url}">${text}</a> `;
+      let lastText = (lastNode == focusNode)? source : lastNode.data;
 
       selection.collapse(focusNode, source.length);
-      selection.extend(lastNode, lastText.length);
+      selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf('[')).length);
 
       document.execCommand('insertHTML', false, linkHtml);
       return true;
