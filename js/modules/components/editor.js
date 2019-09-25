@@ -114,6 +114,20 @@ class Editor extends TextProcessor {
 
     let solution = 'http://jsfiddle.net/s6dgjtx8/1/'; //https://stackoverflow.com/questions/18552336/prevent-contenteditable-adding-div-on-enter-chrome
 
+    if (e.keyCode === 13) {
+      let focusNode = selection.focusNode;
+
+      console.log({
+        'focusNode': focusNode.nodeName == 'LI'
+      });
+
+      if (focusNode.nodeName == 'LI') {
+        e.preventDefault();
+        document.execCommand('insertOrderedList');
+      }
+
+    }
+
     // 'Enter'
     // if (e.keyCode === 13) {
     //   e.preventDefault();
@@ -214,10 +228,10 @@ class Editor extends TextProcessor {
   $onChange() {
     let event = this.customEvents['change'];
 
-    if (this.element.innerHTML != this.$value && event) {
-      event(super.$onChange());
-      this.$value = this.element.innerHTML;
-    }
+    // if (this.element.innerHTML != this.$value && event) {
+    //   event(super.$onChange());
+    //   this.$value = this.element.innerHTML;
+    // }
   }
 }
 
