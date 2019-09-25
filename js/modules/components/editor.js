@@ -109,33 +109,33 @@ class Editor extends TextProcessor {
     //   return document.execCommand('insertHTML', false, '<br>');
     // }
 
-    if (e.keyCode === 13) {
-      let isLast = this.$isLast(selection, selection.focusOffset);
-      let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
-      let li = (container && container.nodeName === 'LI' || container.parentNode.nodeName === 'LI');
-      let node = (!isLast)? '\n' : '\n\n';
-      let focusNode = selection.focusNode;
-      let source = focusNode.data && focusNode.data.substr(selection.focusOffset, selection.focusOffset);
+    // if (e.keyCode === 13) {
+    //   let isLast = this.$isLast(selection, selection.focusOffset);
+    //   let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+    //   let li = (container && container.nodeName === 'LI' || container.parentNode.nodeName === 'LI');
+    //   let node = (!isLast)? '\n' : '\n\n';
+    //   let focusNode = selection.focusNode;
+    //   let source = focusNode.data && focusNode.data.substr(selection.focusOffset, selection.focusOffset);
 
-      console.log({
-        'container': container,
-        'li': li,
-        'isLast': isLast,
-        'source': source,
-      })
+    //   console.log({
+    //     'container': container,
+    //     'li': li,
+    //     'isLast': isLast,
+    //     'source': source,
+    //   })
 
-      if (!li && isLast && !source) {
-        console.log('insertHTML0');
-        e.preventDefault();
-        return document.execCommand('insertHTML', false, '<br><br>');
-      }
+    //   if (!li && isLast && !source) {
+    //     console.log('insertHTML0');
+    //     e.preventDefault();
+    //     return document.execCommand('insertHTML', false, '<br><br>');
+    //   }
 
-      if (!li && !isLast) {
-        console.log('insertHTML');
-        e.preventDefault();
-        return document.execCommand('insertHTML', false, '<br>');
-      }
-    }
+    //   if (!li && !isLast) {
+    //     console.log('insertHTML');
+    //     e.preventDefault();
+    //     return document.execCommand('insertHTML', false, '<br>');
+    //   }
+    // }
   }
 
   $isLast(selection, offset) {
