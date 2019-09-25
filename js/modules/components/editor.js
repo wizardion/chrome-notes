@@ -107,19 +107,40 @@ class Editor extends TextProcessor {
     //   return document.execCommand('insertHTML', false, '<br>');
     // }
 
-    // if (e.keyCode === 13) {
-    //   let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
-    //   let li = (container && container.nodeName === 'LI' || container.parentNode.nodeName === 'LI');
+    if (e.keyCode === 13) {
+      let isLast = this.$isLast(selection, selection.focusOffset);
+      let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+      let li = (container && container.nodeName === 'LI' || container.parentNode.nodeName === 'LI');
+      let node = (!isLast)? '\n' : '\n\n';
+      let focusNode = selection.focusNode;
+      let source = focusNode.data && focusNode.data.substr(selection.focusOffset, selection.focusOffset);
 
-    //   console.log({
-    //     'container': container
-    //   })
+      console.log({
+        'container': container,
+        'li': li,
+        'isLast': isLast,
+        'source': source,
+      })
 
-    //   if (!li) {
-    //     e.preventDefault();
-    //     return document.execCommand('insertHTML', false, '\n');
-    //   }
-    // }
+      if (!li && isLast && !source) {
+        console.log('insertHTML0');
+        e.preventDefault();
+        return document.execCommand('insertHTML', false, '<br><br>');
+      }
+
+      if (!li && !isLast) {
+        console.log('insertHTML');
+        e.preventDefault();
+        return document.execCommand('insertHTML', false, '<br>');
+      }
+    }
+  }
+
+  $isLast(selection, offset) {
+    var focusOffset = offset || selection.focusOffset;
+
+    return (focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling &&
+           (selection.focusNode.parentNode === this.element || !selection.focusNode.parentNode.nextSibling));
   }
 
   /**
