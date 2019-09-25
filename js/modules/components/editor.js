@@ -34,6 +34,9 @@ class Editor extends TextProcessor {
         item.onmouseup = this.$command;
       }
     }
+
+    document.execCommand('defaultParagraphSeparator', false, 'p');
+    // document.execCommand("DefaultParagraphSeparator", false, "br");
   }
 
   /**
@@ -94,6 +97,14 @@ class Editor extends TextProcessor {
         return e.preventDefault();
       }
     }
+
+    // clearInterval(this.inter);
+
+    // this.inter = setTimeout(function() {
+    //   console.log('removeHtml');
+    //   this.element.innerHTML = this.$removeHtml(this.element.innerHTML);
+    //   this.log();
+    // }.bind(this), 1500);
 
     let problems_with_enter = [
       'list',

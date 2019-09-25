@@ -1,6 +1,6 @@
 class TextProcessor {
   constructor (element) {
-    const pasteTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'div', 'br'].join('|'); // Allowed tags
+    const pasteTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'p', 'div1', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     // https://www.regextester.com/93930
@@ -32,8 +32,10 @@ class TextProcessor {
       },
       {
         name: 'Replace paragraph',
-        pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
-        replacement: '<br><br>'
+        // pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
+        pattern: '(?!^)(<)\\s*(\/)\\s*(dt)((\\s[^>]*>|>))',
+        // replacement: '<br><br>'
+        replacement: '<br>'
       },
       {
         name: 'Replace unsopported bold tags',

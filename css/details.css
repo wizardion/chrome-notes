@@ -120,8 +120,8 @@
   background: transparent;
   padding-top: 10px;
 
-  display: flex;
-  flex-flow: column;
+  /* display: flex;
+  flex-flow: column; */
 
   padding: 0px;
   height: 244px;
@@ -165,11 +165,16 @@ div[contenteditable] {
   /* font-family: 'Quicksand2', 'Ubuntu2', sans-serif; */
   font-family: 'Ubuntu2', sans-serif;
   font-weight: 400;
+  /* display: inline-block; */
 }
 
 /* .content-description b {
   font-size: 14px;
 } */
+
+.content-description p {
+  margin: 0px;
+}
 
 .content-description ul,
 .content-description ol {
