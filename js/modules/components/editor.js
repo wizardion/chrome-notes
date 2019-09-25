@@ -101,6 +101,8 @@ class Editor extends TextProcessor {
       'end_string', // '\n\n' vs '\n'
     ]
 
+    let solution = 'http://jsfiddle.net/s6dgjtx8/1/'; //https://stackoverflow.com/questions/18552336/prevent-contenteditable-adding-div-on-enter-chrome
+
     // 'Enter'
     // if (e.keyCode === 13) {
     //   e.preventDefault();
