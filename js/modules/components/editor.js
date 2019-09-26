@@ -163,13 +163,18 @@ class Editor extends TextProcessor {
       console.log({
         'nodeName': focusNode.nodeName,
         'parentNode': focusNode.parentNode.nodeName,
-        'source': source
+        'source': source,
+        'focusNode': selection.focusOffset < focusNode.length,
       });
 
       if (focusNode.nodeName === '#text' && focusNode.parentNode.nodeName !== 'LI') {
         e.preventDefault();
-        console.log({'insertHTML': source.length > 0? '\n' : '\n\n'})
-        return document.execCommand('insertHTML', false, source.length > 0? '\n' : '\n\n');
+        console.log({'insertHTML': selection.focusOffset < focusNode.length? '\n' : '\n\n'})
+        // return document.execCommand('insertText', false, source.length > 0? '\\n' : '\\n\\n');
+        return document.execCommand('insertHTML', false, selection.focusOffset < focusNode.length? '\n' : '\n\n');
+        // document.execCommand("insertHtml", false, source.length > 0? '\n' : '\n\n');
+        // document.execCommand('insertParagraph',false); 
+        // document.execCommand('paste',true, 'TEST'); 
       }
 
       if (focusNode.nodeName === 'LI') {
