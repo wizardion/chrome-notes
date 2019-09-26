@@ -114,18 +114,62 @@ class Editor extends TextProcessor {
 
     let solution = 'http://jsfiddle.net/s6dgjtx8/1/'; //https://stackoverflow.com/questions/18552336/prevent-contenteditable-adding-div-on-enter-chrome
 
-    if (e.keyCode === 13) {
+    // console.log({
+    //   'e': e,
+    //   'keyCode': e.keyCode
+    // });
+
+    // console.log({
+    //   'baseNode': selection.baseNode.nodeName,
+    //   'extentNode': selection.extentNode.nodeName,
+    //   'focusNode':selection.focusNode.nodeName,
+    //   'focusOffset': selection.focusOffset.nodeName,
+    //   'baseOffset': selection.baseOffset,
+    // });
+    
+    // if (!e.shiftKey && e.keyCode === 8) {
+    //   let focusNode = selection.focusNode;
+
+    //   // console.log(selection);
+      
+
+    //   // e.preventDefault();
+    // }
+
+    if (!e.shiftKey && e.keyCode === 46) {
       let focusNode = selection.focusNode;
 
-      console.log({
-        'focusNode': focusNode.nodeName == 'LI'
-      });
-
-      if (focusNode.nodeName == 'LI') {
+      if (focusNode.nodeName === 'LI') {
         e.preventDefault();
-        document.execCommand('insertOrderedList');
-      }
 
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
+          document.execCommand('insertUnorderedList', false);
+          document.execCommand('forwardDelete', false);
+          return document.execCommand('insertUnorderedList', false);
+        }
+
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
+          document.execCommand('insertOrderedList', false);
+          document.execCommand('forwardDelete', false);
+          return document.execCommand('insertOrderedList', false);
+        }
+      }
+    }
+
+    if (!e.shiftKey && e.keyCode === 13) {
+      let focusNode = selection.focusNode;
+
+      if (focusNode.nodeName === 'LI') {
+        e.preventDefault();
+
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
+          return document.execCommand('insertUnorderedList');
+        }
+
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
+          return document.execCommand('insertOrderedList');
+        }
+      }
     }
 
     // 'Enter'
