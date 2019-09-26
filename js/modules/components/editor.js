@@ -35,7 +35,7 @@ class Editor extends TextProcessor {
       }
     }
 
-    // document.execCommand('defaultParagraphSeparator', false, 'p');
+    document.execCommand('defaultParagraphSeparator', false, 'p');
     // document.execCommand("DefaultParagraphSeparator", false, "br");
   }
 
@@ -164,45 +164,45 @@ class Editor extends TextProcessor {
     //   'nextSibling': focusNode.nextSibling && focusNode.nextSibling.data,
     // });
 
-    // if (!e.shiftKey && e.keyCode === 13) {
+    if (!e.shiftKey && e.keyCode === 13) {
       
 
-    //   // console.log({
-    //   //   'nodeName': focusNode.nodeName,
-    //   //   'parentNode.parentNode': focusNode.parentNode.nodeName,
-    //   //   'source': focusNode.data && focusNode.data.substr(selection.focusOffset),
-    //   //   'focusNode': focusNode,
-    //   //   'focusOffset': selection.focusOffset,
-    //   //   'length': focusNode.length,
-    //   //   'nextSibling': focusNode.nextSibling,
-    //   //   'nextSibling.nodeName': focusNode.nextSibling && focusNode.nextSibling.nodeName
-    //   // });
+      // console.log({
+      //   'nodeName': focusNode.nodeName,
+      //   'parentNode.parentNode': focusNode.parentNode.nodeName,
+      //   'source': focusNode.data && focusNode.data.substr(selection.focusOffset),
+      //   'focusNode': focusNode,
+      //   'focusOffset': selection.focusOffset,
+      //   'length': focusNode.length,
+      //   'nextSibling': focusNode.nextSibling,
+      //   'nextSibling.nodeName': focusNode.nextSibling && focusNode.nextSibling.nodeName
+      // });
 
      
 
-    //   // if (focusNode.nodeName === '#text' && (selection.focusOffset < focusNode.length) && focusNode.parentNode.nodeName !== 'LI') {
-    //   //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling) ||
-    //   //   //                 (!focusNode.nextSibling || focusNode.nextSibling.nodeName !== 'BR') ? '<br>' : '<br><br>';
-    //   //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling)? '<br>' : '<br><br>';
-    //   //   // let separator = (selection.focusOffset < focusNode.length)? '<br>' : '<br><br>';
+      // if (focusNode.nodeName === '#text' && (selection.focusOffset < focusNode.length) && focusNode.parentNode.nodeName !== 'LI') {
+      //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling) ||
+      //   //                 (!focusNode.nextSibling || focusNode.nextSibling.nodeName !== 'BR') ? '<br>' : '<br><br>';
+      //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling)? '<br>' : '<br><br>';
+      //   // let separator = (selection.focusOffset < focusNode.length)? '<br>' : '<br><br>';
 
-    //   //   e.preventDefault();
-    //   //   // console.log({'separator': separator});
-    //   //   return document.execCommand('insertHTML', false, '<br>');
-    //   // }
+      //   e.preventDefault();
+      //   // console.log({'separator': separator});
+      //   return document.execCommand('insertHTML', false, '<br>');
+      // }
 
-    //   if (focusNode.nodeName === 'LI') {
-    //     e.preventDefault();
+      if (focusNode.nodeName === 'LI') {
+        e.preventDefault();
 
-    //     if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
-    //       return document.execCommand('insertUnorderedList');
-    //     }
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
+          return document.execCommand('insertUnorderedList');
+        }
 
-    //     if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
-    //       return document.execCommand('insertOrderedList');
-    //     }
-    //   }
-    // }
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
+          return document.execCommand('insertOrderedList');
+        }
+      }
+    }
 
     // 'Enter'
     // if (e.keyCode === 13) {

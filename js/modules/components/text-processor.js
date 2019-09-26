@@ -1,6 +1,6 @@
 class TextProcessor {
   constructor (element) {
-    const pasteTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'p23', 'div', 'br'].join('|'); // Allowed tags
+    const pasteTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'p', 'div123', 'br'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     // https://www.regextester.com/93930
@@ -30,13 +30,13 @@ class TextProcessor {
         pattern: `(<\\s*\/\\s*)(h[0-9])(\\s*>)`,
         replacement: '$1b$3<br><br>'
       },
-      {
-        name: 'Replace paragraph',
-        pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
-        replacement: '<br><br>'
-        // pattern: '(?!^)(<)\\s*(\/)\\s*(dt)((\\s[^>]*>|>))',
-        // replacement: '<br>'
-      },
+      // {
+      //   name: 'Replace paragraph',
+      //   pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
+      //   replacement: '<br><br>'
+      //   // pattern: '(?!^)(<)\\s*(\/)\\s*(dt)((\\s[^>]*>|>))',
+      //   // replacement: '<br>'
+      // },
       {
         name: 'Replace unsopported bold tags',
         pattern: `(<\\s*\/?)(strong)(\\s*>)`,
@@ -49,7 +49,7 @@ class TextProcessor {
       },
       {
         name: 'Replace empty tags',
-        pattern: `<div><\/div>|<b><\/b>|<i><\/i>`,
+        pattern: `<p><\/p>|<b><\/b>|<i><\/i>`,
         replacement: ''
       },
       {
