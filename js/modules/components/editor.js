@@ -159,19 +159,23 @@ class Editor extends TextProcessor {
     if (!e.shiftKey && e.keyCode === 13) {
       let focusNode = selection.focusNode;
       let source = focusNode.data && focusNode.data.substr(selection.focusOffset);
+      // let lineSeparator = '<br>';
+      let lineSeparator = '\n';
 
       console.log({
         'nodeName': focusNode.nodeName,
         'parentNode': focusNode.parentNode.nodeName,
         'source': source,
-        'focusNode': selection.focusOffset < focusNode.length,
+        'focusNode': focusNode,
+        'not_end': selection.focusOffset < focusNode.length,
       });
 
       if (focusNode.nodeName === '#text' && focusNode.parentNode.nodeName !== 'LI') {
         e.preventDefault();
-        console.log({'insertHTML': selection.focusOffset < focusNode.length? '\n' : '\n\n'})
+
+        console.log({'insertHTML': selection.focusOffset < focusNode.length? lineSeparator : lineSeparator + lineSeparator})
         // return document.execCommand('insertText', false, source.length > 0? '\\n' : '\\n\\n');
-        return document.execCommand('insertHTML', false, selection.focusOffset < focusNode.length? '\n' : '\n\n');
+        return document.execCommand('insertHTML', false, selection.focusOffset < focusNode.length? lineSeparator : lineSeparator + lineSeparator);
         // document.execCommand("insertHtml", false, source.length > 0? '\n' : '\n\n');
         // document.execCommand('insertParagraph',false); 
         // document.execCommand('paste',true, 'TEST'); 
