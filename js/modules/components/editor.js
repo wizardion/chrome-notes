@@ -156,30 +156,40 @@ class Editor extends TextProcessor {
     //   }
     // }
 
+    let focusNode = selection.focusNode;
+
+    console.log({
+      'focusNode': focusNode,
+      'source': focusNode.data && focusNode.data.substr(selection.focusOffset),
+      'nextSibling': focusNode.nextSibling && focusNode.nextSibling.data,
+    });
+
     if (!e.shiftKey && e.keyCode === 13) {
-      let focusNode = selection.focusNode;
-      let source = focusNode.data && focusNode.data.substr(selection.focusOffset);
-      // let lineSeparator = '<br>';
-      let lineSeparator = '\n';
+      
 
-      console.log({
-        'nodeName': focusNode.nodeName,
-        'parentNode': focusNode.parentNode.nodeName,
-        'source': source,
-        'focusNode': focusNode,
-        'not_end': selection.focusOffset < focusNode.length,
-      });
+      // console.log({
+      //   'nodeName': focusNode.nodeName,
+      //   'parentNode.parentNode': focusNode.parentNode.nodeName,
+      //   'source': focusNode.data && focusNode.data.substr(selection.focusOffset),
+      //   'focusNode': focusNode,
+      //   'focusOffset': selection.focusOffset,
+      //   'length': focusNode.length,
+      //   'nextSibling': focusNode.nextSibling,
+      //   'nextSibling.nodeName': focusNode.nextSibling && focusNode.nextSibling.nodeName
+      // });
 
-      if (focusNode.nodeName === '#text' && focusNode.parentNode.nodeName !== 'LI') {
-        e.preventDefault();
+     
 
-        console.log({'insertHTML': selection.focusOffset < focusNode.length? lineSeparator : lineSeparator + lineSeparator})
-        // return document.execCommand('insertText', false, source.length > 0? '\\n' : '\\n\\n');
-        return document.execCommand('insertHTML', false, selection.focusOffset < focusNode.length? lineSeparator : lineSeparator + lineSeparator);
-        // document.execCommand("insertHtml", false, source.length > 0? '\n' : '\n\n');
-        // document.execCommand('insertParagraph',false); 
-        // document.execCommand('paste',true, 'TEST'); 
-      }
+      // if (focusNode.nodeName === '#text' && (selection.focusOffset < focusNode.length) && focusNode.parentNode.nodeName !== 'LI') {
+      //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling) ||
+      //   //                 (!focusNode.nextSibling || focusNode.nextSibling.nodeName !== 'BR') ? '<br>' : '<br><br>';
+      //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling)? '<br>' : '<br><br>';
+      //   // let separator = (selection.focusOffset < focusNode.length)? '<br>' : '<br><br>';
+
+      //   e.preventDefault();
+      //   // console.log({'separator': separator});
+      //   return document.execCommand('insertHTML', false, '<br>');
+      // }
 
       if (focusNode.nodeName === 'LI') {
         e.preventDefault();
