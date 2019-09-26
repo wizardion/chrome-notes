@@ -165,7 +165,7 @@ div[contenteditable] {
   /* font-family: 'Quicksand2', 'Ubuntu2', sans-serif; */
   font-family: 'Ubuntu2', sans-serif;
   font-weight: 400;
-  display: inline-block;
+  /* display: inline-block; */
 }
 
 /* .content-description b {

@@ -136,28 +136,41 @@ class Editor extends TextProcessor {
     //   // e.preventDefault();
     // }
 
-    if (!e.shiftKey && e.keyCode === 46) {
-      let focusNode = selection.focusNode;
+    // if (!e.shiftKey && e.keyCode === 46) {
+    //   let focusNode = selection.focusNode;
 
-      if (focusNode.nodeName === 'LI') {
-        e.preventDefault();
+    //   if (focusNode.nodeName === 'LI') {
+    //     e.preventDefault();
 
-        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
-          document.execCommand('insertUnorderedList', false);
-          document.execCommand('forwardDelete', false);
-          return document.execCommand('insertUnorderedList', false);
-        }
+    //     if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
+    //       return document.execCommand('insertUnorderedList', false);
+    //       // document.execCommand('forwardDelete', false);
+    //       // return document.execCommand('insertUnorderedList', false);
+    //     }
 
-        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
-          document.execCommand('insertOrderedList', false);
-          document.execCommand('forwardDelete', false);
-          return document.execCommand('insertOrderedList', false);
-        }
-      }
-    }
+    //     if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
+    //       return document.execCommand('insertOrderedList', false);
+    //       // document.execCommand('forwardDelete', false);
+    //       // return document.execCommand('insertOrderedList', false);
+    //     }
+    //   }
+    // }
 
     if (!e.shiftKey && e.keyCode === 13) {
       let focusNode = selection.focusNode;
+      let source = focusNode.data && focusNode.data.substr(selection.focusOffset);
+
+      console.log({
+        'nodeName': focusNode.nodeName,
+        'parentNode': focusNode.parentNode.nodeName,
+        'source': source
+      });
+
+      if (focusNode.nodeName === '#text' && focusNode.parentNode.nodeName !== 'LI') {
+        e.preventDefault();
+        console.log({'insertHTML': source.length > 0? '\n' : '\n\n'})
+        return document.execCommand('insertHTML', false, source.length > 0? '\n' : '\n\n');
+      }
 
       if (focusNode.nodeName === 'LI') {
         e.preventDefault();
