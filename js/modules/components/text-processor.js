@@ -33,9 +33,9 @@ class TextProcessor {
       {
         name: 'Replace paragraph',
         pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
+        replacement: '<br><br>'
         // pattern: '(?!^)(<)\\s*(\/)\\s*(dt)((\\s[^>]*>|>))',
-        // replacement: '<br><br>'
-        replacement: '<br>'
+        // replacement: '<br>'
       },
       {
         name: 'Replace unsopported bold tags',
