@@ -165,11 +165,16 @@ div[contenteditable] {
   /* font-family: 'Quicksand2', 'Ubuntu2', sans-serif; */
   font-family: 'Ubuntu2', sans-serif;
   font-weight: 400;
-  /* display: inline-block; */
+  display: inline-block;
 }
 
 /* .content-description b {
   font-size: 14px;
+} */
+
+/* textarea.content-description {
+  width: 100%;
+  height: 100%;
 } */
 
 .content-description p {
