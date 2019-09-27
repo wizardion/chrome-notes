@@ -72,24 +72,6 @@ class TextProcessor {
     //#endregion
   }
 
-  /**
-   * Internal event: Command.
-   * 
-   * @param {*} e
-   * 
-   * Executes before the keyboard input, handels the commands text format.
-   */
-  $preProcessInput(e) {
-    
-  }
-
-  $isLast(selection, offset) {
-    var focusOffset = offset || selection.focusOffset;
-
-    return focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling &&
-           (selection.focusNode.parentNode === this.element || !selection.focusNode.parentNode.nextSibling);
-  }
-
   $findMax(data) {
     let longest = 0;
     let max;

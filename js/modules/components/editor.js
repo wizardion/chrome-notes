@@ -36,7 +36,6 @@ class Editor extends TextProcessor {
     }
 
     document.execCommand('defaultParagraphSeparator', false, 'p');
-    // document.execCommand("DefaultParagraphSeparator", false, "br");
   }
 
   /**
@@ -88,6 +87,7 @@ class Editor extends TextProcessor {
   $preProcessInput(e) {
     let selection = window.getSelection();
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+    let focusNode = selection.focusNode;
 
     // 'Space' or 'Enter'
     if (!textSelected && (e.keyCode === 32 || e.keyCode === 13)) {
@@ -98,46 +98,15 @@ class Editor extends TextProcessor {
       }
     }
 
-    // Delete key
-    if (!e.shiftKey && e.keyCode === 46) {
-      let focusNode = selection.focusNode;
+    // Delete key or Enter
+    if (!e.shiftKey && (e.keyCode === 46 || e.keyCode === 13) && focusNode.nodeName === 'LI') {
+      let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
 
-      if (focusNode.nodeName === 'LI') {
+      if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
         e.preventDefault();
-
-        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
-          return document.execCommand('insertUnorderedList', false);
-        }
-
-        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
-          return document.execCommand('insertOrderedList', false);
-        }
+        return document.execCommand(command[focusNode.parentNode.nodeName], false);
       }
     }
-
-    // Enter
-    if (!e.shiftKey && e.keyCode === 13) {
-      let focusNode = selection.focusNode;
-
-      if (focusNode.nodeName === 'LI') {
-        e.preventDefault();
-
-        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
-          return document.execCommand('insertUnorderedList');
-        }
-
-        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
-          return document.execCommand('insertOrderedList');
-        }
-      }
-    }
-  }
-
-  $isLast(selection, offset) {
-    var focusOffset = offset || selection.focusOffset;
-
-    return (focusOffset === selection.focusNode.length && !selection.focusNode.nextSibling &&
-           (selection.focusNode.parentNode === this.element || !selection.focusNode.parentNode.nextSibling));
   }
 
   /**

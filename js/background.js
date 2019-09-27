@@ -123,7 +123,7 @@ main.update = function(item, key){
   var data = [item.title, item.description, item.displayOrder, item.updated, item.id];
   var callback = this.events['error'] || function(){};
 
-  if(key != null){
+  if(key != null) {
     sql = 'UPDATE Notes SET ' + key + '=? WHERE rowid=?';
     data = [item[key], item.id];
 
@@ -135,9 +135,9 @@ main.update = function(item, key){
 
   console.log(`%c "${data[0]}"`, 'background: transparent; color: red;');
 
-  // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
-  //   callback('Oops, data not saved! Please try letter.');
-  // }); });
+  main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
+    callback('Oops, data not saved! Please try letter.');
+  }); });
 };
 
 main.add = function(note, callback = function(){}){
