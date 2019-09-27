@@ -166,7 +166,11 @@ div[contenteditable] {
   font-family: 'Ubuntu2', sans-serif;
   font-weight: 400;
   display: inline-block;
+  /* background: lightblue; */
+  width: 100%;
+  min-height: 192px;
 }
+
 
 /* .content-description b {
   font-size: 14px;

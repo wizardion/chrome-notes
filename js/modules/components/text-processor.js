@@ -72,6 +72,17 @@ class TextProcessor {
     //#endregion
   }
 
+  /**
+   * Internal event: Command.
+   * 
+   * @param {*} e
+   * 
+   * Executes before the keyboard input, handels the commands text format.
+   */
+  $preProcessInput(e) {
+    
+  }
+
   $isLast(selection, offset) {
     var focusOffset = offset || selection.focusOffset;
 

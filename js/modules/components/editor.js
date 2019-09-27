@@ -98,98 +98,26 @@ class Editor extends TextProcessor {
       }
     }
 
-    // clearInterval(this.inter);
+    // Delete key
+    if (!e.shiftKey && e.keyCode === 46) {
+      let focusNode = selection.focusNode;
 
-    // this.inter = setTimeout(function() {
-    //   console.log('removeHtml');
-    //   this.element.innerHTML = this.$removeHtml(this.element.innerHTML);
-    //   this.log();
-    // }.bind(this), 1500);
+      if (focusNode.nodeName === 'LI') {
+        e.preventDefault();
 
-    let problems_with_enter = [
-      'list',
-      'list_end_string',
-      'end_string', // '\n\n' vs '\n'
-    ]
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
+          return document.execCommand('insertUnorderedList', false);
+        }
 
-    let solution = 'http://jsfiddle.net/s6dgjtx8/1/'; //https://stackoverflow.com/questions/18552336/prevent-contenteditable-adding-div-on-enter-chrome
+        if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
+          return document.execCommand('insertOrderedList', false);
+        }
+      }
+    }
 
-    // console.log({
-    //   'e': e,
-    //   'keyCode': e.keyCode
-    // });
-
-    // console.log({
-    //   'baseNode': selection.baseNode.nodeName,
-    //   'extentNode': selection.extentNode.nodeName,
-    //   'focusNode':selection.focusNode.nodeName,
-    //   'focusOffset': selection.focusOffset.nodeName,
-    //   'baseOffset': selection.baseOffset,
-    // });
-    
-    // if (!e.shiftKey && e.keyCode === 8) {
-    //   let focusNode = selection.focusNode;
-
-    //   // console.log(selection);
-      
-
-    //   // e.preventDefault();
-    // }
-
-    // if (!e.shiftKey && e.keyCode === 46) {
-    //   let focusNode = selection.focusNode;
-
-    //   if (focusNode.nodeName === 'LI') {
-    //     e.preventDefault();
-
-    //     if (focusNode.parentNode && focusNode.parentNode.nodeName === 'UL') {
-    //       return document.execCommand('insertUnorderedList', false);
-    //       // document.execCommand('forwardDelete', false);
-    //       // return document.execCommand('insertUnorderedList', false);
-    //     }
-
-    //     if (focusNode.parentNode && focusNode.parentNode.nodeName === 'OL') {
-    //       return document.execCommand('insertOrderedList', false);
-    //       // document.execCommand('forwardDelete', false);
-    //       // return document.execCommand('insertOrderedList', false);
-    //     }
-    //   }
-    // }
-
-    // let focusNode = selection.focusNode;
-
-    // console.log({
-    //   'focusNode': focusNode,
-    //   'source': focusNode.data && focusNode.data.substr(selection.focusOffset),
-    //   'nextSibling': focusNode.nextSibling && focusNode.nextSibling.data,
-    // });
-
+    // Enter
     if (!e.shiftKey && e.keyCode === 13) {
-      
-
-      // console.log({
-      //   'nodeName': focusNode.nodeName,
-      //   'parentNode.parentNode': focusNode.parentNode.nodeName,
-      //   'source': focusNode.data && focusNode.data.substr(selection.focusOffset),
-      //   'focusNode': focusNode,
-      //   'focusOffset': selection.focusOffset,
-      //   'length': focusNode.length,
-      //   'nextSibling': focusNode.nextSibling,
-      //   'nextSibling.nodeName': focusNode.nextSibling && focusNode.nextSibling.nodeName
-      // });
-
-     
-
-      // if (focusNode.nodeName === '#text' && (selection.focusOffset < focusNode.length) && focusNode.parentNode.nodeName !== 'LI') {
-      //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling) ||
-      //   //                 (!focusNode.nextSibling || focusNode.nextSibling.nodeName !== 'BR') ? '<br>' : '<br><br>';
-      //   // let separator = (selection.focusOffset < focusNode.length) || (focusNode.nextSibling)? '<br>' : '<br><br>';
-      //   // let separator = (selection.focusOffset < focusNode.length)? '<br>' : '<br><br>';
-
-      //   e.preventDefault();
-      //   // console.log({'separator': separator});
-      //   return document.execCommand('insertHTML', false, '<br>');
-      // }
+      let focusNode = selection.focusNode;
 
       if (focusNode.nodeName === 'LI') {
         e.preventDefault();
@@ -203,40 +131,6 @@ class Editor extends TextProcessor {
         }
       }
     }
-
-    // 'Enter'
-    // if (e.keyCode === 13) {
-    //   e.preventDefault();
-    //   return document.execCommand('insertHTML', false, '<br>');
-    // }
-
-    // if (e.keyCode === 13) {
-    //   let isLast = this.$isLast(selection, selection.focusOffset);
-    //   let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
-    //   let li = (container && container.nodeName === 'LI' || container.parentNode.nodeName === 'LI');
-    //   let node = (!isLast)? '\n' : '\n\n';
-    //   let focusNode = selection.focusNode;
-    //   let source = focusNode.data && focusNode.data.substr(selection.focusOffset, selection.focusOffset);
-
-    //   console.log({
-    //     'container': container,
-    //     'li': li,
-    //     'isLast': isLast,
-    //     'source': source,
-    //   })
-
-    //   if (!li && isLast && !source) {
-    //     console.log('insertHTML0');
-    //     e.preventDefault();
-    //     return document.execCommand('insertHTML', false, '<br><br>');
-    //   }
-
-    //   if (!li && !isLast) {
-    //     console.log('insertHTML');
-    //     e.preventDefault();
-    //     return document.execCommand('insertHTML', false, '<br>');
-    //   }
-    // }
   }
 
   $isLast(selection, offset) {
@@ -304,10 +198,10 @@ class Editor extends TextProcessor {
   $onChange() {
     let event = this.customEvents['change'];
 
-    // if (this.element.innerHTML != this.$value && event) {
-    //   event(super.$onChange());
-    //   this.$value = this.element.innerHTML;
-    // }
+    if (this.element.innerHTML != this.$value && event) {
+      event(super.$onChange());
+      this.$value = this.element.innerHTML;
+    }
   }
 }
 
