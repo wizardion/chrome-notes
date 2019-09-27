@@ -167,8 +167,12 @@ div[contenteditable] {
   font-weight: 400;
   display: inline-block;
   /* background: lightblue; */
+  /* width: 100%; */
+  /* min-height: 192px;
+  width: 588px; */
   width: 100%;
-  min-height: 192px;
+  min-height: 208px;
+  box-sizing: border-box;
 }
 
 

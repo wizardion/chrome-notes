@@ -124,7 +124,7 @@ table
   /* background: rgba(7, 166, 152, 0.1); */
   /* margin-left: 1px;
   margin-right: -1px; */
-  /* opacity: 0.75; */
+  /*  */
   /* animation-name: example;
   animation-duration: 4s; */
   /* animation: move-left 10s; */
@@ -132,9 +132,10 @@ table
   cursor: pointer !important;
   color: #07a698 !important;
   background: rgba(7, 166, 152, 0.1) !important;
+  opacity: 0.65;
 
-  margin-left: 1px !important;
-  margin-right: -1px !important;
+  /* margin-left: 1px !important;
+  margin-right: -1px !important; */
 }
 
 .list-view .list-item.edit-item:hover
