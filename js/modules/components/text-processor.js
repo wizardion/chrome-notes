@@ -135,7 +135,7 @@ class TextProcessor {
 
   $toString(html) {
     let pattern = {
-      '<\\/?(b)[^>]*>': '**',
+      '<\/?(b)([\s]+[^>]*)?>': '**',
       '<\\/?(i)[^>]*>': '*',
       '<\\/?(strike)[^>]*>': '~~',
       '([^\n])<(ul)[^>]*>': '$1\n',
@@ -270,6 +270,25 @@ class TextProcessor {
                                         replace(symbRegex, '<span class="html-symbol">$1</span>').
                                         replace(/( )( )/ig, '$1&nbsp;').
                                         replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
+
+    var text = this.$toString(this.element.innerHTML);
+    var html = this.$toHtml(text);
+    let encodedtext = text.replace(/[&<>]/g, function (tag) {
+      return tagsToReplace[tag] || tag;
+    });
+
+    logDiv.innerHTML += '<hr>'
+    // logDiv.innerHTML += '"' + text.replace(/ /gi, '&nbsp;') + '"';
+    logDiv.innerHTML += encodedtext.replace(tagRegex, '<span class="error">$1</span>').
+                                  replace(symbRegex, '<span class="html-symbol">$1</span>').
+                                  replace(/( )( )/ig, '$1&nbsp;').
+                                  replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>').replace(/ /gi, '&nbsp;') + '"';
+    logDiv.innerHTML += '<hr>'
+    logDiv.innerHTML += html
+    // logDiv.innerHTML += encodedhtml.replace(tagRegex, '<span class="error">$1</span>').
+    //                               replace(symbRegex, '<span class="html-symbol">$1</span>').
+    //                               replace(/( )( )/ig, '$1&nbsp;').
+    //                               replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
 
     // console.log({
     //   'encodedStr': encodedStr.replace(tagRegex, '<span class="error">$1</span>')

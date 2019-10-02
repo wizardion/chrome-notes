@@ -253,6 +253,15 @@ div[contenteditable] {
   overflow: auto;
 }
 
+.expression-logs hr {
+  height: 1px;
+  border: none;
+  /* background: silver; */
+  background: #07a69857;
+  margin: 10px -5px 10px -5px;
+  padding: 0;
+}
+
 .expression-logs.statistic {
   top: 0px;
   height: 14px;
