@@ -6,8 +6,13 @@ class Editor extends TextProcessor {
     this.controls = controls;
 
     this.customEvents = {'change': null};
+    this.$helpers = {
+      link: new LinkAdapter()
+    };
 
     this.init();
+
+    this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
   }
 
   /**
@@ -29,6 +34,8 @@ class Editor extends TextProcessor {
         item.onmouseup = this.$command;
       }
     }
+
+    document.execCommand('defaultParagraphSeparator', false, 'p');
   }
 
   /**
@@ -52,6 +59,7 @@ class Editor extends TextProcessor {
   $command(e) {
     let action = this.getAttribute('action');
 
+    // cancel event.
     e.preventDefault();
     document.execCommand(action);
   }
@@ -66,6 +74,38 @@ class Editor extends TextProcessor {
   $customCommand(helper) {
     if (this.hasFocus()) {
       helper.command(helper);
+    }
+  }
+
+  /**
+   * Internal event: Command.
+   * 
+   * @param {*} e
+   * 
+   * Executes before the keyboard input, handels the commands text format.
+   */
+  $preProcessInput(e) {
+    let selection = window.getSelection();
+    let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+    let focusNode = selection.focusNode;
+
+    // 'Space' or 'Enter'
+    if (!textSelected && (e.keyCode === 32 || e.keyCode === 13)) {
+      const helper = this.$helpers['link'];
+      
+      if (helper.test(selection) && helper.exec(selection)) {
+        return e.preventDefault();
+      }
+    }
+
+    // Delete key or Enter
+    if (!e.shiftKey && (e.keyCode === 46 || e.keyCode === 13) && focusNode.nodeName === 'LI') {
+      let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
+
+      if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
+        e.preventDefault();
+        return document.execCommand(command[focusNode.parentNode.nodeName], false);
+      }
     }
   }
 
@@ -133,3 +173,5 @@ class Editor extends TextProcessor {
     }
   }
 }
+
+
