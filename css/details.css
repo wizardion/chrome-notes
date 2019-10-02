@@ -192,7 +192,7 @@ div[contenteditable] {
 .content-description ul,
 .content-description ol {
   /* margin: 3px 0px 3px 0px; */
-  margin: 0px;
+  margin: -1px;
   padding-left: 30px;
 }
 

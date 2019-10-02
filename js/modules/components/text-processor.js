@@ -58,11 +58,17 @@ class TextProcessor {
         replacement: '$1 $3'
       },
     ];
+    this.$helpers = {
+      link: new LinkAdapter()
+    };
 
     this.element = element;
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
+    this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
+
+    document.execCommand('defaultParagraphSeparator', false, 'p');
 
     this.$text = null;
     //#region TEST_DATA
@@ -169,6 +175,40 @@ class TextProcessor {
     }
 
     return document.execCommand('insertText', false, text.replace(/^\s|\s$/ig, ''));
+  }
+
+  /**
+   * Internal event: Command.
+   * 
+   * @param {*} e
+   * 
+   * Executes before the keyboard input, handels the commands text format.
+   */
+  $preProcessInput(e) {
+    let selection = window.getSelection();
+    let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
+    let focusNode = selection.focusNode;
+
+    // 'Space' or 'Enter'
+    if (!textSelected && (e.keyCode === 32 || e.keyCode === 13)) {
+      for(var key in this.$helpers) {
+        const helper = this.$helpers[key];
+
+        if (helper.test(selection) && helper.exec(selection)) {
+          return e.preventDefault();
+        }
+      }
+    }
+
+    // Delete key or Enter
+    if (!e.shiftKey && (e.keyCode === 46 || e.keyCode === 13) && focusNode.nodeName === 'LI') {
+      let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
+
+      if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
+        e.preventDefault();
+        return document.execCommand(command[focusNode.parentNode.nodeName], false);
+      }
+    }
   }
 
   /**
