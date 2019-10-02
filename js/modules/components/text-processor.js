@@ -133,6 +133,25 @@ class TextProcessor {
     return data;
   }
 
+  $toString(html) {
+    let pattern = {
+      '<\\/?(b)[^>]*>': '**', 
+      '<\\/?(i)[^>]*>': '*', 
+      '([^\n])<(ul)[^>]*>': '$1\n',
+      '<(li)[^>]*>': '- ',
+      '<\\/(li)[^>]*>': '\n'
+    };
+
+    for(var key in pattern) {
+      const command = pattern[key];
+      const regex = new RegExp(key, 'gi');
+
+      html = html.replace(regex, command);
+    }
+
+    return html.replace(/<\/?[^>]+>/gi, '');
+  }
+
   /**
    * Internal method: OnPaste.
    * 
