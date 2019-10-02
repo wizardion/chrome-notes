@@ -64,6 +64,7 @@ class TextProcessor {
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
 
+    this.$text = null;
     //#region TEST_DATA
     this.element.addEventListener('input', this.log.bind(this));
     setTimeout(function () {
@@ -127,6 +128,25 @@ class TextProcessor {
     return data;
   }
 
+  $toString(html) {
+    let pattern = {
+      '<\\/?(b)[^>]*>': '**', 
+      '<\\/?(i)[^>]*>': '*', 
+      '([^\n])<(ul)[^>]*>': '$1\n',
+      '<(li)[^>]*>': '- ',
+      '<\\/(li)[^>]*>': '\n'
+    };
+
+    for(var key in pattern) {
+      const command = pattern[key];
+      const regex = new RegExp(key, 'gi');
+
+      html = html.replace(regex, command);
+    }
+
+    return html.replace(/<\/?[^>]+>/gi, '');
+  }
+
   /**
    * Internal method: OnPaste.
    * 
@@ -157,7 +177,8 @@ class TextProcessor {
    * Fires on content blur
    */
   $onChange() {
-    return this.$removeHtml(this.element.innerHTML);
+    // return this.$removeHtml(this.element.innerHTML);
+    return this.$toString(this.element.innerHTML);
   }
 
   log(sessions, test) {
