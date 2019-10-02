@@ -135,8 +135,9 @@ class TextProcessor {
 
   $toString(html) {
     let pattern = {
-      '<\\/?(b)[^>]*>': '**', 
-      '<\\/?(i)[^>]*>': '*', 
+      '<\\/?(b)[^>]*>': '**',
+      '<\\/?(i)[^>]*>': '*',
+      '<\\/?(strike)[^>]*>': '~~',
       '([^\n])<(ul)[^>]*>': '$1\n',
       '<(li)[^>]*>': '- ',
       '<\\/(li)[^>]*>': '\n'
@@ -150,6 +151,25 @@ class TextProcessor {
     }
 
     return html.replace(/<\/?[^>]+>/gi, '');
+  }
+
+  $toHtml(text) {
+    let pattern = {
+      '([^\\*]|^)\\*\\*([^\\*]+)\\*\\*(?=[^\\*]|$)': '$1<b>$2</b>',
+      '([^\\*]|^)\\*([^\\*]+)\\*(?=[^\\*]|$)': '$1<i>$2</i>',
+      '([^\\*]|^)\\*\\*\\*([^\\*]+)\\*\\*\\*(?=[^\\*]|$)': '$1<b><i>$2</i></b>',
+    };
+
+    for(var key in pattern) {
+      const command = pattern[key];
+      const regex = new RegExp(key, 'gi');
+
+      text = text.replace(regex, command);
+    }
+
+    // replace lists
+
+    return text;
   }
 
   /**
@@ -216,7 +236,12 @@ class TextProcessor {
    * Fires on content blur
    */
   $onChange() {
-    return this.$removeHtml(this.element.innerHTML);
+    var text = this.$toString(this.element.innerHTML);
+
+    console.log(this.$toHtml(text));
+    
+    return this.$toString(text);
+    // return this.$removeHtml(this.element.innerHTML);
   }
 
   log(sessions, test) {
