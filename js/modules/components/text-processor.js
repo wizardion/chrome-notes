@@ -170,7 +170,7 @@ class TextProcessor {
 
     // replace lists
 
-    return text;
+    return text.replace(/^\- ([^\-]+)\n/igm, '<li>$1</li>');
   }
 
   /**
