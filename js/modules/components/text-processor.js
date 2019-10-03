@@ -242,12 +242,12 @@ class TextProcessor {
    * Fires on content blur
    */
   $onChange() {
-    var text = this.$toString(this.element.innerHTML);
+    // var text = this.$toString(this.element.innerHTML);
 
-    console.log(this.$toHtml(text));
+    // console.log(this.$toHtml(text));
     
-    return this.$toString(text);
-    // return this.$removeHtml(this.element.innerHTML);
+    // return this.$toString(text);
+    return this.$removeHtml(this.element.innerHTML);
   }
 
   log(sessions, test) {
@@ -277,35 +277,35 @@ class TextProcessor {
                                         replace(/( )( )/ig, '$1&nbsp;').
                                         replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
 
-    var text = this.$toString(this.element.innerHTML);
-    var html = this.$toHtml(text);
-    let encodedtext = text.replace(/[&<>]/g, function (tag) {
-      return tagsToReplace[tag] || tag;
-    });
+    // var text = this.$toString(this.element.innerHTML);
+    // var html = this.$toHtml(text);
+    // let encodedtext = text.replace(/[&<>]/g, function (tag) {
+    //   return tagsToReplace[tag] || tag;
+    // });
 
-    logDiv.innerHTML += '<hr>'
-    logDiv.innerHTML += encodedtext.replace(tagRegex, '<span class="error">$1</span>').
-                                  replace(symbRegex, '<span class="html-symbol">$1</span>').
-                                  replace(/( )( )/ig, '$1&nbsp;').
-                                  replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>').replace(/ /gi, '&nbsp;') + '"';
+    // logDiv.innerHTML += '<hr>'
+    // logDiv.innerHTML += encodedtext.replace(tagRegex, '<span class="error">$1</span>').
+    //                               replace(symbRegex, '<span class="html-symbol">$1</span>').
+    //                               replace(/( )( )/ig, '$1&nbsp;').
+    //                               replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>').replace(/ /gi, '&nbsp;') + '"';
     
-    var code = document.createElement('pre')
-    code.innerHTML = '<hr>' + html;
-    logDiv.appendChild(code);
+    // var code = document.createElement('pre')
+    // code.innerHTML = '<hr>' + html;
+    // logDiv.appendChild(code);
 
 
-    var source = document.createElement('div');
-    let encodedSource = html.replace(/[&<>]/g, function (tag) {
-      return tagsToReplace[tag] || tag;
-    });
+    // var source = document.createElement('div');
+    // let encodedSource = html.replace(/[&<>]/g, function (tag) {
+    //   return tagsToReplace[tag] || tag;
+    // });
 
-    source.innerHTML += '<hr>'
-    source.innerHTML += encodedSource.replace(tagRegex, '<span class="error">$1</span>').
-                                  replace(symbRegex, '<span class="html-symbol">$1</span>').
-                                  replace(/( )( )/ig, '$1&nbsp;').
-                                  replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
+    // source.innerHTML += '<hr>'
+    // source.innerHTML += encodedSource.replace(tagRegex, '<span class="error">$1</span>').
+    //                               replace(symbRegex, '<span class="html-symbol">$1</span>').
+    //                               replace(/( )( )/ig, '$1&nbsp;').
+    //                               replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>') + '"';
 
-    logDiv.appendChild(source);
+    // logDiv.appendChild(source);
 
     // console.log({
     //   'encodedStr': encodedStr.replace(tagRegex, '<span class="error">$1</span>')
