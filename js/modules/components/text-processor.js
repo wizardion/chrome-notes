@@ -59,7 +59,8 @@ class TextProcessor {
       },
     ];
     this.$helpers = {
-      link: new LinkAdapter()
+      link: new LinkAdapter(),
+      style: new StyleAdapter(),
     };
 
     this.element = element;
