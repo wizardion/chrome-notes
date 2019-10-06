@@ -215,7 +215,7 @@ class TextProcessor {
     let focusNode = selection.focusNode;
 
     // 'Space' or 'Enter'
-    if (!textSelected && (e.keyCode === 32 || e.keyCode === 13)) {
+    if (!textSelected && (e.keyCode === 9 || e.keyCode === 13)) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
@@ -232,6 +232,18 @@ class TextProcessor {
       if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
         e.preventDefault();
         return document.execCommand(command[focusNode.parentNode.nodeName], false);
+      }
+    }
+
+    // 'Tab'
+    if ((e.keyCode === 9)) {
+      let selectionLines = selection.getRangeAt(0).getClientRects().length;
+      e.preventDefault();
+
+      if(selectionLines > 1) {
+        document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
+      } else {
+        document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
       }
     }
   }
