@@ -1,8 +1,11 @@
 class StyleAdapter extends Helper {
-  constructor () {
+  constructor (command, template) {
     super();
 
-    this.$commandRegex = /(\*\*)([^\*]+)(\*\*)$/i;
+    this.$command = command;
+    this.$template = template;
+    this.$rule = this.$command.replace(/(.)/gi, '\\$1');
+    this.$commandRegex = new RegExp(`(${this.$rule})([^${this.$rule[0] + this.$rule[1]}]+)(${this.$rule})`, 'i');
   }
 
   /**
@@ -13,7 +16,7 @@ class StyleAdapter extends Helper {
    * 
    * checks all node behind and extracts the command link
    */
-  $findStyle(node, source) {
+  $findNode(node, source) {
     let lastNode = node;
 
     do {
@@ -47,9 +50,10 @@ class StyleAdapter extends Helper {
   test(selection) {
     let focusNode = selection.focusNode;
     let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    let regex = /(\*\*)$/i;
+    let regex = new RegExp(`\\w+(${this.$rule})$`, 'i');
+    let result = regex.test(source);
 
-    return regex.test(source);
+    return result;
   }
 
   /**
@@ -65,18 +69,18 @@ class StyleAdapter extends Helper {
       return;
     }
 
-    let [lastNode, text] = this.$findStyle(focusNode, source);
+    let [lastNode, text] = this.$findNode(focusNode, source);
 
     if (text) {
-      let styledHtml = `<b>${text}</b> `;
-      let lastText = (lastNode == focusNode)? source : lastNode.data;
+      let styledHtml = this.$template.replace(/\$\{(\w+)\}/gi, text);
+      let lastText = lastNode.data;
 
       if (lastNode == focusNode) {
-        lastText = lastText.substr(0, lastText.length - 2);
+        lastText = source.substr(0, source.length - 2);
       }
 
       selection.collapse(focusNode, source.length);
-      selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf('**')).length);
+      selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf(this.$command)).length);
 
       document.execCommand('insertHTML', false, styledHtml);
       return true;

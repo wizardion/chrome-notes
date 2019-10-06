@@ -60,7 +60,13 @@ class TextProcessor {
     ];
     this.$helpers = {
       link: new LinkAdapter(),
-      style: new StyleAdapter(),
+      style: new StyleAdapter('*', '<i>${text}</i> '),
+      style2: new StyleAdapter('**', '<b>${text}</b> '),
+      style3: new StyleAdapter('***', '<b><i>${text}</i></b> '),
+      style4: new StyleAdapter('~~', '<strike>${text}</strike> '),
+      style5: new StyleAdapter('__', '<u>${text}</u> '),
+      // style6: new StyleAdapter('__*', '<u><i>${text}</i></u> '),
+      // style6: new StyleAdapter('__**', '<u><b>${text}</b></u> '),
     };
 
     this.element = element;
@@ -216,7 +222,7 @@ class TextProcessor {
     let focusNode = selection.focusNode;
 
     // 'Space' or 'Enter'
-    if (!textSelected && (e.keyCode === 9 || e.keyCode === 13)) {
+    if (!e.shiftKey && !textSelected && (e.keyCode === 9 || e.keyCode === 13)) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
