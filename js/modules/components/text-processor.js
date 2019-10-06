@@ -60,6 +60,7 @@ class TextProcessor {
     ];
     this.$helpers = {
       link: new LinkAdapter(),
+      //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
       style: new StyleAdapter('*', '<i>${text}</i> '),
       style2: new StyleAdapter('**', '<b>${text}</b> '),
       style3: new StyleAdapter('***', '<b><i>${text}</i></b> '),
