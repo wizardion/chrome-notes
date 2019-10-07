@@ -1,5 +1,7 @@
 class Helper {
-  constructor () {}
+  constructor (element) {
+    this.$element = element;
+  }
 
   /**
    * @param {*} selection

@@ -58,19 +58,20 @@ class TextProcessor {
         replacement: '$1 $3'
       },
     ];
+
+    this.element = element;
+    
     this.$helpers = {
       link: new LinkAdapter(),
       //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
-      style: new StyleAdapter('*', '<i>${text}</i> '),
-      style2: new StyleAdapter('**', '<b>${text}</b> '),
-      style3: new StyleAdapter('***', '<b><i>${text}</i></b> '),
-      style4: new StyleAdapter('~~', '<strike>${text}</strike> '),
-      style5: new StyleAdapter('__', '<u>${text}</u> '),
+      style: new StyleAdapter(this.element, '*', '<i>${text}</i> '),
+      style2: new StyleAdapter(this.element, '**', '<b>${text}</b> '),
+      style3: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
+      style4: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> '),
+      style5: new StyleAdapter(this.element, '__', '<u>${text}</u> '),
       // style6: new StyleAdapter('__*', '<u><i>${text}</i></u> '),
       // style6: new StyleAdapter('__**', '<u><b>${text}</b></u> '),
     };
-
-    this.element = element;
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));

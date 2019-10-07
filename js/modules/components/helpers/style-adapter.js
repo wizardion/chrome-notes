@@ -1,6 +1,6 @@
 class StyleAdapter extends Helper {
-  constructor (command, template) {
-    super();
+  constructor (element, command, template) {
+    super(element);
 
     this.$command = command;
     this.$template = template;
@@ -26,7 +26,7 @@ class StyleAdapter extends Helper {
       }
 
       node = node.previousSibling? node.previousSibling :
-        node.parentNode !== this.element? node.parentNode.previousSibling : null;
+        node.parentNode !== this.$element? node.parentNode.previousSibling : null;
 
       if(node) {
         source = (node.data || node.outerHTML) + source;
@@ -34,10 +34,6 @@ class StyleAdapter extends Helper {
     } while(node);
 
     let [html, url, text] = source.split(this.$commandRegex, 3);
-
-    console.log({
-      '': source.split(this.$commandRegex, 3)
-    });
 
     return [lastNode, text];
   }
