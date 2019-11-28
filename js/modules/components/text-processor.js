@@ -224,7 +224,7 @@ class TextProcessor {
     let focusNode = selection.focusNode;
 
     // 'Tab' or 'Enter' execute a custom command
-    if (!e.shiftKey && !textSelected && (e.keyCode === 9 || e.keyCode === 13)) {
+    if (!e.shiftKey && !textSelected && (e.keyCode === 9)) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
