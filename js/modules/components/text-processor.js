@@ -223,7 +223,7 @@ class TextProcessor {
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
     let focusNode = selection.focusNode;
 
-    // 'Space' or 'Enter'
+    // 'Tab' or 'Enter' execute a custom command
     if (!e.shiftKey && !textSelected && (e.keyCode === 9 || e.keyCode === 13)) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
@@ -234,7 +234,7 @@ class TextProcessor {
       }
     }
 
-    // Delete key or Enter
+    // Delete key or Enter - removes the last element in the list on delete key
     if (!e.shiftKey && (e.keyCode === 46 || e.keyCode === 13) && focusNode.nodeName === 'LI') {
       let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
 
@@ -244,7 +244,7 @@ class TextProcessor {
       }
     }
 
-    // 'Tab'
+    // 'Tab' shifts spaces toward/backward
     if ((e.keyCode === 9)) {
       let selectionLines = selection.getRangeAt(0).getClientRects().length;
       e.preventDefault();
