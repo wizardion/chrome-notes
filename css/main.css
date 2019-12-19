@@ -81,7 +81,8 @@ table
   color: inherit;
   cursor: inherit;
 
-  border-bottom: 1px dotted rgba(7, 166, 152, 0.15);
+  /* border-bottom: 1px dotted rgba(7, 166, 152, 0.15); */
+  border-bottom: 1px dashed rgba(7, 66, 152, 0.075);
 }
 
 .hold {
@@ -91,9 +92,14 @@ table
 .drag
 {
   position: absolute;
-  left: 5px;
-  right: 10px;
   opacity: 1 !important;
+
+  /* left: 5px;
+  right: 10px; */
+  
+  left: 1px;
+  right: 4px;
+  border-bottom: 1px solid transparent !important;
 }
 
 .alert {
@@ -115,27 +121,40 @@ table
 {
   /* background:rgba(7, 166, 152, 0.1); */
   /* border-bottom: 1px solid transparent; */
+  /* background: rgba(7, 166, 152, 0.05); */
+
   cursor: pointer;
   color: #07a698;
-  background: rgba(7, 166, 152, 0.05);
+  color: #06736a;
+  background:rgba(7, 166, 152, 0.025);
 }
 
 .list-view .list-item:active {
   /* background: rgba(7, 166, 152, 0.1); */
-  /* margin-left: 1px;
-  margin-right: -1px; */
+  margin-left: 1px;
+  margin-right: -1px;
   /*  */
   /* animation-name: example;
   animation-duration: 4s; */
   /* animation: move-left 10s; */
 
-  cursor: pointer !important;
+  /* cursor: pointer !important;
   color: #07a698 !important;
   background: rgba(7, 166, 152, 0.1) !important;
-  opacity: 0.65;
+  opacity: 0.65; */
 
   /* margin-left: 1px !important;
   margin-right: -1px !important; */
+  
+  /* background:rgba(7, 166, 152, 0.025); */
+  /* border-bottom: 1px groove rgba(7, 166, 152, 0.055); */
+  /* margin-left: 1px;
+  margin-right: -1px; */
+  
+  color: #07a698;
+  color: #06736a;
+  background:rgba(7, 166, 152, 0.045);
+  opacity: 0.75;
 }
 
 .list-view .list-item.edit-item:hover
@@ -169,7 +188,8 @@ table
   left: 0px;
   height: 25px;
   text-align:center;
-  border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+  /* border-bottom: 1px solid rgba(7, 166, 152, 0.1); */
+  border-bottom: 1px groove rgba(7, 166, 152, 0.075);
 }
 
 .list-controls span
