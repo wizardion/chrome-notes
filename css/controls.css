@@ -86,6 +86,12 @@ div.button {
   border: 1px solid rgba(7, 166, 152, 0.035);
 }
 
+.editor-controlls .button.bold .svg-icon path {
+  color: red;
+  fill: red;
+  /* background-image: url(../img/bold.svg); */
+}
+
 .editor-controlls .button:hover {
   background: rgba(7, 166, 152, 0.035);
 
