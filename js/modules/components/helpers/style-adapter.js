@@ -1,11 +1,36 @@
 class StyleAdapter extends Helper {
-  constructor (element, command, template) {
+  constructor (element, rule, template) {
     super(element);
 
-    this.$command = command;
+    let start = rule;
+    let end = this.$reverse(rule);
+
+    this.$command = start;
     this.$template = template;
-    this.$rule = this.$command.replace(/(.)/gi, '\\$1');
-    this.$commandRegex = new RegExp(`(${this.$rule})([^${this.$rule[0] + this.$rule[1]}]+)(${this.$rule})`, 'i');
+
+    this.$rule = end.replace(/(.)/gi, '\\$1');
+
+    let escStart = start.replace(/(.)/gi, '\\$1');
+    let excludeRule = (start !== end)?  `${escStart}|${this.$rule}` : `${escStart}`;
+    
+    this.$commandRegex = new RegExp(`(${escStart})(((?!${excludeRule})[\\w\\s\\W\\S])*)(${this.$rule})$`, 'i');
+  }
+
+  /**
+   * Internal method: reverse.
+   * 
+   * @param {*} value
+   * 
+   * returns reversed rule value
+   */
+  $reverse(value) {
+    var result = '';
+
+    for (var i = value.length - 1; i >= 0; i--) {
+      result += value[i];
+    }
+
+    return result;
   }
 
   /**
@@ -46,10 +71,9 @@ class StyleAdapter extends Helper {
   test(selection) {
     let focusNode = selection.focusNode;
     let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    let regex = new RegExp(`\\w+(${this.$rule})$`, 'i');
-    let result = regex.test(source);
+    let regex = new RegExp(`[\\w\\s\\W\\S]+(${this.$rule})$`, 'i');
 
-    return result;
+    return regex.test(source);
   }
 
   /**
@@ -77,7 +101,6 @@ class StyleAdapter extends Helper {
 
       selection.collapse(focusNode, source.length);
       selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf(this.$command)).length);
-
       document.execCommand('insertHTML', false, styledHtml);
       return true;
     }

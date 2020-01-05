@@ -30,6 +30,40 @@ input {
   font-family: 'Ubuntu2', sans-serif;
 }
 
+code {
+  display: block;
+  background: ghostwhite;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  padding: 5px 10px;
+  color: #06736a;
+  font-family: Courier,monospace;
+  margin-right: 5px;
+}
+
+q {
+  border-left: 2px solid silver;
+  padding: 7px 5px;
+  font-style: italic;
+  color: #555555;
+  display: block;
+  quotes: "`" "`";
+}
+/* 
+q::before {
+  content: none;
+}
+
+q::after {
+  content: none;
+} */
+
+blockquote {
+  margin: 0 0 0 20px !important; 
+  border: none; 
+  padding: 0px;
+}
+
 table
 {
   margin: 0;	

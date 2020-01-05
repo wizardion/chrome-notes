@@ -195,6 +195,7 @@ div[contenteditable] {
   /* margin: 3px 0px 3px 0px; */
   margin: -1px;
   padding-left: 30px;
+  /* display: inline-block; */
 }
 
 /* .content-description ul li:first-child::selection {

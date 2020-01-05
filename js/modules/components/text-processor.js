@@ -1,84 +1,95 @@
 class TextProcessor {
   constructor (element) {
-    const pasteTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'p', 'div123', 'br'].join('|'); // Allowed tags
+    const allowedTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'code', 'q', 'blockquote'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     // https://www.regextester.com/93930
     this.rules = [
-      {
-        name: 'Trim html before cutting',
-        pattern: '(<[^>]+>)[\\r\\n]+(?=<[^>]+>)',
-        replacement: '$1'
-      },
+      //#region old
+          // {
+          //   name: 'Trim html before cutting',
+          //   pattern: '(<[^>]+>)[\\r\\n]+(?=<[^>]+>)',
+          //   replacement: '$1'
+          // },
+          // {
+          //   name: 'Replace innesessary html symbols',
+          //   pattern: `(\\S)(&nbsp;)(\\S)`, 
+          //   replacement: '$1 $3'
+          // },
+      // {
+      //   name: 'Replace all space-symbols to simple space',
+      //   // pattern: `(\\s)`, 
+      //   pattern: `(([\\t\v\\f \\u00a0\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u200b\\u2028\\u2029\\u3000]))`, 
+      //   replacement: ' '
+      // },
+      //#endregion
       {
         name: 'Remove styles and scripts',
-        pattern: '<\\s*(style|script)[^>]*>[^<]*<\\s*\/(style|script)\\s*>',
+        pattern: /<\s*(style|script)[^>]*>(((?!<\s*\/(style|script)\s*>).)*)<\s*\/(style|script)\s*>/gi,
         replacement: ''
       },
       {
+        name: 'Replace BR',
+        pattern: /<\s*br\s*[^\<\>]*\s*\/?\s*>/gi,
+        replacement: '\n'
+      },
+      {
         name: 'Remove all attributes except allowed',
-        pattern: `(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 
+        pattern: new RegExp(`(?!<[^<>]+)(\\s*[\\S]*\\b(?!${attributes})\\b\\S+=("[^"]*"|'[^']*')(?=\\W*(>|\\s[^>]+\\s*>)))`, 'ig'),
         replacement: ''
       },
       {
         name: 'Replace headers',
-        pattern: `(<\\s*)(h[0-9])(\\s*>)`,
-        replacement: '$1b$3'
+        pattern: /<\s*(h[1-9])(\s([^\>]*))?\s*>(((?!<\s*\/?\s*\1\s*>).)*)<\s*\/?\s*\1\s*>/gi,
+        replacement: '<b$2>$4</b>'
       },
-      {
-        name: 'Replace headers ends',
-        pattern: `(<\\s*\/\\s*)(h[0-9])(\\s*>)`,
-        replacement: '$1b$3<br><br>'
-      },
-      // {
-      //   name: 'Replace paragraph',
-      //   pattern: '(?!^)(<)\\s*(\/)\\s*(dt|p)((\\s[^>]*>|>))',
-      //   replacement: '<br><br>'
-      //   // pattern: '(?!^)(<)\\s*(\/)\\s*(dt)((\\s[^>]*>|>))',
-      //   // replacement: '<br>'
-      // },
       {
         name: 'Replace unsopported bold tags',
-        pattern: `(<\\s*\/?)(strong)(\\s*>)`,
-        replacement: '$1b$3'
+        pattern: /<\s*(\/?)(strong)\s*>/gi,
+        replacement: '<$1b>'
       },
       {
+        name: 'Separate blocks',
+        pattern: /(<\s*\/?\w+\s*\/?\s*>)/gi,
+        replacement: '$1 ',
+        optional: true
+      },
+      // TODO
+      {
         name: 'Remove all tags except allowed',
-        pattern: `((<)\\s?(\/?)\\s?(${pasteTags})\\s*((\/?)>|\\s[^>]+\\s*(\/?)>))|<[^>]+>`,
-        replacement: '$2$3$4$5'
+        pattern: new RegExp(`(\\<)\\s*(\\/?)\\s*(${allowedTags})\\s*(\\s([^\\>]*))?\\s*(\\/?)\\s*(\\>)|<[^>]+>`, 'gi'),
+        replacement: '$1$2$3$4$6$7'
       },
       {
         name: 'Replace empty tags',
-        pattern: `<p><\/p>|<b><\/b>|<i><\/i>`,
+        pattern: /<(\s*\w+\s*)><\s*\/\1>/gi,
         replacement: ''
-      },
-      {
-        name: 'Replace innesessary html symbols',
-        pattern: `(\\S)(&nbsp;)(\\S)`, 
-        replacement: '$1 $3'
-      },
+      }
     ];
 
     this.element = element;
     
+    //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
       link: new LinkAdapter(),
-      //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
-      style: new StyleAdapter(this.element, '*', '<i>${text}</i> '),
-      style2: new StyleAdapter(this.element, '**', '<b>${text}</b> '),
-      style3: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
-      style4: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> '),
-      style5: new StyleAdapter(this.element, '__', '<u>${text}</u> '),
-      // style6: new StyleAdapter('__*', '<u><i>${text}</i></u> '),
-      // style6: new StyleAdapter('__**', '<u><b>${text}</b></u> '),
+      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> '),
+      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> '), 
+      boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
+      strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> '),
+      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> '),
+      underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
+      underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
+      underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
+      code: new StyleAdapter(this.element, '```', '\n<code>${text}</code>\n'),
+      quote: new StyleAdapter(this.element, `'''`, '\n<q>${text}</q>\n'),
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
 
+    // document.execCommand('defaultParagraphSeparator', false, 'br');
     document.execCommand('defaultParagraphSeparator', false, 'p');
-
     //#region TEST_DATA
     this.element.addEventListener('input', this.log.bind(this));
     setTimeout(function () {
@@ -105,41 +116,29 @@ class TextProcessor {
    * Internal method: RemoveHtml.
    * 
    * @param {*} data
-   * Removes html except allowed tags and attributes.
+   * @param {*} text
+   * Removes html except allowed tags and attributes and merges the html tags into plane text.
    */
-  $removeHtml(data) {
-    var len = 155
-    console.log(`%c${Array(len).fill('-').join('')}`, 'color: darkgreen;');
-    console.log(data);
-    
-
+  $removeHtml(data, text) {
     for (let index = 0; index < this.rules.length; index++) {
       const rule = this.rules[index];
-      data = data.replace(new RegExp(rule.pattern, 'ig'), rule.replacement);
-
-      console.log(`%c${Array(30).fill('-').join('')} ${rule.name} ${Array((len - 30) - (rule.name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
-      console.log(data);
+      
+      if(text || !rule.optional) {
+        data = data.replace(rule.pattern, rule.replacement);
+      }
     }
 
-    var extra = data.match(/(<(div)>){2,}/ig);
+    var extra = data.match(/(<(p)>){2,}/ig);
 
     if (extra) {
       let count = this.$findMax(extra);
 
-      console.log(`%c EXTRA`, 'color: darkred;');
-
       for(let i = count; i > 1; i--) {
-        let name = `Replace extra {${i}}`;
-        data = data.replace(new RegExp(`(<(div)>){${i}}([^<>]*)(<\/(div)>){${i}}`, 'ig'), '$1$3$4');
-
-        console.log(`%c${Array(30).fill('-').join('')} ${name} ${Array((len - 30) - (name.length + 2)).fill('-').join('')}`, 'color: darkgreen;');
-        console.log(data);
+        data = data.replace(new RegExp(`(<(p)>){${i}}([^<>]*)(<\/(p)>){${i}}`, 'ig'), '$1$3$4');
       }
     }
 
-    console.log(`%c${Array(len).fill('-').join('')}`, 'color: darkgreen;');
-
-    return data;
+    return text? this.$merge(data, this.$escapeTags(text)) : data;
   }
 
   $toString(html) {
@@ -187,6 +186,157 @@ class TextProcessor {
     return text.replace(/\- \{([^\-\{\}]+)\}/g, '<li>$1</li>').replace(/\&86/g, '{');
   }
 
+  $merge(html, text) {
+    let cursor = 0;
+    let spaceRegex = /(\s)/g;
+    let list = text.split(spaceRegex);
+    // (<\s*\/?\s*[A-Z][A-Z0-9]*\b(\s\w+\=\"[^\<\>]+\")*\s*\/?\s*>) - more demanding rule in case of issues.
+    let tagTester = /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi;
+    let closeTagTester = /(<\s*\/\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi;
+    let elements = html.match(/(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi);
+    let stacks = {
+      open: [],
+      close: [],
+      split: null
+    };
+
+    print(html);
+    print(text);
+    print(elements);
+    print(list);
+
+    if(!elements) {
+      return '';
+    }
+
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
+      const isTag = !!element.match(tagTester);
+
+      if(!isTag) {
+        let hasBloks = false;
+        let needs = false;
+
+        if(stacks.close.length > 0) {
+          for (let t = 0; t < stacks.close.length; t++) {
+            const tag = stacks.close[t];
+            
+            if(tag.match(/<\s*\/\s*(ul|ol|q|code)\s*>/gi)) {
+              hasBloks = true;
+              break;
+            }
+          }
+
+          list.splice(cursor, 0, stacks.close.join(''));
+          stacks.close = [];
+          cursor += 1;
+          needs = hasBloks;
+        }
+
+        if(stacks.open.length > 0) {
+          for (let t = 0; t < stacks.close.length; t++) {
+            const tag = stacks.close[t];
+            
+            if(tag.match(/<\s*\/\s*(ul|ol|q|code)\s*>/gi)) {
+              needs = false;
+              break;
+            }
+          }
+          
+          for (let g = cursor; g < list.length; g++) {
+            const tword = list[g];
+
+            if(needs && tword.match(/\n/gi)) {
+              list[g] = '';
+              needs = false;
+            }
+
+            if(!tword.match(spaceRegex) && tword.length > 0) {
+              break;
+            }
+            
+            cursor = g + 1;
+          }
+
+          list.splice(cursor, 0, stacks.open.join(''));
+          stacks.open = [];
+          cursor += 1;
+        }
+
+        for (let g = cursor; g < list.length; g++) {
+          const word = list[g];
+          const isSpace = spaceRegex.test(word) || word.length === 0;
+
+          if(needs && word.match(/\n/gi)) {
+            list[g] = '';
+            needs = false;
+          }
+
+          if(!isSpace && word === element) {
+            cursor = g + 1;
+            stacks.split = null;
+            break;
+          }
+
+          if(!isSpace && word !== element) {
+            let index = word.indexOf(element);
+
+            if(index !== -1) {
+              cursor = g + 1;
+              stacks.split = word.substring(index + element.length);
+              break;
+            }
+
+            console.log('%c Error on merging html into plane text', 'background: transparent; color: red;');
+            return text;
+          }
+        }
+
+        if(stacks.split !== null) {
+          list[cursor - 1] = element;
+          list.splice(cursor, 0, stacks.split);
+          stacks.split - null;
+        }
+      } else {
+        let stack = !!element.match(closeTagTester)? stacks.close : stacks.open;
+        stack.push(element);
+      }
+    }
+    
+    if(stacks.open.length > 0) {
+      list.splice(cursor, 0, stacks.open.join(''));
+      stacks.open = [];
+    }
+
+    if(stacks.close.length > 0) {
+      list.splice(cursor, 0, stacks.close.join(''));
+      stacks.close = [];
+    }
+
+    var result = list.join('').replace(/(<\/(li)>)[\n\r](<(li)>)/gi, '$1$3');
+
+    console.log(`{${result}}`)
+    console.log('=========================================================');
+
+    return result;
+  }
+
+  /**
+   * Internal method: EscapeTags.
+   * 
+   * @param {*} e
+   * Removes html tages by replacing it with escaped text.
+   */
+  $escapeTags(value) {
+    const tags = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;'
+    };
+
+    return value.replace(/[&<>]/g, t => tags[t] || t);
+  }
+
   /**
    * Internal method: OnPaste.
    * 
@@ -201,14 +351,18 @@ class TextProcessor {
     e.preventDefault();
 
     if (!linkRegex.test(text) && (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
-      var html = clipboard.getData('text/html') || text;
+      var html = clipboard.getData('text/html');
 
       if (html) {
-        return document.execCommand('insertHTML', false, this.$removeHtml(html));
+        return document.execCommand('insertHTML', false, this.$removeHtml(html, text));
       }
     }
 
-    return document.execCommand('insertText', false, text.replace(/^\s|\s$/ig, ''));
+    console.log('============TEXT============');
+    console.log(text);
+    console.log('============END_TEXT============');
+
+    return document.execCommand('insertText', false, text);
   }
 
   /**
@@ -223,7 +377,7 @@ class TextProcessor {
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
     let focusNode = selection.focusNode;
 
-    // 'Tab' or 'Enter' execute a custom command
+    // 'Tab' execute a custom command
     if (!e.shiftKey && !textSelected && (e.keyCode === 9)) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
@@ -239,8 +393,14 @@ class TextProcessor {
       let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
 
       if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
-        e.preventDefault();
-        return document.execCommand(command[focusNode.parentNode.nodeName], false);
+        
+        if(focusNode.nextSibling) {
+          e.preventDefault();
+          return document.execCommand(command[focusNode.parentNode.nodeName], false);
+        } else {
+          e.preventDefault();
+          return document.execCommand(command[focusNode.parentNode.nodeName], false);
+        }
       }
     }
 
@@ -252,7 +412,8 @@ class TextProcessor {
       if(selectionLines > 1) {
         document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
       } else {
-        document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
+        // document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
+        document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
       }
     }
   }
@@ -268,6 +429,11 @@ class TextProcessor {
     // console.log(this.$toHtml(text));
     
     // return this.$toString(text);
+    print(this.element.outerText)
+    print(this.$removeHtml(this.element.innerHTML))
+    print(this.$removeHtml(this.element.innerHTML, this.element.innerText))
+
+    // return this.$removeHtml(this.element.innerHTML, this.element.innerText);
     return this.$removeHtml(this.element.innerHTML);
   }
 
@@ -334,3 +500,19 @@ class TextProcessor {
     var logDiv = document.getElementById('expression-result').innerHTML = `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
   }
 }
+
+var print = function (value, color) {
+
+  // console.log(`%c ${new Array(210).join('-')}`, 'background: transparent; color: silver');
+  console.log();
+
+  if(color) {
+    if(typeof value === 'object') {
+      console.log(`%c ${value.join? `[${value.join('|')}]` : JSON.stringify(value)}`, `background: transparent; color: ${color};`);
+    } else {
+      console.log(`%c ${value}`, `background: transparent; color: ${color};`);
+    }
+  } else {
+    console.log(value);
+  }
+};

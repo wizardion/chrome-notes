@@ -25,7 +25,6 @@ class BaseNotes {
 
     this.sortHelper = new SortHelper(this.controls.listItems);
     this.searchModule = new SearchModule(controls.search, controls.searchInput);
-    this.searchModule = new SearchModule(controls.search, controls.searchInput);
 
     // init background
     this.background.addEventListener('error', this.error.bind(this));

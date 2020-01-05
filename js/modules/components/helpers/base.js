@@ -13,7 +13,7 @@ class Helper {
   /**
    * Executes command
    */
-  command() {}
+  // command() {}
 
   /**
    * @param {*} selection
