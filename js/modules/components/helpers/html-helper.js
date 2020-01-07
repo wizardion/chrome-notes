@@ -4,7 +4,7 @@ class HtmlHelper {
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.$testers = {
-      end: /\n/g,
+      endLine: /\n/g,
       space: /(\s)/g,
       blocks: /<\s*\/\s*(ul|ol|q|code)\s*>/gi,
       tags: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
@@ -197,11 +197,12 @@ class HtmlHelper {
         let hasBloks = false;
 
         if(tags.closing.length > 0) {
-          [cursor, hasBloks] = this.$fillClosingTags(list, tags, cursor);
+          hasBloks = this.$hasBlocks(tags.closing);
+          cursor = this.$fillClosingTags(list, tags, cursor);
         }
 
         if(tags.opening.length > 0) {
-          [cursor, hasBloks] = this.$fillOpeningTags(list, tags, cursor);
+          cursor = this.$fillOpeningTags(list, tags, cursor);
         }
 
         try {
@@ -260,14 +261,12 @@ class HtmlHelper {
    * @param {*} cursor
    * Fills the list with closing tags.
    */
-  $fillClosingTags(list, tags, cursor) {
-    let hasBloks = this.$hasBlocks(tags.closing);
-    
+  $fillClosingTags(list, tags, cursor) {    
     list.splice(cursor, 0, tags.closing.join(''));
     cursor += 1;
     tags.closing = [];
 
-    return [cursor, hasBloks];
+    return cursor;
   }
 
   /**
@@ -280,16 +279,8 @@ class HtmlHelper {
    * Removes the new lines in the list if the next elemnt has html blocks.
    */
   $fillOpeningTags(list, tags, cursor) {
-    let hasBloks = !this.$hasBlocks(tags.opening);
-
     for (let g = cursor; g < list.length; g++) {
       const word = list[g];
-
-      if(hasBloks && word.match(this.$testers.end)) {
-        list[g] = '';
-        hasBloks = false;
-        print('hasBloks 1: g: ' + g)
-      }
 
       if(!word.match(this.$testers.space) && word.length > 0) {
         break;
@@ -302,7 +293,7 @@ class HtmlHelper {
     tags.opening = [];
     cursor += 1;
 
-    return [cursor, hasBloks];
+    return cursor;
   }
 
   /**
@@ -323,10 +314,9 @@ class HtmlHelper {
       const word = list[g];
       const isSpace = word.match(this.$testers.space) || word.length === 0;
 
-      if(hasBloks && word.match(this.$testers.end)) {
+      if(hasBloks && word.match(this.$testers.endLine)) {
         list[g] = '';
         hasBloks = false;
-        print('hasBloks 2: g: ' + g)
       }
 
       if(!isSpace && word === element) {
