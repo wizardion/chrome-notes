@@ -176,10 +176,7 @@ class HtmlHelper {
     let cursor = 0;
     let list = text.split(this.$testers.space);
     let elements = html.match(this.$testers.delimiter);
-    let tags = {
-      opening: [],
-      closing: []
-    };
+    let tags = {opening: [], closing: []};
 
     if(!elements) {
       return '';
