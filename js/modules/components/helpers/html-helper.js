@@ -8,7 +8,8 @@ class HtmlHelper {
       space: /(\s)/g,
       blocks: /<\s*\/\s*(ul|ol|q|code)\s*>/gi,
       tags: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
-      closingTag: /(<\s*\/\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi
+      closingTag: /(<\s*\/\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
+      delimiter: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi
     };
 
     // https://www.regextester.com/93930
@@ -174,16 +175,11 @@ class HtmlHelper {
   $merge(html, text) {
     let cursor = 0;
     let list = text.split(this.$testers.space);
-    let elements = html.match(/(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi);
+    let elements = html.match(this.$testers.delimiter);
     let tags = {
       opening: [],
       closing: []
-    }
-
-    print(html);
-    print(text);
-    print(elements);
-    print(list);
+    };
 
     if(!elements) {
       return '';
