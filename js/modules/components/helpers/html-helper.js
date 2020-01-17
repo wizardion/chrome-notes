@@ -225,6 +225,10 @@ class HtmlHelper {
       tags.closing = [];
     }
 
+    if(!!list[list.length - 1].match(this.$testers.tags)) {
+      list.push(' ');
+    }
+
     var result = list.join('').replace(/(<\/(li)>)[\n\r](<(li)>)/gi, '$1$3');
 
     // console.log('-----html------------------------------------------------');
