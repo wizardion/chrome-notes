@@ -31,19 +31,35 @@ input {
 }
 
 code {
+  /* display: block; */
+  background: ghostwhite;
+  border: 1px solid lightgray;
+  border-radius: 2px;
+  padding: 0px 4px;
+  color: #06736a;
+  /* font-family: Courier,monospace; */
+  /* margin-right: 5px; */
+  /* font-size: 13px; */
+  /* font-family: Quicksand2; */
+}
+
+pre > pre {
   display: block;
   background: ghostwhite;
   border: 1px solid lightgray;
-  border-radius: 4px;
-  padding: 5px 10px;
+  border-radius: 2px;
+  padding: 2px 7px 2px 7px;
   color: #06736a;
   font-family: Courier,monospace;
-  margin-right: 5px;
+  margin: 3px 5px 3px 0;
+
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 q {
   border-left: 2px solid silver;
-  padding: 7px 5px;
+  padding: 2px 5px;
   font-style: italic;
   color: #555555;
   display: block;
@@ -182,8 +198,8 @@ table
   background: rgba(7, 166, 152, 0.1) !important;
   opacity: 0.65; */
 
-  /* margin-left: 1px !important;
-  margin-right: -1px !important; */
+  margin-left: 1px !important;
+  margin-right: -1px !important;
   
   /* background:rgba(7, 166, 152, 0.025); */
   /* border-bottom: 1px groove rgba(7, 166, 152, 0.055); */

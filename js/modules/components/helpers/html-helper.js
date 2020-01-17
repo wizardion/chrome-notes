@@ -1,12 +1,12 @@
 class HtmlHelper {
   constructor () {
-    const allowedTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'code', 'q', 'blockquote'].join('|'); // Allowed tags
+    const allowedTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'pre', 'code', 'q', 'blockquote'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.$testers = {
       endLine: /\n/g,
       space: /(\s)/g,
-      blocks: /<\s*\/\s*(ul|ol|q|code)\s*>/gi,
+      blocks: /<\s*\/\s*(ul|ol|q|code|pre)\s*>/gi,
       tags: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
       closingTag: /(<\s*\/\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
       delimiter: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi
@@ -68,6 +68,11 @@ class HtmlHelper {
         name: 'Remove all tags except allowed',
         pattern: new RegExp(`(\\<)\\s*(\\/?)\\s*(${allowedTags})\\s*(\\s([^\\>]*))?\\s*(\\/?)\\s*(\\>)|<[^>]+>`, 'gi'),
         replacement: '$1$2$3$4$6$7'
+      },
+      {
+        name: 'Remove all sub-specific tags',
+        pattern: /(<((?!pre)[^<>])+>)(?=((?!<\/?pre>)[^])*<\/pre>)|(<((?!code)[^<>])+>)(?=((?!<\/?code>)[^])*<\/code>)/gi,
+        replacement: ''
       },
       {
         name: 'Replace empty tags',
@@ -222,6 +227,13 @@ class HtmlHelper {
 
     var result = list.join('').replace(/(<\/(li)>)[\n\r](<(li)>)/gi, '$1$3');
 
+    // console.log('-----html------------------------------------------------');
+    // console.log(`{${html}}`)
+    // console.log('-----html_replace----------------------------------------');
+    // console.log(`{${html.replace(/(<((?!pre)[^<>])+>)(?=((?!<\/?pre>)[^])*<\/pre>)/gi, '')}}`)
+    console.log('-----text------------------------------------------------');
+    console.log(`{${text}}`)
+    console.log('=====result==============================================');
     console.log(`{${result}}`)
     console.log('=========================================================');
 

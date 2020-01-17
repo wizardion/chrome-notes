@@ -14,8 +14,9 @@ class TextProcessor {
       underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
       underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
       underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
-      code: new StyleAdapter(this.element, '```', '\n<code>${text}</code>\n'),
-      quote: new StyleAdapter(this.element, `'''`, '\n<q>${text}</q>\n'),
+      code: new StyleAdapter(this.element, '`', '\b<code>${text}</code>\b'),
+      pre: new StyleAdapter(this.element, '```', '\b<pre>${text}</pre>\b'),
+      quote: new StyleAdapter(this.element, `'''`, '\b<q>${text}</q>\b'),
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
@@ -75,6 +76,11 @@ class TextProcessor {
     if (!e.shiftKey && !textSelected && (e.keyCode === 9)) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
+
+        console.log({
+          'key': key,
+          'command': helper.$command,
+        });
 
         if (helper.test(selection) && helper.exec(selection)) {
           return e.preventDefault();

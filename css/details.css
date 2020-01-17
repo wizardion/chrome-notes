@@ -142,6 +142,7 @@ div[contenteditable] {
   resize: none;
   border: none;
   padding: 6px;
+  padding-right: 7px;
   background: transparent;
   /* padding-right: 25px; */
   padding-top: 10px;
@@ -174,6 +175,11 @@ div[contenteditable] {
   width: 100%;
   min-height: 208px;
   box-sizing: border-box;
+  line-height: 20px;
+
+  /* line-height: 20px;
+  font-family: Quicksand2; */
+  /* font-family: Quicksand2; */
 }
 
 
@@ -196,11 +202,16 @@ div[contenteditable] {
   margin: -1px;
   padding-left: 30px;
   /* display: inline-block; */
+  /* line-height:200% */
 }
 
 /* .content-description ul li:first-child::selection {
   background: red;
   height: 30px;
+} */
+
+/* .content-description ol li {
+  line-height: normal;
 } */
 
 .content-description ul li:first-child,
@@ -253,6 +264,9 @@ div[contenteditable] {
   word-wrap: break-word; */
   word-break: break-word;
   overflow: auto;
+
+  font-size: 13px;
+  line-height: 18px;
 }
 
 .expression-logs hr {
@@ -275,6 +289,7 @@ div[contenteditable] {
   background: yellow; 
   border: 1px solid palegoldenrod; 
   border-bottom: 2px solid #e33636;
+  margin: 0px 2px;
 }
 
 .expression-logs .html-symbol {
