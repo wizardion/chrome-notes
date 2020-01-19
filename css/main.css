@@ -65,6 +65,13 @@ q {
   display: block;
   quotes: "`" "`";
 }
+
+hr {
+  border: none;
+  height: 1px;
+  background: #b9e6e2;
+}
+
 /* 
 q::before {
   content: none;

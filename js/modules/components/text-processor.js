@@ -17,6 +17,7 @@ class TextProcessor {
       code: new StyleAdapter(this.element, '`', '\b<code>${text}</code>\b'),
       pre: new StyleAdapter(this.element, '```', '\b<pre>${text}</pre>\b'),
       quote: new StyleAdapter(this.element, `'''`, '\b<q>${text}</q>\b'),
+      line: new StyleAdapter(this.element, `---`, '\b<hr>\b'),
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));

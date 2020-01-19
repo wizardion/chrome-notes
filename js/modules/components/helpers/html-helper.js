@@ -1,6 +1,6 @@
 class HtmlHelper {
   constructor () {
-    const allowedTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'pre', 'code', 'q', 'blockquote'].join('|'); // Allowed tags
+    const allowedTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'hr', 'pre', 'code', 'q', 'blockquote'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
     this.$testers = {

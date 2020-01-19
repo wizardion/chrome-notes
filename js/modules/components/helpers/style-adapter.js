@@ -7,6 +7,7 @@ class StyleAdapter extends Helper {
 
     this.$command = start;
     this.$template = template;
+    this.$primitive = !template.match(/\$\{text\}/gi);
 
     this.$rule = end.replace(/(.)/gi, '\\$1');
 
@@ -71,9 +72,10 @@ class StyleAdapter extends Helper {
   test(selection) {
     let focusNode = selection.focusNode;
     let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    let regex = new RegExp(`[\\w\\s\\W\\S]+(${this.$rule})$`, 'i');
+    let regex = new RegExp(this.$primitive? `(${this.$rule})$` : `[\\w\\s\\W\\S]+(${this.$rule})$`, 'i');
+    let t = regex.test(source);
 
-    return regex.test(source);
+    return t;
   }
 
   /**
@@ -89,6 +91,13 @@ class StyleAdapter extends Helper {
       return;
     }
 
+    if (this.$primitive) {
+      selection.collapse(focusNode, source.length);
+      selection.extend(focusNode, source.length - this.$command.length);
+      document.execCommand('insertHTML', false, this.$template);
+      return true;
+    }
+
     let [lastNode, text] = this.$findNode(focusNode, source);
 
     if (text) {
@@ -96,7 +105,7 @@ class StyleAdapter extends Helper {
       let lastText = lastNode.data;
 
       if (lastNode == focusNode) {
-        lastText = source.substr(0, source.length - 2);
+        lastText = source.substr(0, source.length - this.$command.length);
       }
 
       selection.collapse(focusNode, source.length);
