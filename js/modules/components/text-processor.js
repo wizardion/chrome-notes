@@ -129,7 +129,7 @@ class TextProcessor {
     // console.log(this.$toHtml(text));
     
     // return this.$toString(text);
-    return this.$html.removeHtml(this.element.innerHTML);
+    return this.$html.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
   }
 
   log(sessions, test) {

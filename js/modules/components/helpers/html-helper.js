@@ -71,7 +71,7 @@ class HtmlHelper {
       },
       {
         name: 'Remove all sub-specific tags',
-        pattern: /(<((?!pre)[^<>])+>)(?=((?!<\/?pre>)[^])*<\/pre>)|(<((?!code)[^<>])+>)(?=((?!<\/?code>)[^])*<\/code>)/gi,
+        pattern: /(<\/?code>)(?=((?!<\/?pre>)[^])*<\/pre>)|(<\/?pre>)(?=((?!<\/?code>)[^])*<\/code>)/gi,
         replacement: ''
       },
       {
