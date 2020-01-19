@@ -14,10 +14,10 @@ class TextProcessor {
       underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
       underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
       underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
-      code: new StyleAdapter(this.element, '`', '\b<code>${text}</code>\b'),
-      pre: new StyleAdapter(this.element, '```', '\b<pre>${text}</pre>\b'),
-      quote: new StyleAdapter(this.element, `'''`, '\b<q>${text}</q>\b'),
-      line: new StyleAdapter(this.element, `---`, '\b<hr>\b'),
+      code: new CommandAdapter(this.element, '`', '\b<code>${text}</code>\b'),
+      pre: new CommandAdapter(this.element, '```', '\b<pre>${text}</pre>\b'),
+      quote: new CommandAdapter(this.element, `'''`, '\b<q>${text}</q>\b'),
+      line: new CommandAdapter(this.element, `---`, '\b<hr>\b'),
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));

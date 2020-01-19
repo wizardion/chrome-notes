@@ -19,6 +19,7 @@
   <script type="text/javascript" src="js/modules/components/helpers/base.js"></script>
   <script type="text/javascript" src="js/modules/components/helpers/link-adapter.js"></script>
   <script type="text/javascript" src="js/modules/components/helpers/style-adapter.js"></script>
+  <script type="text/javascript" src="js/modules/components/helpers/style-command.js"></script>
   <script type="text/javascript" src="js/modules/components/helpers/html-helper.js"></script>
   <script type="text/javascript" src="js/modules/components/text-processor.js"></script>
   <script type="text/javascript" src="js/modules/components/editor.js"></script>
@@ -93,6 +94,28 @@
                 </div>
             </fieldset>
             <fieldset>
+              <div action="code" class="button" title="Single line code">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
+                </svg>
+              </div><!--
+              --><div action="pre" class="button" title="Code">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
+                </svg>
+              </div><!--
+              --><div action="quote" class="button" title="Quote">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
+                </svg>
+              </div><!--
+              --><div action="line" class="button" title="Line">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
+                </svg>
+              </div>
+            </fieldset>
+            <fieldset>
                 <div action="undo" class="button" title="Undo">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
                     <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" />
@@ -109,9 +132,7 @@
 
       <div id="content" class="content">
         <input id="title-note" type="text" maxlength="60" tabindex="1" class="edit-title details" placeholder="Enter a Title of Note">
-        <!-- <div id="description-note" class="content-description" contenteditable="true" tabindex="2"></div> -->
         <pre id="description-note" class="content-description" contenteditable="true" tabindex="2"></pre>
-        <!-- <xmp id="description-note" class="content-description" contenteditable="true" tabindex="2"></xmp> -->        
       </div>
     </div>
 

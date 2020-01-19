@@ -69,7 +69,8 @@ q {
 hr {
   border: none;
   height: 1px;
-  background: #b9e6e2;
+  /* background: #b9e6e2; */
+  background: #eeeeee;
 }
 
 /* 

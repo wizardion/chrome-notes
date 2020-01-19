@@ -89,7 +89,7 @@ class LinkAdapter extends Helper {
     }
 
     // create a custom link
-    let customLink = `[${text.replace(/\n/ig, '<br>')}](url)`;
+    let customLink = `[${text}](url)`;
 
     document.execCommand('insertHTML', false, customLink);
     selection.collapse(selection.focusNode, selection.focusOffset - 1);
@@ -112,7 +112,7 @@ class LinkAdapter extends Helper {
     let [lastNode, text, url] = this.$findLink(focusNode, source);
 
     if (text && url) {
-      let linkHtml = `<a href="${url}">${text}</a> `;
+      let linkHtml = `\b<a href="${url}">${text}</a>\b `;
       let lastText = (lastNode == focusNode)? source : lastNode.data;
 
       selection.collapse(focusNode, source.length);
