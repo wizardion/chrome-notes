@@ -11,7 +11,7 @@ class LinkAdapter extends Helper {
    * 
    * @param {*} selection
    * 
-   * checks if selection contains an HTML Link element
+   * Checks if selection contains an HTML Link element
    */
   $containsLink(selection) {
     let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;

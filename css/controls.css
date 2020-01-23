@@ -66,6 +66,7 @@ div.button {
 .editor-controlls {
   height: 100%;
   display: inline-block;
+  /* margin-left: 30px; */
 }
 
 .editor-controlls .button {
