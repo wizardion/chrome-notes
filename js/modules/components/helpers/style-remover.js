@@ -1,9 +1,9 @@
-class FormatRemover extends Helper {
+class StyleRemover extends Helper {
   constructor (element) {
     super(element);
   }
 
-  comand() {
+  command() {
     let selection = window.getSelection();
     let text = selection.toString();
 
