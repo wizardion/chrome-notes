@@ -3,13 +3,14 @@ class StyleRemover extends Helper {
     super(element);
   }
 
+  /**
+   * Executes command, removes all html tags within the selected text.
+   */
   command() {
     let selection = window.getSelection();
     let text = selection.toString();
 
     if(text) {
-      // return document.execCommand("removeFormat", false);
-      
       document.execCommand("insertHTML", false, text);
 
       selection.collapse(selection.focusNode, selection.focusOffset);
