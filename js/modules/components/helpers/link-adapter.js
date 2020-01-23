@@ -112,7 +112,7 @@ class LinkAdapter extends Helper {
     let [lastNode, text, url] = this.$findLink(focusNode, source);
 
     if (text && url) {
-      let linkHtml = `\b<a href="${url}">${text}</a>\b `;
+      let linkHtml = `<a href="${url}">${text}</a> `;
       let lastText = (lastNode == focusNode)? source : lastNode.data;
 
       selection.collapse(focusNode, source.length);
