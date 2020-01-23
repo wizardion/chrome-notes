@@ -18,7 +18,7 @@ class TextProcessor {
       pre: new CommandAdapter(this.element, '```', '\b<pre>${text}</pre>\b'),
       quote: new CommandAdapter(this.element, `'''`, '\b<q>${text}</q>\b'),
       line: new CommandAdapter(this.element, `---`, '\b<hr>\b'),
-      removeFormat: new FormatRemover()
+      removeFormat: new StyleRemover()
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
