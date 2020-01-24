@@ -229,16 +229,20 @@ div[contenteditable] {
   color: dodgerblue;
   text-decoration: none;
   /* color: blue; */
+  color: #06736a;
 }
 
-.content-description a[contentEditable]:hover {
-  text-decoration: underline;
+.content-description a:hover {
+  text-decoration: underline !important;
+  /* cursor: pointer; */
+  /* cursor: context-menu; */
   /* color: blue; */
 }
 
 .content-description a:visited,
 .content-description a:active {
   color: dodgerblue;
+  color: #06736a;
   /* color: blue; */
 }
 
