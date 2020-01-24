@@ -14,24 +14,6 @@ class HtmlHelper {
 
     // https://www.regextester.com/93930
     this.rules = [
-      //#region old
-          // {
-          //   name: 'Trim html before cutting',
-          //   pattern: '(<[^>]+>)[\\r\\n]+(?=<[^>]+>)',
-          //   replacement: '$1'
-          // },
-          // {
-          //   name: 'Replace innesessary html symbols',
-          //   pattern: `(\\S)(&nbsp;)(\\S)`, 
-          //   replacement: '$1 $3'
-          // },
-      // {
-      //   name: 'Replace all space-symbols to simple space',
-      //   // pattern: `(\\s)`, 
-      //   pattern: `(([\\t\v\\f \\u00a0\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u200b\\u2028\\u2029\\u3000]))`, 
-      //   replacement: ' '
-      // },
-      //#endregion
       {
         name: 'Remove styles and scripts',
         pattern: /<\s*(style|script)[^>]*>(((?!<\s*\/(style|script)\s*>).)*)<\s*\/(style|script)\s*>/gi,
@@ -229,19 +211,7 @@ class HtmlHelper {
       list.push(' ');
     }
 
-    var result = list.join('').replace(/(<\/(li)>)[\n\r](<(li)>)/gi, '$1$3');
-
-    // console.log('-----html------------------------------------------------');
-    // console.log(`{${html}}`)
-    // console.log('-----html_replace----------------------------------------');
-    // console.log(`{${html.replace(/(<((?!pre)[^<>])+>)(?=((?!<\/?pre>)[^])*<\/pre>)/gi, '')}}`)
-    console.log('-----text------------------------------------------------');
-    console.log(`{${text}}`)
-    console.log('=====result==============================================');
-    console.log(`{${result}}`)
-    console.log('=========================================================');
-
-    return result;
+    return list.join('').replace(/(<\/(li)>)[\n\r](<(li)>)/gi, '$1$3');
   }
 
   /**
