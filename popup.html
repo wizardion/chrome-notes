@@ -46,7 +46,12 @@
   <div id="notes" class="notes">
     <div id="details-view" class="details-view">
       <div id="details-controls" class="head">
-        <input id="to-list" type="button" class="button back" value="All Notes" />
+        <!-- <input id="to-list" type="button" class="button back" value="All Notes" /> -->
+        <button id="to-list" class="button back"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="17">
+          <path d="M 9,3 V 4 H 8 V 5 H 7 V 6 H 6 V 7 H 5 V 8 H 4 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 1 V 13 H 10 V 12 H 9 V 11 H 8 V 10 H 7 V 9 H 6 V 8 H 7 V 7 H 8 V 6 H 9 V 5 h 1 V 4 h 1 V 3 h -1 z" /></svg>
+          All Notes
+        </button>
+
         <!-- <input id="to-list" type="button" class="button back" value="" /> -->
         <div id="delete-note" class="button delete">
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="19">
@@ -98,32 +103,34 @@
             <fieldset>
               <div action="removeFormat" class="button" title="Remove Format">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
+                  <!-- <path d="M 13.160156 3 L 11.388672 7.6386719 L 13.099609 6.90625 L 14 4.4667969 L 14.65625 6.2382812 L 15.880859 5.7128906 L 14.847656 3 L 13.160156 3 z M 21 4.6074219 L 7 10.607422 L 7 12.240234 L 21 6.2402344 L 21 4.6074219 z M 17.128906 8.9882812 L 15.873047 9.5253906 L 16.025391 9.9394531 L 14.908203 9.9394531 L 12.019531 11.177734 L 16.490234 11.177734 L 17.492188 14 L 19.039062 14 L 17.128906 8.9882812 z M 11.443359 11.423828 L 9.6503906 12.193359 L 8.9609375 14 L 10.529297 14 L 11.443359 11.423828 z" /> -->
+                  <!-- <path d="M 13.160156 3 L 11.576172 7.1464844 L 13.279297 6.4179688 L 14 4.4667969 L 14.525391 5.8847656 L 15.746094 5.359375 L 14.847656 3 L 13.160156 3 z M 21 4.46875 L 20.705078 4.5957031 L 7 10.46875 L 7 12.101562 L 7.2949219 11.974609 L 21 6.1015625 L 21 4.46875 z M 17.171875 9.1015625 L 15.914062 9.640625 L 16.025391 9.9394531 L 15.21875 9.9394531 L 12.328125 11.177734 L 16.490234 11.177734 L 17.492188 14 L 19.039062 14 L 17.171875 9.1015625 z M 11.388672 11.580078 L 9.5898438 12.351562 L 8.9609375 14 L 10.529297 14 L 11.388672 11.580078 z" /> -->
+                  <path d="M 13.160156 3 L 11.697266 6.8300781 L 13.285156 6.40625 L 14 4.4667969 L 14.587891 6.0566406 L 15.880859 5.7109375 L 14.847656 3 L 13.160156 3 z M 21 5.6347656 L 7 9.3808594 L 7 10.935547 L 21 7.1894531 L 21 5.6347656 z M 17.3125 9.4707031 L 15.982422 9.8261719 L 16.025391 9.9394531 L 15.558594 9.9394531 L 9.9375 11.443359 L 8.9609375 14 L 10.529297 14 L 11.53125 11.177734 L 16.490234 11.177734 L 17.492188 14 L 19.039062 14 L 17.3125 9.4707031 z" />
                 </svg>
               </div>
             </fieldset>
-            <fieldset>
+            <!-- <fieldset>
               <div action="code" class="button" title="Single line code">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
-                </svg>
-              </div><!--
-              --><div action="pre" class="button" title="Code">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
-                </svg>
-              </div><!--
-              --><div action="quote" class="button" title="Quote">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
-                </svg>
-              </div><!--
-              --><div action="line" class="button" title="Line">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                  <!-- <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" /> -->
+                  
                 </svg>
               </div>
-            </fieldset>
+                <div action="pre" class="button" title="Code">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  
+                </svg>
+              </div>
+                <div action="quote" class="button" title="Quote">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  
+                </svg>
+              </div>
+                <div action="line" class="button" title="Line">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  
+                </svg>
+              </div>
+            </fieldset> -->
             <fieldset>
                 <div action="undo" class="button" title="Undo">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">

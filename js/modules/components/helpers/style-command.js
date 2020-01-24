@@ -2,10 +2,24 @@ class CommandAdapter extends StyleAdapter {
   constructor (element, rule, template) {
     super(element, rule, template);
 
-    this.$reverce = this.$reverse(this.$command);
+    let tagRegex = /<(\w+)>/gi;
+    let tags = tagRegex.exec(template);
 
-    // this.$commandRegex = /\[([^\[\]]+)\]\(([\S]+)\)$/i;
-    // this.$linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
+    this.$nodeName = tags[tags.index].toUpperCase();
+    this.$reverce = this.$reverse(this.$command);
+    this.$nodeRegex = new RegExp(`<(${this.$nodeName})[^>]+>`, 'gi');
+  }
+
+  /**
+   * @param {*} selection
+   * 
+   * Checks if selection contains a serving HTML element
+   */
+  $containsNode(selection) {
+    let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+
+    return (container &&  ((container.nodeName === this.$nodeName || container.parentNode.nodeName === this.$nodeName) ||
+        (container.innerHTML && container.innerHTML.match(this.$nodeRegex))));        
   }
 
   /**
@@ -14,12 +28,31 @@ class CommandAdapter extends StyleAdapter {
   command() {
     let selection = window.getSelection();
     let text = selection.toString();
-    // let containsLink = this.$containsLink(selection);
+    let containsNode = this.$containsNode(selection);
+
+    console.log({
+      'contains': containsNode
+    });
 
     // selection is empty
     // if (!text.length) {
     //   return;
     // }
+
+    // return document.execCommand("insertHTML", false, text);
+
+    // unlink
+    if (containsNode) {
+      // return document.execCommand("unlink", false);
+      
+      // return document.execCommand('formatBlock', false, 'br');
+      // return document.execCommand('insertText', false, 'text');
+      // return document.execCommand('insertHTML', false, '<b>text</b>');
+
+      // document.execCommand('insertText', false, 'select_text');
+      // document.execCommand("insertHTML", false, text);
+      return;
+    }
 
     if (text.length || this.$primitive) {
       let styledHtml = this.$template.replace(/\$\{(\w+)\}/gi, text);
@@ -27,10 +60,7 @@ class CommandAdapter extends StyleAdapter {
       return true;
     }
 
-    // unlink
-    // if (containsLink) {
-    //   return document.execCommand("unlink", false);
-    // }
+    
 
     // create an auto link
     // if (!containsLink && text.match(this.$linkRegex)) {
@@ -47,38 +77,5 @@ class CommandAdapter extends StyleAdapter {
     // selection.extend(selection.focusNode, selection.focusOffset);
 
     // this.exec(selection);
-  }
-
-  exec(selection) {
-    let focusNode = selection.focusNode;
-    let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
-    
-
-    if (!source) {
-      return;
-    }
-
-    if (this.$primitive) {
-      selection.collapse(focusNode, source.length);
-      selection.extend(focusNode, source.length - this.$command.length);
-      document.execCommand('insertHTML', false, this.$template);
-      return true;
-    }
-
-    let [lastNode, text] = this.$findNode(focusNode, source);
-
-    if (text) {
-      let styledHtml = this.$template.replace(/\$\{(\w+)\}/gi, text);
-      let lastText = lastNode.data;
-
-      if (lastNode == focusNode) {
-        lastText = source.substr(0, source.length - this.$command.length);
-      }
-
-      selection.collapse(focusNode, source.length);
-      selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf(this.$command)).length);
-      document.execCommand('insertHTML', false, styledHtml);
-      return true;
-    }
   }
 }

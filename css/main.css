@@ -24,7 +24,7 @@ b {
   /* background: #e33636; */
 }
 
-input {
+input, button {
   font-size: 12px;
   outline: none;
   font-family: 'Ubuntu2', sans-serif;
@@ -272,8 +272,8 @@ table
 
 .back
 {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVR42mNgGBmAY9m0/yA8qpkemkcNobEhNAMA4aIxw3jfnaoAAAAASUVORK5CYII=);
-  padding-left: 15px;
+  /* padding-left: 15px; */
+  /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVR42mNgGBmAY9m0/yA8qpkemkcNobEhNAMA4aIxw3jfnaoAAAAASUVORK5CYII=); */
   width: inherit;
   /* float: left; */
   background-position: left;
@@ -282,11 +282,21 @@ table
   top: 0px;
   left: 5px;
   line-height: 26px;
+  font-size: 12px;
+  /* background-repeat-x: repeat;
+  width: 16px;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAQAQMAAAD+hscAAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRFAAAACKaWSkXFaQAAAAJ0Uk5TAP9bkSK1AAAAJElEQVR4nGNggAFmBgY2BgYeBgYJBgYDBoYEMCkBFmEDy4IBABmGARu8XIhPAAAAAElFTkSuQmCC'); */
+
+}
+
+.back svg{
+  margin-top: 4px;
+  margin-bottom: -4px;
 }
 
 .back:hover
 {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVR42mNgGBngsZnZfxAe1UwPzaOG0NgQmgEAyyoytXm7VbsAAAAASUVORK5CYII=);
+  /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVR42mNgGBngsZnZfxAe1UwPzaOG0NgQmgEAyyoytXm7VbsAAAAASUVORK5CYII=); */
 }
 
 /* .back:active {
