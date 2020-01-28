@@ -24,6 +24,7 @@ class TextProcessor {
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
+    this.element.addEventListener('keyup', this.$setEditable.bind(this, 'A'));
 
     document.execCommand('defaultParagraphSeparator', false, 'p');
     //#region TEST_DATA
@@ -32,6 +33,22 @@ class TextProcessor {
       this.log();
     }.bind(this), 250)
     //#endregion
+  }
+
+  $setUneditable(tag) {
+    const links = this.element.getElementsByTagName(tag);
+
+    for(let i = 0; i < links.length; i++) {
+      links[i].setAttribute('contenteditable', 'false');
+    }
+  }
+
+  $setEditable(tag) {
+    const links = this.element.getElementsByTagName(tag);
+
+    for(let i = 0; i < links.length; i++) {
+      links[i].removeAttribute('contenteditable');
+    }
   }
 
   /**
@@ -73,6 +90,12 @@ class TextProcessor {
     let selection = window.getSelection();
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
     let focusNode = selection.focusNode;
+
+    if(e.ctrlKey && e.keyCode === 17 && !e.shiftKey) {
+      this.$setUneditable('A');
+    } else {
+      this.$setEditable('A');
+    }
 
     // 'Tab' execute a custom command
     if (!e.shiftKey && !textSelected && (e.keyCode === 9)) {

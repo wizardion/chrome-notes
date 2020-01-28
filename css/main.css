@@ -160,6 +160,8 @@ table
   left: 2px;
   right: 4px;
   border-bottom: 1px solid transparent !important;
+  /* background: #b9e6e2 !important; */
+  /* background:rgba(7, 166, 152, 0.075) !important; */
 }
 
 .alert {
@@ -206,8 +208,8 @@ table
   background: rgba(7, 166, 152, 0.1) !important;
   opacity: 0.65; */
 
-  margin-left: 1px !important;
-  margin-right: -1px !important;
+  /* margin-left: 1px !important;
+  margin-right: -1px !important; */
   
   /* background:rgba(7, 166, 152, 0.025); */
   /* border-bottom: 1px groove rgba(7, 166, 152, 0.055); */
