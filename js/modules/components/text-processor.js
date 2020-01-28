@@ -35,6 +35,12 @@ class TextProcessor {
     //#endregion
   }
 
+  /**
+   * Internal method: SetUneditable.
+   * 
+   * @param {*} e
+   * Makes all elements not editable/executable by tag name.
+   */
   $setUneditable(tag) {
     const links = this.element.getElementsByTagName(tag);
 
@@ -43,6 +49,12 @@ class TextProcessor {
     }
   }
 
+  /**
+   * Internal method: OnPaste.
+   * 
+   * @param {*} e
+   * Removes from elements not editable/executable functionality by tag name.
+   */
   $setEditable(tag) {
     const links = this.element.getElementsByTagName(tag);
 
