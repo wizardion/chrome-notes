@@ -17,7 +17,7 @@ class TextProcessor {
       code: new StyleAdapter(this.element, '`', '<code>${text}</code>'),
       pre: new StyleAdapter(this.element, '```', '<pre>${text}</pre>'),
       quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q>'),
-      line: new StyleAdapter(this.element, `---`, '<hr>'),
+      line: new StyleAdapter(this.element, `---`, '<hr> '),
       removeFormat: new StyleRemover()
     };
 
