@@ -11,10 +11,15 @@ class StyleRemover extends Helper {
     let text = selection.toString();
 
     if(text) {
-      document.execCommand("insertHTML", false, text);
-
+      
+      // document.execCommand('removeFormat');
+      document.execCommand('insertHTML', false, text);
+      
       selection.collapse(selection.focusNode, selection.focusOffset);
       selection.extend(selection.focusNode, selection.focusOffset - text.length);
+
+      // document.execCommand('removeFormat', false);
+      document.execCommand('outdent', false);
 
       return true;
     }

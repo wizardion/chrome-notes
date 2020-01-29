@@ -161,11 +161,6 @@ class TextProcessor {
    * Fires on content blur
    */
   $onChange() {
-    // var text = this.$toString(this.element.innerHTML);
-
-    // console.log(this.$toHtml(text));
-    
-    // return this.$toString(text);
     return this.$html.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
   }
 

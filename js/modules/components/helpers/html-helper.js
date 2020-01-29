@@ -45,7 +45,6 @@ class HtmlHelper {
         replacement: '$1 ',
         optional: true
       },
-      // TODO
       {
         name: 'Remove all tags except allowed',
         pattern: new RegExp(`(\\<)\\s*(\\/?)\\s*(${allowedTags})\\s*(\\s([^\\>]*))?\\s*(\\/?)\\s*(\\>)|<[^>]+>`, 'gi'),
@@ -146,9 +145,6 @@ class HtmlHelper {
       text = text.replace(regex, command);
     }
 
-    // replace lists
-
-    // return text.replace(/^\- ([^\-]+)\n/igm, '<li>$1</li>');
     return text.replace(/\- \{([^\-\{\}]+)\}/g, '<li>$1</li>').replace(/\&86/g, '{');
   }
 
