@@ -73,6 +73,13 @@ hr {
   background: #eeeeee;
 }
 
+strike {
+  /* color: #555555; */
+  color: #555555;
+  /* font-style: italic; */
+  text-decoration: line-through;
+}
+
 /* 
 q::before {
   content: none;
