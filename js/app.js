@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function(){
     searchInput: document.getElementById('search-notes'),
     listControls: document.getElementById('list-controls'),
     
-    editorControlls: editorControlls.getElementsByClassName('button'),
+    // editorControlls: editorControlls.getElementsByClassName('button'),
     content: document.getElementById('content')
   });
 

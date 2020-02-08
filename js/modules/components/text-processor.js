@@ -21,17 +21,21 @@ class TextProcessor {
       removeFormat: new StyleRemover()
     };
 
-    this.element.addEventListener('paste', this.$onPaste.bind(this));
-    this.element.addEventListener('blur', this.$onChange.bind(this));
-    this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
-    this.element.addEventListener('keyup', this.$setEditable.bind(this, 'A'));
+    // this.element.addEventListener('paste', this.$onPaste.bind(this));
+    // this.element.addEventListener('blur', this.$onChange.bind(this));
+    // this.element.addEventListener('change', this.$onChange.bind(this));
 
-    document.execCommand('defaultParagraphSeparator', false, 'p');
+    this.element.addEventListener('change', this.$onChange.bind(this));
+
+    // this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
+    // this.element.addEventListener('keyup', this.$setEditable.bind(this, 'A'));
+
+    // document.execCommand('defaultParagraphSeparator', false, 'p');
     //#region TEST_DATA
-    this.element.addEventListener('input', this.log.bind(this));
-    setTimeout(function () {
-      this.log();
-    }.bind(this), 250)
+    // this.element.addEventListener('input', this.log.bind(this));
+    // setTimeout(function () {
+    //   this.log();
+    // }.bind(this), 250)
     //#endregion
   }
 
@@ -161,7 +165,13 @@ class TextProcessor {
    * Fires on content blur
    */
   $onChange() {
-    return this.$html.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
+    // console.log({
+    //   'value': this.element.value 
+    // });
+    
+    return this.element.value;
+
+    // return this.$html.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
   }
 
   log(sessions, test) {

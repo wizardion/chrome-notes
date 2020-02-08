@@ -3,7 +3,7 @@ class Editor extends TextProcessor {
     super(element);
 
     this.$value = this.element.innerHTML;
-    this.controls = controls;
+    this.controls = controls || [];
 
     this.customEvents = {'change': null};
 
@@ -71,14 +71,16 @@ class Editor extends TextProcessor {
    */
   set value(value) {
     this.$value = value;
-    this.element.innerHTML = this.$value;
+    // this.element.innerHTML = this.$value;
+    this.element.value = this.$value;
   }
 
   /**
    * Gets html value
    */
   get value() {
-    return this.element.innerHTML;
+    // return this.element.innerHTML;
+    return this.element.value;
   }
 
   /**
@@ -122,9 +124,13 @@ class Editor extends TextProcessor {
   $onChange() {
     let event = this.customEvents['change'];
 
-    if (this.element.innerHTML != this.$value && event) {
-      event(super.$onChange());
-      this.$value = this.element.innerHTML;
-    }
+    // if (this.element.innerHTML != this.$value && event) {
+    //   event(super.$onChange());
+    //   this.$value = this.element.innerHTML;
+    // }
+
+
+    event(super.$onChange());
+    this.$value = this.element.value;
   }
 }

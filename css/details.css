@@ -195,6 +195,7 @@ div[contenteditable] {
 
 textarea.content-description {
   border: 1px solid red;
+  height: 244px;
 }
 
 
