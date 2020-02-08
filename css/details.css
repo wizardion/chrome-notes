@@ -109,7 +109,8 @@
   /* height: 240px; */
   height: 228px;
   /* height: 209px; */
-  overflow-y: scroll;
+  
+
   overflow-y: hidden;
   overflow-x: hidden;
   outline: none;
@@ -126,6 +127,11 @@
 
   padding: 0px;
   height: 244px;
+
+  overflow-y: scroll;
+  /* padding-right: 25px; */
+  padding-right: 15px;
+  margin-right: -25px;
 }
 
 div[contenteditable] {
@@ -177,9 +183,18 @@ div[contenteditable] {
   box-sizing: border-box;
   line-height: 20px;
 
+  
+
+  /* overflow-y: hidden;
+  overflow-x: hidden; */
+
   /* line-height: 20px;
   font-family: Quicksand2; */
   /* font-family: Quicksand2; */
+}
+
+textarea.content-description {
+  border: 1px solid red;
 }
 
 

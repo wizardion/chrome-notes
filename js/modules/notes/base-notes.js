@@ -19,7 +19,7 @@ class BaseNotes {
       chrome.extension.getBackgroundPage().main : main; /*this.background = main;*/
 
     // init modules
-    this.controls.listItems = new ScrollBar(controls.listItems);
+    this.controls.listItems = new ScrollBar(controls.listItems, {wheel: true});
     this.controls.content = new ScrollBar(controls.content, {background: '#D6D6D6'});
     this.controls.description = new Editor(controls.description, controls.editorControlls);
 

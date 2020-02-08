@@ -13,10 +13,6 @@ html, body
   background: rgb(238, 238, 238);
   font-family: 'Ubuntu2', sans-serif;
 }
-/* 
-b {
-  font-weight: 500;
-} */
 
 .notes {
   position: relative;
@@ -75,9 +71,22 @@ hr {
 
 strike {
   /* color: #555555; */
-  color: #555555;
+  color: #777777;
   /* font-style: italic; */
   text-decoration: line-through;
+}
+
+/* b, b i {
+  color: #b50404;
+} */
+
+/* 
+b {
+  font-weight: 500;
+} */
+
+i {
+  color: #333333;
 }
 
 /* 
