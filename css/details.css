@@ -127,11 +127,6 @@
 
   padding: 0px;
   height: 244px;
-
-  overflow-y: scroll;
-  /* padding-right: 25px; */
-  padding-right: 15px;
-  margin-right: -25px;
 }
 
 div[contenteditable] {
@@ -196,6 +191,9 @@ div[contenteditable] {
 textarea.content-description {
   /* border: 1px solid red; */
   height: 244px;
+  padding-right: 15px;
+  margin-right: -25px;
+  width: 625px;
 }
 
 
