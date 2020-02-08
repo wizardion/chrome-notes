@@ -18,6 +18,12 @@ b {
   font-weight: 500;
 } */
 
+b {
+  color: #b50404;
+}
+
+
+
 .notes {
   position: relative;
   background: white;

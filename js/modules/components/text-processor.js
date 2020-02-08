@@ -5,20 +5,24 @@ class TextProcessor {
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
-      link: new LinkAdapter(),
-      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> '),
-      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> '), 
-      boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
-      strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> '),
-      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> '),
-      underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
-      underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
-      underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
-      code: new StyleAdapter(this.element, '`', '<code>${text}</code>'),
-      pre: new StyleAdapter(this.element, '```', '<pre>${text}</pre>'),
-      quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q>'),
-      line: new StyleAdapter(this.element, `---`, '<hr> '),
-      removeFormat: new StyleRemover()
+      // link: new LinkAdapter(),
+      // italic: new StyleAdapter(this.element, '*', '<i>${text}</i> '),
+      // bold: new StyleAdapter(this.element, '**', '<b>${text}</b> '), 
+      // boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
+      // strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> '),
+      // underline: new StyleAdapter(this.element, '__', '<u>${text}</u> '),
+      // underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
+      // underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
+      // underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
+      // code: new StyleAdapter(this.element, '`', '<code>${text}</code>'),
+      // pre: new StyleAdapter(this.element, '```', '<pre>${text}</pre>'),
+      // quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q>'),
+      // line: new StyleAdapter(this.element, `---`, '<hr> '),
+      // removeFormat: new StyleRemover()
+      bold: new CommandAdapter(this.element, '**', '<b>${text}</b>'),
+      italic: new CommandAdapter(this.element, '*', '<i>${text}</i> '),
+      underline: new CommandAdapter(this.element, '__', '<u>${text}</u> '),
+      strikethrough: new CommandAdapter(this.element, '~~', '<strike>${text}</strike> '),
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
@@ -29,7 +33,7 @@ class TextProcessor {
     document.execCommand('defaultParagraphSeparator', false, 'p');
     //#region TEST_DATA
     this.element.addEventListener('input', this.log.bind(this));
-    setTimeout(function () {
+    setInterval(function () {
       this.log();
     }.bind(this), 250)
     //#endregion

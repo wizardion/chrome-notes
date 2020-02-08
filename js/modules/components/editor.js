@@ -22,7 +22,11 @@ class Editor extends TextProcessor {
       const helper = this.$helpers[action];
 
       item.onmousedown = this.$preCommand;
-      item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper) : this.$command;
+      // item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper) : this.$command;
+
+      if(helper && helper.command) {
+        item.onmouseup = this.$customCommand.bind(this, helper);
+      }
     }
   }
 
