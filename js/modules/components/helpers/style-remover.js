@@ -1,6 +1,6 @@
 class StyleRemover extends Helper {
-  constructor (element) {
-    super(element);
+  constructor (element, keyCode) {
+    super(element, keyCode);
   }
 
   /**

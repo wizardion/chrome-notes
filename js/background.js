@@ -99,7 +99,7 @@ main.init = function(callback = function(){}){
   var notes = [];
 
   main.database.transaction(function(tx) {
-    tx.executeSql("SELECT rowid as id, * FROM Notes ORDER BY displayOrder ASC LIMIT 18", [], function(tx, result) {
+    tx.executeSql("SELECT rowid as id, * FROM Notes ORDER BY displayOrder ASC LIMIT 25", [], function(tx, result) {
       for(var i = 0; i < result.rows.length; i++) {
         notes.push({
           id: result.rows.item(i)['id'],
@@ -135,9 +135,9 @@ main.update = function(item, key){
 
   console.log(`%c "${data[0]}"`, 'background: transparent; color: red;');
 
-  main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
-    callback('Oops, data not saved! Please try letter.');
-  }); });
+  // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
+  //   callback('Oops, data not saved! Please try letter.');
+  // }); });
 };
 
 main.add = function(note, callback = function(){}){

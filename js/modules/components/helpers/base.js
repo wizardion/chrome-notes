@@ -1,6 +1,14 @@
 class Helper {
-  constructor (element) {
+  constructor (element, keyCode) {
     this.$element = element;
+    this.$keyCode = keyCode;
+  }
+
+  /**
+   * Returns the keyCode the handles this adapter.
+   */
+  key() {
+    return this.$keyCode;
   }
 
   /**

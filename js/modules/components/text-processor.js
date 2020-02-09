@@ -2,18 +2,19 @@ class TextProcessor {
   constructor (element) {
     this.element = element;
     this.$html = new HtmlHelper();
+    this.$sysKeys = [65, 67, 86, 88, 90,   82];
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
       link: new LinkAdapter(),
-      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> '),
-      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> '), 
-      boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
-      strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> '),
-      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> '),
-      underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
-      underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
-      underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
+      italic: new StyleAdapter(this.element, '*', '<i>${text}</i>', 73),
+      bold: new StyleAdapter(this.element, '**', '<b>${text}</b>', 66), 
+      strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike>', 89),
+      underline: new StyleAdapter(this.element, '__', '<u>${text}</u>', 85),
+      // boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
+      // underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
+      // underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
+      // underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
       code: new StyleAdapter(this.element, '`', '<code>${text}</code>'),
       pre: new StyleAdapter(this.element, '```', '<pre>${text}</pre>'),
       quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q>'),
@@ -24,7 +25,7 @@ class TextProcessor {
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
-    this.element.addEventListener('keyup', this.$setEditable.bind(this, 'A'));
+    this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
 
     document.execCommand('defaultParagraphSeparator', false, 'p');
     //#region TEST_DATA
@@ -38,11 +39,11 @@ class TextProcessor {
   /**
    * Internal method: SetUneditable.
    * 
-   * @param {*} e
+   * @param {*} tagName
    * Makes all elements not editable/executable by tag name.
    */
-  $setUneditable(tag) {
-    const links = this.element.getElementsByTagName(tag);
+  $setUneditable(tagName) {
+    const links = this.element.getElementsByTagName(tagName);
 
     for(let i = 0; i < links.length; i++) {
       links[i].setAttribute('contenteditable', 'false');
@@ -52,11 +53,11 @@ class TextProcessor {
   /**
    * Internal method: OnPaste.
    * 
-   * @param {*} e
+   * @param {*} tagName
    * Removes from elements not editable/executable functionality by tag name.
    */
-  $setEditable(tag) {
-    const links = this.element.getElementsByTagName(tag);
+  $setEditable(tagName) {
+    const links = this.element.getElementsByTagName(tagName);
 
     for(let i = 0; i < links.length; i++) {
       links[i].removeAttribute('contenteditable');
@@ -76,7 +77,7 @@ class TextProcessor {
 
     e.preventDefault();
 
-    if (!linkRegex.test(text) && (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
+    if(!linkRegex.test(text) && (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
       var html = clipboard.getData('text/html');
 
       if (html) {
@@ -109,8 +110,25 @@ class TextProcessor {
       this.$setEditable('A');
     }
 
+    // custom commands
+    if (!e.shiftKey && e.ctrlKey && this.$sysKeys.indexOf(e.keyCode) < 0) {
+      console.log({
+        'e': e.keyCode
+      });
+
+      e.preventDefault();
+      
+      for(var key in this.$helpers) {
+        const helper = this.$helpers[key];
+
+        if (e.keyCode === helper.key()) {
+          return helper.command();
+        }
+      }
+    }
+
     // 'Tab' execute a custom command
-    if (!e.shiftKey && !textSelected && (e.keyCode === 9)) {
+    if (!e.ctrlKey && !e.shiftKey && !textSelected && e.keyCode === 9) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
@@ -153,6 +171,13 @@ class TextProcessor {
         document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
       }
     }
+  }
+
+  $postProcessInput(e) {
+    this.$shiftKey = false;
+    this.$ctrlKey = false;
+
+    this.$setEditable('A');
   }
 
   /**
