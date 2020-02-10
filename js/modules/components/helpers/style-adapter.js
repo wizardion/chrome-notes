@@ -103,28 +103,33 @@ class StyleAdapter extends Helper {
    */
   $toHtml(selection) {
     var nodes = this.$getNodes(selection);
+    let nodeTypes = { // https://www.w3schools.com/jsref/prop_node_nodetype.asp
+      text: 3,        //https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+      element: 1,
+    };
 
     if(nodes.firstNode !== nodes.secondNode) {
       let sibling = nodes.secondNode.previousSibling;
       let list = [];
 
-      if(nodes.firstNode.data) {
+      if(nodes.firstNode.nodeType === nodeTypes.text) {
         list.push(nodes.firstNode.data.substring(nodes.start));
       }
 
-      while(sibling && sibling !== nodes.firstNode) {
-        if(sibling.data) {
+      //TODO needs to think about the sibling nodes with the same tag
+      while(sibling && sibling !== nodes.firstNode && sibling !== nodes.firstNode.parentNode) {
+        if(sibling.nodeType === nodeTypes.text) {
           list.push(sibling.data);
         }
   
-        if(sibling.outerHTML) {
+        if(sibling.nodeType === nodeTypes.element) {
           list.push(sibling.outerHTML);
         }
   
         sibling = sibling.previousSibling;
       }
 
-      if(nodes.secondNode.data) {
+      if(nodes.secondNode.nodeType === nodeTypes.text) {
         list.push(nodes.secondNode.data.substring(0, nodes.end));
       }
   
