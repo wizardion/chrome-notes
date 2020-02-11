@@ -22,10 +22,7 @@ class Editor extends TextProcessor {
       const helper = this.$helpers[action];
 
       item.onmousedown = this.$preCommand;
-
-      if(helper && helper.command) {
-        item.onmouseup = this.$customCommand.bind(this, helper);
-      }
+      item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper) : this.$command;
     }
   }
 
@@ -38,6 +35,20 @@ class Editor extends TextProcessor {
    */
   $preCommand(e) {
     e.preventDefault();
+  }
+
+  /**
+   * Internal event: Command.
+   * 
+   * @param {*} e
+   * 
+   * Executes the command in editor.
+   */
+  $command(e) {
+    let action = this.getAttribute('action');
+
+    e.preventDefault();
+    document.execCommand(action);
   }
 
   /**
