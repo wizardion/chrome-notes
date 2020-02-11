@@ -3,7 +3,7 @@ class TextProcessor {
     this.element = element;
     this.$html = new HtmlHelper();
     // this.$sysKeys = [65, 67, 86, 88, 90,   82];
-    this.$sysKeys = [code.a, code.c, code.v, code.z, code.x,   code.r];
+    this.$sysKeys = [code.a, code.c, code.v, code.z, code.x, code.right, code.left, code.up, code.down,   code.r];
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {

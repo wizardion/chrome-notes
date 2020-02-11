@@ -135,9 +135,9 @@ main.update = function(item, key){
 
   console.log(`%c "${data[0]}"`, 'background: transparent; color: red;');
 
-  // main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
-  //   callback('Oops, data not saved! Please try letter.');
-  // }); });
+  main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){}, function(){
+    callback('Oops, data not saved! Please try letter.');
+  }); });
 };
 
 main.add = function(note, callback = function(){}){

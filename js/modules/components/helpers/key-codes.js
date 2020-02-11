@@ -39,4 +39,8 @@ var code = {
   enter: 13,
   del: 13,
   ctrl: 17,
+  right: 37,
+  up: 38,
+  left: 39,
+  down: 40,
 };

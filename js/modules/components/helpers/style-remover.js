@@ -4,6 +4,22 @@ class StyleRemover extends Helper {
   }
 
   /**
+   * Internal method: EscapeTags.
+   * 
+   * @param {*} e
+   * Removes html tages by replacing it with escaped text.
+   */
+  $escapeTags(value) {
+    const tags = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;'
+    };
+
+    return value.replace(/[&<>]/g, t => tags[t] || t);
+  }
+
+  /**
    * Executes command, removes all html tags within the selected text.
    */
   command() {
@@ -11,14 +27,10 @@ class StyleRemover extends Helper {
     let text = selection.toString();
 
     if(text) {
-      // document.execCommand('removeFormat');
-      document.execCommand('insertText', false, text);
-      // document.execCommand('insertHTML', false, text);
+      document.execCommand('insertHTML', false, this.$escapeTags(text));
       
       selection.collapse(selection.focusNode, selection.focusOffset);
       selection.extend(selection.focusNode, selection.focusOffset - text.length);
-
-      // document.execCommand('removeFormat', false);
       document.execCommand('outdent', false);
 
       return true;
