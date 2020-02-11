@@ -38,5 +38,5 @@ var code = {
   tab: 9,
   enter: 13,
   del: 13,
-  ctrl: 13,
+  ctrl: 17,
 };
