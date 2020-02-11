@@ -179,11 +179,22 @@ class StyleAdapter extends Helper {
     let text = selection.toString();
     let inside = this.isInside(selection);
 
+    if(text.length && inside) {
+      document.execCommand('insertHTML', false, text);
+      // document.execCommand('insertText', false, text);
+
+      selection.collapse(selection.focusNode, 0);
+      selection.extend(selection.focusNode, text.length);
+    }
+
     if(text.length && !inside) {
       let html = this.$toHtml(selection);
       
-      document.execCommand('insertHTML', false, `${this.$rules.start}${html.replace(this.$nodeRegex, '')}${this.$rules.end}`);
-      // document.execCommand('insertHTML', false, this.$template.replace(/\$\{(\w+)\}/gi, html));
+      // document.execCommand('insertHTML', false, `${this.$rules.start}${html.replace(this.$nodeRegex, '')}${this.$rules.end}`);
+      document.execCommand('insertHTML', false, this.$template.replace(/\$\{(\w+)\}/gi, html));
+
+      selection.collapse(selection.focusNode, 0);
+      selection.extend(selection.focusNode, text.length);
     }
   }
 
