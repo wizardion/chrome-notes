@@ -180,11 +180,12 @@ class StyleAdapter extends Helper {
     let inside = this.isInside(selection);
 
     if(text.length && inside) {
-      document.execCommand('insertHTML', false, text);
-      // document.execCommand('insertText', false, text);
+      document.execCommand('removeFormat', false);
+      // document.execCommand('insertHTML', false, text);
+      // // document.execCommand('insertText', false, text);
 
-      selection.collapse(selection.focusNode, 0);
-      selection.extend(selection.focusNode, text.length);
+      // selection.collapse(selection.focusNode, 0);
+      // selection.extend(selection.focusNode, text.length);
     }
 
     if(text.length && !inside) {
