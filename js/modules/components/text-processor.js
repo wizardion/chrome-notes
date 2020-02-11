@@ -2,6 +2,8 @@ class TextProcessor {
   constructor (element) {
     this.element = element;
     this.$html = new HtmlHelper();
+    // this.$sysKeys = [65, 67, 86, 88, 90,   82];
+    this.$sysKeys = [code.a, code.c, code.v, code.z, code.x, code.right, code.left, code.up, code.down,   code.r];
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
@@ -24,7 +26,7 @@ class TextProcessor {
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
-    this.element.addEventListener('keyup', this.$setEditable.bind(this, 'A'));
+    this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
 
     document.execCommand('defaultParagraphSeparator', false, 'p');
     //#region TEST_DATA
@@ -38,11 +40,11 @@ class TextProcessor {
   /**
    * Internal method: SetUneditable.
    * 
-   * @param {*} e
+   * @param {*} tagName
    * Makes all elements not editable/executable by tag name.
    */
-  $setUneditable(tag) {
-    const links = this.element.getElementsByTagName(tag);
+  $setUneditable(tagName) {
+    const links = this.element.getElementsByTagName(tagName);
 
     for(let i = 0; i < links.length; i++) {
       links[i].setAttribute('contenteditable', 'false');
@@ -52,11 +54,11 @@ class TextProcessor {
   /**
    * Internal method: OnPaste.
    * 
-   * @param {*} e
+   * @param {*} tagName
    * Removes from elements not editable/executable functionality by tag name.
    */
-  $setEditable(tag) {
-    const links = this.element.getElementsByTagName(tag);
+  $setEditable(tagName) {
+    const links = this.element.getElementsByTagName(tagName);
 
     for(let i = 0; i < links.length; i++) {
       links[i].removeAttribute('contenteditable');
@@ -76,7 +78,7 @@ class TextProcessor {
 
     e.preventDefault();
 
-    if (!linkRegex.test(text) && (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
+    if(!linkRegex.test(text) && (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
       var html = clipboard.getData('text/html');
 
       if (html) {
@@ -103,14 +105,14 @@ class TextProcessor {
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
     let focusNode = selection.focusNode;
 
-    if(e.ctrlKey && e.keyCode === 17 && !e.shiftKey) {
+    if(e.ctrlKey && e.keyCode === code.ctrl && !e.shiftKey) {
       this.$setUneditable('A');
     } else {
       this.$setEditable('A');
     }
 
     // 'Tab' execute a custom command
-    if (!e.shiftKey && !textSelected && (e.keyCode === 9)) {
+    if (!e.ctrlKey && !e.shiftKey && !textSelected && e.keyCode === code.tab) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
@@ -126,7 +128,7 @@ class TextProcessor {
     }
 
     // Delete key or Enter - removes the last element in the list on delete key
-    if (!e.shiftKey && (e.keyCode === 46 || e.keyCode === 13) && focusNode.nodeName === 'LI') {
+    if (!e.shiftKey && (e.keyCode === code.del || e.keyCode === code.enter) && focusNode.nodeName === 'LI') {
       let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
 
       if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
@@ -142,17 +144,27 @@ class TextProcessor {
     }
 
     // 'Tab' shifts spaces toward/backward
-    if ((e.keyCode === 9)) {
-      let selectionLines = selection.getRangeAt(0).getClientRects().length;
+    if ((e.keyCode === code.tab)) {
       e.preventDefault();
+      document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
 
-      if(selectionLines > 1) {
-        document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
-      } else {
-        // document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
-        document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
-      }
+      // let selectionLines = selection.getRangeAt(0).getClientRects().length;
+      // e.preventDefault();
+
+      // if(selectionLines > 1) {
+      //   document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
+      // } else {
+      //   // document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
+      //   document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
+      // }
     }
+  }
+
+  $postProcessInput(e) {
+    this.$shiftKey = false;
+    this.$ctrlKey = false;
+
+    this.$setEditable('A');
   }
 
   /**

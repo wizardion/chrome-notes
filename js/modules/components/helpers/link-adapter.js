@@ -1,6 +1,6 @@
 class LinkAdapter extends Helper {
-  constructor (element) {
-    super(element);
+  constructor (element, keyCode) {
+    super(element, keyCode);
 
     this.$commandRegex = /\[([^\[\]]+)\]\(([\S]+)\)$/i;
     this.$linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;

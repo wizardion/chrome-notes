@@ -1,19 +1,26 @@
 class StyleAdapter extends Helper {
-  constructor (element, rule, template) {
-    super(element);
+  constructor (element, rule, template, keyCode) {
+    super(element, keyCode);
 
-    let start = rule;
-    let end = this.$reverse(rule);
+    let tagRegex = /<(\w+)>/gi;
+    let tags = tagRegex.exec(template);
 
-    this.$command = start;
+    this.$rules = {
+      start: rule,
+      end: this.$reverse(rule),
+    };
+
+    this.$command = this.$rules.start;
     this.$template = template;
     this.$primitive = !template.match(/\$\{text\}/gi);
 
-    this.$rule = end.replace(/(.)/gi, '\\$1');
+    this.$rule = this.$rules.end.replace(/(.)/gi, '\\$1');
 
-    let escStart = start.replace(/(.)/gi, '\\$1');
-    let excludeRule = (start !== end)?  `${escStart}|${this.$rule}` : `${escStart}`;
+    let escStart = this.$rules.start.replace(/(.)/gi, '\\$1');
+    let excludeRule = (this.$rules.start !== this.$rules.end)?  `${escStart}|${this.$rule}` : `${escStart}`;
     
+    this.$nodeName = tags[1].toUpperCase();
+    this.$nodeRegex = new RegExp(`<\/?${this.$nodeName}[^>]*>`, 'gi');
     this.$commandRegex = new RegExp(`(${escStart})(((?!${excludeRule})[\\w\\s\\W\\S])*)(${this.$rule})$`, 'i');
   }
 
@@ -65,6 +72,92 @@ class StyleAdapter extends Helper {
   }
 
   /**
+   * Internal method: GetNodes.
+   * 
+   * @param {*} selection
+   * Returns the first and last nodes of selection in a proper order.
+   */
+  $getNodes(selection) {
+    var range = document.createRange();
+
+    range.setStart(selection.anchorNode, selection.anchorOffset);
+    range.setEnd(selection.focusNode, selection.focusOffset);
+    
+    let [firstNode, secondNode, start, end] = (!range.collapsed)? 
+      [selection.anchorNode, selection.focusNode, selection.anchorOffset, selection.focusOffset] : 
+      [selection.focusNode, selection.anchorNode, selection.focusOffset, selection.anchorOffset];
+
+    return {
+      firstNode: firstNode,
+      secondNode: secondNode,
+      start: start,
+      end: end,
+    }
+  }
+
+  /**
+   * Internal method: ToHtml.
+   * 
+   * @param {*} selection
+   * Returns the html from selected text.
+   */
+  $toHtml(selection) {
+    var nodes = this.$getNodes(selection);
+    let nodeTypes = { // https://www.w3schools.com/jsref/prop_node_nodetype.asp
+      text: 3,        //https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+      element: 1,
+    };
+
+    if(nodes.firstNode !== nodes.secondNode) {
+      let sibling = nodes.secondNode.previousSibling;
+      let list = [];
+
+      if(nodes.firstNode.nodeType === nodeTypes.text) {
+        list.push(nodes.firstNode.data.substring(nodes.start));
+      }
+
+      //TODO needs to think about the sibling nodes with the same tag
+      while(sibling && sibling !== nodes.firstNode && sibling !== nodes.firstNode.parentNode) {
+        if(sibling.nodeType === nodeTypes.text) {
+          list.push(sibling.data);
+        }
+  
+        if(sibling.nodeType === nodeTypes.element) {
+          list.push(sibling.outerHTML);
+        }
+  
+        sibling = sibling.previousSibling;
+      }
+
+      if(nodes.secondNode.nodeType === nodeTypes.text) {
+        list.push(nodes.secondNode.data.substring(0, nodes.end));
+      }
+  
+      return list.join('');
+    }
+
+    return nodes.firstNode.data.substring(nodes.start, nodes.end);
+  }
+
+  /**
+   * @param {*} selection
+   * 
+   * Checks if selection contains a serving HTML element
+   */
+  isInside(selection) {
+    let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+
+    while(container && container !== this.$element) {
+      if(container.nodeName === this.$nodeName) {
+        return true;
+      }
+
+      container = container.parentNode;
+    }
+    return false;
+  }
+
+  /**
    * @param {*} selection
    * 
    * Returns the executed test of selection if it can contain the link formated text.
@@ -76,6 +169,34 @@ class StyleAdapter extends Helper {
     let t = regex.test(source);
 
     return t;
+  }
+
+  /**
+   * Replaces selection into command link format.
+   */
+  command2() {
+    let selection = window.getSelection();
+    let text = selection.toString();
+    let inside = this.isInside(selection);
+
+    if(text.length && inside) {
+      document.execCommand('removeFormat', false);
+      // document.execCommand('insertHTML', false, text);
+      // // document.execCommand('insertText', false, text);
+
+      // selection.collapse(selection.focusNode, 0);
+      // selection.extend(selection.focusNode, text.length);
+    }
+
+    if(text.length && !inside) {
+      let html = this.$toHtml(selection);
+      
+      // document.execCommand('insertHTML', false, `${this.$rules.start}${html.replace(this.$nodeRegex, '')}${this.$rules.end}`);
+      document.execCommand('insertHTML', false, this.$template.replace(/\$\{(\w+)\}/gi, html));
+
+      selection.collapse(selection.focusNode, 0);
+      selection.extend(selection.focusNode, text.length);
+    }
   }
 
   /**
