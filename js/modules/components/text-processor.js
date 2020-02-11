@@ -2,22 +2,23 @@ class TextProcessor {
   constructor (element) {
     this.element = element;
     this.$html = new HtmlHelper();
-    this.$sysKeys = [65, 67, 86, 88, 90,   82];
+    // this.$sysKeys = [65, 67, 86, 88, 90,   82];
+    this.$sysKeys = [code.a, code.c, code.v, code.z, code.x,   code.r];
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
       link: new LinkAdapter(),
-      italic: new StyleAdapter(this.element, '*', '<i>${text}</i>', 73),
-      bold: new StyleAdapter(this.element, '**', '<b>${text}</b>', 66), 
-      strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike>', 89),
-      underline: new StyleAdapter(this.element, '__', '<u>${text}</u>', 85),
+      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> ', code.i),
+      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> ', code.b),
+      strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> ', code.y),
+      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> ', code.u),
       // boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
       // underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
       // underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
       // underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
-      code: new StyleAdapter(this.element, '`', '<code>${text}</code>'),
-      pre: new StyleAdapter(this.element, '```', '<pre>${text}</pre>'),
-      quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q>'),
+      code: new StyleAdapter(this.element, '`', '<code>${text}</code> '),
+      pre: new StyleAdapter(this.element, '```', '<pre>${text}</pre> '),
+      quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q> '),
       line: new StyleAdapter(this.element, `---`, '<hr> '),
       removeFormat: new StyleRemover()
     };
@@ -104,7 +105,7 @@ class TextProcessor {
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
     let focusNode = selection.focusNode;
 
-    if(e.ctrlKey && e.keyCode === 17 && !e.shiftKey) {
+    if(e.ctrlKey && e.keyCode === code.ctrl && !e.shiftKey) {
       this.$setUneditable('A');
     } else {
       this.$setEditable('A');
@@ -121,14 +122,14 @@ class TextProcessor {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
-        if (e.keyCode === helper.key()) {
+        if (e.keyCode === helper.keyCode) {
           return helper.command();
         }
       }
     }
 
     // 'Tab' execute a custom command
-    if (!e.ctrlKey && !e.shiftKey && !textSelected && e.keyCode === 9) {
+    if (!e.ctrlKey && !e.shiftKey && !textSelected && e.keyCode === code.tab) {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
@@ -144,7 +145,7 @@ class TextProcessor {
     }
 
     // Delete key or Enter - removes the last element in the list on delete key
-    if (!e.shiftKey && (e.keyCode === 46 || e.keyCode === 13) && focusNode.nodeName === 'LI') {
+    if (!e.shiftKey && (e.keyCode === code.del || e.keyCode === code.enter) && focusNode.nodeName === 'LI') {
       let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
 
       if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
@@ -160,16 +161,19 @@ class TextProcessor {
     }
 
     // 'Tab' shifts spaces toward/backward
-    if ((e.keyCode === 9)) {
-      let selectionLines = selection.getRangeAt(0).getClientRects().length;
+    if ((e.keyCode === code.tab)) {
       e.preventDefault();
+      document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
 
-      if(selectionLines > 1) {
-        document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
-      } else {
-        // document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
-        document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
-      }
+      // let selectionLines = selection.getRangeAt(0).getClientRects().length;
+      // e.preventDefault();
+
+      // if(selectionLines > 1) {
+      //   document.execCommand(e.shiftKey && 'outdent' || 'indent', true, null);
+      // } else {
+      //   // document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
+      //   document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
+      // }
     }
   }
 

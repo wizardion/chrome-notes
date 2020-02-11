@@ -183,6 +183,7 @@ class StyleAdapter extends Helper {
       let html = this.$toHtml(selection);
       
       document.execCommand('insertHTML', false, `${this.$rules.start}${html.replace(this.$nodeRegex, '')}${this.$rules.end}`);
+      // document.execCommand('insertHTML', false, this.$template.replace(/\$\{(\w+)\}/gi, html));
     }
   }
 

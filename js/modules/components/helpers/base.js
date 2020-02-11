@@ -5,9 +5,12 @@ class Helper {
   }
 
   /**
-   * Returns the keyCode the handles this adapter.
+   * Key Code.
+   *
+   * @return {number}
+   * Returns the key code that handles this adapter..
    */
-  key() {
+  get keyCode() {
     return this.$keyCode;
   }
 
