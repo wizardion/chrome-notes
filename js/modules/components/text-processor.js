@@ -113,10 +113,6 @@ class TextProcessor {
 
     // custom commands
     if (!e.shiftKey && e.ctrlKey && this.$sysKeys.indexOf(e.keyCode) < 0) {
-      console.log({
-        'e': e.keyCode
-      });
-
       e.preventDefault();
       
       for(var key in this.$helpers) {
