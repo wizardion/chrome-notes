@@ -171,6 +171,13 @@ class StyleAdapter extends Helper {
     return t;
   }
 
+  command(action) {
+    let scrollTop = this.$element.parentNode.scrollTop;
+
+    document.execCommand(action);
+    this.$element.parentNode.scrollTop = scrollTop;
+  }
+
   /**
    * Replaces selection into command link format.
    */

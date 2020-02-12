@@ -22,7 +22,7 @@ class Editor extends TextProcessor {
       const helper = this.$helpers[action];
 
       item.onmousedown = this.$preCommand;
-      item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper) : this.$command;
+      item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper, action) : this.$command.bind(this, action);
     }
   }
 
@@ -44,11 +44,17 @@ class Editor extends TextProcessor {
    * 
    * Executes the command in editor.
    */
-  $command(e) {
-    let action = this.getAttribute('action');
+  $command(action) {
+    // let action = this.getAttribute('action');
+    let scrollTop = this.element.parentNode.scrollTop;
 
-    e.preventDefault();
+    console.log({
+      'scrollTop': scrollTop
+    });
+
+    // e.preventDefault();
     document.execCommand(action);
+    this.element.parentNode.scrollTop = scrollTop;
   }
 
   /**
@@ -58,9 +64,9 @@ class Editor extends TextProcessor {
    * 
    * Executes the custom command handling the specified helper in editor.
    */
-  $customCommand(helper) {
+  $customCommand(helper, action) {
     if (this.hasFocus()) {
-      helper.command(helper);
+      helper.command(action);
     }
   }
 

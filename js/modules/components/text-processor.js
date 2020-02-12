@@ -8,11 +8,11 @@ class TextProcessor {
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
       link: new LinkAdapter(),
-      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> '),
-      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> '), 
+      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> ', code.i),
+      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> ', code.b),
       boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
-      strike: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> '),
-      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> '),
+      strikethrough: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> ', code.y),
+      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> ', code.u),
       underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
       underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
       underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
@@ -109,6 +109,19 @@ class TextProcessor {
       this.$setUneditable('A');
     } else {
       this.$setEditable('A');
+    }
+
+    // custom commands
+    if (!e.shiftKey && e.ctrlKey && this.$sysKeys.indexOf(e.keyCode) < 0) {
+      e.preventDefault();
+      
+      for(var key in this.$helpers) {
+        const helper = this.$helpers[key];
+
+        if (e.keyCode === helper.keyCode) {
+          return helper.command(key);
+        }
+      }
     }
 
     // 'Tab' execute a custom command
