@@ -1,4 +1,4 @@
-class StyleAdapter extends Helper {
+class StyleAdapter extends CommandAdapter {
   constructor (element, rule, template, keyCode) {
     super(element, keyCode);
 
@@ -169,13 +169,6 @@ class StyleAdapter extends Helper {
     let t = regex.test(source);
 
     return t;
-  }
-
-  command(action) {
-    let scrollTop = this.$element.parentNode.scrollTop;
-
-    document.execCommand(action);
-    this.$element.parentNode.scrollTop = scrollTop;
   }
 
   /**

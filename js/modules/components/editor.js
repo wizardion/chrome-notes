@@ -45,14 +45,8 @@ class Editor extends TextProcessor {
    * Executes the command in editor.
    */
   $command(action) {
-    // let action = this.getAttribute('action');
     let scrollTop = this.element.parentNode.scrollTop;
 
-    console.log({
-      'scrollTop': scrollTop
-    });
-
-    // e.preventDefault();
     document.execCommand(action);
     this.element.parentNode.scrollTop = scrollTop;
   }
