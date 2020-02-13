@@ -1,18 +1,35 @@
 class CommandAdapter extends Helper {
   constructor (element, keyCode) {
     super(element, keyCode);
-
-    
   }
 
-  command(action) {
+  $getScrollTop(selection) {
+    let rage = selection && selection.getRangeAt(0);
+    let rect = rage && rage.getBoundingClientRect();
+    let y = rect && rect.y;
+    let clientHeight = this.$element.parentNode.clientHeight;
     let scrollTop = this.$element.parentNode.scrollTop;
 
-    console.log({
-      'action': action
-    })
+    if (!y) {
+      return scrollTop;
+    }
+
+    if (y < 0) {
+      return (scrollTop - (clientHeight - Math.abs(y))) - (clientHeight / 2);
+    }
+
+    if (y > clientHeight) {
+      return (scrollTop + (y - clientHeight)) + (clientHeight / 2);
+    }
+
+    return scrollTop;
+  }
+
+  command(action, selection) {
+    let scrollTop = this.$element.parentNode.scrollTop;
 
     document.execCommand(action);
-    this.$element.parentNode.scrollTop = scrollTop;
+
+    this.$element.parentNode.scrollTop = this.$getScrollTop(selection)
   }
 }

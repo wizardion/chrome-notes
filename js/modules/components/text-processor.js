@@ -122,15 +122,8 @@ class TextProcessor {
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
-        console.log({
-          'key': key,
-          'command': helper.command,
-          'keyCode': helper.keyCode,
-          'e.keyCode': e.keyCode,
-        });
-
         if (e.keyCode === helper.keyCode) {
-          return helper.command(key);
+          return helper.command(key, selection);
         }
       }
     }
