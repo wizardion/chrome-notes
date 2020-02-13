@@ -10,17 +10,18 @@ class CommandAdapter extends Helper {
     let clientHeight = this.$element.parentNode.clientHeight;
     let scrollTop = this.$element.parentNode.scrollTop;
     let offsetTop = this.$element.parentNode.offsetTop;
+    let scrollMax = this.$element.parentNode.scrollHeight - clientHeight;
 
     if (!y) {
       return scrollTop;
     }
 
     if (y < 0) {
-      return ((scrollTop - Math.abs(y)) - offsetTop) - (clientHeight / 2);
+      return Math.max(0, ((scrollTop - Math.abs(y)) - offsetTop) - (clientHeight / 2));
     }
 
     if (y > clientHeight) {
-      return (scrollTop + ((y - offsetTop))) - (clientHeight / 2);
+      return Math.min(scrollMax, (scrollTop + ((y - offsetTop))) - (clientHeight / 2));
     }
 
     return scrollTop;
