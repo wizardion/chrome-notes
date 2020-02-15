@@ -1,14 +1,14 @@
 var code = {
-  0: 48,
-  1: 49,
-  2: 50,
-  3: 51,
-  4: 52,
-  5: 53,
-  6: 54,
-  7: 55,
-  8: 56,
-  9: 57,
+  _0: 48,
+  _1: 49,
+  _2: 50,
+  _3: 51,
+  _4: 52,
+  _5: 53,
+  _6: 54,
+  _7: 55,
+  _8: 56,
+  _9: 57,
   a: 65,
   b: 66,
   c: 67,
@@ -38,9 +38,18 @@ var code = {
   tab: 9,
   enter: 13,
   del: 13,
-  ctrl: 17,
   right: 37,
   up: 38,
   left: 39,
   down: 40,
+  shiftKey: 16,
+  ctrlKey: 17,
+  ctrl: 1000,
+  shift: 1000,
+  sysKeys: null,
+  uid: function (ctrlKey, shiftKey, keyCode) {
+    return ((ctrlKey << shiftKey) * 1000) + keyCode;
+  }
 };
+
+code.sysKeys = [code.a, code.c, code.v, code.x, code.right, code.left, code.up, code.down, code.shiftKey, code.ctrlKey,   code.r];

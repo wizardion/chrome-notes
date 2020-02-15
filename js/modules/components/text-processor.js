@@ -2,19 +2,16 @@ class TextProcessor {
   constructor (element) {
     this.element = element;
     this.$html = new HtmlHelper();
-    // this.$sysKeys = [65, 67, 86, 88, 90,   82];
-    // this.$sysKeys = [code.a, code.c, code.v, code.z, code.x, code.right, code.left, code.up, code.down,   code.r];
-    this.$sysKeys = [code.a, code.c, code.v, code.x, code.right, code.left, code.up, code.down, code.ctrl,   code.r];
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
       link: new LinkAdapter(),
-      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> ', code.i),
-      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> ', code.b),
-      boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
-      strikethrough: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> ', code.y),
-      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> ', code.u),
+      italic: new StyleAdapter(this.element, '*', '<i>${text}</i> ', code.ctrl + code.i),
+      bold: new StyleAdapter(this.element, '**', '<b>${text}</b> ', code.ctrl + code.b),
+      strikethrough: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> ', code.ctrl + code.y),
+      underline: new StyleAdapter(this.element, '__', '<u>${text}</u> ', code.ctrl + code.u),
       
+      boldItalic: new StyleAdapter(this.element, '***', '<b><i>${text}</i></b> '),
       underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
       underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
       underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
@@ -23,8 +20,8 @@ class TextProcessor {
       quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q>'),
       line: new StyleAdapter(this.element, `---`, '<hr> '),
       removeFormat: new StyleRemover(),
-      undo: new CommandAdapter(this.element, code.z),
-      // redo: new CommandAdapter(this.element, code.z),
+      undo: new CommandAdapter(this.element, code.ctrl + code.z, true),
+      redo: new CommandAdapter(this.element, code.ctrl + code.shift + code.z, true)
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
@@ -116,13 +113,13 @@ class TextProcessor {
     }
 
     // custom commands
-    if (e.ctrlKey && this.$sysKeys.indexOf(e.keyCode) < 0) {
+    if (e.ctrlKey && code.sysKeys.indexOf(e.keyCode) < 0) {
       e.preventDefault();
-      
+
       for(var key in this.$helpers) {
         const helper = this.$helpers[key];
 
-        if (e.keyCode === helper.keyCode) {
+        if (code.uid(e.ctrlKey, e.shiftKey, e.keyCode) === helper.keyCode) {
           return helper.command(key, selection);
         }
       }
