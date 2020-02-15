@@ -192,7 +192,7 @@ class StyleAdapter extends CommandAdapter {
       let html = this.$toHtml(selection);
       
       // document.execCommand('insertHTML', false, `${this.$rules.start}${html.replace(this.$nodeRegex, '')}${this.$rules.end}`);
-      document.execCommand('insertHTML', false, this.$template.replace(/\$\{(\w+)\}/gi, html));
+      this.command('insertHTML', false, this.$template.replace(/\$\{(\w+)\}/gi, html));
 
       selection.collapse(selection.focusNode, 0);
       selection.extend(selection.focusNode, text.length);
@@ -215,7 +215,7 @@ class StyleAdapter extends CommandAdapter {
     if (this.$primitive) {
       selection.collapse(focusNode, source.length);
       selection.extend(focusNode, source.length - this.$command.length);
-      document.execCommand('insertHTML', false, this.$template);
+      this.command('insertHTML', false, this.$template);
       return true;
     }
 
@@ -231,7 +231,7 @@ class StyleAdapter extends CommandAdapter {
 
       selection.collapse(focusNode, source.length);
       selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf(this.$command)).length);
-      document.execCommand('insertHTML', false, styledHtml);
+      this.command('insertHTML', selection, styledHtml);
       return true;
     }
   }

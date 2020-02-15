@@ -39,10 +39,14 @@ class CommandAdapter extends Helper {
     return scrollTop;
   }
 
-  command(action, selection) {
+  command(action, selection, value) {
     let scrollTop = this.$element.parentNode.scrollTop;
 
-    document.execCommand(action);
+    if(action === 'insertHTML' || action === 'insertText') {
+      document.execCommand(action, false, value);
+    } else {
+      document.execCommand(action);
+    }
 
     this.$element.parentNode.scrollTop = scrollTop;
 
