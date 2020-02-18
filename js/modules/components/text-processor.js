@@ -111,7 +111,7 @@ class TextProcessor {
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
     let focusNode = selection.focusNode;
 
-    if(e.ctrlKey && e.keyCode === code.ctrl && !e.shiftKey) {
+    if(e.ctrlKey && e.keyCode === code.ctrlKey && !e.shiftKey) {
       this.$setUneditable('A');
     } else {
       this.$setEditable('A');

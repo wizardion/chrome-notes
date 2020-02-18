@@ -78,20 +78,18 @@ class LinkAdapter extends CommandAdapter {
 
     // unlink
     if (containsLink) {
-      return document.execCommand("unlink", false);
+      return super.command('unlink', selection);
     }
 
     // create an auto link
     if (!containsLink && text.match(this.$linkRegex)) {
       let linkHtml = text.replace(this.$linkRegex, '$1<a href="$2">$2</a>$4');
 
-      return document.execCommand('insertHTML', false, linkHtml);
+      return super.command('insertHTML', selection, linkHtml);
     }
 
     // create a custom link
-    let customLink = `[${text}](url)`;
-
-    document.execCommand('insertHTML', false, customLink);
+    super.command('insertHTML', selection, `[${text}](url)`);
     selection.collapse(selection.focusNode, selection.focusOffset - 1);
     selection.extend(selection.focusNode, selection.focusOffset - 3);
   }
@@ -118,7 +116,7 @@ class LinkAdapter extends CommandAdapter {
       selection.collapse(focusNode, source.length);
       selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf('[')).length);
 
-      document.execCommand('insertHTML', false, linkHtml);
+      super.command('insertHTML', selection, linkHtml);
       return true;
     }
   }
