@@ -27,12 +27,15 @@ class StyleRemover extends Helper {
     let text = selection.toString();
 
     if(text) {
+      let scrollTop = this.$element.parentNode.scrollTop;
+      
       document.execCommand('insertHTML', false, this.$escapeTags(text));
       
       selection.collapse(selection.focusNode, selection.focusOffset);
       selection.extend(selection.focusNode, selection.focusOffset - text.length);
       document.execCommand('outdent', false);
 
+      this.$element.parentNode.scrollTop = scrollTop;
       return true;
     }
   }

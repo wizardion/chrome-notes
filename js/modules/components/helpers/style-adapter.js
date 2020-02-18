@@ -142,24 +142,6 @@ class StyleAdapter extends CommandAdapter {
   /**
    * @param {*} selection
    * 
-   * Checks if selection contains a serving HTML element
-   */
-  isInside(selection) {
-    let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
-
-    while(container && container !== this.$element) {
-      if(container.nodeName === this.$nodeName) {
-        return true;
-      }
-
-      container = container.parentNode;
-    }
-    return false;
-  }
-
-  /**
-   * @param {*} selection
-   * 
    * Returns the executed test of selection if it can contain the link formated text.
    */
   test(selection) {
