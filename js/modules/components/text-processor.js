@@ -78,10 +78,13 @@ class TextProcessor {
     var clipboard = (e.originalEvent || e).clipboardData;
     var text = clipboard.getData('text/plain');
     let linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
+    let adapter = new CommandAdapter(this.element);
+    let isLocked = adapter.isInside(window.getSelection(), 'CODE|PRE');
 
     e.preventDefault();
 
-    if(!linkRegex.test(text) && (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
+    if(!isLocked && !linkRegex.test(text) && 
+      (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
       var html = clipboard.getData('text/html');
 
       if (html) {
