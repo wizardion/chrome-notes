@@ -1,4 +1,4 @@
-class LinkAdapter extends Helper {
+class LinkAdapter extends CommandAdapter {
   constructor (element, keyCode) {
     super(element, keyCode);
 
@@ -72,7 +72,7 @@ class LinkAdapter extends Helper {
     let containsLink = this.$containsLink(selection);
 
     // selection is empty
-    if (!text.length) {
+    if (!text.length || (!this.$system && this.isInside(selection, 'CODE|PRE'))) {
       return;
     }
 
