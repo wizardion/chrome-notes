@@ -68,21 +68,34 @@ class LinkAdapter extends CommandAdapter {
    */
   command() {
     let selection = window.getSelection();
-    let text = selection.toString();
-    let containsLink = this.$containsLink(selection);
-
-    // selection is empty
-    if (!text.length || (!this.$system && this.isInside(selection, 'CODE|PRE'))) {
+    
+    if(!this.$system && this.isInside(selection, 'CODE|PRE')) {
       return;
     }
 
+    let text = selection.toString();
+    var link = this.isInside(selection, 'A');
+
     // unlink
-    if (containsLink) {
-      return super.command('unlink', selection);
+    if(link) {
+      let innerHTML = link.innerHTML;
+      let url = link.getAttribute('href');
+      let range = selection.rangeCount > 0 && selection.getRangeAt(0);
+
+      range.selectNode(link);
+
+      document.execCommand("unlink", false);
+
+      super.command('insertHTML', selection, `[${innerHTML}](${url})`);
+
+      selection.collapse(selection.focusNode, selection.focusOffset - 1);
+      selection.extend(selection.focusNode, selection.focusOffset - url.length);
+
+      return;
     }
 
     // create an auto link
-    if (!containsLink && text.match(this.$linkRegex)) {
+    if (!link && text.match(this.$linkRegex)) {
       let linkHtml = text.replace(this.$linkRegex, '$1<a href="$2">$2</a>$4');
 
       return super.command('insertHTML', selection, linkHtml);

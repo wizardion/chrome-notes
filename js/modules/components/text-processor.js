@@ -69,17 +69,31 @@ class TextProcessor {
   }
 
   /**
+   * Internal method: SetScrollTop.
+   * 
+   * @param {*} selection
+   * @param {*} scrollTop
+   * Moves the scroll to the active element
+   */
+  $setScrollTop(selection, scrollTop) {
+    this.element.parentNode.scrollTop = scrollTop;
+    this.element.parentNode.scrollTop = Helper.getScrollTop(this.element, selection, scrollTop);
+  }
+
+  /**
    * Internal method: OnPaste.
    * 
    * @param {*} e
    * Removes html except allowed tags and attributes.
    */
   $onPaste(e) {
+    let selection = window.getSelection();
+    let scrollTop = this.element.parentNode.scrollTop;
     var clipboard = (e.originalEvent || e).clipboardData;
     var text = clipboard.getData('text/plain');
     let linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
     let adapter = new CommandAdapter(this.element);
-    let isLocked = adapter.isInside(window.getSelection(), 'CODE|PRE');
+    let isLocked = adapter.isInside(selection, 'CODE|PRE');
 
     e.preventDefault();
 
@@ -88,7 +102,8 @@ class TextProcessor {
       var html = clipboard.getData('text/html');
 
       if (html) {
-        return document.execCommand('insertHTML', false, this.$html.removeHtml(html, text));
+        document.execCommand('insertHTML', false, this.$html.removeHtml(html, text));
+        return this.$setScrollTop(selection, scrollTop);
       }
     }
 
@@ -96,7 +111,8 @@ class TextProcessor {
     console.log(text);
     console.log('============END_TEXT============');
 
-    return document.execCommand('insertText', false, text);
+    document.execCommand('insertText', false, text);
+    return this.$setScrollTop(selection, scrollTop);
   }
 
   /**
@@ -111,7 +127,7 @@ class TextProcessor {
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
     let focusNode = selection.focusNode;
 
-    if(e.ctrlKey && e.keyCode === code.ctrlKey && !e.shiftKey) {
+    if (e.ctrlKey && e.keyCode === code.ctrlKey && !e.shiftKey) {
       this.$setUneditable('A');
     } else {
       this.$setEditable('A');
@@ -171,6 +187,15 @@ class TextProcessor {
       //   // document.execCommand(e.shiftKey && 'delete' || 'insertText', true, '\t');
       //   document.execCommand(e.shiftKey && 'delete' || 'insertHTML', true, '    ');
       // }
+    }
+
+    if (e.keyCode === code.enter) {
+      let scrollTop = this.element.parentNode.scrollTop;
+
+      e.preventDefault();
+      document.execCommand('insertText', false, '\n');
+
+      return this.$setScrollTop(selection, scrollTop);
     }
   }
 

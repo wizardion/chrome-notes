@@ -6,39 +6,6 @@ class CommandAdapter extends Helper {
     this.$system = system;
   }
 
-  $getCoordinates(select) {
-    let selection = select || window.getSelection();
-    let rage = selection && selection.getRangeAt(0);
-    let rect = rage && rage.getBoundingClientRect();
-
-    return {
-      y: rect && rect.y || 0,
-      height: rect? (this.$lineHeight - rect.height) : 0
-    };
-  }
-
-  $getScrollTop(selection, scrollTop) {
-    let rect = this.$getCoordinates(selection);
-    let clientHeight = this.$element.parentNode.clientHeight;
-    let offsetTop = this.$element.parentNode.offsetTop + rect.height;
-
-    if (!rect.y || !rect.height) {
-      return scrollTop;
-    }
-
-    if (rect.y < offsetTop) {
-      let top = ((rect.y < 0)? ((scrollTop - (rect.y * -1)) - offsetTop) : scrollTop - (offsetTop - rect.y));
-      return Math.max(0, top - (clientHeight / 2) + rect.height);
-    }
-
-    if (rect.y > clientHeight) {
-      let top = (scrollTop + ((rect.y - offsetTop))) - ((clientHeight / 2) - rect.height);
-      return Math.min(this.$element.parentNode.scrollHeight - clientHeight, top);
-    }
-
-    return scrollTop;
-  }
-
   /**
    * @param {*} selection
    * @param {*} nodeName
@@ -52,7 +19,7 @@ class CommandAdapter extends Helper {
 
     while(container && container !== this.$element) {
       if(node.indexOf(container.nodeName) >= 0) {
-        return true;
+        return container;
       }
 
       container = container.parentNode;
@@ -76,7 +43,7 @@ class CommandAdapter extends Helper {
     this.$element.parentNode.scrollTop = scrollTop;
 
     if(this.$system) {
-      this.$element.parentNode.scrollTop = this.$getScrollTop(selection, scrollTop);
+      this.$element.parentNode.scrollTop = Helper.getScrollTop(this.$element, selection, scrollTop);
     }
   }
 }
