@@ -5,7 +5,7 @@ class TextProcessor {
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
-      link: new LinkAdapter(this.element),
+      link: new LinkAdapter(this.element, code.ctrl + code.l),
       italic: new StyleAdapter(this.element, '*', '<i>${text}</i> ', code.ctrl + code.i),
       bold: new StyleAdapter(this.element, '**', '<b>${text}</b> ', code.ctrl + code.b),
       strikethrough: new StyleAdapter(this.element, '~~', '<strike>${text}</strike> ', code.ctrl + code.y),
