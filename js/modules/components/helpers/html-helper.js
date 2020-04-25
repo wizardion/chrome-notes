@@ -63,35 +63,6 @@ class HtmlHelper {
     ];
   }
 
-  /**
-   * Public method: RemoveHtml.
-   * 
-   * @param {*} data
-   * @param {*} text
-   * Removes html except allowed tags and attributes and merges the html tags into plane text.
-   */
-  removeHtml(data, text) {
-    for (let index = 0; index < this.rules.length; index++) {
-      const rule = this.rules[index];
-      
-      if(text || !rule.optional) {
-        data = data.replace(rule.pattern, rule.replacement);
-      }
-    }
-
-    var extra = data.match(/(<(p)>){2,}/ig);
-
-    if (extra) {
-      let count = this.$findMax(extra);
-
-      for(let i = count; i > 1; i--) {
-        data = data.replace(new RegExp(`(<(p)>){${i}}([^<>]*)(<\/(p)>){${i}}`, 'ig'), '$1$3$4');
-      }
-    }
-
-    return text? this.$merge(data, this.$escapeTags(text)) : data;
-  }
-
   $findMax(data) {
     let longest = 0;
     let max;
@@ -334,5 +305,106 @@ class HtmlHelper {
     };
 
     return value.replace(/[&<>]/g, t => tags[t] || t);
+  }
+
+  /**
+   * Internal method: GetNodes.
+   * 
+   * @param {*} selection
+   * Returns the first and last nodes of selection in a proper order.
+   */
+  $getNodes(selection) {
+    var range = document.createRange();
+
+    range.setStart(selection.anchorNode, selection.anchorOffset);
+    range.setEnd(selection.focusNode, selection.focusOffset);
+    
+    let [firstNode, secondNode, start, end] = (!range.collapsed)? 
+      [selection.anchorNode, selection.focusNode, selection.anchorOffset, selection.focusOffset] : 
+      [selection.focusNode, selection.anchorNode, selection.focusOffset, selection.anchorOffset];
+
+    return {
+      firstNode: firstNode,
+      secondNode: secondNode,
+      start: start,
+      end: end,
+    }
+  }
+
+  isInternalClipboard(html) {
+    return !!html.match(/<wd-editor>([\s\S\w\W]*)<\/wd-editor>$/gi);
+  }
+
+  /**
+   * Public method: RemoveHtml.
+   * 
+   * @param {*} data
+   * @param {*} text
+   * Removes html except allowed tags and attributes and merges the html tags into plane text.
+   */
+  removeHtml(data, text) {
+    for (let index = 0; index < this.rules.length; index++) {
+      const rule = this.rules[index];
+      
+      if(text || !rule.optional) {
+        data = data.replace(rule.pattern, rule.replacement);
+      }
+    }
+
+    var extra = data.match(/(<(p)>){2,}/ig);
+
+    if (extra) {
+      let count = this.$findMax(extra);
+
+      for(let i = count; i > 1; i--) {
+        data = data.replace(new RegExp(`(<(p)>){${i}}([^<>]*)(<\/(p)>){${i}}`, 'ig'), '$1$3$4');
+      }
+    }
+
+    return text? this.$merge(data, this.$escapeTags(text)) : data;
+  }
+
+  /**
+   * Internal method: GetHtml.
+   * 
+   * @param {*} selection
+   * Returns the html from selected text.
+   */
+  getHtml(selection) {
+    var nodes = this.$getNodes(selection);
+    let nodeTypes = { // https://www.w3schools.com/jsref/prop_node_nodetype.asp
+      text: 3,        //https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+      element: 1,
+    };
+
+    if(nodes.firstNode !== nodes.secondNode) {
+      let sibling = nodes.secondNode.previousSibling;
+      let list = [];
+
+      if(nodes.firstNode.nodeType === nodeTypes.text) {
+        list.push(nodes.firstNode.data.substring(nodes.start));
+      }
+
+      //TODO needs to think about the sibling nodes with the same tag
+      while(sibling && sibling !== nodes.firstNode && sibling !== nodes.firstNode.parentNode) {
+        if(sibling.nodeType === nodeTypes.text) {
+          list.push(sibling.data);
+        }
+  
+        if(sibling.nodeType === nodeTypes.element) {
+          list.push(sibling.outerHTML);
+        }
+  
+        sibling = sibling.previousSibling;
+      }
+
+      if(nodes.secondNode.nodeType === nodeTypes.text) {
+        list.push(nodes.secondNode.data.substring(0, nodes.end));
+      }
+  
+      return list.join('');
+    }
+
+    return nodes.firstNode.data.substring(nodes.start, nodes.end);
   }
 }

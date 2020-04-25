@@ -1,7 +1,7 @@
 class TextProcessor {
   constructor (element) {
     this.element = element;
-    this.$html = new HtmlHelper();
+    this.$htmlHelper = new HtmlHelper();
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
@@ -15,18 +15,23 @@ class TextProcessor {
       underlineItalic: new StyleAdapter(this.element, '__*', '<u><i>${text}</i></u> '),
       underlineBold: new StyleAdapter(this.element, '__**', '<u><b>${text}</b></u> '),
       underlineBoldItalic: new StyleAdapter(this.element, '__***', '<u><b><i>${text}</i></b></u> '),
+      
       code: new StyleAdapter(this.element, '`', '<code>${text}</code>'),
       pre: new StyleAdapter(this.element, '```', '<pre>${text}</pre>'),
       quote: new StyleAdapter(this.element, `'''`, '<q>${text}</q>'),
       line: new StyleAdapter(this.element, `---`, '<hr> '),
-      removeFormat: new StyleRemover(this.element),
-      insertOrderedList: new CommandAdapter(this.element),
-      insertUnorderedList: new CommandAdapter(this.element),
+      
+      removeFormat: new StyleRemover(this.element, code.ctrl + code.g),
+      insertOrderedList: new CommandAdapter(this.element, code.ctrl + code.o),
+      insertUnorderedList: new CommandAdapter(this.element, code.ctrl + code.p),
+      
       undo: new CommandAdapter(this.element, code.ctrl + code.z, true),
       redo: new CommandAdapter(this.element, code.ctrl + code.shift + code.z, true)
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
+    this.element.addEventListener('copy', this.$onCopy.bind(this));
+    this.element.addEventListener('cut', this.$onCopy.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
     this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
@@ -90,21 +95,23 @@ class TextProcessor {
     let selection = window.getSelection();
     let scrollTop = this.element.parentNode.scrollTop;
     var clipboard = (e.originalEvent || e).clipboardData;
-    var text = clipboard.getData('text/plain');
     let linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
     let adapter = new CommandAdapter(this.element);
     let isLocked = adapter.isInside(selection, 'CODE|PRE');
+    var text = clipboard.getData('text/plain');
+    var html = clipboard.getData('text/html');
+
+    console.log({
+      'text': text,
+      'html': clipboard.getData('text/html')
+    });
 
     e.preventDefault();
 
-    if(!isLocked && !linkRegex.test(text) && 
-      (localStorage.allowPasteHtml === undefined || localStorage.allowPasteHtml === true)) {
-      var html = clipboard.getData('text/html');
-
-      if (html) {
-        document.execCommand('insertHTML', false, this.$html.removeHtml(html, text));
-        return this.$setScrollTop(selection, scrollTop);
-      }
+    if(!isLocked && html && !linkRegex.test(text) && 
+      (localStorage.allowPasteHtml === true || this.$htmlHelper.isInternalClipboard(html))) {
+      document.execCommand('insertHTML', false, this.$htmlHelper.removeHtml(html, text));
+      return this.$setScrollTop(selection, scrollTop);
     }
 
     console.log('============TEXT============');
@@ -115,8 +122,22 @@ class TextProcessor {
     return this.$setScrollTop(selection, scrollTop);
   }
 
+  $onCopy(e) {
+    let selection = window.getSelection();
+    let html = this.$htmlHelper.getHtml(selection);
+
+    e.clipboardData.setData('text/plain', selection.toString());
+    e.clipboardData.setData('text/html', `<wd-editor>${html}</wd-editor>`);
+
+    if (e.type === 'cut') {
+      document.execCommand('delete', false);
+    }
+
+    e.preventDefault();
+  }
+
   /**
-   * Internal event: Command.
+   * Internal event: PreProcessInput.
    * 
    * @param {*} e
    * 
@@ -125,8 +146,9 @@ class TextProcessor {
   $preProcessInput(e) {
     let selection = window.getSelection();
     let textSelected = Math.abs(selection.focusOffset - selection.baseOffset) > 0;
-    let focusNode = selection.focusNode;
+    // let focusNode = selection.focusNode;
 
+    // ctrlKey enables/disables links to be clickable.
     if (e.ctrlKey && e.keyCode === code.ctrlKey && !e.shiftKey) {
       this.$setUneditable('A');
     } else {
@@ -155,23 +177,7 @@ class TextProcessor {
           return e.preventDefault();
         }
       }
-    }
-
-    // Delete key or Enter - removes the last element in the list on delete key
-    if (!e.shiftKey && (e.keyCode === code.del || e.keyCode === code.enter) && focusNode.nodeName === 'LI') {
-      let command = {'UL': 'insertUnorderedList', 'OL': 'insertOrderedList'};
-
-      if (focusNode.parentNode && command[focusNode.parentNode.nodeName]) {
-        
-        if(focusNode.nextSibling) {
-          e.preventDefault();
-          return document.execCommand(command[focusNode.parentNode.nodeName], false);
-        } else {
-          e.preventDefault();
-          return document.execCommand(command[focusNode.parentNode.nodeName], false);
-        }
-      }
-    }
+    } 
 
     // 'Tab' shifts spaces toward/backward
     if ((e.keyCode === code.tab)) {
@@ -189,6 +195,7 @@ class TextProcessor {
       // }
     }
 
+    // 'Enter' scrolls to cursor
     if (e.keyCode === code.enter) {
       let scrollTop = this.element.parentNode.scrollTop;
 
@@ -199,6 +206,13 @@ class TextProcessor {
     }
   }
 
+  /**
+   * Internal event: PostProcessInput.
+   * 
+   * @param {*} e
+   * 
+   * Executes after the keyboard's input, revert beck the commands.
+   */
   $postProcessInput(e) {
     this.$shiftKey = false;
     this.$ctrlKey = false;
@@ -212,7 +226,7 @@ class TextProcessor {
    * Fires on content blur
    */
   $onChange() {
-    return this.$html.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
+    return this.$htmlHelper.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
   }
 
   log(sessions, test) {
