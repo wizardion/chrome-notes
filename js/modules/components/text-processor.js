@@ -30,7 +30,7 @@ class TextProcessor {
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
-    this.element.addEventListener('copy', this.$onCopy.bind(this));
+    // this.element.addEventListener('copy', this.$onCopy.bind(this));
     this.element.addEventListener('cut', this.$onCopy.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
@@ -100,11 +100,6 @@ class TextProcessor {
     let isLocked = adapter.isInside(selection, 'CODE|PRE');
     var text = clipboard.getData('text/plain');
     var html = clipboard.getData('text/html');
-
-    console.log({
-      'text': text,
-      'html': clipboard.getData('text/html')
-    });
 
     e.preventDefault();
 
