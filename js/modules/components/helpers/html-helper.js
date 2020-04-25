@@ -9,7 +9,8 @@ class HtmlHelper {
       blocks: /<\s*\/\s*(ul|ol|q|code|pre)\s*>/gi,
       tags: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
       closingTag: /(<\s*\/\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
-      delimiter: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi
+      delimiter: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi,
+      indernal: /<wd-editor>([\s\S\w\W]*)<\/wd-editor>$/gi
     };
 
     // https://www.regextester.com/93930
@@ -61,6 +62,16 @@ class HtmlHelper {
         replacement: ''
       }
     ];
+  }
+
+  /**
+   * Key Code.
+   *
+   * @return {number}
+   * Returns the key code that handles this adapter..
+   */
+  get tagName() {
+    return 'wd-editor';
   }
 
   $findMax(data) {
@@ -331,8 +342,14 @@ class HtmlHelper {
     }
   }
 
+  /**
+   * Public method: IsInternalClipboard.
+   * 
+   * @param {*} html
+   * Checks that clipboard data was set from internal editor by copu command.
+   */
   isInternalClipboard(html) {
-    return !!html.match(/<wd-editor>([\s\S\w\W]*)<\/wd-editor>$/gi);
+    return !!html.match(this.$testers.indernal);
   }
 
   /**

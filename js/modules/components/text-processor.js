@@ -127,7 +127,7 @@ class TextProcessor {
     let html = this.$htmlHelper.getHtml(selection);
 
     e.clipboardData.setData('text/plain', selection.toString());
-    e.clipboardData.setData('text/html', `<wd-editor>${html}</wd-editor>`);
+    e.clipboardData.setData('text/html', `<${this.$htmlHelper.tagName}>${html}</${this.$htmlHelper.tagName}>`);
 
     if (e.type === 'cut') {
       document.execCommand('delete', false);
