@@ -1,7 +1,7 @@
 class TextProcessor {
   constructor (element) {
     this.element = element;
-    this.$htmlHelper = new HtmlHelper();
+    this.$htmlHelper = new HtmlHelper(this.element);
     
     //SWEET STYLES https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
     this.$helpers = {
@@ -30,7 +30,7 @@ class TextProcessor {
     };
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
-    // this.element.addEventListener('copy', this.$onCopy.bind(this));
+    this.element.addEventListener('copy', this.$onCopy.bind(this));
     this.element.addEventListener('cut', this.$onCopy.bind(this));
     this.element.addEventListener('blur', this.$onChange.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));

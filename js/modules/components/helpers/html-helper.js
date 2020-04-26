@@ -1,13 +1,16 @@
 class HtmlHelper {
-  constructor () {
+  constructor (element) {
     const allowedTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'q', 's', 'hr', 'pre', 'code', 'strike', 'blockquote'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
+    this.$element = element;
+    this.$container = document.createElement('div');
     this.$testers = {
       endLine: /\n/g,
       space: /(\s)/g,
       blocks: /<\s*\/\s*(ul|ol|q|code|pre)\s*>/gi,
       tags: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
+      list: /<\/(ul|li|ol)>/gi,
       closingTag: /(<\s*\/\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
       delimiter: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi,
       indernal: /<wd-editor>([\s\S\w\W]*)<\/wd-editor>$/gi
@@ -185,7 +188,7 @@ class HtmlHelper {
       tags.closing = [];
     }
 
-    if(!!list[list.length - 1].match(this.$testers.tags)) {
+    if(!!list[list.length - 1].match(this.$testers.tags) && !list[list.length - 1].match(this.$testers.list)) {
       list.push(' ');
     }
 
@@ -343,6 +346,34 @@ class HtmlHelper {
   }
 
   /**
+   * Internal method: GetParents.
+   * 
+   * @param {*} node
+   * Returns the opened and closed parent strings.
+   */
+  $getParents(node) {
+    var openedTags = '', closedTags = '';
+
+    if (node !== this.$element) {
+      node = node.parentNode;
+    }
+
+    while (node && node !== this.$element) {
+      const nodeName = node.nodeName.toLowerCase();
+
+      openedTags = `<${nodeName}>` + openedTags;
+      closedTags += `</${nodeName}>`;
+
+      node = node.parentNode;
+    }
+
+    return {
+      open: openedTags,
+      close: closedTags
+    };
+  }
+
+  /**
    * Public method: IsInternalClipboard.
    * 
    * @param {*} html
@@ -388,40 +419,23 @@ class HtmlHelper {
    * Returns the html from selected text.
    */
   getHtml(selection) {
-    var nodes = this.$getNodes(selection);
-    let nodeTypes = { // https://www.w3schools.com/jsref/prop_node_nodetype.asp
-      text: 3,        //https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
-      element: 1,
-    };
+    if (selection.rangeCount > 0) {
+      var nodes = this.$getNodes(selection);
+      var range = selection.getRangeAt(0);
+      var clonedSelection = range.cloneContents();
 
-    if(nodes.firstNode !== nodes.secondNode) {
-      let sibling = nodes.secondNode.previousSibling;
-      let list = [];
+      this.$container.appendChild(clonedSelection);
+      var html = this.$container.innerHTML;
+      this.$container.innerHTML = '';
 
-      if(nodes.firstNode.nodeType === nodeTypes.text) {
-        list.push(nodes.firstNode.data.substring(nodes.start));
+      if(nodes.firstNode !== nodes.secondNode) {
+        var parents = this.$getParents(nodes.firstNode.parentNode);
+        return `${parents.open}${html}${parents.close}`;
       }
 
-      //TODO needs to think about the sibling nodes with the same tag
-      while(sibling && sibling !== nodes.firstNode && sibling !== nodes.firstNode.parentNode) {
-        if(sibling.nodeType === nodeTypes.text) {
-          list.push(sibling.data);
-        }
-  
-        if(sibling.nodeType === nodeTypes.element) {
-          list.push(sibling.outerHTML);
-        }
-  
-        sibling = sibling.previousSibling;
-      }
-
-      if(nodes.secondNode.nodeType === nodeTypes.text) {
-        list.push(nodes.secondNode.data.substring(0, nodes.end));
-      }
-  
-      return list.join('');
+      return html;
     }
 
-    return nodes.firstNode.data.substring(nodes.start, nodes.end);
+    return '';
   }
 }
