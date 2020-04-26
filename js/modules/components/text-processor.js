@@ -109,10 +109,6 @@ class TextProcessor {
       return this.$setScrollTop(selection, scrollTop);
     }
 
-    console.log('============TEXT============');
-    console.log(text);
-    console.log('============END_TEXT============');
-
     document.execCommand('insertText', false, text);
     return this.$setScrollTop(selection, scrollTop);
   }
