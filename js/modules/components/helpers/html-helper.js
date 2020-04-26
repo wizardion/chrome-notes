@@ -10,7 +10,8 @@ class HtmlHelper {
       space: /(\s)/g,
       blocks: /<\s*\/\s*(ul|ol|q|code|pre)\s*>/gi,
       tags: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
-      list: /<\/(ul|li|ol)>/gi,
+      list: /<\/?(ul|li|ol)>/gi,
+      listParents: /<\/?(ul|ol)>/gi,
       closingTag: /(<\s*\/\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)/gi,
       delimiter: /(<\s*\/?\s*[A-Z][A-Z0-9]*\b[^\<\>]*>)|([^\s\<\>]+)|([\S\<\>]+)/gi,
       indernal: /<wd-editor>([\s\S\w\W]*)<\/wd-editor>$/gi
@@ -351,7 +352,7 @@ class HtmlHelper {
    * @param {*} node
    * Returns the opened and closed parent strings.
    */
-  $getParents(node) {
+  $getParents(node, filter) {
     var openedTags = '', closedTags = '';
 
     if (node !== this.$element) {
@@ -361,8 +362,10 @@ class HtmlHelper {
     while (node && node !== this.$element) {
       const nodeName = node.nodeName.toLowerCase();
 
-      openedTags = `<${nodeName}>` + openedTags;
-      closedTags += `</${nodeName}>`;
+      if (!filter || filter.indexOf(nodeName) < 0) {
+        openedTags = `<${nodeName}>` + openedTags;
+        closedTags += `</${nodeName}>`;
+      }
 
       node = node.parentNode;
     }
@@ -420,16 +423,22 @@ class HtmlHelper {
    */
   getHtml(selection) {
     if (selection.rangeCount > 0) {
-      var nodes = this.$getNodes(selection);
-      var range = selection.getRangeAt(0);
-      var clonedSelection = range.cloneContents();
+      let nodes = this.$getNodes(selection);
+      let range = selection.getRangeAt(0);
+      let clonedSelection = range.cloneContents();
+      let parents = this.$getParents(nodes.firstNode, ['li', 'ul', 'ol']);
 
       this.$container.appendChild(clonedSelection);
-      var html = this.$container.innerHTML;
+      let html = this.$container.innerHTML;
+      let hasList = !!html.match(this.$testers.list);
       this.$container.innerHTML = '';
 
-      if(nodes.firstNode !== nodes.secondNode) {
-        var parents = this.$getParents(nodes.firstNode.parentNode);
+      if(hasList && nodes.firstNode !== nodes.secondNode && !html.match(this.$testers.listParents)) {
+        parents = this.$getParents(nodes.firstNode.parentNode);
+        return `${parents.open}${html}${parents.close}`;
+      }
+      
+      if (!hasList) {
         return `${parents.open}${html}${parents.close}`;
       }
 
