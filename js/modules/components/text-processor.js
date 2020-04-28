@@ -86,7 +86,7 @@ class TextProcessor {
   }
 
   /**
-   * Internal method: OnPaste.
+   * Internal Event: OnPaste.
    * 
    * @param {*} e
    * Removes html except allowed tags and attributes.
@@ -113,6 +113,12 @@ class TextProcessor {
     return this.$setScrollTop(selection, scrollTop);
   }
 
+  /**
+   * Internal Event: OnCopy.
+   * 
+   * @param {*} e
+   * Fills the clipboardData on copy/cut command.
+   */
   $onCopy(e) {
     let selection = window.getSelection();
     let html = this.$htmlHelper.getHtml(selection);
