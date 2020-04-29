@@ -52,10 +52,6 @@ class BaseNotes {
     this.build(notes);
     this.notes = notes;
     this.searchModule.notes = notes;
-
-    if (localStorage.rowId) {
-      this.selectNote(parseInt(localStorage.rowId));
-    }
   }
 
   build(notes) {

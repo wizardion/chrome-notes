@@ -97,6 +97,21 @@ class Editor extends TextProcessor {
   }
 
   /**
+   * @param {*} name
+   * @param {*} callback
+   * 
+   * Removes html event listener
+   */
+  removeEventListener(name, callback) {
+    if (name in this.customEvents) {
+      this.customEvents[name] = callback;
+      return;
+    }
+
+    this.element.removeEventListener(name, callback);
+  }
+
+  /**
    * Focus
    * 
    * Sets focus to element

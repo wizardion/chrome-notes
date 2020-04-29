@@ -10,6 +10,7 @@ class NewNote extends Module {
       title: null,
       save: null,
       cancel: null,
+      activeElement: null
     };
 
     this.parent = {
@@ -56,11 +57,14 @@ class NewNote extends Module {
     this.events.keyDown = this._inputhandler.bind(this);
     document.addEventListener('keydown', this.events.keyDown);
 
+    this.events.change = this._changeHandler.bind(this);
+    this.controls.title.addEventListener('blur', this.events.change);
+    this.parent.description.addEventListener('blur', this.events.change);
+
     this.showError = Validator.bindRequiredAnimation(this.controls.title);
     this.controls.save.onclick = this._savebuttonhandler.bind(this);
     this.controls.cancel.onclick = this._cancelbuttonhandler.bind(this);
     this.controls.title.onkeydown = this._titleinputhandler.bind(this);
-    this.controls.title.focus();
   }
 
   /**
@@ -75,6 +79,9 @@ class NewNote extends Module {
       callback();
     }
 
+    this.controls.title.removeEventListener('blur', this.events.change);
+    this.parent.description.removeEventListener('blur', this.events.change);
+
     this.controls.title.parentNode.removeChild(this.controls.title);
     this.parent.delete.parentNode.removeChild(this.controls.save);
     this.parent.delete.parentNode.removeChild(this.controls.cancel);
@@ -86,9 +93,13 @@ class NewNote extends Module {
     this.events.deleteButton = this._bindHandler(this.parent.delete, this._showbuttonhandler);
     document.addEventListener('mousemove', this.events.deleteButton.event);
     document.removeEventListener('keydown', this.events.keyDown);
+    document.removeEventListener('blur', this.events.change);
 
     this.showError = null;
     this.events.keyDown = null;
+    this.events.change = null;
+
+    localStorage.removeItem('newNote');
   }
 
   /**
@@ -126,6 +137,16 @@ class NewNote extends Module {
     this.parent.delete.style.visibility = 'hidden';
 
     this.parent.description.value = '';
+
+    if(localStorage.newNote) {
+      let note = JSON.parse(localStorage.newNote);
+
+      this.controls.title.value = note.title;
+      this.parent.description.value = note.description;
+      this.controls.activeElement = note.id === 0? this.controls.title : this.parent.description;
+    } else {
+      this.controls.activeElement = this.controls.title;
+    }
   }
 
   /**
@@ -218,6 +239,20 @@ class NewNote extends Module {
       e.preventDefault();
       this.remove(true);
     }
+  }
+
+  /**
+   * Handler: On Intput Change
+   * 
+   * @param {*} e
+   * Handles the change input event and saves the data to the storage.
+   */
+  _changeHandler(e) {
+    localStorage.newNote = JSON.stringify({
+      title: this.controls.title.value,
+      description: this.parent.description.value,
+      id: e.target === this.controls.title? 0 : 1
+    });
   }
 
   /**
