@@ -248,11 +248,15 @@ class NewNote extends Module {
    * Handles the change input event and saves the data to the storage.
    */
   _changeHandler(e) {
-    localStorage.newNote = JSON.stringify({
-      title: this.controls.title.value,
-      description: this.parent.description.value,
-      id: e.target === this.controls.title? 0 : 1
-    });
+    if (this.controls.title.value !== '' || this.parent.description.value !== '') {
+      localStorage.newNote = JSON.stringify({
+        title: this.controls.title.value,
+        description: this.parent.description.value,
+        id: e.target === this.controls.title? 0 : 1
+      });
+    } else {
+      localStorage.removeItem('newNote');
+    }
   }
 
   /**
