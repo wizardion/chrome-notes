@@ -37,19 +37,29 @@ var code = {
   z: 90,
   tab: 9,
   enter: 13,
-  del: 13,
+  del: 46,
   right: 37,
   up: 38,
   left: 39,
   down: 40,
+  pageUp: 33,
+  pageDowm: 34,
+  end: 35,
+  home: 36,
   shiftKey: 16,
   ctrlKey: 17,
   ctrl: 1000,
   shift: 1000,
   sysKeys: null,
+  back: 8,
   uid: function (ctrlKey, shiftKey, keyCode) {
     return ((ctrlKey << shiftKey) * 1000) + keyCode;
   }
 };
 
 code.sysKeys = [code.a, code.c, code.v, code.x, code.right, code.left, code.up, code.down, code.shiftKey, code.ctrlKey,   code.r];
+
+code.comKeys = [code.shiftKey, code.ctrlKey]
+code.allowed = [
+  code.shiftKey, code.ctrlKey, code.right, code.left, code.up, code.down, code.home, code.end, code.pageUp, code.pageDowm, 
+];
