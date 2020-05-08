@@ -20,6 +20,10 @@ class Processor {
   $preProcessInput(e) {
     let selection = window.getSelection();
 
+    // console.log({
+    //   'e': e
+    // })
+
     if (e.keyCode === code.r && e.ctrlKey) {
       return;
     }
@@ -68,26 +72,36 @@ class Processor {
 
     // console.log(selection)
     // console.log(e)
+    console.log(nodes)
+
+    // Input method - New
+    if (e.key.length === 1 && nodes.firstNode === nodes.secondNode && 
+      nodes.firstNode === this.element && this.element.childNodes.length === 0) {
+        let textNode = document.createTextNode(e.key);
+
+        nodes.firstNode.appendChild(textNode);
+        return selection.setBaseAndExtent(textNode, nodes.start + 1, textNode, nodes.start + 1);
+    }
 
     // Input method
     if (e.key.length === 1 && nodes.firstNode === nodes.secondNode && nodes.firstNode.data) {
       nodes.firstNode.data = nodes.firstNode.data.substring(0, nodes.start) + e.key + nodes.firstNode.data.substring(nodes.end);
-      selection.setBaseAndExtent(nodes.firstNode, nodes.start + 1, nodes.firstNode, nodes.start + 1);
+      return selection.setBaseAndExtent(nodes.firstNode, nodes.start + 1, nodes.firstNode, nodes.start + 1);
     }
 
     // Enter command
     if (e.keyCode === code.enter) {
-      this.$enter(selection, nodes);
+      return this.$enter(selection, nodes);
     }
 
     // Backspace command
     if (e.keyCode === code.back && nodes.firstNode === nodes.secondNode) {
-      this.$backspace(selection, nodes);
+      return this.$backspace(selection, nodes);
     }
 
     // DELETE command
     if (e.keyCode === code.del && nodes.firstNode === nodes.secondNode) {
-      this.$delete(selection, nodes);
+      return this.$delete(selection, nodes);
     }
   }
 
