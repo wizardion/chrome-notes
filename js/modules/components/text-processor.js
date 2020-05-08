@@ -226,7 +226,7 @@ class TextProcessor {
     return this.$htmlHelper.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
   }
 
-  log(sessions, test) {
+  static log(element) {
     var tagRegex = /(&lt\;\/?[^&]+&gt\;)/ig;
     var symbRegex = /(&amp\;\w+\;)/ig;
     var logDiv = document.getElementById('expression');
@@ -236,7 +236,7 @@ class TextProcessor {
       '>': '&gt;'
     };
 
-    let encodedStr = this.element.innerHTML.replace(/[&<>]/g, function (tag) {
+    let encodedStr = element.innerHTML.replace(/[&<>]/g, function (tag) {
       return tagsToReplace[tag] || tag;
     });
 
@@ -286,7 +286,8 @@ class TextProcessor {
     // console.log({
     //   'encodedStr': encodedStr.replace(tagRegex, '<span class="error">$1</span>')
     // });
-    var logDiv = document.getElementById('expression-result').innerHTML = `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
+    var logDiv = document.getElementById('expression-result').innerHTML = 
+      `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
   }
 }
 

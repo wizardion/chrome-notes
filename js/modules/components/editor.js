@@ -1,4 +1,5 @@
-class Editor extends TextProcessor {
+class Editor extends Processor {
+// class Editor extends TextProcessor {
   constructor (element, controls) {
     super(element);
 
@@ -8,6 +9,7 @@ class Editor extends TextProcessor {
     this.customEvents = {'change': null};
 
     this.init();
+    // this.element.addEventListener('blur', this.$onChange.bind(this));
   }
 
   /**
@@ -22,7 +24,7 @@ class Editor extends TextProcessor {
       const helper = this.$helpers[action];
 
       item.onmousedown = this.$preCommand;
-      item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper, action) : this.$command.bind(this, action);
+      // item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper, action) : this.$command.bind(this, action);
     }
   }
 
@@ -138,7 +140,8 @@ class Editor extends TextProcessor {
     let event = this.customEvents['change'];
 
     if (this.element.innerHTML != this.$value && event) {
-      event(super.$onChange());
+      // event(super.$onChange());
+      event(this.element.innerHTML);
       this.$value = this.element.innerHTML;
     }
   }
