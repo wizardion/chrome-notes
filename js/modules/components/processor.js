@@ -20,8 +20,12 @@ class Processor {
   $preProcessInput(e) {
     let selection = window.getSelection();
 
-    if (e.keyCode === code.r && e.ctrlKey || 
-       (e.ctrlKey && code.allowed.indexOf(e.keyCode) < 0)) {
+    if (e.keyCode === code.r && e.ctrlKey) {
+      return;
+    }
+
+    if (e.ctrlKey && code.allowed.indexOf(e.keyCode) < 0) {
+      e.preventDefault();
       return;
     }
 
