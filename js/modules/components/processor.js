@@ -4,8 +4,8 @@ class Processor {
 
     this.$helpers = {};
 
-    // this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
-    document.addEventListener('keydown', this.$preProcessInput.bind(this));
+    this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
+    // document.addEventListener('keydown', this.$preProcessInput.bind(this));
     // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
 
     this.$timer = null;
