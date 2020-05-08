@@ -20,7 +20,8 @@ class Processor {
   $preProcessInput(e) {
     let selection = window.getSelection();
 
-    if (e.keyCode === code.r && e.ctrlKey) {
+    if (e.keyCode === code.r && e.ctrlKey || 
+       (e.ctrlKey && code.allowed.indexOf(e.keyCode) < 0)) {
       return;
     }
 
@@ -72,23 +73,58 @@ class Processor {
 
     // Enter command
     if (e.keyCode === code.enter) {
-      let value = nodes.firstNode.data.length === nodes.start? '\n\n' : '\n';
-      nodes.firstNode.data = nodes.firstNode.data.substring(0, nodes.start) + value + nodes.firstNode.data.substring(nodes.end);
-      selection.setBaseAndExtent(nodes.firstNode, nodes.start + 1, nodes.firstNode, nodes.start + 1);
+      this.$enter(selection, nodes);
     }
 
     // Backspace command
     if (e.keyCode === code.back && nodes.firstNode === nodes.secondNode) {
-      let length = (nodes.length > 0)? 0 : 1;
-      nodes.firstNode.data = nodes.firstNode.data.substring(0, nodes.start - length) + nodes.firstNode.data.substring(nodes.end);
-      selection.setBaseAndExtent(nodes.firstNode, nodes.start - length, nodes.firstNode, nodes.start - length);
+      this.$backspace(selection, nodes);
     }
 
     // DELETE command
     if (e.keyCode === code.del && nodes.firstNode === nodes.secondNode) {
-      let length = (nodes.length > 0)? 0 : 1;
-      nodes.firstNode.data = nodes.firstNode.data.substring(0, nodes.start) + nodes.firstNode.data.substring(nodes.end + length);
-      selection.setBaseAndExtent(nodes.firstNode, nodes.start, nodes.firstNode, nodes.start);
+      this.$delete(selection, nodes);
     }
   }
+
+  //#region commmans
+  $delete(selection, nodes) {
+    let length = (nodes.length > 0)? 0 : 1;
+    let left = nodes.firstNode.data.substring(0, nodes.start);
+    let right = nodes.firstNode.data.substring(nodes.end + length);
+
+    if (right.length === 0 && left[left.length - 1] === '\n') {
+      right += '\n';
+    }
+
+    nodes.firstNode.data = left + right;
+    selection.setBaseAndExtent(nodes.firstNode, nodes.start, nodes.firstNode, nodes.start);
+  }
+
+  $backspace(selection, nodes) {
+    let length = (nodes.length > 0)? 0 : 1;
+    let left = nodes.firstNode.data.substring(0, nodes.start - length);
+    let right = nodes.firstNode.data.substring(nodes.end);
+
+    if (right.length === 0 && left[left.length - 1] === '\n') {
+      right += '\n';
+    }
+
+    nodes.firstNode.data = left + right;
+    selection.setBaseAndExtent(nodes.firstNode, nodes.start - length, nodes.firstNode, nodes.start - length);
+  }
+
+  $enter(selection, nodes) {
+    let value = nodes.firstNode.data.length === nodes.start? '\n\n' : '\n';
+    let left = nodes.firstNode.data.substring(0, nodes.start) + value;
+    let right = nodes.firstNode.data.substring(nodes.end);
+
+    if (right.length === 0 && left[left.length - 1] === '\n') {
+      right += '\n';
+    }
+
+    nodes.firstNode.data = left + right;
+    selection.setBaseAndExtent(nodes.firstNode, nodes.start + 1, nodes.firstNode, nodes.start + 1);
+  }
+  //#endregion
 }
