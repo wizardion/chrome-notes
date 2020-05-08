@@ -11,8 +11,9 @@ class Processor {
     this.$timer = null;
 
     //#region TEST_DATA
+    var value = this.element.innerHTML;
     setInterval(function () {
-      TextProcessor.log(this.element);
+      if(value !== this.element.innerHTML) { TextProcessor.log(this.element); value = this.element.innerHTML; }
     }.bind(this), 250)
     //#endregion
   }
