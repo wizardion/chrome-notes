@@ -76,18 +76,29 @@ strike {
   text-decoration: line-through;
 }
 
-/* b, b i {
+b {
   color: #b50404;
-} */
+  /* text-decoration: underline; */
+}
+
+i {
+  color: #b56404;
+  /* text-decoration: underline; */
+}
+
+u {
+  color: #06636a;
+  /* text-decoration: underline; */
+}
 
 /* 
 b {
   font-weight: 500;
 } */
 
-i {
+/* i {
   color: #333333;
-}
+} */
 
 /* 
 q::before {

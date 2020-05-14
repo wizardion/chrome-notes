@@ -1,5 +1,5 @@
-class Editor extends Processor {
 // class Editor extends TextProcessor {
+class Editor extends Processor {
   constructor (element, controls) {
     super(element);
 
@@ -25,6 +25,10 @@ class Editor extends Processor {
 
       item.onmousedown = this.$preCommand;
       // item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper, action) : this.$command.bind(this, action);
+
+      if (action === 'bold') {
+        item.onmouseup = this.$onChange.bind(this);
+      }
     }
   }
 

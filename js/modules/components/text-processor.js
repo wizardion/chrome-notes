@@ -38,10 +38,11 @@ class TextProcessor {
 
     document.execCommand('defaultParagraphSeparator', false, 'p');
     //#region TEST_DATA
-    this.element.addEventListener('input', this.log.bind(this));
-    setTimeout(function () {
-      this.log();
-    }.bind(this), 250)
+    // this.element.addEventListener('input', this.log.bind(this));
+    var value = this.element.innerHTML;
+    setInterval(function () {
+      if(value !== this.element.innerHTML) { TextProcessor.log(this.element); value = this.element.innerHTML; }
+    }.bind(this), 5)
     //#endregion
   }
 

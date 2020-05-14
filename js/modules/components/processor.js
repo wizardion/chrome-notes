@@ -1,6 +1,11 @@
 class Processor {
   constructor (element, controls) {
     this.element = element;
+    this.$types = {
+      element: 1,
+      attr: 2,
+      text: 3
+    };
 
     this.$helpers = {};
 
@@ -14,7 +19,7 @@ class Processor {
     var value = this.element.innerHTML;
     setInterval(function () {
       if(value !== this.element.innerHTML) { TextProcessor.log(this.element); value = this.element.innerHTML; }
-    }.bind(this), 250)
+    }.bind(this), 5)
     //#endregion
   }
 
@@ -30,7 +35,7 @@ class Processor {
     }
 
     if (e.ctrlKey && code.allowed.indexOf(e.keyCode) < 0) {
-      e.preventDefault();
+      // e.preventDefault();
       return;
     }
 
@@ -64,7 +69,7 @@ class Processor {
       secondNode: secondNode,
       start: start,
       end: end,
-      length: (end - start)
+      length: selection.toString().length
     }
   }
 
@@ -73,7 +78,7 @@ class Processor {
 
     // console.log(selection)
     // console.log(e)
-    console.log(nodes)
+    // console.log(nodes)
 
     // Input method - New
     if (e.key.length === 1 && nodes.firstNode === nodes.secondNode && 
@@ -121,6 +126,281 @@ class Processor {
   }
 
   $backspace(selection, nodes) {
+    console.log({'start-0': nodes.start});
+
+    if (nodes.length === 0) {
+      if (nodes.start === 0 && nodes.firstNode.length > 0 && nodes.firstNode.data[0] === '\n') {
+        console.log({'start-1': nodes.start});
+        nodes.firstNode.data = nodes.firstNode.data.substring(1);
+        let [firstNode, start] = this.$toPreviousSibling(selection, nodes.firstNode);
+        return selection.setBaseAndExtent(firstNode, start, firstNode, start);
+      }
+
+      if(nodes.start === 1 && this.$check(nodes.firstNode)) {
+        nodes.firstNode.data = nodes.firstNode.data.substring(1);
+        return selection.setBaseAndExtent(nodes.firstNode, 0, nodes.firstNode, 0);
+      }
+
+      if(nodes.start === 0 && this.$check(nodes.firstNode)) {
+        console.log({'start-1.2': nodes.start});
+        let [firstNode, start] = this.$toPreviousSibling(selection, nodes.firstNode);
+        return selection.setBaseAndExtent(firstNode, start, firstNode, start);
+      }
+
+      console.log({'b': nodes.firstNode.previousSibling})
+      if(nodes.start === 0 && nodes.firstNode.previousSibling && nodes.firstNode.previousSibling.lastChild.nodeName === 'LI') {
+        console.log({'start-1.3': nodes.start});
+        let [firstNode, start] = this.$toPreviousSibling(selection, nodes.firstNode);
+        return selection.setBaseAndExtent(firstNode, start, firstNode, start);
+      }
+
+      let [firstNode, start] = !nodes.start? this.$toPreviousSibling(selection, nodes.firstNode) : [nodes.firstNode, nodes.start];
+
+      console.log({'start-2': nodes.start});
+
+      if (start === 0 && firstNode === nodes.firstNode) {
+        return;
+      } else {
+        nodes.firstNode = firstNode;
+        nodes.start = start;
+      }
+
+      let len = !nodes.start? 0 : 1;
+      let left = nodes.firstNode.data.substring(0, nodes.start - len);
+      let right = nodes.firstNode.data.substring(nodes.start);
+
+      console.log({'right-1': right, 'left': left, 'len': len, 'is': left[left.length - 1] === '\n'});
+      if (right.length === 0 && left[left.length - 1] === '\n') {
+        right += '\n';
+      }
+
+      console.log({'right-2': right, 'left': left});
+      if (right === '\n' && left[left.length - 1] !== '\n' && 
+          !nodes.firstNode.nextSibling && !nodes.firstNode.previousSibling) {
+        right = '';
+      }
+
+      console.log({'right-3': right, 'left': left});
+      nodes.firstNode.data = left + right;
+
+      if (nodes.firstNode.length === 0) {
+        console.log({'start-3': nodes.start})
+        let [node, index] = this.$toPreviousSibling(selection, nodes.firstNode);
+        selection.setBaseAndExtent(node, index, node, index);
+      } else {
+        console.log({'start-4': nodes.start})
+        selection.setBaseAndExtent(nodes.firstNode, nodes.start - len, nodes.firstNode, nodes.start - len);
+      }
+    }
+  }
+
+  $check(node) {
+    return (node && node.nodeType === this.$types.text && node.parentNode.nodeName === 'LI') || 
+            (node && node.nodeType !== this.$types.text && node.nodeName === 'LI');
+  }
+
+  // Works with textNodes only.
+  $toPreviousSibling(selection, node) {
+    let previousNode = node;
+    let length = 0;
+
+    console.log({'node-00': node});
+
+    if (!node.previousSibling) {
+      node = node.parentNode;
+
+      console.log({'node-0': node});
+
+      if (previousNode.parentNode === this.element) {
+        console.log({'node-exit': previousNode});
+        return [previousNode, 0];
+      }
+
+      if ((previousNode.nodeType === this.$types.text && previousNode.length === 0) || 
+          (previousNode.nodeType !== this.$types.text && !previousNode.firstChild)) {
+        console.log({'node-remove-1': previousNode});
+        previousNode.remove();
+        previousNode = node;
+      }
+
+      console.log({'node-1': node})
+
+      while(node.parentNode !== this.element && !node.previousSibling) {
+        console.log({'node-2': node});
+
+        previousNode = node;
+        node = node.parentNode;
+
+        if ((previousNode.nodeType === this.$types.text && previousNode.length === 0) || 
+            (previousNode.nodeType !== this.$types.text && !previousNode.firstChild)) {
+          console.log({'node-remove-2': previousNode});
+          previousNode.remove();
+          previousNode = node;
+        }
+      }
+
+      if (!node.previousSibling) {
+        console.log({'node-3': node});
+        console.log('THE END!');
+
+        if (!node.nextSibling) {
+          console.log({'node-3.1': node});
+          return node;
+        }
+        
+        throw '$toNextSibling is not implemented yet!'
+      }
+      
+      node = node.previousSibling;
+    } else {
+      node = node.previousSibling;
+    }
+
+    if ((previousNode.nodeType === this.$types.text && previousNode.length === 0) || 
+        (previousNode.nodeType !== this.$types.text && !previousNode.firstChild)) {
+      console.log({'node-remove-3': previousNode});
+      previousNode.remove();
+    }
+
+    if (node.nextSibling && node.nodeType === this.$types.text && node.nodeType === node.nextSibling.nodeType) {
+      length = node.length;
+      node.data += node.nextSibling.data;
+      node.nextSibling.remove();
+    }
+    
+    if (node.nextSibling && node.nodeType !== this.$types.text && node.nodeName === node.nextSibling.nodeName) {
+      let tmp = node;
+      let r = tmp;
+
+      console.log({'node-r-0': tmp});
+
+      while (tmp.lastChild) {
+        tmp = tmp.lastChild;
+      }
+
+      length = tmp.length;
+      r = tmp;
+
+      console.log({'node-r-1': tmp, 'nextSibling': node.nextSibling});
+
+      while (node.nextSibling.firstChild) {
+        let firstChild = node.nextSibling.firstChild;
+
+        console.log({'node-r-2': firstChild});
+
+        if (tmp && firstChild.nodeType === this.$types.text) {
+          console.log({'node-r-3': firstChild});
+          tmp.data += firstChild.data;
+        } else {
+          console.log({'node-r-4': firstChild, 'node': node});
+          tmp = null;
+          node.appendChild(firstChild.cloneNode(true));
+        }
+
+        firstChild.remove();
+      }
+
+      node.nextSibling.remove();
+
+      return [r, length];
+    }
+
+    // TODO implement by id nodeName
+    if (node.nodeName === 'OL') {
+      let tmp = node;
+      let r = tmp;
+
+      // dig into the left childs
+      while (tmp.lastChild) {
+        tmp = tmp.lastChild;
+      }
+      length = tmp.length;
+      r = tmp;
+      //-------------------------
+
+      // search next end of paragraph
+      let next = node.nextSibling;
+      let index = -1;
+
+      do {
+        const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
+        var id = text.indexOf('\n');
+
+        console.log({'next-0': text, 'match': id});
+
+        if (id > -1) {
+          index = id;
+          // break;
+        }
+
+        next = next.nextSibling? next.nextSibling : next;
+      } while(next.nextSibling);
+
+  
+      let current = node.nextSibling;
+
+      do {
+        let tcurrent = current;
+
+        console.log({'next-1': next, 'current': current, 'is': (current === next), 'while': (current !== next)});
+
+        if (current.nodeType !== this.$types.text) {
+          while (current.firstChild) {
+            const firstChild = current.firstChild;
+    
+            console.log({'node-r-20': firstChild});
+    
+            if (tmp && firstChild.nodeType === this.$types.text) {
+              console.log({'node-r-30': firstChild});
+              tmp.data += firstChild.data;
+            } else {
+              console.log({'node-r-40': firstChild, 'node': node});
+              tmp = null;
+              node.appendChild(firstChild.cloneNode(true));
+            }
+    
+            firstChild.remove();
+          }
+        } else {
+          console.log({'node-r-50': current});
+          if (current === next) {
+            tmp.data += current.data.substring(0, index);
+            current.data = current.data.substring(index + 1);
+
+            if (current.data.length === 0) {
+              current.remove();
+            }
+
+          } else {
+            tmp.data += current.data;
+          }
+        }
+
+        if (current !== next) {
+          current = current.nextSibling;
+          tcurrent.remove();
+        }
+      } while(current !== next);
+
+      return [r, length];
+    }
+
+    console.log({'node-4': node});
+
+    while (node.lastChild) {
+      console.log({'node-5': node})
+      node = node.lastChild;
+    }
+
+    if (!length) {
+      length = node.length;
+    }
+
+    console.log({'node-6': node})
+    return [node, length];
+  }
+
+  $backspaceOld(selection, nodes) {
     let length = (nodes.length > 0)? 0 : 1;
     let left = nodes.firstNode.data.substring(0, nodes.start - length);
     let right = nodes.firstNode.data.substring(nodes.end);
