@@ -38,10 +38,10 @@ class TextProcessor {
 
     document.execCommand('defaultParagraphSeparator', false, 'p');
     //#region TEST_DATA
-    this.element.addEventListener('input', this.log.bind(this));
-    setTimeout(function () {
-      this.log();
-    }.bind(this), 250)
+    // this.element.addEventListener('input', this.log.bind(this));
+    // setTimeout(function () {
+    //   this.log();
+    // }.bind(this), 250)
     //#endregion
   }
 
@@ -226,7 +226,7 @@ class TextProcessor {
     return this.$htmlHelper.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
   }
 
-  log(sessions, test) {
+  static log(element) {
     var tagRegex = /(&lt\;\/?[^&]+&gt\;)/ig;
     var symbRegex = /(&amp\;\w+\;)/ig;
     var logDiv = document.getElementById('expression');
@@ -236,7 +236,7 @@ class TextProcessor {
       '>': '&gt;'
     };
 
-    let encodedStr = this.element.innerHTML.replace(/[&<>]/g, function (tag) {
+    let encodedStr = element.innerHTML.replace(/[&<>]/g, function (tag) {
       return tagsToReplace[tag] || tag;
     });
 

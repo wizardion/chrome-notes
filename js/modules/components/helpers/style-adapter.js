@@ -25,7 +25,7 @@ class StyleAdapter extends CommandAdapter {
   }
 
   /**
-   * Internal method: reverse.
+   * Internal Method: reverse.
    * 
    * @param {*} value
    * 
@@ -42,7 +42,7 @@ class StyleAdapter extends CommandAdapter {
   }
 
   /**
-   * Internal method: RemoveHtml.
+   * Internal Method: RemoveHtml.
    * 
    * @param {*} node
    * @param {*} source

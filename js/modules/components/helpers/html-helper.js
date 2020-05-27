@@ -3,6 +3,8 @@ class HtmlHelper {
     const allowedTags = ['a', 'li', 'ul', 'ol', 'b', 'i', 'u', 'q', 's', 'hr', 'pre', 'code', 'strike', 'blockquote'].join('|'); // Allowed tags
     const attributes = ['href'].join('|'); // Allowed attributes
 
+    
+
     this.$element = element;
     this.$container = document.createElement('div');
     this.$testers = {
@@ -413,6 +415,76 @@ class HtmlHelper {
     }
 
     return text? this.$merge(data, this.$escapeTags(text)) : data;
+  }
+
+  removeDoms() {
+    var div = document.createElement('div');
+    div.innerHTML = this.$element.innerHTML;
+
+    this.$allowedTags = ['a', 'li', 'ul', 'ol', 'b1', 'i', 'u', 'q', 's', 'hr', 'pre', 'code', 'strike', 'blockquote'].join('|');
+
+    var at = `${this.$allowedTags}|\#text`;
+    var allowedTags = new RegExp(`(${at})`, 'gi');
+
+    console.log({
+      '': allowedTags
+    });
+
+    var inx = 0;
+    // var children = div.children;
+    var children = this.$element.children;
+    var node = children[inx];
+
+    console.log('children: ' + children.length);
+
+    while(node && inx < children.length) {
+      if (node.childElementCount) {
+        node = node.children[0];
+        continue;
+      }
+
+      let nextElementSibling = node.nextElementSibling;
+      let parentElement = node.parentElement;
+
+      console.log({
+        node: node,
+        next: node.nextElementSibling
+      });
+
+      if (!node.nodeName.match(allowedTags)) {
+        // textContent
+        // node.remove();
+
+        node.outerHTML = node.outerText
+
+        console.log('remove: ' + node.nodeName);
+      }
+
+      if (nextElementSibling) {
+        node = nextElementSibling;
+        continue;
+      }
+
+      // if (parentElement && inx < children.length && parentElement !== children[inx + 1]) {
+      //   node = parentElement;
+      //   continue;
+      // }
+
+      console.log('next inx');
+      inx++;
+      node = children[inx];
+    }
+
+    // for (var i = 0; i < childNodes.length; i++) {
+    //   const node = childNodes[i];
+      
+    //   if (!node.nodeName.match(allowedTags)) {
+    //     console.log('remove: ' + node.nodeName);
+    //   }
+
+    // }
+
+    return div.innerHTML;
   }
 
   /**

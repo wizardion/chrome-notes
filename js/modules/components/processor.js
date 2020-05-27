@@ -111,7 +111,7 @@ class Processor {
     let right = nodes.firstNode.data.substring(nodes.end);
 
     if (right.length === 0 && left[left.length - 1] === '\n') {
-      right += '\n';
+      right += '\n';.
     }
 
     nodes.firstNode.data = left + right;

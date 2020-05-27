@@ -7,6 +7,8 @@ class CommandAdapter extends Helper {
   }
 
   /**
+   * Public Method: isInside.
+   * 
    * @param {*} selection
    * @param {*} nodeName
    * 
@@ -27,6 +29,15 @@ class CommandAdapter extends Helper {
     return false;
   }
 
+  /**
+   * 
+   * Public Method: command.
+   * 
+   * @param {*} selection
+   * @param {*} nodeName
+   * 
+   * Executes the command for selection.
+   */
   command(action, selection, value) {
     let scrollTop = this.$element.parentNode.scrollTop;
 
