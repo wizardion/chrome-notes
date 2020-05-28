@@ -206,6 +206,7 @@ class Processor {
 
     console.log({'node-00': node});
 
+    // if not previous sibling we try to get it from the parents.
     if (!node.previousSibling) {
       node = node.parentNode;
 
@@ -256,18 +257,23 @@ class Processor {
       node = node.previousSibling;
     }
 
+    // remove next node (which is previousNode) if it is emplty.
     if ((previousNode.nodeType === this.$types.text && previousNode.length === 0) || 
         (previousNode.nodeType !== this.$types.text && !previousNode.firstChild)) {
       console.log({'node-remove-3': previousNode});
       previousNode.remove();
     }
 
+    /* if *selected* sibling is text and next sibling is the same like `"selected""next"`: 
+     * we merge it into the selected sibling: `"selectednext"` */
     if (node.nextSibling && node.nodeType === this.$types.text && node.nodeType === node.nextSibling.nodeType) {
       length = node.length;
       node.data += node.nextSibling.data;
       node.nextSibling.remove();
     }
     
+    /* if *selected* sibling is not text and next sibling is the same like `<b>selected</b><b>next</b>`:
+     * we merge it into the selected sibling: `<b>selectednext</b>` */
     if (node.nextSibling && node.nodeType !== this.$types.text && node.nodeName === node.nextSibling.nodeName) {
       let tmp = node;
       let r = tmp;
@@ -305,8 +311,11 @@ class Processor {
       return [r, length];
     }
 
-    // TODO implement by id nodeName
-    if (node.nodeName === 'OL') {
+    // if previous sibling is part of the list
+
+    /* if *selected* sibling is a list and there are next siblings:
+     * we merge it into the selected sibling's lastChild all the next siblings until the end of paragraph and quit. */
+    if (node.nodeName === 'OL') { // TODO implement by id nodeName
       let tmp = node;
       let r = tmp;
 
@@ -321,6 +330,10 @@ class Processor {
       // search next end of paragraph
       let next = node.nextSibling;
       let index = -1;
+
+      console.log({
+        'next': next
+      });
 
       do {
         const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
@@ -387,16 +400,19 @@ class Processor {
 
     console.log({'node-4': node});
 
+    // If we still have the *selected* sibling, we dig into lastChild of it.
     while (node.lastChild) {
       console.log({'node-5': node})
       node = node.lastChild;
     }
 
+    // if length if not exists, we get it from the lastChild.
     if (!length) {
       length = node.length;
     }
 
     console.log({'node-6': node})
+    // returning the lastChild of *selected* sibling and its length. 
     return [node, length];
   }
 
