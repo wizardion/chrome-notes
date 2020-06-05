@@ -317,25 +317,39 @@ class Processor {
      * we merge it into the selected sibling's lastChild all the next siblings until the end of paragraph and quit. */
     if (node.nodeName === 'OL') { // TODO implement by id nodeName
       let tmp = node;
-      let r = tmp;
+      let nextSibling = tmp;
 
-      // dig into the left childs
+      // dig into the left childs: current element
       while (tmp.lastChild) {
         tmp = tmp.lastChild;
       }
       length = tmp.length;
-      r = tmp;
+      nextSibling = tmp;
       //-------------------------
 
       // search next end of paragraph
       let next = node.nextSibling;
       let index = -1;
 
-      console.log({
-        'next': next
-      });
+      // find the element that have the end of paragraph.
+      while(next && next.nextSibling) {
+        const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
+        var id = text.indexOf('\n');
 
-      do {
+        console.log({'next-0': text, 'match': id});
+
+        if (id > -1) {
+          index = id;
+          break;
+        }
+
+        next = next.nextSibling;
+      }
+
+      console.log({'next': next});
+
+      //#region Remove
+      /* do {
         const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
         var id = text.indexOf('\n');
 
@@ -347,12 +361,22 @@ class Processor {
         }
 
         next = next.nextSibling? next.nextSibling : next;
-      } while(next.nextSibling);
-
+      } while(next.nextSibling); */
+      //#endregion
   
       let current = node.nextSibling;
 
-      do {
+      // remove all the next elements until the end of paragraph.
+      while(current && next && current !== next) {
+        console.log({'current-0': current});
+
+        current = current.nextSibling;
+      }
+
+      console.log({'current': current});
+
+      //#region Remove 2
+      /* do {
         let tcurrent = current;
 
         console.log({'next-1': next, 'current': current, 'is': (current === next), 'while': (current !== next)});
@@ -393,9 +417,10 @@ class Processor {
           current = current.nextSibling;
           tcurrent.remove();
         }
-      } while(current !== next);
+      } while(current !== next); */
+      //#endregion
 
-      return [r, length];
+      return [nextSibling, length];
     }
 
     console.log({'node-4': node});
