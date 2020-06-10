@@ -328,52 +328,62 @@ class Processor {
       //-------------------------
 
       // search next end of paragraph
-      let next = node.nextSibling;
-      let index = -1;
+      if (node.nextSibling) {
+        let next = node.nextSibling;
+        // let index = -1;
 
-      // find the element that have the end of paragraph.
-      while(next && next.nextSibling) {
-        const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
-        var id = text.indexOf('\n');
+        // find the element that have the end of paragraph.
+        while(next) {
+          const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
+          var id = text.indexOf('\n');
+          var nextS = next.nextSibling;
 
-        console.log({'next-0': text, 'match': id});
+          console.log({'next-0': next, 'match': id, 'text': text});
 
-        if (id > -1) {
-          index = id;
-          break;
+          if (id > -1) {
+            console.log({
+              'text-match': text
+            });
+
+            break;
+          } else {
+            this.$merge(nextSibling, next);
+          }
+
+          next = nextS;
         }
 
-        next = next.nextSibling;
+        console.log({'next': next});
+
+        //#region Remove
+        /* do {
+          const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
+          var id = text.indexOf('\n');
+
+          console.log({'next-0': text, 'match': id});
+
+          if (id > -1) {
+            index = id;
+            // break;
+          }
+
+          next = next.nextSibling? next.nextSibling : next;
+        } while(next.nextSibling); */
+        //#endregion
+    
+        //#region Remove3
+        // let current = node.nextSibling;
+
+        // // remove all the next elements until the end of paragraph.
+        // while(current !== next) {
+        //   console.log({'current-0': current});
+
+        //   current = current.nextSibling;
+        // }
+
+        // console.log({'current': current});
+        //#endregion
       }
-
-      console.log({'next': next});
-
-      //#region Remove
-      /* do {
-        const text = next.nodeType === this.$types.text? next.nodeValue : next.innerText;
-        var id = text.indexOf('\n');
-
-        console.log({'next-0': text, 'match': id});
-
-        if (id > -1) {
-          index = id;
-          // break;
-        }
-
-        next = next.nextSibling? next.nextSibling : next;
-      } while(next.nextSibling); */
-      //#endregion
-  
-      let current = node.nextSibling;
-
-      // remove all the next elements until the end of paragraph.
-      while(current && next && current !== next) {
-        console.log({'current-0': current});
-
-        current = current.nextSibling;
-      }
-
-      console.log({'current': current});
 
       //#region Remove 2
       /* do {
@@ -439,6 +449,35 @@ class Processor {
     console.log({'node-6': node})
     // returning the lastChild of *selected* sibling and its length. 
     return [node, length];
+  }
+
+  $merge(firstNode, secondNode) {
+    if (firstNode.nodeType === this.$types.text) {
+      var parent = firstNode.parentNode;
+      var next = secondNode;
+
+      if (next.nodeType === this.$types.text) {
+        firstNode.data += next.data;
+        next.remove();
+        return;
+      }
+
+      parent.appendChild(next.cloneNode(true));
+      next.remove();
+
+      // while(next.firstChild && next.firstChild.nodeType === this.$types.text) {
+      //   firstNode.data += next.firstChild.data;
+      //   next.firstChild.remove();
+      // }
+
+      // if(next.firstChild) {
+      //   parent.appendChild(next.cloneNode(true));
+      //   next.remove();
+      // }
+    } else {
+      firstNode.appendChild(secondNode.cloneNode(true));
+      secondNode.remove();
+    }
   }
 
   $backspaceOld(selection, nodes) {
