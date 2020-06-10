@@ -346,6 +346,8 @@ class Processor {
               'text-match': text
             });
 
+            this.$splitBySymbol(next, '\n');
+
             break;
           } else {
             current = this.$merge(current, next);
@@ -450,6 +452,14 @@ class Processor {
     console.log({'node-6': node})
     // returning the lastChild of *selected* sibling and its length. 
     return [node, length];
+  }
+
+  $splitBySymbol(node, symbol) {
+    var collection = node.nodeList; 
+
+    console.log({
+      'collection': collection
+    })
   }
 
   $merge(firstNode, secondNode) {
