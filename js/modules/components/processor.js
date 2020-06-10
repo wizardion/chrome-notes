@@ -330,6 +330,7 @@ class Processor {
       // search next end of paragraph
       if (node.nextSibling) {
         let next = node.nextSibling;
+        var current = nextSibling;
         // let index = -1;
 
         // find the element that have the end of paragraph.
@@ -347,7 +348,7 @@ class Processor {
 
             break;
           } else {
-            this.$merge(nextSibling, next);
+            current = this.$merge(current, next);
           }
 
           next = nextS;
@@ -452,32 +453,18 @@ class Processor {
   }
 
   $merge(firstNode, secondNode) {
-    if (firstNode.nodeType === this.$types.text) {
-      var parent = firstNode.parentNode;
-      var next = secondNode;
-
-      if (next.nodeType === this.$types.text) {
-        firstNode.data += next.data;
-        next.remove();
-        return;
-      }
-
-      parent.appendChild(next.cloneNode(true));
-      next.remove();
-
-      // while(next.firstChild && next.firstChild.nodeType === this.$types.text) {
-      //   firstNode.data += next.firstChild.data;
-      //   next.firstChild.remove();
-      // }
-
-      // if(next.firstChild) {
-      //   parent.appendChild(next.cloneNode(true));
-      //   next.remove();
-      // }
-    } else {
-      firstNode.appendChild(secondNode.cloneNode(true));
+    if (firstNode.nodeType === this.$types.text && secondNode.nodeType === this.$types.text) {
+      firstNode.data += secondNode.data;
       secondNode.remove();
+
+      return firstNode;
     }
+
+    let newNode = secondNode.cloneNode(true);
+    firstNode.parentNode.insertBefore(newNode, firstNode.nextSibling);
+    secondNode.remove();
+
+    return newNode;
   }
 
   $backspaceOld(selection, nodes) {
