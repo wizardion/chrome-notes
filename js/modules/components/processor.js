@@ -454,8 +454,8 @@ class Processor {
     return [node, length];
   }
 
-  $splitBySymbol(node, symbol) {
-    var collection = node.childNodes;
+  $splitBySymbol(firstNode, symbol) {
+    var collection = firstNode.childNodes;
     
     for (var i = 0; i < collection.length; i++) {
       const node = collection[i];
@@ -471,6 +471,8 @@ class Processor {
         // check symbol
         if (index >= 0) {
           // divide and break;
+          let sub = tmp.substring(0, index);
+          
           break;
         }
       }
@@ -483,6 +485,10 @@ class Processor {
         // continue to parent.
       }
     }
+
+    console.log({
+      'resutl': 1
+    });
   }
 
   $merge(firstNode, secondNode) {
