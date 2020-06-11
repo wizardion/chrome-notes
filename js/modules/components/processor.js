@@ -455,11 +455,34 @@ class Processor {
   }
 
   $splitBySymbol(node, symbol) {
-    var collection = node.nodeList; 
+    var collection = node.childNodes;
+    
+    for (var i = 0; i < collection.length; i++) {
+      const node = collection[i];
+      let tmp = node;
 
-    console.log({
-      'collection': collection
-    })
+      while (tmp.lastChild) {
+        tmp = tmp.lastChild;
+      }
+
+      if (tmp.nodeType === Node.TEXT_NODE) {
+        let index = tmp.data.indexOf(symbol);
+
+        // check symbol
+        if (index >= 0) {
+          // divide and break;
+          break;
+        }
+      }
+
+      if (tmp.nextSibling) {
+        // continue to next.
+      }
+
+      if (tmp.parentNode && tmp.parentNode !== node) {
+        // continue to parent.
+      }
+    }
   }
 
   $merge(firstNode, secondNode) {
