@@ -456,15 +456,20 @@ class Processor {
 
   $splitBySymbol(firstNode, symbol) {
     var collection = firstNode.childNodes;
+    var list = [];
     
     for (var i = 0; i < collection.length; i++) {
       const node = collection[i];
       let tmp = node;
+      // list.push(node);
 
+      //#region deep
+      //dig to lowest level
       while (tmp.lastChild) {
         tmp = tmp.lastChild;
       }
 
+      //lowest level
       if (tmp.nodeType === Node.TEXT_NODE) {
         let index = tmp.data.indexOf(symbol);
 
@@ -477,13 +482,16 @@ class Processor {
         }
       }
 
+      // next from lowest level
       if (tmp.nextSibling) {
         // continue to next.
       }
 
+      // up from lowest level
       if (tmp.parentNode && tmp.parentNode !== node) {
         // continue to parent.
       }
+      //#endregion
     }
 
     console.log({
