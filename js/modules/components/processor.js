@@ -343,10 +343,11 @@ class Processor {
 
           if (id > -1) {
             console.log({
-              'text-match': text
+              'text-match': text,
+              'node': this.$splitBySymbol(next, '\n')
             });
 
-            this.$splitBySymbol(next, '\n');
+            // this.$merge(this.$splitBySymbol(next, '\n'), next);
 
             break;
           } else {
@@ -454,9 +455,38 @@ class Processor {
     return [node, length];
   }
 
+  $splitBySymbol2(node, offset, limit) {
+    var parent = limit.parentNode;
+    var parentOffset = getNodeIndex(parent, limit);
+  
+    var doc = node.ownerDocument;  
+    var leftRange = doc.createRange();
+
+    leftRange.setStart(parent, parentOffset);
+    leftRange.setEnd(node, offset);
+
+    var left = leftRange.extractContents();
+
+    parent.insertBefore(left, limit);
+  }
+  
+  $getNodeIndex(parent, node) {
+    var index = parent.childNodes.length;
+    while (index--) {
+      if (node === parent.childNodes[index]) {
+        break;
+      }
+    }
+    return index;
+  }
+
   $splitBySymbol(firstNode, symbol) {
     var collection = firstNode.childNodes;
     var list = [];
+
+    console.log({
+      'collection': collection
+  });
     
     for (var i = 0; i < collection.length; i++) {
       const node = collection[i];
@@ -465,37 +495,65 @@ class Processor {
 
       //#region deep
       //dig to lowest level
-      while (tmp.lastChild) {
-        tmp = tmp.lastChild;
-      }
+      while(1) {
+        while (tmp.firstChild) {
+          tmp = tmp.firstChild;
+        }
 
-      //lowest level
-      if (tmp.nodeType === Node.TEXT_NODE) {
-        let index = tmp.data.indexOf(symbol);
+        //lowest level
+        if (tmp.nodeType === Node.TEXT_NODE) {
+          let index = tmp.data.indexOf(symbol);
 
-        // check symbol
-        if (index >= 0) {
-          // divide and break;
-          let sub = tmp.substring(0, index);
-          
+          // check symbol
+          if (index >= 0) {
+            // divide and break;
+            let sub = tmp.data.substring(0, index);
+            // return $splitBySymbol2(tmp, index, firstNode);
+            return tmp;
+            // break;
+          }
+        }
+
+        // next from lowest level
+        if (tmp.nextSibling && tmp.parentNode !== firstNode) {
+          // continue to next.
+          tmp = tmp.nextSibling;
+          continue;
+        }
+
+        // up from lowest level
+        while(tmp.parentNode !== firstNode) {
+          tmp = tmp.parentNode;
+
+          if (tmp.nextSibling) {
+            tmp = tmp.nextSibling;
+            break;
+          }
+        }
+
+        if (tmp.parentNode === firstNode) {
           break;
         }
-      }
-
-      // next from lowest level
-      if (tmp.nextSibling) {
-        // continue to next.
-      }
-
-      // up from lowest level
-      if (tmp.parentNode && tmp.parentNode !== node) {
-        // continue to parent.
       }
       //#endregion
     }
 
+    if (firstNode.nodeType === Node.TEXT_NODE) {
+      let index = firstNode.data.indexOf(symbol);
+
+      // check symbol
+      if (index >= 0) {
+        // divide and break;
+        let sub = firstNode.data.substring(0, index);
+        return firstNode;
+        // break;
+      }
+    } else {
+      throw 'ERROR';
+    }
+
     console.log({
-      'resutl': 1
+      'result': 1
     });
   }
 
