@@ -342,10 +342,22 @@ class Processor {
           console.log({'next-0': next, 'match': id, 'text': text});
 
           if (id > -1) {
+            let n = this.$splitBySymbol(next, '\n');
             console.log({
               'text-match': text,
-              'node': this.$splitBySymbol(next, '\n')
+              'node': n
             });
+
+            // next = this.$splitBySymbol2(n, ind, next);
+            // current = this.$merge(current, next);
+
+            // console.log({
+            //   'current': current
+            // });
+
+            // console.log({
+            //   'n': this.$splitBySymbol2(n, 1, next)
+            // });
 
             // this.$merge(this.$splitBySymbol(next, '\n'), next);
 
@@ -457,7 +469,7 @@ class Processor {
 
   $splitBySymbol2(node, offset, limit) {
     var parent = limit.parentNode;
-    var parentOffset = getNodeIndex(parent, limit);
+    var parentOffset = this.$getNodeIndex(parent, limit);
   
     var doc = node.ownerDocument;  
     var leftRange = doc.createRange();
@@ -468,6 +480,9 @@ class Processor {
     var left = leftRange.extractContents();
 
     parent.insertBefore(left, limit);
+
+    // return [left, limit];
+    return limit.previousSibling;
   }
   
   $getNodeIndex(parent, node) {
@@ -484,32 +499,62 @@ class Processor {
     var collection = firstNode.childNodes;
     var list = [];
 
+    var tmpNode = firstNode.cloneNode();
+
     console.log({
       'collection': collection
-  });
+    });
+
+    console.log({'s-00': firstNode});
     
     for (var i = 0; i < collection.length; i++) {
       const node = collection[i];
       let tmp = node;
       // list.push(node);
 
+      console.log({'s-0': tmp});
+
+      let tmpC = tmp.cloneNode();
+      tmpNode.appendChild(tmpC);
+
       //#region deep
       //dig to lowest level
       while(1) {
+
+
         while (tmp.firstChild) {
           tmp = tmp.firstChild;
+
+          let subC = tmp.cloneNode();
+          tmpC.appendChild(subC);
+
+          tmpC = subC;
+
+
+          console.log({'s-1': tmp});
         }
 
         //lowest level
         if (tmp.nodeType === Node.TEXT_NODE) {
           let index = tmp.data.indexOf(symbol);
 
+          console.log({'s-2': tmp});
+
           // check symbol
           if (index >= 0) {
             // divide and break;
-            let sub = tmp.data.substring(0, index);
+            // let sub = tmp.data.substring(0, index);
+
+            // tmp.data = tmp.data.replace(symbol, '');
+            tmpC.data = tmp.data.substring(0, index);
             // return $splitBySymbol2(tmp, index, firstNode);
-            return tmp;
+
+            // console.log({'sub': index})
+            console.log({
+              '-tmpNode-': tmpNode.outerHTML
+            });
+
+            return [index, tmp];
             // break;
           }
         }
@@ -518,15 +563,33 @@ class Processor {
         if (tmp.nextSibling && tmp.parentNode !== firstNode) {
           // continue to next.
           tmp = tmp.nextSibling;
+
+          let pC = tmp.cloneNode();
+          tmpC.parentNode.appendChild(pC);
+          tmpC = pC;
+
+          console.log('!!!GOING TO THE NEXT!!!');
           continue;
         }
 
         // up from lowest level
         while(tmp.parentNode !== firstNode) {
           tmp = tmp.parentNode;
+          console.log('!!!GOING TO THE PARENT!!!');
+
+          let pC = tmp.cloneNode();
+          tmpC = tmpC.parentNode;
+          tmpC.parentNode.appendChild(pC);
+          tmpC = pC;
 
           if (tmp.nextSibling) {
             tmp = tmp.nextSibling;
+
+            let pC = tmp.cloneNode();
+            tmpC.parentNode.appendChild(pC);
+            tmpC = pC;
+
+            console.log('!!!GOING TO THE PARENT-NEXT!!!');
             break;
           }
         }
