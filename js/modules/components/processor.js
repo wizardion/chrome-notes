@@ -342,25 +342,14 @@ class Processor {
           console.log({'next-0': next, 'match': id, 'text': text});
 
           if (id > -1) {
-            let n = this.$splitBySymbol(next, '\n');
+            let n = this.$splitBySymbol(next, '\n', next);
             console.log({
               'text-match': text,
-              'node': n
+              'next': next.outerHTML,
+              'node': n && n.outerHTML
             });
 
-            // next = this.$splitBySymbol2(n, ind, next);
-            // current = this.$merge(current, next);
-
-            // console.log({
-            //   'current': current
-            // });
-
-            // console.log({
-            //   'n': this.$splitBySymbol2(n, 1, next)
-            // });
-
-            // this.$merge(this.$splitBySymbol(next, '\n'), next);
-
+            current.parentNode.insertBefore(n, current.nextSibling);
             break;
           } else {
             current = this.$merge(current, next);
@@ -467,35 +456,82 @@ class Processor {
     return [node, length];
   }
 
-  $splitBySymbol2(node, offset, limit) {
-    var parent = limit.parentNode;
-    var parentOffset = this.$getNodeIndex(parent, limit);
+  $splitBySymbol(node, symbol) {
+    var [child, index] = this.$findNode(node, symbol);
   
-    var doc = node.ownerDocument;  
+    var doc = node.ownerDocument;
     var leftRange = doc.createRange();
 
-    leftRange.setStart(parent, parentOffset);
-    leftRange.setEnd(node, offset);
+    leftRange.setStartBefore(node);
+    leftRange.setEnd(child, index);
 
     var left = leftRange.extractContents();
 
-    parent.insertBefore(left, limit);
+    child.data = child.data.substring(1);
 
-    // return [left, limit];
-    return limit.previousSibling;
+    // console.log({
+    //   'left': left
+    // });
+
+    // var div = document.createElement('div');
+
+    // div.appendChild(left);
+
+    // return div.firstChild;
+    return left;
   }
-  
-  $getNodeIndex(parent, node) {
-    var index = parent.childNodes.length;
-    while (index--) {
-      if (node === parent.childNodes[index]) {
-        break;
+
+  $findNode(firstNode, symbol) {
+    var collection = firstNode.childNodes;
+    
+    for (var i = 0; i < collection.length; i++) {
+      let node = collection[i];
+
+      //#region deep
+      while(node) {
+        // dig to lowest level
+        while (node.firstChild) {
+          node = node.firstChild;
+        }
+
+        //lowest level
+        if (node.nodeType === Node.TEXT_NODE) {
+          let index = node.data.indexOf(symbol);
+
+          // check symbol
+          if (index >= 0) {
+            return [node, index];
+          }
+        }
+
+        // next from lowest level
+        if (node.nextSibling && node.parentNode !== firstNode) {
+          node = node.nextSibling;
+          continue;
+        }
+
+        // up from lowest level
+        while(node.parentNode !== firstNode) {
+          node = node.parentNode;
+
+          if (node.nextSibling) {
+            node = node.nextSibling;
+            break;
+          }
+        }
+
+        if (node.parentNode === firstNode) {
+          break;
+        }
       }
+      //#endregion
     }
-    return index;
+
+    let index = firstNode.data.indexOf(symbol);
+    return [firstNode, index < 0? 0 : index];
   }
 
-  $splitBySymbol(firstNode, symbol) {
+  $splitBySymbol0(firstNode, symbol) {
     var collection = firstNode.childNodes;
     var list = [];
 
@@ -519,7 +555,7 @@ class Processor {
 
       //#region deep
       //dig to lowest level
-      while(1) {
+      while(tmp) {
 
 
         while (tmp.firstChild) {
