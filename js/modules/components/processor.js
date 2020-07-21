@@ -26,15 +26,13 @@ class Processor {
   $preProcessInput(e) {
     let selection = window.getSelection();
 
-    // console.log({
-    //   'e': e
-    // })
+    // console.log(e);
 
-    if (e.keyCode === code.r && e.ctrlKey) {
+    if (e.keyCode === code.r && (e.ctrlKey || e.metaKey)) {
       return;
     }
 
-    if (e.ctrlKey && code.allowed.indexOf(e.keyCode) < 0) {
+    if ((e.ctrlKey || e.metaKey) && code.allowed.indexOf(e.keyCode) < 0) {
       // e.preventDefault();
       return;
     }
@@ -349,7 +347,9 @@ class Processor {
               'node': n && n.outerHTML
             });
 
-            current.parentNode.insertBefore(n, current.nextSibling);
+            // current.parentNode.insertBefore(n, current.nextSibling);
+            // current = this.$merge(n, current.nextSibling);
+            current = this.$merge(current, n);
             break;
           } else {
             current = this.$merge(current, next);
@@ -663,6 +663,20 @@ class Processor {
 
       return firstNode;
     }
+
+    if (firstNode.nodeType === Node.TEXT_NODE && secondNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+      if (secondNode.firstChild && secondNode.children.length === 0) {
+        firstNode.data += secondNode.firstChild.data;
+  
+        return firstNode;
+      }
+
+      firstNode.parentNode.insertBefore(secondNode, firstNode.nextSibling);
+      return firstNode.nextSibling;
+    }
+
+    console.log({'firstNode': firstNode, 't': firstNode.childNodes});
+    console.log({'secondNode': secondNode, 't': secondNode.childNodes});
 
     let newNode = secondNode.cloneNode(true);
     firstNode.parentNode.insertBefore(newNode, firstNode.nextSibling);
