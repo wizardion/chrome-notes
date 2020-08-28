@@ -1,4 +1,4 @@
-class Processor {
+class ProcessorOld {
   constructor (element, controls) {
     this.element = element;
     this.$types = {

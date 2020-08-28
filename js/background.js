@@ -7,13 +7,19 @@ var main = {
   
 document.addEventListener('DOMContentLoaded', function(){
   main.database = openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
+
   main.database.transaction(function(tx) {
     var createSQL = 'CREATE TABLE IF NOT EXISTS Notes (title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, updated REAL, created REAL)'; 
-    tx.executeSql(createSQL, null, function(tx, data){}, function(tx, error){
+    tx.executeSql(createSQL, null, function(tx, data){
       console.log({
-        'error.code': error.code,
-        'error.message': error.message
-      });
+        'tx': tx,
+        'data': data,
+        'database': main.database
+      })
+
+      console.warn({'Message': 'A NEW TABLE "Notes" HAS BEEN CREATED!'});
+    }, function(tx, error){
+      console.log({'error.code': error.code, 'error.message': error.message});
     });
   });
 
@@ -155,6 +161,8 @@ main.add = function(note, callback = function(){}){
 main.remove = function (id, callback = function(){}){
   var sql = "DELETE FROM Notes WHERE rowId = ?";
   var data = [id];
+
+  console.log(sql, data);
 
   main.database.transaction(function(tx) { tx.executeSql(sql, data, function(tx, data){
     callback(data.rowsAffected);
