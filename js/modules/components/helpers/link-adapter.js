@@ -1,0 +1,136 @@
+class LinkAdapter extends CommandAdapter {
+  constructor (element, keyCode) {
+    super(element, keyCode);
+
+    this.$commandRegex = /\[([^\[\]]+)\]\(([\S]+)\)$/i;
+    this.$linkRegex = /^(\s*)((https?\:\/\/|www\.)[^\s]+)(\s*)$/i;
+  }
+
+  /**
+   * Internal method: RemoveHtml.
+   * 
+   * @param {*} selection
+   * 
+   * Checks if selection contains an HTML Link element
+   */
+  $containsLink(selection) {
+    let container = selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer;
+
+    return (container && container.nodeName === 'A' || container.parentNode.nodeName === 'A') ||
+           (container && container.innerHTML && container.innerHTML.match(/<(a)[^>]+>/ig));
+  }
+
+  /**
+   * Internal method: RemoveHtml.
+   * 
+   * @param {*} node
+   * @param {*} source
+   * 
+   * checks all node behind and extracts the command link
+   */
+  $findLink(node, source) {
+    let lastNode = node;
+
+    do {
+      if (this.$commandRegex.test(source)) {
+        lastNode = node;
+        break;
+      }
+
+      node = node.previousSibling? node.previousSibling :
+        node.parentNode !== this.element? node.parentNode.previousSibling : null;
+
+      if(node) {
+        source = (node.data || node.outerHTML) + source;
+      }
+    } while(node);
+
+    let [html, text, url] = source.split(this.$commandRegex, 3);
+
+    return [lastNode, text, url];
+  }
+
+  /**
+   * @param {*} selection
+   * 
+   * Returns the executed test of selection if it can contain the link formated text.
+   */
+  test(selection) {
+    let focusNode = selection.focusNode;
+    let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
+    let regex = /([^\[\]]+)\]\(([\S]+)\)$/i;
+
+    return regex.test(source);
+  }
+
+  /**
+   * Executes command, replaces selection into command link format [text](url)
+   */
+  command() {
+    let selection = window.getSelection();
+    
+    if(!this.$system && this.isInside(selection, 'CODE|PRE')) {
+      return;
+    }
+
+    let text = selection.toString();
+    var link = this.isInside(selection, 'A');
+
+    // unlink
+    if(link) {
+      let innerHTML = link.innerHTML;
+      let url = link.getAttribute('href');
+      let range = selection.rangeCount > 0 && selection.getRangeAt(0);
+
+      range.selectNode(link);
+
+      document.execCommand("unlink", false);
+
+      super.command('insertHTML', selection, `[${innerHTML}](${url})`);
+
+      selection.collapse(selection.focusNode, selection.focusOffset - 1);
+      selection.extend(selection.focusNode, selection.focusOffset - url.length);
+
+      return;
+    }
+
+    // create an auto link
+    if (!link && text.match(this.$linkRegex)) {
+      let linkHtml = text.replace(this.$linkRegex, '$1<a href="$2">$2</a>$4');
+
+      return super.command('insertHTML', selection, linkHtml);
+    }
+
+    // create a custom link
+    super.command('insertHTML', selection, `[${text}](url)`);
+    selection.collapse(selection.focusNode, selection.focusOffset - 1);
+    selection.extend(selection.focusNode, selection.focusOffset - 3);
+  }
+
+  /**
+   * @param {*} selection
+   * 
+   * Replace selection into HTML Link Element
+   */
+  exec(selection) {
+    let focusNode = selection.focusNode;
+    let source = focusNode.data && focusNode.data.substr(0, selection.focusOffset);
+
+    if (!source) {
+      return;
+    }
+
+    let [lastNode, text, url] = this.$findLink(focusNode, source);
+
+    if (text && url) {
+      let linkHtml = `<a href="${url}">${text}</a> `;
+      let lastText = (lastNode == focusNode)? source : lastNode.data;
+
+      selection.collapse(focusNode, source.length);
+      selection.extend(lastNode, lastText.substr(0, lastText.lastIndexOf('[')).length);
+
+      super.command('insertHTML', selection, linkHtml);
+      return true;
+    }
+  }
+}

@@ -9,10 +9,22 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
   
+  <link rel="stylesheet" type="text/css" href="css/fonts.css" />
   <link rel="stylesheet" type="text/css" href="css/details.css" />
   <link rel="stylesheet" type="text/css" href="css/controls.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="css/editor.css" /> -->
   <link rel="stylesheet" type="text/css" href="css/main.css" />
 
+  <!-- <script type="text/javascript" src="js/modules/components/editor-base.js"></script> -->
+  <script type="text/javascript" src="js/modules/components/helpers/key-codes.js"></script>
+  <script type="text/javascript" src="js/modules/components/helpers/base.js"></script>
+  <script type="text/javascript" src="js/modules/components/helpers/command-adapter.js"></script>
+  <script type="text/javascript" src="js/modules/components/helpers/link-adapter.js"></script>
+  <script type="text/javascript" src="js/modules/components/helpers/style-adapter.js"></script>
+  <script type="text/javascript" src="js/modules/components/helpers/style-remover.js"></script>
+  <script type="text/javascript" src="js/modules/components/helpers/html-helper.js"></script>
+  <script type="text/javascript" src="js/modules/components/text-processor.js"></script>
+  <script type="text/javascript" src="js/modules/components/processor.js"></script>
   <script type="text/javascript" src="js/modules/components/editor.js"></script>
 
   <script type="text/javascript" src="js/modules/components/validators.js"></script>
@@ -36,7 +48,13 @@
   <div id="notes" class="notes">
     <div id="details-view" class="details-view">
       <div id="details-controls" class="head">
-        <input id="to-list" type="button" class="button back" value="All Notes" />
+        <!-- <input id="to-list" type="button" class="button back" value="All Notes" /> -->
+        <button id="to-list" class="button back"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="17">
+          <path d="M 9,3 V 4 H 8 V 5 H 7 V 6 H 6 V 7 H 5 V 8 H 4 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 v 1 h 1 1 V 13 H 10 V 12 H 9 V 11 H 8 V 10 H 7 V 9 H 6 V 8 H 7 V 7 H 8 V 6 H 9 V 5 h 1 V 4 h 1 V 3 h -1 z" /></svg>
+          All Notes
+        </button>
+
+        <!-- <input id="to-list" type="button" class="button back" value="" /> -->
         <div id="delete-note" class="button delete">
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="19">
             <path d="m 11,1 0,2 -4,0 0,1 1,0 0,12 c 4.263e-4,0.58315 0.1537698,1.111243 0.5214844,1.480469 C 8.889199,17.849695 9.4187095,18.004381 10.003906,18 l 8.990235,0 c 0.586679,0.0079 1.116934,-0.147251 1.484375,-0.517578 C 20.845956,17.112095 20.998723,16.584733 21,16.001953 L 21,16 21,4 22,4 22,3 18,3 18,1 11,1 Z m 1,1 5,0 0,1 -5,0 0,-1 z m -3,2 11,0 0,11.998047 c -9.15e-4,0.41722 -0.09846,0.646249 -0.230469,0.779297 C 19.63752,16.910392 19.41918,17.00558 19.005859,17 l -0.002,0 -9.0058591,0 -0.00195,0 C 9.5812905,17.003105 9.3625714,16.908036 9.2304688,16.775391 9.0983661,16.642745 9.0003047,16.41685 9,16 L 9,4 Z m 2,2 0,9 1,0 0,-9 -1,0 z m 3,0 0,9 1,0 0,-9 -1,0 z m 3,0 0,9 1,0 0,-9 -1,0 z" />
@@ -45,50 +63,63 @@
 
         <div id="editor-controlls" class="editor-controlls">
             <fieldset>
-              <div action="bold" name="bold" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">  
-                    <path d="m 12.65678,13 c -0.466102,0 -0.936441,-0.01695 -1.411017,-0.05085 -0.474577,-0.02543 -0.889831,-0.08475 -1.2457631,-0.177967 l 0,-8.5550843 c 0.1864411,-0.033898 0.3855931,-0.063559 0.5974581,-0.088983 0.211864,-0.033898 0.427966,-0.059322 0.648305,-0.076271 0.220339,-0.016949 0.43644,-0.029661 0.648305,-0.038136 0.220339,-0.00847 0.427966,-0.012712 0.622881,-0.012712 0.533899,0 1.029661,0.042373 1.487288,0.1271186 0.457627,0.076271 0.851695,0.2076271 1.182204,0.3940678 0.796918,0.4478179 1.045654,1.0440198 1.067796,1.8686441 0.02214,0.8246243 -0.530982,1.3256882 -1.131356,1.7796611 1.128027,0.3907992 1.564914,1.0934826 1.56356,2.1101697 -0.0014,1.016687 -0.330509,1.588983 -0.991526,2.04661 C 15.033898,12.775423 14.021187,13 12.65678,13 Z m -1.080509,-4.0677966 0,2.6822036 c 0.177966,0.01695 0.368644,0.02966 0.572034,0.03814 0.20339,0.0085 0.389831,0.01271 0.559322,0.01271 0.330509,0 0.635593,-0.02119 0.915254,-0.06356 0.288136,-0.04237 0.533899,-0.114407 0.737289,-0.216102 0.211864,-0.110169 0.377118,-0.254237 0.495762,-0.432203 0.127119,-0.177966 0.190678,-0.40678 0.190678,-0.686441 C 15.04661,9.7669511 14.864407,9.4194936 14.5,9.2245783 14.135593,9.029663 13.631356,8.9322054 12.987288,8.9322054 Z m 0,-1.2584746 1.131356,0 c 0.610169,0 1.088983,-0.084746 1.436441,-0.2542372 0.347457,-0.1779661 0.521186,-0.4915255 0.521186,-0.940678 0,-0.4237289 -0.182203,-0.7245763 -0.54661,-0.9025424 C 13.762712,5.3983051 13.29661,5.309322 12.720339,5.309322 c -0.245763,0 -0.466102,0.00424 -0.661017,0.012712 -0.186441,0.00847 -0.347458,0.021187 -0.483051,0.038136 z" />
+              <div action="bold"  name="bold" class="button bold" title="Bold Ctrl+B">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                    <path d="M 10,3 V 8.25 14 h 4 c 2,0 3.5,-0.762277 3.5,-3.285 C 17.5,9.6197614 16.733803,8.8576983 16,8.25 16.733803,7.6951445 17,7 17,6 17,3.6966437 15,3 13,3 Z m 1.5,1.5 c 2.5,0 4,0 4,1.5 0,1.5 -1.5,1.5 -4,1.5 z m 0,4.5722656 c 2.5,0 4.5,-1.233e-4 4.5,1.6427344 0,1.642857 -1,1.785 -4.5,1.785 z" />
                   </svg>
               </div><!--
-              --><div action="italic" class="button">
+              --><div action="italic" class="button" title="Italic Ctrl+I">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 13.625,4 h 1.639 l -1.776,9 h -1.639 z" />
+                    <path d="M 14.021484 3 L 11.849609 14 L 13.488281 14 L 15.660156 3 L 14.021484 3 z " />
                   </svg>
               </div><!--
-            --><div action="underline" class="button">
+            --><div action="underline" class="button" title="Underline Ctrl+U">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 10,4 0,5.5 c 0.0019,1.899515 1.546508,3.511383 3.503906,3.5 C 15.450982,12.988677 17,11.400436 17,9.5 l 0,-5.5 -1.5,0 0,5.5 c 0,1.099564 -0.853596,1.993311 -2.003906,2 C 12.356106,11.506629 11.5011,10.600485 11.5,9.5 L 11.5,4 10,4 Z" />
-                    <path d="m 10,14 0,1 7,0 0,-1 -7,0 z" />
+                    <path d="m 10.5,3 v 6.5 c 0.0019,1.899515 1.546508,3.511383 3.503906,3.5 C 15.950985,12.988685 17.5,11.400436 17.5,9.5 V 3 H 16 v 6.5 c 0,1.099564 -0.853599,1.993315 -2.003906,2 C 12.856106,11.506629 12.0011,10.600485 12,9.5 V 3 Z m 0,11 v 1 h 7 v -1 z" />
                   </svg>
               </div><!--
-            --><div action="strikethrough" class="button">
+            --><div action="strikethrough" class="button" title="Strikethrough Ctrl+Y">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 12.9425,12.845 q 2.09,0 2.09,-1.43 0,-0.44 -0.1925,-0.7425 -0.17875,-0.31625 -0.495,-0.53625 -0.31625,-0.2337502 -0.72875,-0.3987502 -0.39875,-0.165 -0.8525,-0.33 -0.5225,-0.17875 -0.99,-0.39875 -0.4675,-0.23375 -0.81125,-0.53625 -0.34375,-0.31625 -0.55,-0.7425 -0.1925,-0.42625 -0.1925,-1.03125 0,-1.25125 0.8525,-1.9525 0.8525,-0.70125 2.35125,-0.70125 0.86625,0 1.5675,0.1925 0.715,0.17875 1.045,0.39875 L 15.61,5.7224998 q -0.28875,-0.17875 -0.86625,-0.34375 -0.56375,-0.17875 -1.32,-0.17875 -0.385,0 -0.715,0.0825 -0.33,0.0825 -0.5775,0.2475 -0.2475,0.165 -0.39875,0.42625 -0.1375,0.2475 -0.1375,0.59125 0,0.385 0.15125,0.64625 0.15125,0.26125 0.42625,0.4675 0.275,0.1925 0.6325,0.3575 0.37125,0.165 0.81125,0.33 0.61875,0.2475 1.1275,0.495 0.5225,0.2475 0.89375,0.59125 0.385,0.34375 0.59125,0.8250002 0.20625,0.4675 0.20625,1.14125 0,1.25125 -0.92125,1.925 Q 14.60625,14 12.9425,14 12.37875,14 11.8975,13.9175 11.43,13.84875 11.05875,13.7525 10.6875,13.6425 10.4125,13.5325 10.15125,13.40875 10,13.32625 l 0.39875,-1.1 q 0.31625,0.17875 0.9625,0.39875 0.64625,0.22 1.58125,0.22 z" />
-                    <path d="M 18,7.485 18,8.724 9,10.5 9,9.261 Z" />
+                    <path d="m 13.626953,3.0019531 c -2.71248,0.076765 -3.958545,2.160587 -2.845703,4.4121094 L 12.419922,6.9121094 C 10.823643,5.3944404 12.789729,3.1570373 16.322266,4.8613281 L 16.794922,3.6621094 C 15.597817,3.1734501 14.531113,2.9763647 13.626953,3.0019531 Z m 3.763672,3.59375 c -0.102021,-0.00794 -0.21397,0.00581 -0.332031,0.046875 l -6.611328,2.2988281 c -0.944494,0.3285316 -0.450354,1.7445478 0.49414,1.4160158 l 6.611328,-2.2988282 c 0.826432,-0.287465 0.552039,-1.4073165 -0.162109,-1.4628907 z m -0.509766,3.0390625 -1.558593,0.4765624 c 1.54483,2.771903 -2.221142,3.246789 -4.757813,1.921875 L 10.125,13.248047 c 3.29697,1.620561 8.449162,0.712622 6.755859,-3.6132814 z" />
                   </svg>
+              </div><!--
+              --><div action="link" class="button" title="Link Ctrl+L">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                    <path d="M 7.1322587,6.6993471 C 5.2023543,7.6517372 4.4343073,9.9163976 5.3866975,11.846302 c 0.95239,1.929905 3.21705,2.697951 5.1469545,1.745561 l 2.067755,-1.020418 c 1.309578,-0.646265 2.082983,-1.879684 2.090161,-3.2545974 l -1.603683,0.603911 C 12.844404,10.469467 12.472529,10.92083 11.921128,11.192942 L 9.8533733,12.21336 C 8.6816457,12.791597 7.3434375,12.337751 6.7652006,11.166023 6.1869638,9.9942956 6.6408097,8.6560871 7.8125374,8.0778502 L 9.8802924,7.0574321 C 10.569544,6.7172927 11.291071,6.7790658 11.942719,7.0574584 L 13.707524,6.4543892 C 12.544769,5.3139835 10.716366,4.9306227 9.2000138,5.6789289 Z M 15.237949,3.4224475 c -0.159241,0.078848 -0.308775,0.1784585 -0.452602,0.2769237 l 0.863501,1.2613 c 0.321617,-0.2201835 0.792064,-0.3677567 1.226608,-0.3910426 0.620562,0.042006 1.76786,0.00673 2.288167,-0.031021 1.250264,-0.044495 2.273481,0.972816 2.319189,2.2571461 0.04449,1.2502632 -0.972817,2.2734819 -2.257147,2.3191879 -0.635125,-0.04299 -1.841843,-0.0083 -2.341875,0.03074 l 0.120822,1.5474514 c 0.30696,-0.02396 1.899306,-0.05471 2.180752,-0.03158 l 0.05371,2.84e-4 0.03217,0.01091 c 2.084926,-0.07419 3.82324,-1.7929409 3.747831,-3.9119349 l 2.84e-4,-0.053708 C 22.918107,4.6459644 21.229583,2.9275855 19.128686,3.0023513 l -0.02154,0.010631 -0.03217,-0.010915 c -0.306959,0.023966 -1.899306,0.054709 -2.180751,0.031581 l -0.03217,-0.010909 -0.05371,-2.812e-4 c -0.550872,0.029519 -1.092673,0.1634453 -1.570396,0.3999894 z m -4.181978,4.7690129 a 0.77095282,0.77095282 0 0 0 0.787974,1.3253562 L 17.698096,7.4849537 A 0.77459243,0.77459243 0 0 0 17.190131,6.0214154 l -5.854153,2.0318633 a 0.76868763,0.76868763 0 0 0 -0.215391,0.1062936 0.768986,0.768986 0 0 0 -0.06462,0.03189 z" />
+                  </svg>
+                </svg>
               </div>
             </fieldset>
             <fieldset>
-                <div action="bullet-number" class="button">
+                <div action="insertOrderedList" class="button" title="Point List Ctrl+O">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
                     <path d="m 7,4 -1,0 0,1 1.0039062,0 0,4 L 6,9 l 0,1 4,0 0,-1 -1.5,0 0,-5 z m 4,0 0,2 12,0 0,-2 z m 0,4 0,2 12,0 0,-2 z m -3,4 0,2 15,0 0,-2 z" />
                   </svg>
                 </div><!--
-                --><div action="bullet-list" class="button">
+                --><div action="insertUnorderedList" class="button" title="Ordered List Ctrl+P">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
                     <path d="m 6,8 0,2 3,0 0,-2 z M 6,4 6,6 9,6 9,4 Z m 2,8 0,2 16,0 0,-2 z m 3,-4 0,2 13,0 0,-2 z m 0,-4 0,2 13,0 0,-2 z" />
                   </svg>
                 </div>
             </fieldset>
             <fieldset>
-                <div action="undo" class="button">
+              <div action="removeFormat" class="button" title="Remove Format Ctrl+G">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
+                  <!-- <path d="M 13.160156 3 L 11.388672 7.6386719 L 13.099609 6.90625 L 14 4.4667969 L 14.65625 6.2382812 L 15.880859 5.7128906 L 14.847656 3 L 13.160156 3 z M 21 4.6074219 L 7 10.607422 L 7 12.240234 L 21 6.2402344 L 21 4.6074219 z M 17.128906 8.9882812 L 15.873047 9.5253906 L 16.025391 9.9394531 L 14.908203 9.9394531 L 12.019531 11.177734 L 16.490234 11.177734 L 17.492188 14 L 19.039062 14 L 17.128906 8.9882812 z M 11.443359 11.423828 L 9.6503906 12.193359 L 8.9609375 14 L 10.529297 14 L 11.443359 11.423828 z" /> -->
+                  <!-- <path d="M 13.160156 3 L 11.576172 7.1464844 L 13.279297 6.4179688 L 14 4.4667969 L 14.525391 5.8847656 L 15.746094 5.359375 L 14.847656 3 L 13.160156 3 z M 21 4.46875 L 20.705078 4.5957031 L 7 10.46875 L 7 12.101562 L 7.2949219 11.974609 L 21 6.1015625 L 21 4.46875 z M 17.171875 9.1015625 L 15.914062 9.640625 L 16.025391 9.9394531 L 15.21875 9.9394531 L 12.328125 11.177734 L 16.490234 11.177734 L 17.492188 14 L 19.039062 14 L 17.171875 9.1015625 z M 11.388672 11.580078 L 9.5898438 12.351562 L 8.9609375 14 L 10.529297 14 L 11.388672 11.580078 z" /> -->
+                  <path d="M 13.160156 3 L 11.697266 6.8300781 L 13.285156 6.40625 L 14 4.4667969 L 14.587891 6.0566406 L 15.880859 5.7109375 L 14.847656 3 L 13.160156 3 z M 21 5.6347656 L 7 9.3808594 L 7 10.935547 L 21 7.1894531 L 21 5.6347656 z M 17.3125 9.4707031 L 15.982422 9.8261719 L 16.025391 9.9394531 L 15.558594 9.9394531 L 9.9375 11.443359 L 8.9609375 14 L 10.529297 14 L 11.53125 11.177734 L 16.490234 11.177734 L 17.492188 14 L 19.039062 14 L 17.3125 9.4707031 z" />
+                </svg>
+              </div>
+            </fieldset>
+            <fieldset>
+                <div action="undo" class="button" title="Undo Ctrl+Z">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 10,2 -4,4 4,4 0,-3 5.5,0 C 16.96035,7 18,8.1736578 18,9.5 18,10.826342 16.96035,12 15.5,12 L 12,12 a 1.0001,1.0001 0 1 0 0,2 l 3.5,0 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 L 10,5 10,2 Z" />
+                    <path d="M 12,2.5 8,6 12,9.5 V 7 h 3.5 C 16.96035,7 18,8.173658 18,9.5 18,10.826342 16.96035,12 15.5,12 H 15 c -1.352323,-0.01913 -1.352323,2.019125 0,2 h 0.5 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 H 12 Z" />
                   </svg>
                 </div><!--
-                --><div action="redo" class="button">
+                --><div action="redo" class="button" title="Redo Ctrl+Shift+Z">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 16,2 0,3 -5.5,0 C 7.950198,5 6,7.102992 6,9.5 6,11.897008 7.950198,14 10.5,14 l 3.5,0 a 1.0001,1.0001 0 1 0 0,-2 l -3.5,0 C 9.03965,12 8,10.826342 8,9.5 8,8.1736578 9.03965,7 10.5,7 l 5.5,0 0,3 4,-4 -4,-4 z" />
+                    <path d="M 16,2.5 20,6 16,9.5 V 7 H 12.5 C 11.03965,7 10,8.173658 10,9.5 10,10.826342 11.03965,12 12.5,12 H 13 c 1.352323,-0.01913 1.352323,2.019125 0,2 H 12.5 C 9.950198,14 8,11.897008 8,9.5 8,7.102992 9.950198,5 12.5,5 H 16 Z" />
                   </svg>
                 </div>
             </fieldset>
@@ -97,7 +128,7 @@
 
       <div id="content" class="content">
         <input id="title-note" type="text" maxlength="60" tabindex="1" class="edit-title details" placeholder="Enter a Title of Note">
-        <div id="description-note" class="content-description" contenteditable="true" tabindex="2"></div>
+        <pre id="description-note" class="content-description" contenteditable="true" tabindex="2"></pre>
       </div>
     </div>
 
@@ -111,5 +142,101 @@
       <div id="list-items" class="list-items"></div>
     </div>
   </div>
+
+  <div id="expression" class="expression-logs"></div>
+  <div id="expression-result"  class="expression-logs statistic"></div>
+  <div class="expression-logs" style="top: 272px; width: 900px; height: 200px;">
+    <p style="margin-top: 5px; margin-bottom: 5px;">1. you have 
+      <script>var i = 1;</script>
+      to explicitly <b><i>tell</i></b> Git which changes</p>
+
+      <script type="text/javascript">var i = 1;</script>
+
+
+    <p style="margin-top: 5px; margin-bottom: 5px;">2. you have to explicitly <b><i>tell</i></b> Git 2 <= 3 which changes</p>
+    <p style="margin-top: 5px; margin-bottom: 5px;">you have to explicitly |<b><i>tell</i></b>| Git which changes</p>
+    <p style="margin-top: 5px; margin-bottom: 5px;">you have to explicitly |<b><i>tell </i></b>| Git which changes</p>
+    <p style="margin-top: 5px; margin-bottom: 5px;">you have to explicitly |<b><i> tell</i></b>| Git which changes</p>
+    <p style="margin-top: 5px; margin-bottom: 5px;">you have to explicitly Un<b><i>Tell</i></b>ing me Git which changes</p>
+    <p style="margin-top: 5px; margin-bottom: 5px;">you have to explicitly |<b><i> tell </i></b>| Git which changes</p>
+    <p style="margin-top: 5px; margin-bottom: 5px;">you have to explicitly <b>tell</b> you<br> Git which changes</p>
+    <p><strong>The "commit" command is used to save your changes to the local repository.</strong></p>
+    <p>Note that you have to explicitly <b><i>tell</i></b> Git which changes you want to include in a commit <b>before</b> running the "git commit" command. This means that a file won't be <b>automatically</b> included in the next commit just because it was changed. Instead, you need to use the "git add" command to mark the desired changes for inclusion.</p>
+    <p>Also note that in Git (not like in Subversion), a commit is <b>not</b> automatically transferred to the remote server. Using the "git commit" command only saves a new commit object in the <b>local</b> Git repository. Exchanging commits has to be performed manually and explicitly (with the "git fetch", "git pull", and "git push" commands).</p>
+    <hr>
+    
+    <h2>Important 1 < 2 Options</h2> <h2    title="test"   href="#"  name="test21 "         > test </h2>
+<h4 class="monospaced bold">-m &lt;message&gt;</h4>
+<p><strong>Sets the commit's message.</strong> Make sure to provide a concise description that helps your teammates (and yourself) understand what happened.</p>
+
+  </div>
+
+  <div id="t-rect" style="position: absolute; background: red; opacity: 0.35;">
+
+  </div>
+  <script>
+    function fill(properies, params) {
+      if(properies === null || properies === undefined) {
+        return `null`;
+      }
+
+      let logs = [];
+      let keys = Object.keys(properies);
+      let isArray =  typeof properies === 'object' && properies.length;
+      let brackets = isArray? ['[', ']'] : ['{', '}'];
+      let delimeter = isArray? ', ' : '; ';
+
+      params.push('background: transparent; color: black;');
+
+      for (let key in properies) {
+        let value = properies[key];
+        let color = typeof value === 'string'? '#ca0303' : 'blue';
+        let quote = typeof value === 'string'? '"' : '';
+
+        if(isArray) {
+          params.push(`background: transparent; color: ${color};`);
+
+          if (typeof value === 'object') {
+            value = fill(value, params);
+          }
+  
+          logs.push(`%c${quote}${value}${quote}%c`);
+          params.push('background: transparent; color: black;');
+        } else {
+          params.push('background: transparent; color: dimgray;');
+          params.push(`background: transparent; color: ${color};`);
+
+          if (typeof value === 'object') {
+            value = fill(value, params);
+          }
+
+          if (typeof value === 'function') {
+            value = 'fn';
+          }
+  
+          logs.push(`%c${key}: %c${quote}${value}${quote}%c`);
+          params.push('background: transparent; color: black;');
+        }
+      }
+
+      params.push('background: transparent; color: black;');
+      return `%c${brackets[0]}${logs.join(delimeter)}%c${brackets[1]}`;
+    }
+
+    function printStr(value) {
+      console.log(value);
+    }
+
+    console.print = function(properies) {
+      if (typeof properies === "object") {
+        let params = [];
+        
+        params.unshift(fill(properies, params));
+        console.log.apply(console, params);
+      } else {
+        printStr(value);
+      }
+    }
+  </script>
 </body>
 </html>

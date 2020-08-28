@@ -1,8 +1,3 @@
-div[contenteditable] {
-  cursor: text;
-  /* min-height: 185px; */
-}
-
 .head
 {
   height: 25px;
@@ -12,6 +7,9 @@ div[contenteditable] {
   position: relative;
   line-height: 23px;
   border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+  border-bottom: 1px dashed #07a69857;
+  border-bottom: 1px dotted rgba(7, 166, 152, 0.15);
+  /* border-bottom: 1px groove rgba(7, 166, 152, 0.075); */
 }
 
 .edit-title
@@ -21,6 +19,7 @@ div[contenteditable] {
   height: 26px;
   background: transparent;
   margin: 0px 0px 0px 0px;
+
   /* padding-left: 40px; */
 
   /* position: absolute; */
@@ -33,36 +32,42 @@ div[contenteditable] {
   transform: translateX(-50%); */
 }
 
-.edit-title:focus
-{
-  outline: none;
-}
-
 .edit-title.details
 {
   width: 100%;
   left: 0px;
   text-align: center;
   border-bottom: 1px solid transparent;
-  font: 15px sans-serif;
+  /* font: 15px sans-serif; */
   color: #07a698;
+  color: #088e82;
+  color: #06736a;
   padding-bottom: 3px;
-  /* margin-left: -40px; */
-  padding-left: 75px;
-  padding-right: 60px;
 
   width: 100%;
   left: 0px;
   text-align: center;
   border: none;
-  color: black;
+  /* color: black; */
 
-  font: 16px sans-serif;
+  /* font: 15px "Open Sans", sans-serif; */
+  /* font: 16px sans-serif; */
+  /* font: 15px "Open Sans", sans-serif; */
   /* font-weight: bold; */
-  /* margin-top: 0px; */
+  font-family: inherit;
+  
+  /* color: darkgrey; */
 
   /* font-weight: bold; */
-  text-decoration: underline;
+  /* text-decoration: underline; */
+  font-size: 17px;
+  font-weight: 500;
+
+  /* font-family: 'Nunito2', sans-serif; */
+  /* font-family: 'Quicksand2', 'Ubuntu2', sans-serif; */
+  font-family: 'Ubuntu2', sans-serif;
+  border-bottom: 1px solid transparent;
+  margin-top: 10px;
 }
 
 .content
@@ -104,7 +109,8 @@ div[contenteditable] {
   /* height: 240px; */
   height: 228px;
   /* height: 209px; */
-  overflow-y: scroll;
+  
+
   overflow-y: hidden;
   overflow-x: hidden;
   outline: none;
@@ -116,22 +122,200 @@ div[contenteditable] {
   background: transparent;
   padding-top: 10px;
 
-  display: flex;
-  flex-flow: column;
+  /* display: flex;
+  flex-flow: column; */
+
+  padding: 0px;
+  height: 244px;
+
+  overflow-y: scroll;
+  /* padding-right: 25px; */
+  padding-right: 15px;
+  margin-right: -25px;
+}
+
+div[contenteditable] {
+  cursor: text;
+  /* min-height: 185px; */
 }
 
 .content-description {
   outline: none;
   border: none;
   /* margin: 5px 0 0 0; */
+  margin: 0;
   padding: 2px;
   resize: none;
   border: none;
   padding: 6px;
+  padding-right: 7px;
   background: transparent;
   /* padding-right: 25px; */
   padding-top: 10px;
 
   /* background: yellow; */
   flex: 1 1 auto;
+  /* font: 13.5px "Open Sans", sans-serif; */
+  font-family: inherit;
+  
+  /* font-family: sans-serif;
+  font-size: 15px; */
+
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  /* white-space: inherit; */
+
+  font-size: 14px;
+  /* font-weight: 300; */
+  /* font-family: 'Karla', sans-serif; */
+  /* font-family: 'Nunito2', sans-serif; */
+  /* font-family: 'Quicksand2', 'Ubuntu2', sans-serif; */
+  font-family: 'Ubuntu2', sans-serif;
+  font-weight: 400;
+  display: inline-block;
+  /* background: lightblue; */
+  /* width: 100%; */
+  /* min-height: 192px;
+  width: 588px; */
+  width: 100%;
+  min-height: 208px;
+  box-sizing: border-box;
+  line-height: 20px;
+
+  
+
+  /* overflow-y: hidden;
+  overflow-x: hidden; */
+
+  /* line-height: 20px;
+  font-family: Quicksand2; */
+  /* font-family: Quicksand2; */
 }
+
+textarea.content-description {
+  border: 1px solid red;
+}
+
+
+/* .content-description b {
+  font-size: 14px;
+} */
+
+/* textarea.content-description {
+  width: 100%;
+  height: 100%;
+} */
+
+.content-description p {
+  margin: 0px;
+}
+
+.content-description ul,
+.content-description ol {
+  /* margin: 3px 0px 3px 0px; */
+  margin: -1px;
+  padding-left: 30px;
+  /* display: inline-block; */
+  /* line-height:200% */
+}
+
+/* .content-description ul li:first-child::selection {
+  background: red;
+  height: 30px;
+} */
+
+/* .content-description ol li {
+  line-height: normal;
+} */
+
+.content-description ul li:first-child,
+.content-description ol li:first-child {
+  /* background: #e8b600; */
+  padding-top: 1px;
+}
+
+.content-description ul li:last-child,
+.content-description ol li:last-child {
+  padding-bottom: 1px;
+}
+
+.content-description a {
+  color: dodgerblue;
+  text-decoration: none;
+  /* color: blue; */
+  color: #06736a;
+}
+
+.content-description a:hover {
+  text-decoration: underline !important;
+  /* cursor: pointer; */
+  /* cursor: context-menu; */
+  /* color: blue; */
+}
+
+.content-description a:visited,
+.content-description a:active {
+  color: dodgerblue;
+  color: #06736a;
+  /* color: blue; */
+}
+
+.content-description::selection,
+.content-description ::selection,
+.edit-title.details::selection {
+  /* background: #07a69857; */
+  background: #07a6983d; /* WebKit/Blink Browsers */
+}
+
+.expression-logs {
+  font-size: 14px;
+  position: fixed;
+  padding: 5px;
+  width: 500px;
+  height: 232px;
+  top: 27px;
+  left: 605px;
+  /* border: 1px solid #07a698; */
+  border: 1px solid #07a69857;
+  background: white;
+  /* white-space: pre-wrap;
+  word-wrap: break-word; */
+  word-break: break-word;
+  overflow: auto;
+
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.expression-logs hr {
+  height: 1px;
+  border: none;
+  /* background: silver; */
+  background: #07a69857;
+  margin: 10px -5px 10px -5px;
+  padding: 0;
+}
+
+.expression-logs.statistic {
+  top: 0px;
+  height: 14px;
+  font-size: 13px;
+}
+
+/* LOG */
+.expression-logs .error {
+  background: yellow; 
+  border: 1px solid palegoldenrod; 
+  border-bottom: 2px solid #e33636;
+  margin: 0px 2px;
+}
+
+.expression-logs .html-symbol {
+  border-bottom: 2px solid #f1bebe;
+}
+
+.expression-logs .symbol {
+  border-bottom: 2px solid #b9e6e2;
+}
+/* END LOG */

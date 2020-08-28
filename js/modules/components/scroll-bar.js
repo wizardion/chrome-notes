@@ -11,11 +11,14 @@ class ScrollBar {
     this.thumb.classList.add('scroll');
     this.control.parentNode.appendChild(this.thumb);
 
-    if (options) {
+    if (options && options.background) {
       this.thumb.style.background = options.background;
     }
 
-    this.control.addEventListener('wheel', this.onWheel.bind(this));
+    if (options && options.wheel === true) {
+      this.control.addEventListener('wheel', this.onWheel.bind(this));
+    }
+
     this.control.addEventListener('scroll', this.onScroll.bind(this));
 
     return control;
@@ -49,9 +52,12 @@ class ScrollBar {
       return;
     }
 
+    var height = parseInt(max / (this.control.scrollHeight / max));
+    var top = parseInt(this.control.scrollTop * ((max - height) / scrollHeight));
+
     this.thumb.style.marginTop = this.control.offsetTop;
-    this.thumb.style.height = this.control.offsetHeight / (this.control.scrollHeight / this.control.offsetHeight);
-    this.thumb.style.top = (this.control.scrollTop * ((max - this.thumb.offsetHeight) / scrollHeight));
+    this.thumb.style.height = height;
+    this.thumb.style.top = top;
 
     this.thumb.style.visibility = '';
 

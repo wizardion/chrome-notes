@@ -14,10 +14,21 @@ class SimpleNotes extends BaseNotes {
   }
 
   init(notes) {
+    const rowId = localStorage.rowId;
+    const isNewNote = !!localStorage.newNote;
+
     super.init(notes);
 
-    if (!localStorage.rowId) {
+    if (!isNewNote && !rowId) {
       this.backToList();
+    }
+
+    if (!isNewNote && rowId) {
+      this.selectNote(parseInt(rowId));
+    }
+
+    if (isNewNote) {
+      this.newNote();
     }
   }
 
@@ -42,7 +53,7 @@ class SimpleNotes extends BaseNotes {
       this.controls.detailsView.style.display = 'inherit';
 
       this.editMode.controls.cancel.className = 'button back';
-      this.editMode.controls.title.focus();
+      this.editMode.controls.activeElement.focus();
 
       this.editMode.onCancel = function () {
         this.backToList();

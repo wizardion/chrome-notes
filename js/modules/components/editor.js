@@ -1,103 +1,152 @@
-class Editor {
+// class Editor extends TextProcessor {
+class Editor extends Processor {
   constructor (element, controls) {
-    const allowedTags = ['a', 'b', 'strong', 'br'];
-    const allowedAttributes = ['href'];
+    super(element);
 
-    this.element = element;
+    this.$value = this.element.innerHTML;
     this.controls = controls;
-    this.rules = [];
 
-    // Replace to <br/>
-    this.rules.push({
-      pattern: new RegExp('<\/(li|p|h[0-9])>', 'gi'),
-      replacement: '<br/>'
-    });
-
-    // Remove all attributes except allowed.
-    var replacements = ['$1'];
-    var attrPatterns = [];
-
-    for(var i = 0; i < allowedAttributes.length; i++){
-      replacements.push('$' + (i + 2));
-
-      attrPatterns.push(
-          '(?:(?:(?:(?!' + allowedAttributes.join('=|') + '=)[^>]))*((?:' + 
-          allowedAttributes.join('|') + ')=[\'"][^\'"]*[\'"]\\s*)?)'
-      );
-    }
-
-    this.rules.push({
-      pattern: new RegExp('<(\\w+)\\s*' + attrPatterns.join('') + '[^>]*>', 'gi'),
-      replacement: '<' + replacements.join(' ') + '>'
-    });
-    
-    // Remove all tags except allowed.
-    this.rules.push({
-      pattern: new RegExp('(<\/?(?:' + allowedTags.join('|') + ')[^>]*>)|<[^>]+>', 'gi'),
-      replacement: '$1'
-    });
+    this.customEvents = {'change': null};
 
     this.init();
-
-    // Add events
-    this.element.addEventListener('paste', this.$onPaste.bind(this));
-    this.element.addEventListener('keydown', this.$onHandleInput.bind(this));
-
-    return this.element;
+    // this.element.addEventListener('blur', this.$onChange.bind(this));
   }
 
+  /**
+   * Init the controller
+   * 
+   * Init controlls and events.
+   */
   init() {
-    //https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
-    //https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard
-    //https://bear.app/
-
     for (let i = 0; i < this.controls.length; i++) {
       const item = this.controls[i];
+      const action = item.getAttribute('action');
+      const helper = this.$helpers[action];
 
-      item.onmousedown = this.precommand;
-      item.onmouseup = this.command;
+      item.onmousedown = this.$preCommand;
+      // item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper, action) : this.$command.bind(this, action);
+
+      if (action === 'bold') {
+        item.onmouseup = this.$onChange.bind(this);
+      }
     }
   }
 
-  precommand(e) {
-    // cancel paste.
+  /**
+   * Internal event: PreCommand.
+   * 
+   * @param {*} e
+   * 
+   * Executes before the command to cancel the original event
+   */
+  $preCommand(e) {
     e.preventDefault();
   }
 
-  command(e) {
-    let action = this.getAttribute('action');
+  /**
+   * Internal event: Command.
+   * 
+   * @param {*} e
+   * 
+   * Executes the command in editor.
+   */
+  $command(action) {
+    // let scrollTop = this.element.parentNode.scrollTop;
 
-    // cancel event.
-    e.preventDefault();
-
-    console.log(`action: ${action}`);
     document.execCommand(action);
+    // this.element.parentNode.scrollTop = scrollTop;
   }
 
-  $onPaste(e) {
-    // cancel paste.
-    e.preventDefault();
+  /**
+   * Internal event: CustomCommand.
+   * 
+   * @param {*} e
+   * 
+   * Executes the custom command handling the specified helper in editor.
+   */
+  $customCommand(helper, action) {
+    if (this.hasFocus()) {
+      helper.command(action);
+    }
+  }
 
-    // Get html data from clipboard.
-    var data = (e.originalEvent || e).clipboardData.getData('text/html').toString();
+  /**
+   * @param {*} value
+   * 
+   * Sets html value
+   */
+  set value(value) {
+    this.$value = value;
+    this.element.innerHTML = this.$value;
+  }
 
-    for (let index = 0; index < this.rules.length; index++) {
-      const rule = this.rules[index];
-      data = data.replace(rule.pattern, rule.replacement);
+  /**
+   * Gets html value
+   */
+  get value() {
+    return this.element.innerHTML;
+  }
+
+  /**
+   * @param {*} name
+   * @param {*} callback
+   * 
+   * Sets html event listener
+   */
+  addEventListener(name, callback) {
+    if (name in this.customEvents) {
+      this.customEvents[name] = callback;
+      return;
     }
 
-    document.execCommand('insertHTML', false, data);
+    this.element.addEventListener(name, callback);
   }
 
-  $onHandleInput(e) {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      // this.controls.description.focus();
-      document.execCommand('insertHTML', true, '&emsp;&emsp;&emsp;&emsp;');
-      // document.execCommand('insertHTML', true, '<pre>\tSome </pre>');
-      // document.execCommand('insertHTML', false, '&#9;');
+  /**
+   * @param {*} name
+   * @param {*} callback
+   * 
+   * Removes html event listener
+   */
+  removeEventListener(name, callback) {
+    if (name in this.customEvents) {
+      this.customEvents[name] = callback;
+      return;
+    }
+
+    this.element.removeEventListener(name, callback);
+  }
+
+  /**
+   * Focus
+   * 
+   * Sets focus to element
+   */
+  focus() {
+    this.element.focus();
+  }
+
+  /**
+   * HasFocus
+   * 
+   * Gets the result if the editor is in focus.
+   */
+  hasFocus() {
+    return document.activeElement === this.element;
+  }
+
+  /**
+   * Internal method: OnChange.
+   * 
+   * Fires onChange handler if custom event is configured.
+   */
+  $onChange() {
+    let event = this.customEvents['change'];
+
+    if (this.element.innerHTML != this.$value && event) {
+      // event(super.$onChange());
+      event(this.element.innerHTML);
+      this.$value = this.element.innerHTML;
     }
   }
 }
-
-
