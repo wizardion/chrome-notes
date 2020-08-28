@@ -112,7 +112,7 @@ class Processor {
     }
 
     if (!nodes.selected && nodes.start - nodes.step < 0) {
-      console.log('The node is ended!');
+      console.log('The End of the node!');
       return;
     }
 
