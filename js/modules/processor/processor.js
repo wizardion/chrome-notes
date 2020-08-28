@@ -23,6 +23,7 @@ class Processor {
     //#endregion
   }
 
+  //#region Handlers
   $preProcessInput(e) {
     let selection = window.getSelection();
 
@@ -49,29 +50,6 @@ class Processor {
         this.element.spellcheck = true;
         console.log('spellcheck')
       }.bind(this), 10000);
-    }
-  }
-
-  $getNodes(selection) {
-    var range = document.createRange();
-    var selected = selection.toString().length;
-
-    range.setStart(selection.anchorNode, selection.anchorOffset);
-    range.setEnd(selection.focusNode, selection.focusOffset);
-    
-    let [leftNode, rightNode, start, end] = (!range.collapsed)? 
-      [selection.anchorNode, selection.focusNode, selection.anchorOffset, selection.focusOffset] : 
-      [selection.focusNode, selection.anchorNode, selection.focusOffset, selection.anchorOffset];
-
-    return {
-      left: leftNode,
-      right: rightNode,
-      previousSibling: leftNode.previousSibling,
-      nextSibling: rightNode.nextSibling,
-      start: start,
-      end: end,
-      selected: selected,
-      step: (selected > 0)? 0 : 1
     }
   }
 
@@ -112,6 +90,7 @@ class Processor {
       return this.$delete(selection, nodes);
     }
   }
+  //#endregion
 
   //#region Commands
   $delete(selection, nodes) {
@@ -127,6 +106,11 @@ class Processor {
   }
 
   $backspace(selection, nodes) {
+    if (!this.$canMoveBackward(nodes)) {
+      console.log('The End!');
+      return;
+    }
+
     if (!nodes.selected && nodes.start - nodes.step < 0) {
       console.log('The node is ended!');
       return;
@@ -159,6 +143,40 @@ class Processor {
 
     nodes.left.data = left + right;
     selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
+  }
+  //#endregion
+
+  //#region Internal Functions
+  $getNodes(selection) {
+    var range = document.createRange();
+    var selected = selection.toString().length;
+
+    range.setStart(selection.anchorNode, selection.anchorOffset);
+    range.setEnd(selection.focusNode, selection.focusOffset);
+    
+    let [leftNode, rightNode, start, end] = (!range.collapsed)? 
+      [selection.anchorNode, selection.focusNode, selection.anchorOffset, selection.focusOffset] : 
+      [selection.focusNode, selection.anchorNode, selection.focusOffset, selection.anchorOffset];
+
+    return {
+      left: leftNode,
+      right: rightNode,
+      previousSibling: leftNode.previousSibling,
+      nextSibling: rightNode.nextSibling,
+      start: start,
+      end: end,
+      selected: selected,
+      step: (selected > 0)? 0 : 1
+    }
+  }
+
+  $canMoveBackward(nodes) {
+    return !((!nodes.selected && nodes.start - nodes.step < 0) && !nodes.previousSibling && 
+        (nodes.left === this.element || nodes.left.parentNode === this.element));
+  }
+
+  $canMoveForward(nodes) {
+    return true;
   }
   //#endregion
 }
