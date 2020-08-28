@@ -70,7 +70,7 @@ class Processor {
     }
 
     // Input method
-    if (e.key.length === 1 && nodes.left === nodes.right && nodes.left.data) {
+    if (e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
       nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
       return selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
     }
@@ -89,6 +89,8 @@ class Processor {
     if (e.keyCode === code.del && nodes.left === nodes.right) {
       return this.$delete(selection, nodes);
     }
+
+    throw 'Unhandled Exception!';
   }
   //#endregion
 
