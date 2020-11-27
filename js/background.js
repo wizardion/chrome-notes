@@ -11,21 +11,27 @@ document.addEventListener('DOMContentLoaded', function(){
   main.database.transaction(function(tx) {
     var createSQL = 'CREATE TABLE IF NOT EXISTS Notes (title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, updated REAL, created REAL)'; 
     tx.executeSql(createSQL, null, function(tx, data){
-      console.log({
-        'tx': tx,
-        'data': data,
-        'database': main.database
-      })
+      // console.log({
+      //   'tx': tx,
+      //   'data': data,
+      //   'database': main.database
+      // })
 
-      console.warn({'Message': 'A NEW TABLE "Notes" HAS BEEN CREATED!'});
+      // console.warn({'Message': 'A NEW TABLE "Notes" HAS BEEN CREATED!'});
     }, function(tx, error){
-      console.log({'error.code': error.code, 'error.message': error.message});
+      // console.log({'error.code': error.code, 'error.message': error.message});
     });
   });
 
   if(localStorage.notes){
-    migrate();
+    // migrate();
   }
+
+  setInterval(function () {
+    console.warn({
+      'database': main.database
+    });
+  }, 15000);
 //#region TEST
 //#region test tracking
   //----------------------------------------------------------------------
@@ -172,6 +178,8 @@ main.remove = function (id, callback = function(){}){
 main.addEventListener = function(key, callback) {
   this.events[key] = callback;
 };
+
+main.selection = null;
 
 function pritSQL(sql, data) {
   var sqlText = sql;

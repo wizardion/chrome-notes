@@ -227,7 +227,7 @@ class TextProcessor {
     return this.$htmlHelper.removeHtml(this.element.innerHTML).replace(/^([ ]*)[\r\n]$/gi, '$1');
   }
 
-  static log(element) {
+  static log0(element) {
     var tagRegex = /(&lt\;\/?[^&]+&gt\;)/ig;
     var symbRegex = /(&amp\;\w+\;)/ig;
     var logDiv = document.getElementById('expression');
@@ -289,6 +289,70 @@ class TextProcessor {
     // });
     var logDiv = document.getElementById('expression-result').innerHTML = 
       `<i>html tags: - <b>${(tags && tags.length) || 0};</b></i>&nbsp;&nbsp;&nbsp;<i>symbols: - <b>${(sTags && sTags.length || 0)};</b></i>`;
+  }
+
+  static log(element, focused) {
+    var logDiv = document.getElementById('expression');
+    var logs = this.getLogs(element, focused);
+
+    // console.log(element.childNodes);
+
+    logDiv.innerHTML = this.escape(logs.join('\n'));
+  }
+
+  static getLogs(element, focused, level=0) {
+    var logs = [];
+    // let lev = '';
+
+    // for (var j = 0; j < level; j++) {
+    //   lev += '          ';
+    // }
+
+    for (var i = 0; i < element.childNodes.length; i++) {
+      const node = element.childNodes[i];
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        if (node === focused.node) {
+          let left = node.data.substring(0, focused.start);
+          let right = node.data.substring(focused.start);
+
+          logs.push(`"${left}|${right}"`);
+        } else {
+          logs.push(`"${node.data}"`);
+        }
+      }
+
+      if (node.nodeType !== Node.TEXT_NODE && !node.childNodes.length) {
+        logs.push(`<${node.localName}></${node.localName}>`);
+      }
+
+      if (node.nodeType !== Node.TEXT_NODE && node.childNodes.length) {
+        // logs = logs.concat(`${lev} <${node.localName}>`, this.getLogs(node, level+1).join('\n'), `${lev} </${node.localName}>`)
+        logs.push(`<${node.localName}>${this.getLogs(node, focused, level).join('')}</${node.localName}>`);
+      }
+    }
+
+    return logs;
+  }
+
+  static escape(str) {
+    var tagRegex = /(&lt\;\/?[^&]+&gt\;)/ig;
+    var symbRegex = /(&amp\;\w+\;)/ig;
+    var tagsToReplace = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;'
+    };
+
+    let encodedStr = str.replace(/[&<>]/g, function (tag) {
+      return tagsToReplace[tag] || tag;
+    });
+
+    return encodedStr.replace(tagRegex, '<span class="error">$1</span>').
+                                  replace(symbRegex, '<span class="html-symbol">$1</span>').
+                                  replace(/( )( )/ig, '$1&nbsp;').
+                                  replace(/(\n|\r)/ig, '<br>').
+                                  replace(/(\n|\r)/ig, '<span class="symbol">\\n</span>');
   }
 }
 
