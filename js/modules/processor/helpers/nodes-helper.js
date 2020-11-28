@@ -156,7 +156,7 @@ class NodeHelper {
     return sibling;
   }
 
-  merge(node) {
+  mergeNext(node) {
     var sibling = node.nextSibling;
 
     if (!sibling) {

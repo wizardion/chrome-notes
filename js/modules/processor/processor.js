@@ -157,8 +157,7 @@ class Processor {
         nodes.step = (nodes.left.data.length && !level && !inList)? 1 : 0;
 
         if (inList) {
-          helper.merge(nodes.left);
-          console.warn('Merge!');
+          helper.mergeNext(nodes.left);
         }
       }
     }
