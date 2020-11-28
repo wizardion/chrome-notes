@@ -13,71 +13,26 @@ class NodeHelper {
     4 - "#text<b>#text<i>#text</i>#text</b>#text".
     5 - "<b>#text<u><i>#text</i></u></b>".
   */
-  backToPrevous(node) {
+  backToPrevous(nodeElement) {
+    var node = this.$deegDown(nodeElement);
     var sibling = node.previousSibling;
 
-    //#region  UP
     if (!sibling) {
-      console.log('-------------------- UP --------------------');
-      console.log(node);
-
-      while (node.parentNode && node.parentNode !== this.$root) {
-        var tmp = null;
-
-        if (this.isEmptyNode(node)) {
-          console.log({'remove_1': node});
-          tmp = node;
-        }
-
-        node = node.parentNode;
-        console.log(node);
-
-        if (tmp) {
-          tmp.remove();
-          tmp = null;
-        }
-
-        if (node.previousSibling) {
-          sibling = node.previousSibling;
-
-          if (this.isEmptyNode(node)) {
-            console.log({'remove_2': node});
-            node.remove();
-          }
-
-          break;
-        }
-      }
-
-      if (this.isEmptyNode(node)) {
-        console.log({'remove_2': node});
-        node.remove();
-      }
-
-      console.log({
-        'sibling': sibling,
-        // 'node': node,
-      });
+      sibling = this.$backToUp(node);
 
       if (!sibling) {
         return null;
       }
     }
-    //#endregion
 
-    //#region DOWN
-    console.log('-------------------- DOWN --------------------');
-    console.log(sibling);
-    while (sibling.lastChild) {
-      sibling = sibling.lastChild;
-      console.log(sibling);
-    }
+    sibling = this.$deegDown(sibling);
 
     if (this.isEmptyNode(node)) {
       console.log({'remove_3': node});
       node.remove();
     }
 
+    //#region END
     // if (this.isEmptyNode(sibling)) {
     //   console.log({'remove_3': sibling});
     //   sibling.remove();
@@ -88,6 +43,68 @@ class NodeHelper {
     //#endregion
 
     return sibling;
+    //#endregion
+  }
+
+  $backToUp(node) {
+    var sibling;
+
+    console.log('-------------------- UP --------------------');
+    console.log(node);
+
+    while (node.parentNode && node.parentNode !== this.$root) {
+      var tmp = null;
+
+      if (this.isEmptyNode(node)) {
+        console.log({'remove_1': node});
+        tmp = node;
+      }
+
+      node = node.parentNode;
+      console.log(node);
+
+      if (tmp) {
+        tmp.remove();
+        tmp = null;
+      }
+
+      if (node.previousSibling) {
+        sibling = node.previousSibling;
+
+        if (this.isEmptyNode(node)) {
+          console.log({'remove_2': node});
+          node.remove();
+        }
+
+        break;
+      }
+    }
+
+    //#region END
+    if (this.isEmptyNode(node)) {
+      console.log({'remove_2': node});
+      node.remove();
+    }
+
+    console.log({
+      'sibling': sibling,
+      // 'node': node,
+    });
+
+    return sibling;
+    //#endregion
+  }
+
+  $deegDown(sibling) {
+    console.log('-------------------- DOWN --------------------');
+    console.log(sibling);
+
+    while (sibling && sibling.lastChild) {
+      sibling = sibling.lastChild;
+      console.log(sibling);
+    }
+
+    return sibling;
   }
 
   isEmptyNode(node) {
@@ -95,11 +112,6 @@ class NodeHelper {
       (node.nodeType === Node.TEXT_NODE && !node.data.length) || 
       (node.nodeType !== Node.TEXT_NODE && !node.lastChild)
     );
-
-    // console.log({
-    //   'is':  (node.nodeType === Node.TEXT_NODE)? node.data : node.outerHTML,
-    //   'result': result
-    // })
 
     return result;
   }

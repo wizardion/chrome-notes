@@ -23,8 +23,7 @@ class Processor {
     setTimeout(function(){
       setInterval(function () {
         if (document.activeElement === this.element) {
-          let selection = window.getSelection();
-          var nodes = this.$getNodes(selection);
+          var nodes = this.$getNodes(window.getSelection());
 
           if(value !== this.element.innerHTML || (cursor !== nodes.left || start !== nodes.start) || 1) {
             cursor = nodes.left;
@@ -33,8 +32,9 @@ class Processor {
             value = this.element.innerHTML;
           }
         }
-      }.bind(this), 25);
-    }.bind(this), 1000);
+      // }.bind(this), 250);
+      }.bind(this), 1000);
+    }.bind(this), 10);
     //#endregion
   }
 
@@ -111,18 +111,81 @@ class Processor {
 
   //#region Commands
   $delete(selection, nodes) {
-    let left = nodes.left.data.substring(0, nodes.start);
-    let right = nodes.left.data.substring(nodes.end + nodes.step);
+    // let left = nodes.left.data.substring(0, nodes.start);
+    // let right = nodes.left.data.substring(nodes.end + nodes.step);
+
+    // if (right.length === 0 && left[left.length - 1] === '\n') {
+    //   right += '\n';
+    // }
+
+    // nodes.left.data = left + right;
+    // selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
+
+    this.$setData(selection, nodes, nodes.start, nodes.end + nodes.step);
+  }
+
+  $backspace(selection, nodes, level=null) {
+    let helper = new NodeHelper(this.element, nodes);
+
+    // The End!
+    if (!this.$canMoveBackward(nodes)) {
+      console.log('The End!');
+      return;
+    }
+
+    // moving backward
+    if (!nodes.selected && nodes.start - nodes.step < 0) {
+      nodes.left = helper.backToPrevous(nodes.left);
+
+      if(!nodes.left) {
+        if (!this.element.firstChild) {
+          nodes.left = document.createTextNode('');
+          this.element.appendChild(nodes.left);
+        } else {
+          nodes.left = helper.$deegDown(this.element.firstChild);
+        }
+
+        nodes.right = nodes.left;
+        nodes.start = 0;
+        nodes.end = 0;
+        nodes.step = 0;
+      } else {
+        nodes.right = nodes.left;
+        nodes.start = nodes.left.data.length;
+        nodes.end = nodes.left.data.length;
+        nodes.step = (nodes.left.data.length && !level && !this.$isInList(nodes.left))? 1 : 0;
+      }
+    }
+
+    // Multipules nodes selected!
+    if (nodes.selected && nodes.left !== nodes.right) {
+      console.warn('Multipules nodes selected!');
+      return;
+    }
+
+    this.$setData(selection, nodes, nodes.start - nodes.step, nodes.end);
+    
+    // cleaning up
+    if (!level && !nodes.selected && helper.isEmptyNode(nodes.left) && this.element.childNodes.length === 1) {
+    // if (!level && !nodes.selected && helper.isEmptyNode(nodes.left)) {
+      return this.$backspace(selection, nodes, 1);
+    }
+  }
+
+  $setData(selection, nodes, start, end) {
+    let left = nodes.left.data.substring(0, nodes.start - nodes.step);
+    let right = nodes.left.data.substring(nodes.end);
 
     if (right.length === 0 && left[left.length - 1] === '\n') {
       right += '\n';
     }
 
     nodes.left.data = left + right;
+    nodes.start = nodes.start - nodes.step;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
   }
 
-  $backspace(selection, nodes) {
+  $backspace0(selection, nodes) {
     let helper = new NodeHelper(this.element, nodes);
 
     // The End!
@@ -189,33 +252,34 @@ class Processor {
     // }
     //#endregion
 
+    // ?
     if (!nodes.left.data.length && this.$canMoveBackward(nodes)) {
-      console.log({
-        'left': nodes.left,
-        'start': nodes.start,
-        'step': nodes.step
-      });
+      // console.log({
+      //   'left': nodes.left,
+      //   'start': nodes.start,
+      //   'step': nodes.step
+      // });
 
-      nodes.left = helper.backToPrevous(nodes.left);
+      // nodes.left = helper.backToPrevous(nodes.left);
 
-      if(!nodes.left) {
-        console.log('The End 3!');
+      // if(!nodes.left) {
+      //   console.log('The End 3!');
 
-        if (!this.element.lastChild) {
-          console.log('Add a text node 3!');
-        }
+      //   if (!this.element.lastChild) {
+      //     console.log('Add a text node 3!');
+      //   }
 
-        return;
-      }
+      //   return;
+      // }
 
-      nodes.right = nodes.left;
-      nodes.start = nodes.left.data.length;
-      nodes.end = nodes.left.data.length;
-      nodes.step = 0;
+      // nodes.right = nodes.left;
+      // nodes.start = nodes.left.data.length;
+      // nodes.end = nodes.left.data.length;
+      // nodes.step = 0;
     }
     
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
-    console.warn(`"${this.element.innerHTML}"`);
+    // console.warn(`"${this.element.innerHTML}"`);
   }
 
   $enter(selection, nodes) {
@@ -283,6 +347,11 @@ class Processor {
 
   $canMoveForward(nodes) {
     return true;
+  }
+
+  $isInList(node) {
+    return node && (node.nodeName === 'LI' || 
+           node.parentNode && node.parentNode.nodeName === 'LI')
   }
   //#endregion
 }

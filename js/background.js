@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', function(){
     // migrate();
   }
 
-  setInterval(function () {
-    console.warn({
-      'database': main.database
-    });
-  }, 15000);
+  // setInterval(function () {
+  //   console.warn({
+  //     'database': main.database
+  //   });
+  // }, 15000);
 //#region TEST
 //#region test tracking
   //----------------------------------------------------------------------
