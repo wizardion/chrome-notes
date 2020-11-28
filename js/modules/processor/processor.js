@@ -150,10 +150,16 @@ class Processor {
         nodes.end = 0;
         nodes.step = 0;
       } else {
+        let inList = this.$isInList(nodes.left);
         nodes.right = nodes.left;
         nodes.start = nodes.left.data.length;
         nodes.end = nodes.left.data.length;
-        nodes.step = (nodes.left.data.length && !level && !this.$isInList(nodes.left))? 1 : 0;
+        nodes.step = (nodes.left.data.length && !level && !inList)? 1 : 0;
+
+        if (inList) {
+          helper.merge(nodes.left);
+          console.warn('Merge!');
+        }
       }
     }
 

@@ -95,6 +95,55 @@ class NodeHelper {
     //#endregion
   }
 
+  $frontToUp(node) {
+    var sibling;
+
+    console.log('-------------------- UP --------------------');
+    console.log(node);
+
+    while (node.parentNode && node.parentNode !== this.$root) {
+      var tmp = null;
+
+      if (this.isEmptyNode(node)) {
+        console.log({'remove_1': node});
+        tmp = node;
+      }
+
+      node = node.parentNode;
+      console.log(node);
+
+      if (tmp) {
+        tmp.remove();
+        tmp = null;
+      }
+
+      if (node.nextSibling) {
+        sibling = node.nextSibling;
+
+        if (this.isEmptyNode(node)) {
+          console.log({'remove_2': node});
+          node.remove();
+        }
+
+        break;
+      }
+    }
+
+    //#region END
+    if (this.isEmptyNode(node)) {
+      console.log({'remove_2': node});
+      node.remove();
+    }
+
+    console.log({
+      'sibling': sibling,
+      // 'node': node,
+    });
+
+    return sibling;
+    //#endregion
+  }
+
   $deegDown(sibling) {
     console.log('-------------------- DOWN --------------------');
     console.log(sibling);
@@ -107,6 +156,23 @@ class NodeHelper {
     return sibling;
   }
 
+  merge(node) {
+    var sibling = node.nextSibling;
+
+    if (!sibling) {
+      sibling = this.$frontToUp(node);
+
+      if (!sibling) {
+        return null;
+      }
+    }
+
+    sibling = this.$deegDown(sibling);
+
+    // document.insertBefore()
+    this.$insertAfter(sibling, node);
+  }
+
   isEmptyNode(node) {
     var result = (
       (node.nodeType === Node.TEXT_NODE && !node.data.length) || 
@@ -114,6 +180,10 @@ class NodeHelper {
     );
 
     return result;
+  }
+
+  $insertAfter(newNode, existingNode) {
+    existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
   }
 
 }
