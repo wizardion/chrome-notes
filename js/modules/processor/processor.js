@@ -15,6 +15,7 @@ class Processor {
     // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
 
     this.$timer = null;
+    this.$history = [];
 
     //#region TEST_DATA
     var value = this.element.innerHTML;
@@ -89,7 +90,13 @@ class Processor {
 
     // Input method
     if (!e.metaKey && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
+      if (!this.$history.length) {
+        this.$setHistory(nodes.left, nodes.start);
+      }
+
       nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
+
+      this.$setHistory(nodes.left, nodes.start + 1);
       return selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
     }
 
@@ -128,6 +135,16 @@ class Processor {
     // DELETE command
     if (e.keyCode === code.del) {
       return this.$delete(selection, nodes);
+    }
+
+    // DELETE command
+    if (e.metaKey && e.shiftKey && e.keyCode === code.z) {
+      return this.$getHistory(selection, 1);
+    }
+    
+    // DELETE command
+    if (e.metaKey && e.keyCode === code.z) {
+      return this.$getHistory(selection, -1);
     }
 
     throw 'Unhandled Exception!';
@@ -255,6 +272,8 @@ class Processor {
     let left = nodes.left.data.substring(0, start) + value;
     let right = nodes.left.data.substring(end);
 
+    this.$setHistory(nodes.left, nodes.start);
+
     if (right.length === 0 && left[left.length - 1] === '\n') {
       right += '\n';
     }
@@ -262,6 +281,80 @@ class Processor {
     nodes.left.data = left + right;
     nodes.start = start + value.length;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
+  }
+
+  $setHistory(node, start){
+    var data = {
+      html: this.element.innerHTML,
+      start: start,
+      possition: this.$getPossition(node),
+      nodes: this.element.childNodes
+    };
+
+    if (this.$currentHistory && this.$currentHistory < this.$history.length - 1) {
+      this.$history = this.$history.splice(0, this.$currentHistory);
+    }
+
+    this.$history.push(data);
+    this.$currentHistory = this.$history.length - 1;
+  }
+
+  $getHistory(selection, step){
+    // var data = this.$history.pop();
+    this.$currentHistory += step;
+
+    console.log({
+      'c0': this.$currentHistory
+    });
+
+    if(this.$currentHistory < 0) {
+      this.$currentHistory = 0;
+    }
+
+    if(this.$currentHistory >= this.$history.length) {
+      this.$currentHistory = this.$history.length - 1;
+    }
+
+    var data = this.$history[this.$currentHistory];
+
+    console.log({
+      'c': this.$currentHistory,
+      'h': this.$history
+    });
+
+    if (data) {
+      this.element.innerHTML = data.html;
+      var node = this.$getNode(data.possition);      
+
+      selection.setBaseAndExtent(node, data.start, node, data.start);
+    }
+  }
+
+  $getPossition(node) {
+    var children = 0;
+    var nodes = 0;
+
+    while (node.parentNode && node.parentNode !== this.element) {
+      children++;
+      node = node.parentNode;
+    }
+
+    while (node && node.previousSibling) {
+      nodes++;
+      node = node.previousSibling;
+    }
+
+    return {children: children, nodes: nodes};
+  }
+
+  $getNode(possition) {
+    var node = this.element.childNodes[possition.nodes];
+
+    for (var i = 0; i < possition.children; i++) {
+      node = node.firstChild;
+    }
+
+    return node;
   }
   //#endregion
 }
