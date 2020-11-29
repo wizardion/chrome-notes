@@ -48,6 +48,8 @@ var code = {
   home: 36,
   shiftKey: 16,
   ctrlKey: 17,
+  altKey: 18,
+  metaKey: 91,
   ctrl: 1000,
   shift: 1000,
   sysKeys: null,
@@ -57,9 +59,17 @@ var code = {
   }
 };
 
-code.sysKeys = [code.a, code.c, code.v, code.x, code.right, code.left, code.up, code.down, code.shiftKey, code.ctrlKey,   code.r];
+code.sysKeys = [
+  code.a, code.c, 
+  code.v, 
+  code.x, code.right, code.left, code.up, code.down, 
+  code.shiftKey, code.ctrlKey, code.altKey, code.metaKey,
+  code.r
+];
 
 code.comKeys = [code.shiftKey, code.ctrlKey]
 code.allowed = [
-  code.shiftKey, code.ctrlKey, code.right, code.left, code.up, code.down, code.home, code.end, code.pageUp, code.pageDowm, 
+  code.shiftKey, code.ctrlKey, code.right, code.left, code.up, code.down, code.home, code.end, 
+  code.pageUp, code.pageDowm
 ];
+

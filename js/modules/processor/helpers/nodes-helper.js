@@ -167,10 +167,16 @@ class NodeHelper {
       }
     }
 
-    sibling = this.$deegDown(sibling);
+    var second = this.$findParagraph(sibling);
 
-    // document.insertBefore()
-    this.$insertAfter(sibling, node);
+    console.log({
+      'second': second
+    });
+
+    // sibling = this.$deegDown(sibling);
+
+    // // document.insertBefore()
+    // this.$insertAfter(sibling, node);
   }
 
   isEmptyNode(node) {
@@ -180,6 +186,33 @@ class NodeHelper {
     );
 
     return result;
+  }
+
+  $findParagraph(node) {
+    console.log('-------------------- FIND --------------------');
+    while (node && node.nextSibling) {
+      var value = this.$toString(node);
+
+      if (node.nodeType === Node.TEXT_NODE && node.data.match(/\r|\n/gi)) {
+        return node;
+      }
+
+      if (node.nodeType !== Node.TEXT_NODE && node.outerHTML.match(/\r|\n/gi)) {
+        return node;
+      }
+
+      // if (this.$toString(node).indexOf('\n') >= 0)
+
+      node = node.nextSibling;
+    }
+
+    console.log({
+      'node2': this.$toString(node)
+    });
+  }
+
+  $toString(node) {
+    return node && (node.nodeType === Node.TEXT_NODE? node.data : node.outerHTML) || null; 
   }
 
   $insertAfter(newNode, existingNode) {

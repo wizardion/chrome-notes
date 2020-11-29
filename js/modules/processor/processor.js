@@ -9,6 +9,7 @@ class Processor {
 
     this.$helpers = {};
 
+    this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
     // document.addEventListener('keydown', this.$preProcessInput.bind(this));
     // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
@@ -44,14 +45,20 @@ class Processor {
 
     // console.log(e);
 
-    if (e.keyCode === code.r && (e.ctrlKey || e.metaKey)) {
+    // Tmp
+    if (e.keyCode === code.r && (e.ctrlKey || e.metaKey || e.altKey)) {
       return;
     }
 
-    if ((e.ctrlKey || e.metaKey) && code.allowed.indexOf(e.keyCode) < 0) {
+    if ((e.ctrlKey || e.metaKey || e.altKey) && code.sysKeys.indexOf(e.keyCode) >= 0) {
       // e.preventDefault();
       return;
     }
+
+    // if ((e.ctrlKey || e.metaKey) && !isAllowed && e.keyCode !== code.back) {
+    //   e.preventDefault();
+    //   return;
+    // }
 
     if (code.allowed.indexOf(e.keyCode) < 0) {
       this.element.spellcheck = false;
@@ -71,12 +78,8 @@ class Processor {
   $processInput(e, selection) {
     var nodes = this.$getNodes(selection);
 
-    // console.log(selection)
-    // console.log(e)
-    // console.log(nodes)
-
     // Input method - New
-    if (e.key.length === 1 && nodes.left === nodes.right && 
+    if (e.key.length === 1 && nodes.left === nodes.right &&
       nodes.left === this.element && this.element.childNodes.length === 0) {
         let textNode = document.createTextNode(e.key);
 
@@ -85,7 +88,7 @@ class Processor {
     }
 
     // Input method
-    if (e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
+    if (!e.metaKey && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
       nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
       return selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
     }
@@ -95,209 +98,76 @@ class Processor {
       return this.$enter(selection, nodes);
     }
 
+    // metaKey + Backspace command
+    if (e.metaKey && e.keyCode === code.back && !nodes.selected) {
+      let data = nodes.left? nodes.left.data.substring(0, nodes.start - 1) : '';
+      let index = data.lastIndexOf(' ');
+
+      nodes.step = 0;
+      nodes.start = index < 0? 0 : index;
+      nodes.selected = 2;
+      return this.$backspace(selection, nodes);
+    }
+
     // Backspace command
     if (e.keyCode === code.back) {
       return this.$backspace(selection, nodes);
     }
 
+    // metaKey + Backspace command
+    if (e.metaKey && e.keyCode === code.del && !nodes.selected && nodes.start < nodes.left.length) {
+      let data = nodes.left? nodes.left.data.substring(nodes.start + 1) : '';
+      let index = data.indexOf(' ');
+
+      nodes.step = 0;
+      nodes.end = nodes.start + index < 0? nodes.left.length : index + 2;
+      nodes.selected = 2;
+      return this.$delete(selection, nodes);
+    }
+
     // DELETE command
-    if (e.keyCode === code.del && nodes.left === nodes.right) {
+    if (e.keyCode === code.del) {
       return this.$delete(selection, nodes);
     }
 
     throw 'Unhandled Exception!';
   }
+
+  $onPaste(e) {
+    var clipboard = (e.originalEvent || e).clipboardData;
+    let selection = window.getSelection();
+    var nodes = this.$getNodes(selection);
+    var text = clipboard.getData('text/plain');
+
+    e.preventDefault();
+
+    if (nodes.left && nodes.left.nodeType === Node.TEXT_NODE) {
+      this.$setData(selection, nodes, nodes.start, nodes.end, text);
+    }
+  }
   //#endregion
 
   //#region Commands
   $delete(selection, nodes) {
-    // let left = nodes.left.data.substring(0, nodes.start);
-    // let right = nodes.left.data.substring(nodes.end + nodes.step);
-
-    // if (right.length === 0 && left[left.length - 1] === '\n') {
-    //   right += '\n';
-    // }
-
-    // nodes.left.data = left + right;
-    // selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
+    if (!this.$canMoveForward(nodes)) {
+      console.log('The End!');
+      return;
+    }
 
     this.$setData(selection, nodes, nodes.start, nodes.end + nodes.step);
   }
 
   $backspace(selection, nodes, level=null) {
-    let helper = new NodeHelper(this.element, nodes);
-
-    // The End!
     if (!this.$canMoveBackward(nodes)) {
       console.log('The End!');
-      return;
-    }
-
-    // moving backward
-    if (!nodes.selected && nodes.start - nodes.step < 0) {
-      nodes.left = helper.backToPrevous(nodes.left);
-
-      if(!nodes.left) {
-        if (!this.element.firstChild) {
-          nodes.left = document.createTextNode('');
-          this.element.appendChild(nodes.left);
-        } else {
-          nodes.left = helper.$deegDown(this.element.firstChild);
-        }
-
-        nodes.right = nodes.left;
-        nodes.start = 0;
-        nodes.end = 0;
-        nodes.step = 0;
-      } else {
-        let inList = this.$isInList(nodes.left);
-        nodes.right = nodes.left;
-        nodes.start = nodes.left.data.length;
-        nodes.end = nodes.left.data.length;
-        nodes.step = (nodes.left.data.length && !level && !inList)? 1 : 0;
-
-        if (inList) {
-          helper.mergeNext(nodes.left);
-        }
-      }
-    }
-
-    // Multipules nodes selected!
-    if (nodes.selected && nodes.left !== nodes.right) {
-      console.warn('Multipules nodes selected!');
       return;
     }
 
     this.$setData(selection, nodes, nodes.start - nodes.step, nodes.end);
-    
-    // cleaning up
-    if (!level && !nodes.selected && helper.isEmptyNode(nodes.left) && this.element.childNodes.length === 1) {
-    // if (!level && !nodes.selected && helper.isEmptyNode(nodes.left)) {
-      return this.$backspace(selection, nodes, 1);
-    }
-  }
-
-  $setData(selection, nodes, start, end) {
-    let left = nodes.left.data.substring(0, nodes.start - nodes.step);
-    let right = nodes.left.data.substring(nodes.end);
-
-    if (right.length === 0 && left[left.length - 1] === '\n') {
-      right += '\n';
-    }
-
-    nodes.left.data = left + right;
-    nodes.start = nodes.start - nodes.step;
-    selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
-  }
-
-  $backspace0(selection, nodes) {
-    let helper = new NodeHelper(this.element, nodes);
-
-    // The End!
-    if (!this.$canMoveBackward(nodes)) {
-      console.log('The End!');
-      return;
-    }
-
-    if (!nodes.selected && nodes.start - nodes.step < 0) {
-      console.log({
-        'previousSibling': nodes.previousSibling
-      });
-      
-      nodes.left = helper.backToPrevous(nodes.left);
-
-      if(!nodes.left) {
-        console.log('The End 2!');
-
-        if (!this.element.lastChild) {
-          console.log('Add a text node');
-        }
-
-        return;
-      }
-
-      nodes.right = nodes.left;
-      nodes.start = nodes.left.data.length;
-      nodes.end = nodes.left.data.length;
-      nodes.step = (nodes.left.data.length)? 1 : 0;
-
-      console.log('The End of the node!');
-      // return;
-    }
-
-    // Multipules nodes selected!
-    if (nodes.selected && nodes.left !== nodes.right) {
-      console.log('Multipules nodes selected!');
-      return;
-    }
-
-    let left = nodes.left.data.substring(0, nodes.start - nodes.step);
-    let right = nodes.left.data.substring(nodes.end);
-
-    if (right.length === 0 && left[left.length - 1] === '\n') {
-      right += '\n';
-    }
-
-    nodes.left.data = left + right;
-    nodes.start = nodes.start - nodes.step;
-
-    //#region Remove
-    // if (helper.isEmptyNode(nodes.left) && this.$canMoveBackward(nodes)) {
-    //   nodes.left = helper.backToPrevous(nodes.left);
-    //   nodes.right = nodes.left;
-    //   nodes.start = nodes.left.data.length;
-    //   nodes.end = nodes.left.data.length;
-    //   nodes.step = 0;
-
-    //   console.log('The End of the node2!');
-
-    //   if (!this.element.lastChild) {
-    //     console.log('add a text node');
-    //   }
-    // }
-    //#endregion
-
-    // ?
-    if (!nodes.left.data.length && this.$canMoveBackward(nodes)) {
-      // console.log({
-      //   'left': nodes.left,
-      //   'start': nodes.start,
-      //   'step': nodes.step
-      // });
-
-      // nodes.left = helper.backToPrevous(nodes.left);
-
-      // if(!nodes.left) {
-      //   console.log('The End 3!');
-
-      //   if (!this.element.lastChild) {
-      //     console.log('Add a text node 3!');
-      //   }
-
-      //   return;
-      // }
-
-      // nodes.right = nodes.left;
-      // nodes.start = nodes.left.data.length;
-      // nodes.end = nodes.left.data.length;
-      // nodes.step = 0;
-    }
-    
-    selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
-    // console.warn(`"${this.element.innerHTML}"`);
   }
 
   $enter(selection, nodes) {
-    let value = nodes.left.data.length === nodes.start? '\n\n' : '\n';
-    let left = nodes.left.data.substring(0, nodes.start) + value;
-    let right = nodes.left.data.substring(nodes.end);
-
-    if (right.length === 0 && left[left.length - 1] === '\n') {
-      right += '\n';
-    }
-
-    nodes.left.data = left + right;
-    selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
+    this.$setData(selection, nodes, nodes.start, nodes.end, '\n');
   }
   //#endregion
 
@@ -325,6 +195,32 @@ class Processor {
     }
   }
 
+  // $getSize(node) {
+  //   var height = 0;
+
+  //   if (!this.$render) {
+  //     this.$render = document.createElement('div');
+  //     // this.$render = this.element.cloneNode();
+  //     this.$render.style.width = this.element.offsetWidth - 10;
+  //     // this.$render.style.height = 'auto';
+  //     // this.$render.style.minHeight = 'auto';
+  //     this.$render.style.position = 'fixed';
+  //     this.$render.style.whiteSpace = 'pre-wrap';
+  //     this.$render.style.visibility = 'hidden';
+  //     this.$render.style.top = 2;
+  //     this.$render.style.zIndex = -1;
+  //     this.$render.style.background = 'yellow';
+      
+  //     document.body.appendChild(this.$render);
+  //   }
+
+  //   this.$render.innerHTML = 'a'
+  //   height = this.$render.offsetHeight;
+  //   this.$render.innerHTML = node.data;
+
+  //   return parseInt(this.$render.offsetHeight / height);
+  // }
+
   $canMoveBackward(nodes) {
     var resutl = !(
       (!nodes.selected && nodes.start - nodes.step < 0) && 
@@ -332,31 +228,40 @@ class Processor {
       (nodes.left === this.element || nodes.left.parentNode === this.element)
     );
     
-    // console.log({
-    //   '0':(!nodes.selected && nodes.start - nodes.step < 0),
-    //   'start':nodes.start,
-    //   'step':nodes.step,
-    //   'previousSibling': !nodes.previousSibling,
-    //   'element': (nodes.left === this.element || nodes.left.parentNode === this.element),
-    //   'resutl': resutl,
-    //   'is': (
-    //     (!nodes.selected && nodes.start - nodes.step < 0) && 
-    //     !nodes.previousSibling && 
-    //     (nodes.left === this.element || nodes.left.parentNode === this.element)
-    //   ),
-    //   'add': (this.element.lastChild === nodes.left && nodes.left.nodeType === Node.TEXT_NODE && !nodes.left.data.length)
-    // });
-    
     return resutl;
   }
 
   $canMoveForward(nodes) {
-    return true;
+    if (!nodes.selected && !nodes.nextSibling &&
+      nodes.left.nodeType === Node.TEXT_NODE && nodes.start >= nodes.left.length) {
+        return false;
+    }
+
+    var resutl = !(
+      !nodes.nextSibling && nodes.left && nodes.left.nodeType !== Node.TEXT_NODE &&
+      (nodes.left === this.element || nodes.left.parentNode === this.element)
+    );
+
+    return resutl;
   }
 
+  //TODO need to rewrite
   $isInList(node) {
     return node && (node.nodeName === 'LI' || 
            node.parentNode && node.parentNode.nodeName === 'LI')
+  }
+
+  $setData(selection, nodes, start, end, value='') {
+    let left = nodes.left.data.substring(0, start) + value;
+    let right = nodes.left.data.substring(end);
+
+    if (right.length === 0 && left[left.length - 1] === '\n') {
+      right += '\n';
+    }
+
+    nodes.left.data = left + right;
+    nodes.start = start + value.length;
+    selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
   }
   //#endregion
 }
