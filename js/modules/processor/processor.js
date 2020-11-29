@@ -92,14 +92,15 @@ class Processor {
     // Input method
     if (!e.metaKey && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
       if (!this.$history.length) {
-        this.$setHistory(nodes.left, nodes.start, nodes.selected);
+        this.$setHistory(nodes.left, nodes.start, 0);
+      } else {
+        this.$history[this.$currentHistory].selected = nodes.selected;
+        this.$history[this.$currentHistory].start = nodes.start;
       }
 
       nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
 
-      this.$setHistory(nodes.left, nodes.start + 1, 0);
-      this.$history[this.$currentHistory - 1].selected = nodes.selected;
-      this.$history[this.$currentHistory - 1].start = nodes.start;
+      this.$setHistory(nodes.left, nodes.start + 1);
       return selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
     }
 
@@ -276,7 +277,10 @@ class Processor {
     let right = nodes.left.data.substring(end);
 
     if (!this.$history.length) {
-      this.$setHistory(nodes.left, nodes.start, nodes.selected);
+      this.$setHistory(nodes.left, nodes.start, 0);
+    } else {
+      this.$history[this.$currentHistory].selected = nodes.selected;
+      this.$history[this.$currentHistory].start = nodes.start;
     }
 
     if (right.length === 0 && left[left.length - 1] === '\n') {
@@ -287,14 +291,13 @@ class Processor {
     nodes.start = start + value.length;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
 
-    this.$setHistory(nodes.left, nodes.start, 0);
-    this.$history[this.$currentHistory - 1].selected = nodes.selected;
-    this.$history[this.$currentHistory - 1].start = nodes.start;
+    this.$setHistory(nodes.left, nodes.start);
   }
 
-  $setHistory(node, start, selected){
+  $setHistory(node, start, selected=0){
     var data = {
       html: this.element.innerHTML,
+      len: this.element.innerHTML.length,
       start: start,
       selected: selected,
       possition: this.$getPossition(node),
@@ -316,6 +319,10 @@ class Processor {
 
     this.$currentHistory += step;
     var data = this.$history[this.$currentHistory];
+
+    console.log({
+      'h': this.$history
+    });
 
     if (data) {
       this.element.innerHTML = data.html;
