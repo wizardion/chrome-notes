@@ -300,12 +300,7 @@ class Processor {
   }
 
   $getHistory(selection, step){
-    // var data = this.$history.pop();
     this.$currentHistory += step;
-
-    console.log({
-      'c0': this.$currentHistory
-    });
 
     if(this.$currentHistory < 0) {
       this.$currentHistory = 0;
@@ -316,11 +311,6 @@ class Processor {
     }
 
     var data = this.$history[this.$currentHistory];
-
-    console.log({
-      'c': this.$currentHistory,
-      'h': this.$history
-    });
 
     if (data) {
       this.element.innerHTML = data.html;
