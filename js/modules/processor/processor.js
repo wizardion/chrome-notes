@@ -16,6 +16,7 @@ class Processor {
 
     this.$timer = null;
     this.$history = [];
+    this.$currentHistory = null;
 
     //#region TEST_DATA
     var value = this.element.innerHTML;
@@ -91,12 +92,14 @@ class Processor {
     // Input method
     if (!e.metaKey && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
       if (!this.$history.length) {
-        this.$setHistory(nodes.left, nodes.start);
+        this.$setHistory(nodes.left, nodes.start, nodes.selected);
       }
 
       nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
 
-      this.$setHistory(nodes.left, nodes.start + 1);
+      this.$setHistory(nodes.left, nodes.start + 1, 0);
+      this.$history[this.$currentHistory - 1].selected = nodes.selected;
+      this.$history[this.$currentHistory - 1].start = nodes.start;
       return selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
     }
 
@@ -272,7 +275,9 @@ class Processor {
     let left = nodes.left.data.substring(0, start) + value;
     let right = nodes.left.data.substring(end);
 
-    this.$setHistory(nodes.left, nodes.start);
+    if (!this.$history.length) {
+      this.$setHistory(nodes.left, nodes.start, nodes.selected);
+    }
 
     if (right.length === 0 && left[left.length - 1] === '\n') {
       right += '\n';
@@ -281,18 +286,23 @@ class Processor {
     nodes.left.data = left + right;
     nodes.start = start + value.length;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
+
+    this.$setHistory(nodes.left, nodes.start, 0);
+    this.$history[this.$currentHistory - 1].selected = nodes.selected;
+    this.$history[this.$currentHistory - 1].start = nodes.start;
   }
 
-  $setHistory(node, start){
+  $setHistory(node, start, selected){
     var data = {
       html: this.element.innerHTML,
       start: start,
+      selected: selected,
       possition: this.$getPossition(node),
       nodes: this.element.childNodes
     };
 
     if (this.$currentHistory && this.$currentHistory < this.$history.length - 1) {
-      this.$history = this.$history.splice(0, this.$currentHistory);
+      this.$history = this.$history.splice(0, this.$currentHistory + 1);
     }
 
     this.$history.push(data);
@@ -300,23 +310,18 @@ class Processor {
   }
 
   $getHistory(selection, step){
+    if((this.$currentHistory + step < 0) || (this.$currentHistory + step > this.$history.length - 1)) {
+      return;
+    }
+
     this.$currentHistory += step;
-
-    if(this.$currentHistory < 0) {
-      this.$currentHistory = 0;
-    }
-
-    if(this.$currentHistory >= this.$history.length) {
-      this.$currentHistory = this.$history.length - 1;
-    }
-
     var data = this.$history[this.$currentHistory];
 
     if (data) {
       this.element.innerHTML = data.html;
-      var node = this.$getNode(data.possition);      
+      var node = this.$getNode(data.possition);
 
-      selection.setBaseAndExtent(node, data.start, node, data.start);
+      selection.setBaseAndExtent(node, data.start, node, data.start + data.selected);
     }
   }
 
