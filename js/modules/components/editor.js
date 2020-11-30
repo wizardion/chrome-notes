@@ -78,6 +78,7 @@ class Editor extends Processor {
   set value(value) {
     this.$value = value;
     this.element.innerHTML = this.$value;
+    this.$history = [];
   }
 
   /**

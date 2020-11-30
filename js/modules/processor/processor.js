@@ -80,6 +80,13 @@ class Processor {
   $processInput(e, selection) {
     var nodes = this.$getNodes(selection);
 
+    console.log({
+      'sysKey': e.ctrlKey && 'ctrlKey' || e.metaKey && 'metaKey' || e.altKey && 'altKey' || e.shiftKey && 'shiftKey',
+      'keyCode': e.keyCode,
+      'code': e.code,
+      'is': (e.ctrlKey || e.metaKey) && e.keyCode === code.z
+    });
+
     // Input method - New
     if (e.key.length === 1 && nodes.left === nodes.right &&
       nodes.left === this.element && this.element.childNodes.length === 0) {
@@ -90,7 +97,7 @@ class Processor {
     }
 
     // Input method
-    if (!e.metaKey && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
+    if (!(e.ctrlKey || e.metaKey) && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
       if (!this.$history.length) {
         this.$setHistory(nodes.left, nodes.start, 0);
       } else {
@@ -142,12 +149,13 @@ class Processor {
     }
 
     // DELETE command
-    if (e.metaKey && e.shiftKey && e.keyCode === code.z) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode === code.z) {
       return this.$getHistory(selection, 1);
     }
     
     // DELETE command
-    if (e.metaKey && e.keyCode === code.z) {
+    if ((e.ctrlKey || e.metaKey) && e.keyCode === code.z) {
+      console.log('getHistory')
       return this.$getHistory(selection, -1);
     }
 
@@ -161,6 +169,17 @@ class Processor {
     var text = clipboard.getData('text/plain');
 
     e.preventDefault();
+
+    if (nodes.left === nodes.right && nodes.left === this.element && this.element.childNodes.length === 0) {
+        let textNode = document.createTextNode('');
+
+        nodes.left.appendChild(textNode);
+        nodes.left = textNode;
+        nodes.right = nodes.left;
+        nodes.selected = 0;
+        nodes.start = 0;
+        nodes.end = 0;
+    }
 
     if (nodes.left && nodes.left.nodeType === Node.TEXT_NODE) {
       this.$setData(selection, nodes, nodes.start, nodes.end, text);
@@ -215,32 +234,6 @@ class Processor {
       step: (selected > 0)? 0 : 1
     }
   }
-
-  // $getSize(node) {
-  //   var height = 0;
-
-  //   if (!this.$render) {
-  //     this.$render = document.createElement('div');
-  //     // this.$render = this.element.cloneNode();
-  //     this.$render.style.width = this.element.offsetWidth - 10;
-  //     // this.$render.style.height = 'auto';
-  //     // this.$render.style.minHeight = 'auto';
-  //     this.$render.style.position = 'fixed';
-  //     this.$render.style.whiteSpace = 'pre-wrap';
-  //     this.$render.style.visibility = 'hidden';
-  //     this.$render.style.top = 2;
-  //     this.$render.style.zIndex = -1;
-  //     this.$render.style.background = 'yellow';
-      
-  //     document.body.appendChild(this.$render);
-  //   }
-
-  //   this.$render.innerHTML = 'a'
-  //   height = this.$render.offsetHeight;
-  //   this.$render.innerHTML = node.data;
-
-  //   return parseInt(this.$render.offsetHeight / height);
-  // }
 
   $canMoveBackward(nodes) {
     var resutl = !(
