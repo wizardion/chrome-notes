@@ -28,7 +28,7 @@ class NodeHistory {
 
   preserve(node, start, selected) {
     if (!this.$stack.length) {
-      this.$setHistory(node, start);
+      this.push(node, start);
     } else {
       this.$stack[this.$curren].selected = selected;
       this.$stack[this.$curren].start = start;
