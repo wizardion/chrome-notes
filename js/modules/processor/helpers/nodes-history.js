@@ -61,10 +61,6 @@ class NodeHistory {
   $popData(selection) {
     var data = this.$stack[this.$curren];
 
-    console.log({
-      'h': this.$stack
-    });
-
     if (data) {
       this.$root.innerHTML = data.html;
       let node = this.$getNode(data.possition);
@@ -74,11 +70,18 @@ class NodeHistory {
   }
 
   $getPossition(node) {
-    var children = 0;
+    var possition = [];
     var nodes = 0;
 
     while (node.parentNode && node.parentNode !== this.$root) {
-      children++;
+      let child = node;
+      let siblings = 0;
+
+      while ((child = child.previousSibling) != null) {
+        siblings++;
+      }
+
+      possition.push(siblings);
       node = node.parentNode;
     }
 
@@ -87,14 +90,16 @@ class NodeHistory {
       node = node.previousSibling;
     }
 
-    return { children: children, nodes: nodes };
+    possition.push(nodes);
+    return possition;
   }
 
   $getNode(possition) {
-    var node = this.$root.childNodes[possition.nodes];
+    var index = possition.length - 1;
+    var node = this.$root.childNodes[possition[index]];
 
-    for (var i = 0; i < possition.children; i++) {
-      node = node.firstChild;
+    for (var i = index - 1; i >= 0; i--) {
+      node = node.childNodes[possition[i]];
     }
 
     return node;

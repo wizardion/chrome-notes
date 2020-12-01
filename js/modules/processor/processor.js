@@ -79,12 +79,12 @@ class Processor {
   $processInput(e, selection) {
     var nodes = this.$getNodes(selection);
 
-    console.log({
-      'sysKey': e.ctrlKey && 'ctrlKey' || e.metaKey && 'metaKey' || e.altKey && 'altKey' || e.shiftKey && 'shiftKey',
-      'keyCode': e.keyCode,
-      'code': e.code,
-      'is': (e.ctrlKey || e.metaKey) && e.keyCode === code.z
-    });
+    // console.log({
+    //   'sysKey': e.ctrlKey && 'ctrlKey' || e.metaKey && 'metaKey' || e.altKey && 'altKey' || e.shiftKey && 'shiftKey',
+    //   'keyCode': e.keyCode,
+    //   'code': e.code,
+    //   'is': (e.ctrlKey || e.metaKey) && e.keyCode === code.z
+    // });
 
     // Input method - New
     if (e.key.length === 1 && nodes.left === nodes.right &&
