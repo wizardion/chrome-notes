@@ -15,8 +15,7 @@ class Processor {
     // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
 
     this.$timer = null;
-    this.$history = [];
-    this.$currentHistory = null;
+    this.$history = new NodeHistory(this.element);
 
     //#region TEST_DATA
     var value = this.element.innerHTML;
@@ -89,7 +88,7 @@ class Processor {
 
     // Input method - New
     if (e.key.length === 1 && nodes.left === nodes.right &&
-      nodes.left === this.element && this.element.childNodes.length === 0) {
+        nodes.left === this.element && this.element.childNodes.length === 0) {
         let textNode = document.createTextNode(e.key);
 
         nodes.left.appendChild(textNode);
@@ -98,16 +97,11 @@ class Processor {
 
     // Input method
     if (!(e.ctrlKey || e.metaKey) && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
-      if (!this.$history.length) {
-        this.$setHistory(nodes.left, nodes.start, 0);
-      } else {
-        this.$history[this.$currentHistory].selected = nodes.selected;
-        this.$history[this.$currentHistory].start = nodes.start;
-      }
+      this.$history.preserve(nodes.left, nodes.start, nodes.selected);
 
       nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
 
-      this.$setHistory(nodes.left, nodes.start + 1);
+      this.$history.push(nodes.left, nodes.start + 1);
       return selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
     }
 
@@ -150,13 +144,12 @@ class Processor {
 
     // DELETE command
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode === code.z) {
-      return this.$getHistory(selection, 1);
+      return this.$history.forward(selection);
     }
     
     // DELETE command
     if ((e.ctrlKey || e.metaKey) && e.keyCode === code.z) {
-      console.log('getHistory')
-      return this.$getHistory(selection, -1);
+      return this.$history.back(selection)
     }
 
     throw 'Unhandled Exception!';
@@ -268,13 +261,8 @@ class Processor {
   $setData(selection, nodes, start, end, value='') {
     let left = nodes.left.data.substring(0, start) + value;
     let right = nodes.left.data.substring(end);
-
-    if (!this.$history.length) {
-      this.$setHistory(nodes.left, nodes.start, 0);
-    } else {
-      this.$history[this.$currentHistory].selected = nodes.selected;
-      this.$history[this.$currentHistory].start = nodes.start;
-    }
+    
+    this.$history.preserve(nodes.left, nodes.start, nodes.selected);
 
     if (right.length === 0 && left[left.length - 1] === '\n') {
       right += '\n';
@@ -284,72 +272,9 @@ class Processor {
     nodes.start = start + value.length;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
 
-    this.$setHistory(nodes.left, nodes.start);
+    this.$history.push(nodes.left, nodes.start);
   }
 
-  $setHistory(node, start, selected=0){
-    var data = {
-      html: this.element.innerHTML,
-      len: this.element.innerHTML.length,
-      start: start,
-      selected: selected,
-      possition: this.$getPossition(node),
-      nodes: this.element.childNodes
-    };
-
-    if (this.$currentHistory && this.$currentHistory < this.$history.length - 1) {
-      this.$history = this.$history.splice(0, this.$currentHistory + 1);
-    }
-
-    this.$history.push(data);
-    this.$currentHistory = this.$history.length - 1;
-  }
-
-  $getHistory(selection, step){
-    if((this.$currentHistory + step < 0) || (this.$currentHistory + step > this.$history.length - 1)) {
-      return;
-    }
-
-    this.$currentHistory += step;
-    var data = this.$history[this.$currentHistory];
-
-    console.log({
-      'h': this.$history
-    });
-
-    if (data) {
-      this.element.innerHTML = data.html;
-      var node = this.$getNode(data.possition);
-
-      selection.setBaseAndExtent(node, data.start, node, data.start + data.selected);
-    }
-  }
-
-  $getPossition(node) {
-    var children = 0;
-    var nodes = 0;
-
-    while (node.parentNode && node.parentNode !== this.element) {
-      children++;
-      node = node.parentNode;
-    }
-
-    while (node && node.previousSibling) {
-      nodes++;
-      node = node.previousSibling;
-    }
-
-    return {children: children, nodes: nodes};
-  }
-
-  $getNode(possition) {
-    var node = this.element.childNodes[possition.nodes];
-
-    for (var i = 0; i < possition.children; i++) {
-      node = node.firstChild;
-    }
-
-    return node;
-  }
+  
   //#endregion
 }
