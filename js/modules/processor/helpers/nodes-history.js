@@ -1,6 +1,7 @@
 class NodeHistory {
   constructor(root) {
     this.$root = root;
+    this.$scroll = root.parentNode;
 
     this.$stack = [];
     this.$curren = null;
@@ -12,8 +13,13 @@ class NodeHistory {
       len: this.$root.innerHTML.length,
 
       start: start,
+      backStart: start,
+      
       selected: 0,
       possition: this.$getPossition(node),
+
+      scroll: this.$scroll.scrollTop,
+      backScroll: this.$scroll.scrollTop,
 
       nodes: this.$root.childNodes
     };
@@ -24,6 +30,8 @@ class NodeHistory {
 
     this.$stack.push(data);
     this.$curren = this.$stack.length - 1;
+
+    this.$print(this.$stack);
   }
 
   preserve(node, start, selected) {
@@ -31,7 +39,9 @@ class NodeHistory {
       this.push(node, start);
     } else {
       this.$stack[this.$curren].selected = selected;
-      this.$stack[this.$curren].start = start;
+
+      this.$stack[this.$curren].backStart = start;
+      this.$stack[this.$curren].backScroll = this.$scroll.scrollTop;
     }
   }
 
@@ -41,7 +51,7 @@ class NodeHistory {
     }
 
     this.$curren -= 1;
-    this.$popData(selection);
+    this.$popData(selection, false);
   }
 
   forward(selection) {
@@ -50,7 +60,7 @@ class NodeHistory {
     }
 
     this.$curren += 1;
-    this.$popData(selection);
+    this.$popData(selection, true);
   }
 
   reset() {
@@ -58,14 +68,18 @@ class NodeHistory {
     this.$curren = null;
   }
 
-  $popData(selection) {
+  $popData(selection, forward) {
     var data = this.$stack[this.$curren];
 
     if (data) {
       this.$root.innerHTML = data.html;
-      let node = this.$getNode(data.possition);
 
-      selection.setBaseAndExtent(node, data.start, node, data.start + data.selected);
+      let node = this.$getNode(data.possition);
+      let start = forward ? data.start : data.backStart;
+      let scroll = forward ? data.scroll : data.backScroll;
+
+      this.$scroll.scrollTop = scroll;
+      selection.setBaseAndExtent(node, start, node, start + data.selected);
     }
   }
 
