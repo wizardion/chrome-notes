@@ -30,8 +30,6 @@ class NodeHistory {
 
     this.$stack.push(data);
     this.$curren = this.$stack.length - 1;
-
-    this.$print(this.$stack);
   }
 
   preserve(node, start, selected) {
