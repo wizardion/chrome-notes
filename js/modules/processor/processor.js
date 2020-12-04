@@ -211,6 +211,28 @@ class Processor {
 
     range.setStart(selection.anchorNode, selection.anchorOffset);
     range.setEnd(selection.focusNode, selection.focusOffset);
+
+
+    var rect = range.getBoundingClientRect();
+    let offsetTop = this.element.parentNode.offsetTop;
+    let clientHeight = this.element.parentNode.clientHeight;
+    var scrollTop = -1;
+
+    if ((rect.y - offsetTop) < 0) {
+      scrollTop = Math.ceil(0 - (rect.y - offsetTop));
+      // this.element.parentNode.scrollTop -= (scrollTop + (clientHeight) / 2);
+      this.element.parentNode.scrollTop -= scrollTop;
+    }
+
+    if ((rect.y + rect.height) > (clientHeight + offsetTop)) {
+      // scrollTop = Math.round((rect.y + rect.height) - (clientHeight + offsetTop));
+      scrollTop = Math.round((rect.y) - (clientHeight + offsetTop));
+
+      console.log({rect: rect});
+
+      console.log({ 't1': scrollTop, offsetTop: offsetTop, h: rect.height});
+      this.element.parentNode.scrollTop += scrollTop;
+    }
     
     let [leftNode, rightNode, start, end] = (!range.collapsed)? 
       [selection.anchorNode, selection.focusNode, selection.anchorOffset, selection.focusOffset] : 
