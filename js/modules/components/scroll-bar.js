@@ -21,7 +21,34 @@ class ScrollBar {
 
     this.control.addEventListener('scroll', this.onScroll.bind(this));
 
+    control.scrollTo = this.scrollTo.bind(this);
+
     return control;
+  }
+
+  scrollTo(top) {
+    var isMovingUp = this.control.scrollTop > top;
+    var y = this.control.scrollTop - top;
+
+    if (localStorage.animations !== 'true') {
+      this.control.scrollTop = top;
+      return;
+    }
+
+    if (this.$timeout) {
+      clearInterval(this.$timeout);
+    }
+
+    if (this.control.scrollTop !== top) {
+      this.$timeout = setInterval(function () {
+        y = isMovingUp? Math.max(Math.floor(y / 2), 1) : Math.min(Math.round(y / 2), -1);
+        this.control.scrollTop -= y;
+
+        if (this.control.scrollTop === top) {
+          clearInterval(this.$timeout);
+        }
+      }.bind(this), 15);
+    }
   }
 
   onWheel(e) {

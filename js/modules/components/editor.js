@@ -9,7 +9,7 @@ class Editor extends Processor {
     this.customEvents = {'change': null};
 
     this.init();
-    // this.element.addEventListener('blur', this.$onChange.bind(this));
+    this.element.addEventListener('blur', this.$onChange.bind(this));
   }
 
   /**

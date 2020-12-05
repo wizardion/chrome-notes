@@ -24,7 +24,7 @@ class NodeHistory {
       nodes: this.$root.childNodes
     };
 
-    if (this.$curren && this.$curren < this.$stack.length - 1) {
+    if (this.$curren !== null && this.$curren < this.$stack.length - 1) {
       this.$stack = this.$stack.splice(0, this.$curren + 1);
     }
 
@@ -76,8 +76,8 @@ class NodeHistory {
       let start = forward ? data.start : data.backStart;
       let scroll = forward ? data.scroll : data.backScroll;
 
-      this.$scroll.scrollTop = scroll;
       selection.setBaseAndExtent(node, start, node, start + data.selected);
+      this.$scroll.scrollTo(scroll);
     }
   }
 
