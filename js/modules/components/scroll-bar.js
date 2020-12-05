@@ -4,6 +4,7 @@ class ScrollBar {
     this.thumb = document.createElement('div');
     this.interval = null;
     this.freezeScrolling = false;
+    this.$enableAnimations = localStorage.enableAnimations !== 'true';
 
     this.thumb.style.visibility = 'hidden';
     this.thumb.style.top = 0;
@@ -27,13 +28,17 @@ class ScrollBar {
   }
 
   scrollTo(top) {
+    if (this.$enableAnimations) {
+      this.control.scrollTop = top;
+    } else {
+      this.$scrollSmoothTo(Math.floor(top));
+    }
+  }
+
+  $scrollSmoothTo(top) {
     var isMovingUp = this.control.scrollTop > top;
     var y = this.control.scrollTop - top;
-
-    if (localStorage.animations !== 'true') {
-      this.control.scrollTop = top;
-      return;
-    }
+    var scrollTop = Math.floor(this.control.scrollTop);
 
     if (this.$timeout) {
       clearInterval(this.$timeout);
@@ -41,12 +46,14 @@ class ScrollBar {
 
     if (this.control.scrollTop !== top) {
       this.$timeout = setInterval(function () {
-        y = isMovingUp? Math.max(Math.floor(y / 2), 1) : Math.min(Math.round(y / 2), -1);
-        this.control.scrollTop -= y;
+        y = isMovingUp ? Math.max(Math.floor(y / 2), 1) : Math.min(Math.round(y / 2), -1);
+        scrollTop -= y;
 
-        if (this.control.scrollTop === top) {
+        if (scrollTop === top) {
           clearInterval(this.$timeout);
         }
+
+        this.control.scrollTop = scrollTop;
       }.bind(this), 15);
     }
   }

@@ -7,7 +7,7 @@ class NodeHistory {
     this.$curren = null;
   }
 
-  push(node, start) {
+  push(node, start, selected=0) {
     var data = {
       html: this.$root.innerHTML,
       len: this.$root.innerHTML.length,
@@ -15,11 +15,10 @@ class NodeHistory {
       start: start,
       backStart: start,
       
-      selected: 0,
-      possition: this.$getPossition(node),
+      selected: selected,
+      backSelected: selected,
 
-      scroll: this.$scroll.scrollTop,
-      backScroll: this.$scroll.scrollTop,
+      possition: this.$getPossition(node),
 
       nodes: this.$root.childNodes
     };
@@ -34,12 +33,10 @@ class NodeHistory {
 
   preserve(node, start, selected) {
     if (!this.$stack.length) {
-      this.push(node, start);
+      this.push(node, start, selected);
     } else {
-      this.$stack[this.$curren].selected = selected;
-
+      this.$stack[this.$curren].backSelected = selected;
       this.$stack[this.$curren].backStart = start;
-      this.$stack[this.$curren].backScroll = this.$scroll.scrollTop;
     }
   }
 
@@ -49,7 +46,7 @@ class NodeHistory {
     }
 
     this.$curren -= 1;
-    this.$popData(selection, false);
+    return this.$popData(selection, false);
   }
 
   forward(selection) {
@@ -58,7 +55,7 @@ class NodeHistory {
     }
 
     this.$curren += 1;
-    this.$popData(selection, true);
+    return this.$popData(selection, true);
   }
 
   reset() {
@@ -74,10 +71,10 @@ class NodeHistory {
 
       let node = this.$getNode(data.possition);
       let start = forward ? data.start : data.backStart;
-      let scroll = forward ? data.scroll : data.backScroll;
+      let selected = forward ? data.selected : data.backSelected;
 
-      selection.setBaseAndExtent(node, start, node, start + data.selected);
-      this.$scroll.scrollTo(scroll);
+      selection.setBaseAndExtent(node, start, node, start + selected);
+      return {left: node, start: start};
     }
   }
 

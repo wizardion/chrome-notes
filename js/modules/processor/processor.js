@@ -18,8 +18,7 @@ class Processor {
     this.$history = new NodeHistory(this.element);
 
     this.$possition =  null;
-    // this.$offsetTop = null;
-    // this.$clientHeight = null;
+    this.$scrollBar = this.element.parentNode;
 
     //#region TEST_DATA
     var value = this.element.innerHTML;
@@ -83,12 +82,7 @@ class Processor {
   $processInput(e, selection) {
     var nodes = this.$getNodes(selection);
 
-    // console.log({
-    //   'sysKey': e.ctrlKey && 'ctrlKey' || e.metaKey && 'metaKey' || e.altKey && 'altKey' || e.shiftKey && 'shiftKey',
-    //   'keyCode': e.keyCode,
-    //   'code': e.code,
-    //   'is': (e.ctrlKey || e.metaKey) && e.keyCode === code.z
-    // });
+    console.log(e);
 
     // Input method - New
     if (e.key.length === 1 && nodes.left === nodes.right &&
@@ -100,15 +94,15 @@ class Processor {
     }
 
     // Input method
-    if (!(e.ctrlKey || e.metaKey) && e.key.length === 1 && nodes.left === nodes.right && nodes.left.nodeType === Node.TEXT_NODE) {
+    if (!(e.ctrlKey || e.metaKey) && e.key.length === 1 && nodes.left === nodes.right 
+        && nodes.left.nodeType === Node.TEXT_NODE) {
       this.$history.preserve(nodes.left, nodes.start, nodes.selected);
 
       nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
 
-      this.$history.push(nodes.left, nodes.start + 1);
       selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
-      this.$scrollToSelection(selection);
-      return;
+      this.$history.push(nodes.left, nodes.start + 1);
+      return this.$scrollToCaret(nodes.left, nodes.start + 1);;
     }
 
     // Enter command
@@ -150,12 +144,24 @@ class Processor {
 
     // DELETE command
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode === code.z) {
-      return this.$history.forward(selection);
+      var node = this.$history.forward(selection);
+
+      if (node) {
+        this.$scrollToCaret(node.left, node.start);
+      }
+
+      return;
     }
     
     // DELETE command
     if ((e.ctrlKey || e.metaKey) && e.keyCode === code.z) {
-      return this.$history.back(selection)
+      var node = this.$history.back(selection);
+      
+      if (node) {
+        this.$scrollToCaret(node.left, node.start);
+      }
+
+      return;
     }
 
     throw 'Unhandled Exception!';
@@ -225,14 +231,6 @@ class Processor {
     range.setStart(selection.anchorNode, selection.anchorOffset);
     range.setEnd(selection.focusNode, selection.focusOffset);
 
-    // var rect = range.getBoundingClientRect();
-    // var point = {y: rect.y, height: rect.height};
-
-    // if (selected > 0) {
-    //   var rects = range.getClientRects();
-    //   point.height = rects[0].height;
-    // }
-
     return {
       left: leftNode,
       right: rightNode,
@@ -242,44 +240,40 @@ class Processor {
       end: end,
       selected: selected,
       step: (selected > 0)? 0 : 1,
-      // point: point
     }
   }
 
-  $scrollToCaret(point) {
+  $scrollToPoint(point) {
+    var scrollTop = this.$scrollBar.scrollTop;
     this.$possition = this.$possition || {
-      top: this.element.parentNode.offsetTop,
-      height: this.element.parentNode.clientHeight,
+      top: this.$scrollBar.offsetTop,
+      bottom: this.$scrollBar.clientHeight + this.$scrollBar.offsetTop,
+      height: this.$scrollBar.clientHeight,
+      center: this.$scrollBar.clientHeight / 2
     };
 
     if ((point.y - this.$possition.top) < 0) {
-      // let scrollTop = Math.ceil(0 - (possition.y - this.$possition.top));
-      let scrollTop = Math.ceil((0 - (point.y - this.$possition.top)) + (this.$possition.height / 2));
+      let y = Math.ceil((0 - (point.y - this.$possition.top)) + this.$possition.center);
 
-      this.element.parentNode.scrollTo(Math.max(this.element.parentNode.scrollTop - scrollTop, 0));
-      return;
+      return this.$scrollBar.scrollTo(Math.max(scrollTop - y, 0));
     }
 
-    if ((point.y + point.height) > (this.$possition.height + this.$possition.top)) {
-      let max = this.element.parentNode.scrollHeight - this.$possition.height;
-      let top = ((point.y + point.height) - (this.$possition.height + this.$possition.top));
-      // scrollTop = Math.round(top);
-      var scrollTop = Math.round(top + (this.$possition.height / 2));
+    if (point.bottom > this.$possition.bottom) {
+      let max = this.$scrollBar.scrollHeight - this.$possition.height;
+      let y = Math.round((point.bottom - this.$possition.bottom) + this.$possition.center);
 
-      this.element.parentNode.scrollTo(Math.min(this.element.parentNode.scrollTop + scrollTop, max));
-      return;
+      return this.$scrollBar.scrollTo(Math.min(scrollTop + y, max));
     }
   }
 
-  $scrollToSelection(selection) {
+  $scrollToCaret(node, start) {
     var range = document.createRange();
 
-    range.setStart(selection.anchorNode, selection.anchorOffset);
-    range.setEnd(selection.focusNode, selection.focusOffset);
+    range.setStart(node, start);
+    range.setEnd(node, start);
 
     var rect = range.getBoundingClientRect();
-
-    this.$scrollToCaret({y: rect.y, height: rect.height});
+    this.$scrollToPoint({ y: rect.y, bottom: rect.y + rect.height, height: rect.height});
   }
 
   $canMoveBackward(nodes) {
@@ -326,7 +320,7 @@ class Processor {
     nodes.start = start + value.length;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
 
-    this.$scrollToSelection(selection);
+    this.$scrollToCaret(nodes.left, nodes.start);
     this.$history.push(nodes.left, nodes.start);
   }
 
