@@ -82,7 +82,7 @@ class Processor {
   $processInput(e, selection) {
     var nodes = this.$getNodes(selection);
 
-    console.log(e);
+    // console.log(e);
 
     // Input method - New
     if (e.key.length === 1 && nodes.left === nodes.right &&
