@@ -11,6 +11,7 @@ class Processor {
 
     this.element.addEventListener('paste', this.$onPaste.bind(this));
     this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
+    // document.addEventListener('selectionchange', this.$selectionChange.bind(this));
     // document.addEventListener('keydown', this.$preProcessInput.bind(this));
     // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
 
@@ -25,21 +26,21 @@ class Processor {
     var cursor = null;
     var start = null;
 
-    // setTimeout(function(){
-    //   setInterval(function () {
-    //     if (document.activeElement === this.element) {
-    //       var nodes = this.$getNodes(window.getSelection());
+    setTimeout(function(){
+      setInterval(function () {
+        if (document.activeElement === this.element) {
+          var nodes = this.$getNodes(window.getSelection());
 
-    //       if(value !== this.element.innerHTML || (cursor !== nodes.left || start !== nodes.start) || 1) {
-    //         cursor = nodes.left;
-    //         start = nodes.start;
-    //         TextProcessor.log(this.element, {node: nodes.left, start: nodes.start}); 
-    //         value = this.element.innerHTML;
-    //       }
-    //     }
-    //   // }.bind(this), 250);
-    //   }.bind(this), 1000);
-    // }.bind(this), 10);
+          if(value !== this.element.innerHTML || (cursor !== nodes.left || start !== nodes.start) || 1) {
+            cursor = nodes.left;
+            start = nodes.start;
+            TextProcessor.log(this.element, {node: nodes.left, start: nodes.start}); 
+            value = this.element.innerHTML;
+          }
+        }
+      // }.bind(this), 250);
+      }.bind(this), 1000);
+    }.bind(this), 10);
     //#endregion
   }
 
@@ -190,25 +191,121 @@ class Processor {
       this.$setData(selection, nodes, nodes.start, nodes.end, text);
     }
   }
+
+  $selectionChange(e) {
+    let selection = window.getSelection();
+    let length = selection.toString().length;
+    
+    if (length > 0) {
+      var nodes = this.$getNodes(selection);
+      var range = document.createRange();
+
+      range.setStart(nodes.left, nodes.start);
+      range.setEnd(nodes.right, nodes.end);
+
+      var rect = range.getBoundingClientRect();
+      var point = { y: rect.y, bottom: rect.y + rect.height, height: rect.height };
+
+      console.log(point);
+
+      // console.log({
+      //   'point': point,
+      //   'e': e,
+      //   selection: selection,
+      // });
+    }
+  }
   //#endregion
 
   //#region Commands
-  $delete(selection, nodes) {
-    if (!this.$canMoveForward(nodes)) {
+  $delete(selection, nodes, level=null) {
+    let helper = new NodeHelper(this.element, nodes);
+    let childNodes = this.element.childNodes;
+
+    if (!level && !this.$canMoveForward(nodes)) {
       console.log('The End!');
+      return;
+    }
+
+    // moving forward
+    if (!nodes.selected && nodes.end + nodes.step > nodes.left.length) {
+      nodes.left = helper.backToPrevous(nodes.left, 'nextSibling');
+
+      if (!nodes.left) {
+        if (!this.element.firstChild) {
+          nodes.left = document.createTextNode('');
+          this.element.appendChild(nodes.left);
+        } else {
+          nodes.left = helper.$deegDown(this.element.firstChild, 'nextSibling');
+        }
+
+        nodes.step = 0;
+      } else {
+        nodes.step = (nodes.left.data.length && !level) ? 1 : 0;
+      }
+
+      nodes.start = 0;
+      nodes.end = 0;
+    }
+
+    // Multipules nodes selected!
+    if (nodes.selected && nodes.left !== nodes.right) {
+      console.warn('Multipules nodes selected!');
       return;
     }
 
     this.$setData(selection, nodes, nodes.start, nodes.end + nodes.step);
+
+    // cleaning up
+    if (!level && !nodes.selected && helper.isEmpty(nodes.left) && childNodes.length === 1) {
+      return this.$delete(selection, nodes, 1);
+    }
   }
 
   $backspace(selection, nodes, level=null) {
-    if (!this.$canMoveBackward(nodes)) {
+    let helper = new NodeHelper(this.element, nodes);
+    let childNodes = this.element.childNodes;
+
+    if (!level && !this.$canMoveBackward(nodes, helper)) {
       console.log('The End!');
       return;
     }
 
+    // moving backward
+    if (!nodes.selected && nodes.start - nodes.step < 0) {
+      nodes.left = helper.backToPrevous(nodes.left, 'previousSibling');
+
+      // situation: 
+      if (!nodes.left) {
+        if (!this.element.firstChild) {
+          nodes.left = document.createTextNode('');
+          this.element.appendChild(nodes.left);
+        } else {
+          nodes.left = helper.$deegDown(this.element.firstChild, 'previousSibling');
+        }
+
+        nodes.start = 0;
+        nodes.end = 0;
+        nodes.step = 0;
+      } else {
+        nodes.start = nodes.left.data.length;
+        nodes.end = nodes.start;
+        nodes.step = (nodes.start && !level) ? 1 : 0;
+      }
+    }
+
+    // Multipules nodes selected!
+    if (nodes.selected && nodes.left !== nodes.right) {
+      console.warn('Multipules nodes selected!');
+      return;
+    }
+
     this.$setData(selection, nodes, nodes.start - nodes.step, nodes.end);
+
+    // cleaning up
+    if (!level && !nodes.selected && helper.isEmpty(nodes.left) && childNodes.length === 1) {
+      return this.$backspace(selection, nodes, 1);
+    }
   }
 
   $enter(selection, nodes) {
@@ -277,9 +374,19 @@ class Processor {
   }
 
   $canMoveBackward(nodes) {
+    var node = nodes.left;
+    var firstChild = this.element.firstChild;
+
+    while (node.parentNode && node.parentNode !== this.element) {
+      node = node.parentNode;
+    }
+
+    if ((!nodes.selected && nodes.start - nodes.step < 0) && node === firstChild) {
+      return false;  
+    }
+
     var resutl = !(
-      (!nodes.selected && nodes.start - nodes.step < 0) && 
-      !nodes.previousSibling && 
+      !nodes.previousSibling && nodes.left && nodes.left.nodeType !== Node.TEXT_NODE &&
       (nodes.left === this.element || nodes.left.parentNode === this.element)
     );
     
@@ -287,9 +394,15 @@ class Processor {
   }
 
   $canMoveForward(nodes) {
-    if (!nodes.selected && !nodes.nextSibling &&
-      nodes.left.nodeType === Node.TEXT_NODE && nodes.start >= nodes.left.length) {
-        return false;
+    var node = nodes.left;
+    var lastChild = this.element.lastChild;
+
+    while (node.parentNode && node.parentNode !== this.element) {
+      node = node.parentNode;
+    }
+
+    if ((!nodes.selected && nodes.start >= nodes.left.length) && node === lastChild) {
+      return false;
     }
 
     var resutl = !(

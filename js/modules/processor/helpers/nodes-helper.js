@@ -4,7 +4,6 @@ class NodeHelper {
     this.$nodes = nodes;
   }
 
-
   // The End of the node!
   /*
     1 - "#text<b>#text</b>#text".
@@ -13,66 +12,46 @@ class NodeHelper {
     4 - "#text<b>#text<i>#text</i>#text</b>#text".
     5 - "<b>#text<u><i>#text</i></u></b>".
   */
-  backToPrevous(nodeElement) {
-    var node = this.$deegDown(nodeElement);
-    var sibling = node.previousSibling;
+  backToPrevous(nodeElement, toSibling) {
+    var node = this.$deegDown(nodeElement, toSibling);
+    var sibling = node[toSibling];
 
     if (!sibling) {
-      sibling = this.$backToUp(node);
+      sibling = this.$moveUp(node, toSibling);
 
       if (!sibling) {
         return null;
       }
     }
 
-    sibling = this.$deegDown(sibling);
-
-    if (this.isEmptyNode(node)) {
-      console.log({'remove_3': node});
+    if (this.isEmpty(node)) {
       node.remove();
     }
 
-    //#region END
-    // if (this.isEmptyNode(sibling)) {
-    //   console.log({'remove_3': sibling});
-    //   sibling.remove();
-    //   return null;
-    // }
-    console.log('-------------------- RESULT --------------------');
-    console.log(sibling);
-    //#endregion
-
-    return sibling;
-    //#endregion
+    return this.$deegDown(sibling, toSibling);
   }
 
-  $backToUp(node) {
+  $moveUp(node, toSibling) {
     var sibling;
-
-    console.log('-------------------- UP --------------------');
-    console.log(node);
 
     while (node.parentNode && node.parentNode !== this.$root) {
       var tmp = null;
 
-      if (this.isEmptyNode(node)) {
-        console.log({'remove_1': node});
+      if (this.isEmpty(node)) {
         tmp = node;
       }
 
       node = node.parentNode;
-      console.log(node);
 
       if (tmp) {
         tmp.remove();
         tmp = null;
       }
 
-      if (node.previousSibling) {
-        sibling = node.previousSibling;
+      if (node[toSibling]) {
+        sibling = node[toSibling];
 
-        if (this.isEmptyNode(node)) {
-          console.log({'remove_2': node});
+        if (this.isEmpty(node)) {
           node.remove();
         }
 
@@ -80,87 +59,37 @@ class NodeHelper {
       }
     }
 
-    //#region END
-    if (this.isEmptyNode(node)) {
-      console.log({'remove_2': node});
+    if (this.isEmpty(node)) {
       node.remove();
     }
 
-    console.log({
-      'sibling': sibling,
-      // 'node': node,
-    });
-
     return sibling;
-    //#endregion
   }
 
-  $frontToUp(node) {
-    var sibling;
+  $deegDown(sibling, toSibling) {
+    var dirrection = {'previousSibling': 'lastChild', 'nextSibling': 'firstChild'};
+    var toChild = dirrection[toSibling];
 
-    console.log('-------------------- UP --------------------');
-    console.log(node);
-
-    while (node.parentNode && node.parentNode !== this.$root) {
-      var tmp = null;
-
-      if (this.isEmptyNode(node)) {
-        console.log({'remove_1': node});
-        tmp = node;
-      }
-
-      node = node.parentNode;
-      console.log(node);
-
-      if (tmp) {
-        tmp.remove();
-        tmp = null;
-      }
-
-      if (node.nextSibling) {
-        sibling = node.nextSibling;
-
-        if (this.isEmptyNode(node)) {
-          console.log({'remove_2': node});
-          node.remove();
-        }
-
-        break;
-      }
-    }
-
-    //#region END
-    if (this.isEmptyNode(node)) {
-      console.log({'remove_2': node});
-      node.remove();
-    }
-
-    console.log({
-      'sibling': sibling,
-      // 'node': node,
-    });
-
-    return sibling;
-    //#endregion
-  }
-
-  $deegDown(sibling) {
-    console.log('-------------------- DOWN --------------------');
-    console.log(sibling);
-
-    while (sibling && sibling.lastChild) {
-      sibling = sibling.lastChild;
-      console.log(sibling);
+    while (sibling && sibling[toChild]) {
+      sibling = sibling[toChild];
     }
 
     return sibling;
   }
 
+  isEmpty(node) {
+    return (
+      (node.nodeType === Node.TEXT_NODE && !node.data.length) || 
+      (node.nodeType !== Node.TEXT_NODE && !node.lastChild)
+    );
+  }
+
+  //#region Future
   mergeNext(node) {
     var sibling = node.nextSibling;
 
     if (!sibling) {
-      sibling = this.$frontToUp(node);
+      sibling = this.$moveUp(node, 'nextSibling');
 
       if (!sibling) {
         return null;
@@ -177,15 +106,6 @@ class NodeHelper {
 
     // // document.insertBefore()
     // this.$insertAfter(sibling, node);
-  }
-
-  isEmptyNode(node) {
-    var result = (
-      (node.nodeType === Node.TEXT_NODE && !node.data.length) || 
-      (node.nodeType !== Node.TEXT_NODE && !node.lastChild)
-    );
-
-    return result;
   }
 
   $findParagraph(node) {
@@ -212,11 +132,11 @@ class NodeHelper {
   }
 
   $toString(node) {
-    return node && (node.nodeType === Node.TEXT_NODE? node.data : node.outerHTML) || null; 
+    return node && (node.nodeType === Node.TEXT_NODE ? node.data : node.outerHTML) || null;
   }
 
   $insertAfter(newNode, existingNode) {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
   }
-
+  //#endregion
 }
