@@ -164,7 +164,7 @@ class Processor {
       return;
     }
 
-    throw 'Unhandled Exception!';
+    throw 'Unhandled Exception!', e;
   }
 
   $onPaste(e) {

@@ -10,17 +10,15 @@ class NodeHistory {
   push(node, start, selected=0) {
     var data = {
       html: this.$root.innerHTML,
-      len: this.$root.innerHTML.length,
-
-      start: start,
-      backStart: start,
-      
-      selected: selected,
-      backSelected: selected,
-
       possition: this.$getPossition(node),
-
-      nodes: this.$root.childNodes
+      caret: {
+        forward: start,
+        backward: start,
+      },
+      selection: {
+        forward: selected,
+        backward: selected,
+      }
     };
 
     if (this.$curren !== null && this.$curren < this.$stack.length - 1) {
@@ -35,8 +33,8 @@ class NodeHistory {
     if (!this.$stack.length) {
       this.push(node, start, selected);
     } else {
-      this.$stack[this.$curren].backSelected = selected;
-      this.$stack[this.$curren].backStart = start;
+      this.$stack[this.$curren].caret.backward = start;
+      this.$stack[this.$curren].selection.backward = selected;
     }
   }
 
@@ -70,8 +68,8 @@ class NodeHistory {
       this.$root.innerHTML = data.html;
 
       let node = this.$getNode(data.possition);
-      let start = forward ? data.start : data.backStart;
-      let selected = forward ? data.selected : data.backSelected;
+      let start = forward ? data.caret.forward : data.caret.backward;
+      let selected = forward ? data.selection.forward : data.selection.backward;
 
       selection.setBaseAndExtent(node, start, node, start + selected);
       return {left: node, start: start};
