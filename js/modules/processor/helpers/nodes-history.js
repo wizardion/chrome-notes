@@ -66,19 +66,12 @@ class NodeHistory {
 
     if (data) {
       this.$root.innerHTML = data.html;
-
       let node = this.$getNode(data.possition);
-      let start = forward ? data.caret.forward : data.caret.backward;
-      let selected = forward ? data.selection.forward : data.selection.backward;
 
-      if (!node && !this.$existsNode(data.possition)) {
-        start = selected = 0;
-        node = document.createTextNode('');
+      if (node) {
+        let start = forward ? data.caret.forward : data.caret.backward;
+        let selected = forward ? data.selection.forward : data.selection.backward;
 
-        this.$root.appendChild(node);
-      }
-
-      if (node) {        
         selection.setBaseAndExtent(node, start, node, start + selected);
         return { left: node, start: start };
       }
@@ -119,10 +112,5 @@ class NodeHistory {
     }
 
     return node;
-  }
-
-  $existsNode(possition) {
-    var index = possition.length - 1;
-    return (this.$root.childNodes.length - 1 >= possition[index]);
   }
 }
