@@ -128,10 +128,54 @@
   padding: 0px;
   height: 244px;
 
-  /* overflow-y: scroll; */
+  overflow-y: scroll;
+  /* overflow-x: visible; */
   /* padding-right: 25px; */
-  /* padding-right: 15px;
-  margin-right: -25px; */
+  /* padding-right: 40px;
+  margin-right: -50px; */
+}
+
+/* .content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+} */
+
+/* width */
+::-webkit-scrollbar {
+  width: 3px;
+  /* width: 30px;
+  margin-left: -30px; */
+}
+
+.hidden-scroll::-webkit-scrollbar-thumb {
+  visibility: hidden;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  width: 3px;
+  right: 2px;
+  background: #888;
+  border-radius: 8px;
+  background: #D6D6D6;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.list-items::-webkit-scrollbar-thumb {
+  background: #b9e6e2;
+}
+
+.list-items::-webkit-scrollbar-thumb:hover {
+  background: #92d8d2;
 }
 
 div[contenteditable] {

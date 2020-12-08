@@ -1,33 +1,34 @@
 class ScrollBar {
   constructor(control=new Object, options=null) {
     this.control = control;
-    this.thumb = document.createElement('div');
-    this.interval = null;
-    this.freezeScrolling = false;
-    this.$enableAnimations = localStorage.enableAnimations !== 'true';
+    // this.thumb = document.createElement('div');
+    // this.interval = null;
+    // this.freezeScrolling = false;
+    // this.$enableAnimations = localStorage.enableAnimations !== 'true';
 
-    this.thumb.style.visibility = 'hidden';
-    this.thumb.style.top = 0;
+    // this.thumb.style.visibility = 'hidden';
+    // this.thumb.style.top = 0;
 
-    this.thumb.classList.add('scroll');
-    this.control.parentNode.appendChild(this.thumb);
+    // this.thumb.classList.add('scroll');
+    // this.control.parentNode.appendChild(this.thumb);
 
-    if (options && options.background) {
-      this.thumb.style.background = options.background;
-    }
+    // if (options && options.background) {
+    //   this.thumb.style.background = options.background;
+    // }
 
-    if (options && options.wheel === true) {
-      this.control.addEventListener('wheel', this.onWheel.bind(this));
-    }
+    // if (options && options.wheel === true) {
+    //   this.control.addEventListener('wheel', this.$onWheel.bind(this));
+    // }
 
-    this.control.addEventListener('scroll', this.onScroll.bind(this));
+    this.control.classList.add('hidden-scroll');
+    this.control.addEventListener('scroll', this.$onScrollNew.bind(this));
 
-    control.scrollTo = this.scrollTo.bind(this);
+    control.scrollTo = this.$scrollTo.bind(this);
 
     return control;
   }
 
-  scrollTo(top) {
+  $scrollTo(top) {
     if (this.$enableAnimations) {
       this.control.scrollTop = top;
     } else {
@@ -58,7 +59,7 @@ class ScrollBar {
     }
   }
 
-  onWheel(e) {
+  $onWheel(e) {
     if(!this.freezeScrolling) {
       var scrollTop = this.control.scrollTop + e.deltaY;
       var max = (this.control.scrollHeight - this.control.offsetHeight);
@@ -75,7 +76,7 @@ class ScrollBar {
     }
   }
 
-  onScroll() {
+  $onScroll() {
     var max = this.control.offsetHeight - 1;
     var scrollHeight = (this.control.scrollHeight - this.control.offsetHeight);
 
@@ -97,6 +98,16 @@ class ScrollBar {
 
     this.interval = setTimeout(function(){
       this.thumb.style.visibility = 'hidden';
+    }.bind(this), 1750);
+  }
+
+  $onScrollNew() {
+    clearInterval(this.interval);
+    
+    this.control.classList.remove('hidden-scroll');
+
+    this.interval = setTimeout(function(){
+      this.control.classList.add('hidden-scroll');
     }.bind(this), 1750);
   }
 }
