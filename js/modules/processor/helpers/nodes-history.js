@@ -79,12 +79,14 @@ class NodeHistory {
   }
 
   ensure(node, start, selected=0) {
-    if (!this.$stack.length || selected) {
+    var isEmpty = !this.$stack.length;
+
+    if (!isEmpty && (this.$edited.node) && (this.$edited.node !== node || this.$edited.start !== start)) {
+      this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
       return this.push(node, start, selected);
     }
 
-    if (this.$edited.node && (this.$edited.node !== node || this.$edited.start !== start)) {
-      this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
+    if (isEmpty || selected) {
       return this.push(node, start, selected);
     }
 
