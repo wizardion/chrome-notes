@@ -7,6 +7,7 @@ class NodeHistory {
     this.$curren = null;
 
     this.$edited = {
+      added: false,
       node: null,
       start: null,
       selected: null,
@@ -34,51 +35,10 @@ class NodeHistory {
     this.$stack.push(data);
     this.$curren = this.$stack.length - 1;
     this.$edited.node = null;
+    this.$edited.added = true;
   }
 
-  preserve(node, start, value) {
-    // var edited = this.$edited || {node: {data: '', }};
-
-    // if (!this.$stack.length) {
-    //   this.push(node, start, selected);
-    // } else {
-    //   this.$stack[this.$curren].caret.backward = start;
-    //   this.$stack[this.$curren].selection.backward = selected;
-    // }
-
-    // if (this.$edited.node && value === ' ' || !this.$edited.node) {
-    //   this.push(node, start, selected);
-    //   this.$edited.node = null;
-    // }
-
-    if (this.$edited.node && value === ' ') {
-      console.log({
-        'data': node.data,
-        'html': this.$root.innerHTML,
-      }, 'preserve.push');
-
-      this.push(node, start);
-    }
-
-    // console.log({
-    //   '1': this.$edited && this.$edited.data || '',
-    //   '2': node.data,
-    //   '3': node.data.replace(this.$edited && this.$edited.data || '', ''),
-    //   '4': value,
-    // }, 'preserve', this.$stack);
-
-    // console.log({
-    //   'data': node.data,
-    //   'start': start,
-    // }, 'preserve', this.$stack);
-
-    // this.$edited.data = node.data;
-    this.$edited.node = node;
-    this.$edited.start = start;
-    this.$edited.selected = 0;
-  }
-
-  ensure(node, start, selected=0) {
+  preserve(node, start, selected, value) {
     var isEmpty = !this.$stack.length;
 
     if (!isEmpty && (this.$edited.node) && (this.$edited.node !== node || this.$edited.start !== start)) {
@@ -90,9 +50,20 @@ class NodeHistory {
       return this.push(node, start, selected);
     }
 
+    if (this.$edited.node && value.match(/\W/i) && !node.data[start - 1].match(/\W/i)) {
+      return this.push(node, start);
+    }
+
     this.$edited.node = node;
     this.$edited.start = start;
     this.$edited.selected = selected;
+  }
+
+  ensure(node, start) {
+    this.$edited.added = false;
+    this.$edited.node = node;
+    this.$edited.start = start;
+    this.$edited.selected = 0;
   }
 
   ensure_(node, start, selected=0) {
@@ -193,14 +164,9 @@ class NodeHistory {
   }
 
   back(selection) {
-    if (this.$edited.node) {
+    if (this.$edited.node && !this.$edited.added) {
       this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
-      console.log('back.push', this.$stack);
     }
-
-    console.log({
-      '': this.$curren
-    });
 
     if (this.$curren - 1 < 0) {
       return;
@@ -278,5 +244,16 @@ class NodeHistory {
     }
 
     return node;
+  }
+
+  $copy(list) {
+    var result = [];
+
+    for (var i = 0; i < list.length; i++) {
+      const item = list[i];
+      result.push(item);
+    }
+
+    return result;
   }
 }
