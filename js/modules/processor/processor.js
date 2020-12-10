@@ -79,7 +79,7 @@ class Processor {
       this.$timer = setTimeout(function(){
         this.element.spellcheck = true;
         console.log('spellcheck')
-      }.bind(this), 100);
+      }.bind(this), 1000);
     }
   }
 
