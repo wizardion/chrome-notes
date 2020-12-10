@@ -77,8 +77,22 @@ class Editor extends Processor {
    */
   set value(value) {
     this.$value = value;
-    this.element.innerHTML = this.$value;
+    // this.element.innerHTML = this.$value;
     this.$history.reset();
+
+    if (this.element.nodeName == 'TEXTAREA') {
+      var div = document.createElement('div');
+
+      div.innerHTML = this.$value;
+      this.element.value = div.innerText;
+      div.remove();
+    }
+
+    if (this.element.nodeName == 'PRE') {
+      this.element.innerHTML = this.$value;
+    }
+
+    // if (this.element.nodeName === '')
   }
 
   /**

@@ -7,13 +7,16 @@ class Processor {
       text: 3
     };
 
+
     this.$helpers = {};
 
-    this.element.addEventListener('paste', this.$onPaste.bind(this));
-    this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
-    // document.addEventListener('selectionchange', this.$selectionChange.bind(this));
-    // document.addEventListener('keydown', this.$preProcessInput.bind(this));
-    // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
+    if (this.element.nodeName !== 'TEXTAREA') {
+      this.element.addEventListener('paste', this.$onPaste.bind(this));
+      this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
+      // document.addEventListener('selectionchange', this.$selectionChange.bind(this));
+      // document.addEventListener('keydown', this.$preProcessInput.bind(this));
+      // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
+    }
 
     this.$timer = null;
     this.$history = new NodeHistory(this.element);
@@ -97,13 +100,7 @@ class Processor {
     // Input method
     if (!(e.ctrlKey || e.metaKey) && e.key.length === 1 && nodes.left === nodes.right 
         && nodes.left.nodeType === Node.TEXT_NODE) {
-      this.$history.preserve(nodes.left, nodes.start, nodes.selected);
-
-      nodes.left.data = nodes.left.data.substring(0, nodes.start) + e.key + nodes.left.data.substring(nodes.end);
-
-      selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
-      this.$history.push(nodes.left, nodes.start + 1);
-      return this.$scrollToCaret(nodes.left, nodes.start + 1);;
+      return this.$input(selection, nodes, e.key);
     }
 
     // Enter command
@@ -188,36 +185,25 @@ class Processor {
     }
 
     if (nodes.left && nodes.left.nodeType === Node.TEXT_NODE) {
-      this.$setData(selection, nodes, nodes.start, nodes.end, text);
-    }
-  }
-
-  $selectionChange(e) {
-    let selection = window.getSelection();
-    let length = selection.toString().length;
-    
-    if (length > 0) {
-      var nodes = this.$getNodes(selection);
-      var range = document.createRange();
-
-      range.setStart(nodes.left, nodes.start);
-      range.setEnd(nodes.right, nodes.end);
-
-      var rect = range.getBoundingClientRect();
-      var point = { y: rect.y, bottom: rect.y + rect.height, height: rect.height };
-
-      console.log(point);
-
-      // console.log({
-      //   'point': point,
-      //   'e': e,
-      //   selection: selection,
-      // });
+      this.$setData(selection, nodes, nodes.start, nodes.end, text, true);
     }
   }
   //#endregion
 
   //#region Commands
+  $input(selection, nodes, value) {
+    let left = nodes.left.data.substring(0, nodes.start);
+    let right = nodes.left.data.substring(nodes.end);
+    
+    this.$history.preserve(nodes.left, nodes.start, nodes.selected, value);
+
+    nodes.left.data = left + value + right;
+    selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
+    
+    this.$history.ensure(nodes.left, nodes.start + 1);
+    this.$scrollToCaret(nodes.left, nodes.start + 1);
+  }
+
   $delete(selection, nodes, level=null) {
     let helper = new NodeHelper(this.element, nodes);
     let childNodes = this.element.childNodes;
@@ -419,11 +405,11 @@ class Processor {
            node.parentNode && node.parentNode.nodeName === 'LI')
   }
 
-  $setData(selection, nodes, start, end, value='') {
+  $setData(selection, nodes, start, end, value='', forse=false) {
     let left = nodes.left.data.substring(0, start) + value;
     let right = nodes.left.data.substring(end);
     
-    this.$history.preserve(nodes.left, nodes.start, nodes.selected);
+    this.$history.preserve(nodes.left, nodes.start, nodes.selected, value, forse);
 
     if (right.length === 0 && left[left.length - 1] === '\n') {
       right += '\n';
@@ -433,8 +419,8 @@ class Processor {
     nodes.start = start + value.length;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
 
+    this.$history.ensure(nodes.left, nodes.start);
     this.$scrollToCaret(nodes.left, nodes.start);
-    this.$history.push(nodes.left, nodes.start);
   }
 
   

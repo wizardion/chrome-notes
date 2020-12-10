@@ -38,19 +38,20 @@ class NodeHistory {
     this.$edited.added = true;
   }
 
-  preserve(node, start, selected, value) {
+  preserve(node, start, selected, value, push=false) {
     var isEmpty = !this.$stack.length;
 
-    if (!isEmpty && (this.$edited.node) && (this.$edited.node !== node || this.$edited.start !== start)) {
+    if (!isEmpty && this.$edited.node && (this.$edited.node !== node || this.$edited.start !== start)) {
       this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
       return this.push(node, start, selected);
     }
 
-    if (isEmpty || selected) {
+    if (isEmpty || selected || push) {
       return this.push(node, start, selected);
     }
 
-    if (this.$edited.node && value.match(/\W/i) && !node.data[start - 1].match(/\W/i)) {
+    if (this.$edited.node && value.match(/\W/i) && 
+        (!node.data[start - 1] || !node.data[start - 1].match(/\W/i))) {
       return this.push(node, start);
     }
 
@@ -64,103 +65,6 @@ class NodeHistory {
     this.$edited.node = node;
     this.$edited.start = start;
     this.$edited.selected = 0;
-  }
-
-  ensure_(node, start, selected=0) {
-    if (!node) {
-      return;
-    }
-
-    if ((!this.$stack.length) || (selected) || 
-        (this.$edited.node && (this.$edited.node !== node || this.$edited.start !== start))) {
-      console.log('ensure.push');
-      this.push(node, start, selected);
-    } else {
-      this.$edited.node = node;
-      this.$edited.start = start;
-      this.$edited.selected = selected;
-    }
-  }
-
-  ensure2(node, start, selected=0) {
-    var push = (node && 
-      (!this.$stack.length || selected || 
-        (this.$edited.node && (this.$edited.node !== node || this.$edited.start !== start))))
-
-    if (push) {
-      console.log('ensure.push');
-      this.push(node, start, selected);
-    } else {
-      this.$edited.node = node;
-      this.$edited.start = start;
-      this.$edited.selected = selected;
-    }
-  }
-
-  ensure3(node, start, selected=0) {
-    var push = false;
-
-    if (node && !this.$stack.length) {
-      push = true;
-    } else {
-      if (node && this.$edited.node && (selected || this.$edited.node !== node || this.$edited.start !== start)) {
-        push = true;
-      }
-    }
-
-    if (push) {
-      console.log('ensure.push');
-      this.push(node, start, selected);
-    } else {
-      this.$edited.node = node;
-      this.$edited.start = start;
-      this.$edited.selected = selected;
-    }
-  }
-
-  ensure5(node, start, selected=0) {
-    var isEmpty = !this.$stack.length;
-    var oldPush = (this.$edited.node) && (this.$edited.node !== node || this.$edited.start !== start);
-    var push =  (oldPush && isEmpty) || (selected);
-
-    if (!isEmpty && oldPush) {
-      this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
-    }
-
-    if (push) {
-      this.push(node, start, selected);
-    } else {
-      this.$edited.node = node;
-      this.$edited.start = start;
-      this.$edited.selected = selected;
-    }
-  }
-
-  ensure4(node, start, selected=0) {
-    if (node && !this.$stack.length) {
-      this.push(node, start, selected);
-    } else {
-      if (this.$edited.node) {
-        if ((this.$edited.node !== node) || (this.$edited.start !== start)) {
-          console.log('prev: ensure.push');
-          this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
-
-          if (!selected) {
-            this.push(node, start, selected);
-          }
-        }
-      }
-
-      // this.$edited.data = node.data;
-      this.$edited.node = node;
-      this.$edited.start = start;
-      this.$edited.selected = selected;
-
-      if (this.$edited.node && this.$edited.selected) {
-        console.log('cur: ensure.push');
-        this.push(node, start, selected);
-      }
-    }
   }
 
   back(selection) {

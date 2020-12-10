@@ -142,13 +142,15 @@
 
 /* width */
 ::-webkit-scrollbar {
-  width: 3px;
-  /* width: 30px;
-  margin-left: -30px; */
+  width: 5px;
 }
 
 .hidden-scroll::-webkit-scrollbar-thumb {
   visibility: hidden;
+}
+
+.hidden-scroll::-webkit-scrollbar-thumb:hover {
+  visibility: initial;
 }
 
 /* Track */
@@ -159,10 +161,10 @@
 /* Handle */
 ::-webkit-scrollbar-thumb {
   width: 3px;
-  right: 2px;
-  background: #888;
-  border-radius: 8px;
+  border-radius: 4px;
   background: #D6D6D6;
+  border: none;
+  border-right: 2px solid white;
 }
 
 /* Handle on hover */
@@ -205,7 +207,8 @@ div[contenteditable] {
   /* font-family: sans-serif;
   font-size: 15px; */
 
-  white-space: pre-wrap;
+  /* white-space: pre-wrap; */
+  white-space: break-spaces;
   word-break: break-word;
 
   /* white-space: inherit; */
@@ -227,7 +230,7 @@ div[contenteditable] {
   box-sizing: border-box;
   line-height: 20px;
 
-  
+  padding-right: 1px;
 
   /* overflow-y: hidden;
   overflow-x: hidden; */
@@ -238,7 +241,7 @@ div[contenteditable] {
 }
 
 textarea.content-description {
-  border: 1px solid red;
+  /* border: 1px solid red; */
 }
 
 
