@@ -11,7 +11,7 @@ class Processor {
     this.$helpers = {};
 
     if (this.element.nodeName !== 'TEXTAREA') {
-      this.element.addEventListener('paste', this.$onPaste.bind(this));
+      this.element.addEventListener('paste', this.$paste.bind(this));
       this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
       // document.addEventListener('selectionchange', this.$selectionChange.bind(this));
       // document.addEventListener('keydown', this.$preProcessInput.bind(this));
@@ -165,7 +165,7 @@ class Processor {
     throw 'Unhandled Exception!', e;
   }
 
-  $onPaste(e) {
+  $paste(e) {
     var clipboard = (e.originalEvent || e).clipboardData;
     let selection = window.getSelection();
     var nodes = this.$getNodes(selection);
@@ -185,7 +185,7 @@ class Processor {
     }
 
     if (nodes.left && nodes.left.nodeType === Node.TEXT_NODE) {
-      this.$setData(selection, nodes, nodes.start, nodes.end, text, true);
+      this.$setData(selection, nodes, nodes.start, nodes.end, 5, text);
     }
   }
   //#endregion
@@ -195,12 +195,12 @@ class Processor {
     let left = nodes.left.data.substring(0, nodes.start);
     let right = nodes.left.data.substring(nodes.end);
     
-    this.$history.preserve(nodes.left, nodes.start, nodes.selected, value);
+    this.$history.preserve(nodes.left, nodes.start, nodes.selected, value, 1);
 
     nodes.left.data = left + value + right;
     selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
     
-    this.$history.ensure(nodes.left, nodes.start + 1);
+    this.$history.ensure(nodes.left, nodes.start + 1, 1);
     this.$scrollToCaret(nodes.left, nodes.start + 1);
   }
 
@@ -240,7 +240,7 @@ class Processor {
       return;
     }
 
-    this.$setData(selection, nodes, nodes.start, nodes.end + nodes.step);
+    this.$setData(selection, nodes, nodes.start, nodes.end + nodes.step, 3);
 
     // cleaning up
     if (!level && !nodes.selected && helper.isEmpty(nodes.left) && childNodes.length === 1) {
@@ -286,7 +286,7 @@ class Processor {
       return;
     }
 
-    this.$setData(selection, nodes, nodes.start - nodes.step, nodes.end);
+    this.$setData(selection, nodes, nodes.start - nodes.step, nodes.end, 2);
 
     // cleaning up
     if (!level && !nodes.selected && helper.isEmpty(nodes.left) && childNodes.length === 1) {
@@ -295,7 +295,7 @@ class Processor {
   }
 
   $enter(selection, nodes) {
-    this.$setData(selection, nodes, nodes.start, nodes.end, '\n');
+    this.$setData(selection, nodes, nodes.start, nodes.end, 4, '\n');
   }
   //#endregion
 
@@ -405,11 +405,11 @@ class Processor {
            node.parentNode && node.parentNode.nodeName === 'LI')
   }
 
-  $setData(selection, nodes, start, end, value='', forse=false) {
+  $setData(selection, nodes, start, end, type, value='') {
     let left = nodes.left.data.substring(0, start) + value;
     let right = nodes.left.data.substring(end);
     
-    this.$history.preserve(nodes.left, nodes.start, nodes.selected, value, forse);
+    this.$history.preserve(nodes.left, nodes.start, nodes.selected, value, type);
 
     if (right.length === 0 && left[left.length - 1] === '\n') {
       right += '\n';
@@ -419,7 +419,7 @@ class Processor {
     nodes.start = start + value.length;
     selection.setBaseAndExtent(nodes.left, nodes.start, nodes.left, nodes.start);
 
-    this.$history.ensure(nodes.left, nodes.start);
+    this.$history.ensure(nodes.left, nodes.start, type);
     this.$scrollToCaret(nodes.left, nodes.start);
   }
 

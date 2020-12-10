@@ -8,6 +8,7 @@ class NodeHistory {
 
     this.$edited = {
       added: false,
+      type: null,
       node: null,
       start: null,
       selected: null,
@@ -38,37 +39,57 @@ class NodeHistory {
     this.$edited.added = true;
   }
 
-  preserve(node, start, selected, value, push=false) {
+  preserve(node, start, selected, value, type, push=false) {
     var isEmpty = !this.$stack.length;
 
-    if (!isEmpty && this.$edited.node && (this.$edited.node !== node || this.$edited.start !== start)) {
+    // console.log({
+    //   '1': start,
+    //   '2': this.$edited.start,
+    //   'type': type,
+    //   'value': value,
+    //   'edited.type': this.$edited.type,
+    // });
+
+    if (!isEmpty && this.$edited.node && 
+      (this.$edited.node !== node || this.$edited.start !== start)) {
+      console.log('preserve.prev.push');
       this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
       return this.push(node, start, selected);
     }
 
     if (isEmpty || selected || push) {
+      console.log('preserve.new.push');
       return this.push(node, start, selected);
     }
 
-    if (this.$edited.node && value.match(/\W/i) && 
+    if (this.$edited.node && value && value.match(/\W/i) && 
         (!node.data[start - 1] || !node.data[start - 1].match(/\W/i))) {
+      console.log('preserve.match.push');
+      return this.push(node, start);
+    }
+
+    if (this.$edited.type && this.$edited.type !== type) {
+      console.log('preserve.type.push');
       return this.push(node, start);
     }
 
     this.$edited.node = node;
     this.$edited.start = start;
     this.$edited.selected = selected;
+    this.$edited.type = type;
   }
 
-  ensure(node, start) {
+  ensure(node, start, type) {
     this.$edited.added = false;
     this.$edited.node = node;
     this.$edited.start = start;
     this.$edited.selected = 0;
+    this.$edited.type = type;
   }
 
   back(selection) {
     if (this.$edited.node && !this.$edited.added) {
+      console.log('preserve.back.push');
       this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
     }
 
