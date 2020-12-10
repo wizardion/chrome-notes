@@ -39,7 +39,7 @@ class NodeHistory {
     this.$edited.added = true;
   }
 
-  preserve(node, start, selected, value, type, push=false) {
+  preserve(node, start, selected, value, type) {
     var isEmpty = !this.$stack.length;
 
     // console.log({
@@ -57,7 +57,7 @@ class NodeHistory {
       return this.push(node, start, selected);
     }
 
-    if (isEmpty || selected || push) {
+    if (isEmpty || selected) {
       console.log('preserve.new.push');
       return this.push(node, start, selected);
     }
