@@ -42,34 +42,22 @@ class NodeHistory {
   preserve(node, start, selected, value, type) {
     var isEmpty = !this.$stack.length;
 
-    // console.log({
-    //   '1': start,
-    //   '2': this.$edited.start,
-    //   'type': type,
-    //   'value': value,
-    //   'edited.type': this.$edited.type,
-    // });
-
     if (!isEmpty && this.$edited.node && 
       (this.$edited.node !== node || this.$edited.start !== start)) {
-      console.log('preserve.prev.push');
       this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
       return this.push(node, start, selected);
     }
 
     if (isEmpty || selected) {
-      console.log('preserve.new.push');
       return this.push(node, start, selected);
     }
 
     if (this.$edited.node && value && value.match(/\W/i) && 
         (!node.data[start - 1] || !node.data[start - 1].match(/\W/i))) {
-      console.log('preserve.match.push');
       return this.push(node, start);
     }
 
     if (this.$edited.type && this.$edited.type !== type) {
-      console.log('preserve.type.push');
       return this.push(node, start);
     }
 
@@ -89,7 +77,6 @@ class NodeHistory {
 
   back(selection) {
     if (this.$edited.node && !this.$edited.added) {
-      console.log('preserve.back.push');
       this.push(this.$edited.node, this.$edited.start, this.$edited.selected);
     }
 
