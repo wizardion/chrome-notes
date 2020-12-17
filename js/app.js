@@ -1,6 +1,11 @@
 // window.addEventListener('load', function(){
 document.addEventListener('DOMContentLoaded', function(){
+  var myTextarea = document.getElementById('description-note');
+  
   var editorControlls = document.getElementById('editor-controlls');
+
+  // editor.setSize(600, 203);
+  // editor.setSize(600, 150);
 
   var notes = new SimpleNotes({
     back: document.getElementById('to-list'),
@@ -11,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function(){
     detailsView: document.getElementById('details-view'),
     title: document.getElementById('title-note'),
     description: document.getElementById('description-note'),
+    // description: editor,
 
     search: document.getElementById('search-button'),
     searchInput: document.getElementById('search-notes'),

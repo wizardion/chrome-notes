@@ -1,14 +1,17 @@
 // class Editor extends TextProcessor {
-class Editor extends Processor {
+// class Editor extends Processor {
+class Editor {
   constructor (element, controls) {
-    super(element);
+    // super(element);
 
-    this.$value = this.element.innerHTML;
+    // this.$value = this.element.innerHTML;
+    this.element = element;
     this.controls = controls;
 
     this.customEvents = {'change': null};
+    this.initiated = false;
 
-    this.init();
+    // this.init(element);
     // this.element.addEventListener('blur', this.$onChange.bind(this));
   }
 
@@ -18,18 +21,117 @@ class Editor extends Processor {
    * Init controlls and events.
    */
   init() {
+    console.log('init editor...');
+
+    this.preview = document.getElementById('description-preview');
+
+    // console.log({
+    //   '': marked
+    // });
+
+    this.element = CodeMirror.fromTextArea(this.element, {
+      // lineNumbers: true,
+      // scrollbarStyle: "native",
+
+      // mode: "markdown",
+      // mode: "markdown",
+      // mode: "gfm",
+      lineWrapping: true,
+      showCursorWhenSelecting: true,
+      singleSelection: true,
+      // singleCursorHeightPerLine: false,
+      // mode: {
+      //   name: "markdown",
+      //   highlightFormatting: true
+      // }
+      mode: {
+        name: "gfm",
+        // highlightFormatting: true
+      }
+      // mode: {
+      //   name: "gfm",
+      //   allowAtxHeaderWithoutSpace: false,
+      //   highlightFormatting: true,
+      //   tokenTypeOverrides: {
+      //     emoji: "emoji"
+      //   }
+      // },
+      
+      // lineNumbers: true,
+      // viewportMargin: Infinity
+    });
+
+    this.element.on('blur', this.$onChange.bind(this));
+    this.initiated = true;
+
+    var makeBold = function (cm) {
+      var text = cm.getSelection();
+      if (text.length) {
+        cm.replaceSelection(`**${text}**`);
+      }
+    }
+
+    this.element.setOption("extraKeys", {
+      'Cmd-B': makeBold
+    });
+
     for (let i = 0; i < this.controls.length; i++) {
       const item = this.controls[i];
       const action = item.getAttribute('action');
-      const helper = this.$helpers[action];
+      // const helper = this.$helpers[action];
 
       item.onmousedown = this.$preCommand;
       // item.onmouseup = (helper && helper.command)? this.$customCommand.bind(this, helper, action) : this.$command.bind(this, action);
 
       if (action === 'bold') {
-        item.onmouseup = this.$onChange.bind(this);
+        item.onmouseup = makeBold.bind(this, this.element);
+      }
+
+      if (action === 'italic') {
+        item.onmouseup = function () {
+          this.selections = this.element.listSelections();
+          this.cursors = this.element.getCursor();          
+        }.bind(this);
+      }
+
+      if (action === 'underline') {
+        item.onmouseup = function () {
+          if (this.selections && this.cursors){
+            let c = this.cursors;
+            let selction = [];
+
+            for (var i = 0; i < this.selections.length; i++) {
+              const s = this.selections[i];
+
+              selction.push({
+                anchor: {
+                  ch: s.anchor.ch,
+                  line: s.anchor.line,
+                },
+                head: {
+                  ch: s.head.ch,
+                  line: s.head.line,
+                }
+              });
+            }
+
+            this.element.setSelections(selction);
+
+            this.selections = null;
+            this.cursors = null;
+          }
+        }.bind(this);
+      }
+
+      if (action === 'preview') {
+        item.onmouseup = this.$preview.bind(this);
       }
     }
+
+    marked.setOptions({
+      gfm: true,
+      breaks: true,
+    });
   }
 
   /**
@@ -57,6 +159,29 @@ class Editor extends Processor {
     // this.element.parentNode.scrollTop = scrollTop;
   }
 
+  $preview() {
+    if (!this.previewMode) {
+      let scrollInfo = this.element.getScrollInfo();
+      let html = marked(this.element.getValue());
+
+      console.log(html);
+
+      // this.preview.innerHTML = html;
+      this.preview.innerHTML = html;
+      this.element.getWrapperElement().style.display = 'none';
+      this.preview.style.display = '';
+      this.preview.scrollTop = scrollInfo.top;
+    } else {
+      let scrollInfo = this.preview.scrollTop;
+
+      this.element.getWrapperElement().style.display = '';
+      this.preview.style.display = 'none';
+      this.element.scrollTo(0, scrollInfo);
+    }
+
+    this.previewMode = !this.previewMode;
+  }
+
   /**
    * Internal event: CustomCommand.
    * 
@@ -78,7 +203,13 @@ class Editor extends Processor {
   set value(value) {
     this.$value = value;
     // this.element.innerHTML = this.$value;
-    this.$history.reset();
+    // this.$history.reset();
+
+    if (this.element.setValue) {
+      this.element.setValue(value);
+
+      return;
+    }
 
     if (this.element.nodeName == 'TEXTAREA') {
       var div = document.createElement('div');
@@ -86,9 +217,11 @@ class Editor extends Processor {
       div.innerHTML = this.$value;
       this.element.value = div.innerText;
       div.remove();
+
+      this.element.style.height = this.element.scrollHeight + 'px';
     }
 
-    if (this.element.nodeName == 'PRE') {
+    if (this.element.nodeName == 'PRE' || this.element.nodeName == 'DIV') {
       this.element.innerHTML = this.$value;
     }
 
@@ -99,6 +232,9 @@ class Editor extends Processor {
    * Gets html value
    */
   get value() {
+    if (this.element.getValue) {
+      return this.element.getValue();
+    }
     return this.element.innerHTML;
   }
 
@@ -114,7 +250,7 @@ class Editor extends Processor {
       return;
     }
 
-    this.element.addEventListener(name, callback);
+    // this.element.addEventListener(name, callback);
   }
 
   /**
@@ -157,6 +293,18 @@ class Editor extends Processor {
    */
   $onChange() {
     let event = this.customEvents['change'];
+
+    if (this.element.getValue) {
+      this.$value = this.element.getValue();
+      this.$value = this.$value.replace(/^\#([^\#\n]+)\n/gi, '');
+      return event(this.$value);
+    }
+
+    if (this.element.nodeName === 'TEXTAREA') {
+      event(this.element.value);
+      this.$value = this.element.value;
+      return;
+    }
 
     if (this.element.innerHTML != this.$value && event) {
       // event(super.$onChange());

@@ -1,6 +1,7 @@
 class ScrollBar {
   constructor(control=new Object, options=null) {
     this.control = control;
+    this.$enableAnimations = localStorage.enableAnimations === 'true';
 
     this.control.classList.add('hidden-scroll');
     this.control.addEventListener('scroll', this.$onScroll.bind(this));
@@ -10,7 +11,11 @@ class ScrollBar {
   }
 
   $scrollTo(top) {
-    if (this.$enableAnimations) {
+    console.log({
+      'enableAnimations': this.$enableAnimations
+    });
+
+    if (!this.$enableAnimations) {
       this.control.scrollTop = top;
     } else {
       this.$scrollSmoothTo(Math.floor(top));

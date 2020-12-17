@@ -25,6 +25,7 @@ class SimpleNotes extends BaseNotes {
 
     if (!isNewNote && rowId) {
       this.selectNote(parseInt(rowId));
+      // this.controls.description.init();
     }
 
     if (isNewNote) {

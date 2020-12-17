@@ -1,21 +1,33 @@
 class Processor {
   constructor (element, controls) {
     this.element = element;
-    this.$types = {
-      element: 1,
-      attr: 2,
-      text: 3
-    };
-
-
     this.$helpers = {};
 
-    if (this.element.nodeName !== 'TEXTAREA') {
+    if (this.element.nodeName === 'PRE') {
       this.element.addEventListener('paste', this.$paste.bind(this));
       this.element.addEventListener('keydown', this.$preProcessInput.bind(this));
       // document.addEventListener('selectionchange', this.$selectionChange.bind(this));
       // document.addEventListener('keydown', this.$preProcessInput.bind(this));
       // this.element.addEventListener('keyup', this.$postProcessInput.bind(this));
+    }
+
+    if (this.element.nodeName === 'TEXTAREA') {
+      this.element.style.height = this.element.scrollHeight + 'px';
+
+      this.element.addEventListener('input', function (e) {
+        this.style.height = this.scrollHeight + 'px';
+        
+        
+
+        console.log({
+          'clientHeight': this.clientHeight,
+          'scrollHeight': this.scrollHeight,
+        });
+        if (this.clientHeight !== this.scrollHeight) {
+          // this.style.height = this.clientHeight + this.scrollHeight + 'px';
+          // this.style.height = this.scrollHeight + 'px';
+        }
+      });
     }
 
     this.$timer = null;
@@ -29,21 +41,23 @@ class Processor {
     var cursor = null;
     var start = null;
 
-    setTimeout(function(){
-      setInterval(function () {
-        if (document.activeElement === this.element) {
-          var nodes = this.$getNodes(window.getSelection());
+    if (this.element.nodeName === 'PRE1') {
+      setTimeout(function(){
+        setInterval(function () {
+          if (document.activeElement === this.element) {
+            var nodes = this.$getNodes(window.getSelection());
 
-          if(value !== this.element.innerHTML || (cursor !== nodes.left || start !== nodes.start) || 1) {
-            cursor = nodes.left;
-            start = nodes.start;
-            TextProcessor.log(this.element, {node: nodes.left, start: nodes.start}); 
-            value = this.element.innerHTML;
+            if(value !== this.element.innerHTML || (cursor !== nodes.left || start !== nodes.start) || 1) {
+              cursor = nodes.left;
+              start = nodes.start;
+              TextProcessor.log(this.element, {node: nodes.left, start: nodes.start}); 
+              value = this.element.innerHTML;
+            }
           }
-        }
-      // }.bind(this), 250);
-      }.bind(this), 1000);
-    }.bind(this), 10);
+        // }.bind(this), 250);
+        }.bind(this), 1000);
+      }.bind(this), 10);
+    }
     //#endregion
   }
 
@@ -192,16 +206,23 @@ class Processor {
 
   //#region Commands
   $input(selection, nodes, value) {
-    let left = nodes.left.data.substring(0, nodes.start);
-    let right = nodes.left.data.substring(nodes.end);
+    var tracker = new Tracker();
+    let data = nodes.left.data;
+    let left = data.slice(0, nodes.start);
+    let right = data.slice(nodes.end);
     
     this.$history.preserve(nodes.left, nodes.start, nodes.selected, value, 1);
 
     nodes.left.data = left + value + right;
-    selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
+    tracker.track('data');
+    // selection.setBaseAndExtent(nodes.left, nodes.start + 1, nodes.left, nodes.start + 1);
+    nodes.range.setStart(nodes.left, nodes.start + 1);
+    // nodes.range.collapse(true);
+    tracker.track('setBaseAndExtent');
     
     this.$history.ensure(nodes.left, nodes.start + 1, 1);
     this.$scrollToCaret(nodes.left, nodes.start + 1);
+    tracker.print();
   }
 
   $delete(selection, nodes, level=null) {
@@ -314,6 +335,9 @@ class Processor {
     range.setStart(selection.anchorNode, selection.anchorOffset);
     range.setEnd(selection.focusNode, selection.focusOffset);
 
+    selection.removeAllRanges();
+    selection.addRange(range);
+
     return {
       left: leftNode,
       right: rightNode,
@@ -323,6 +347,7 @@ class Processor {
       end: end,
       selected: selected,
       step: (selected > 0)? 0 : 1,
+      range: range
     }
   }
 
@@ -406,8 +431,9 @@ class Processor {
   }
 
   $setData(selection, nodes, start, end, type, value='') {
-    let left = nodes.left.data.substring(0, start) + value;
-    let right = nodes.left.data.substring(end);
+    let data = nodes.left.data;
+    let left = data.slice(0, start) + value;
+    let right = data.slice(end);
     
     this.$history.preserve(nodes.left, nodes.start, nodes.selected, value, type);
 
