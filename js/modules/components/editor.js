@@ -162,15 +162,40 @@ class Editor {
   $preview() {
     if (!this.previewMode) {
       let scrollInfo = this.element.getScrollInfo();
-      let html = marked(this.element.getValue());
+      let text = this.element.getValue();
 
-      console.log(html);
+      // let title = text.replace(/^\#([^\n]+)\n/gi, '');
+      let title = text.match(/^([^\n]+)\n/gi);
 
-      // this.preview.innerHTML = html;
-      this.preview.innerHTML = html;
-      this.element.getWrapperElement().style.display = 'none';
-      this.preview.style.display = '';
-      this.preview.scrollTop = scrollInfo.top;
+      if (title) {
+        text = text.replace(title, '');
+        title = title[0].replace(/\n/gi, '');
+        console.log({
+          'title': title
+        });
+  
+  
+        let html = marked(text);
+  
+        // let d = document.createElement('div');
+  
+        // console.log(html);
+  
+        // // this.preview.innerHTML = html;
+        // d.innerHTML = html;
+  
+        // console.log({
+        //   'text': d.innerText
+        // });
+  
+        this.preview.innerHTML = `<div class="edit-title details">${title}</div>${html}`;
+        this.element.getWrapperElement().style.display = 'none';
+        this.preview.style.display = '';
+        this.preview.scrollTop = scrollInfo.top;
+      } else {
+        this.preview.innerHTML = 'There is no title, please add a title';
+      }
+      
     } else {
       let scrollInfo = this.preview.scrollTop;
 
@@ -296,7 +321,7 @@ class Editor {
 
     if (this.element.getValue) {
       this.$value = this.element.getValue();
-      this.$value = this.$value.replace(/^\#([^\#\n]+)\n/gi, '');
+      this.$value = this.$value.replace(/^([^\n]+)\n/gi, '');
       return event(this.$value);
     }
 

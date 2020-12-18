@@ -133,7 +133,7 @@ class BaseNotes {
   
       this.controls.title.value = this.notes[index].title;
       // this.controls.description.value = this.notes[index].description;
-      this.controls.description.value = '# ' + this.notes[index].title + '\n' + this.notes[index].description;
+      this.controls.description.value = '' + this.notes[index].title + '\n' + this.notes[index].description;
       
       if (!this.controls.description.initiated) {
         this.controls.description.init();

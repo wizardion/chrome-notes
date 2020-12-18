@@ -32,7 +32,7 @@
   transform: translateX(-50%); */
 }
 
-.edit-title.details, h1
+.edit-title.details
 {
   width: 100%;
   left: 0px;
@@ -61,11 +61,12 @@
   /* font-weight: bold; */
   /* text-decoration: underline; */
   font-size: 17px;
-  font-weight: 500;
+  font-weight: bold;
+  /* font-weight: 500; */
 
   /* font-family: 'Nunito2', sans-serif; */
   /* font-family: 'Quicksand2', 'Ubuntu2', sans-serif; */
-  font-family: 'Ubuntu2', sans-serif;
+  /* font-family: 'Ubuntu2', sans-serif; */
   border-bottom: 1px solid transparent;
   margin-top: 15px !important;
 }
@@ -260,8 +261,14 @@ div[contenteditable] {
 }
 
 .content-description > p + ul,
-.content-description > p + ol {
+.content-description > p + ol,
+.content-description h1 + * {
   margin-top: -20px;
+}
+
+.content-description h1 {
+  font-size: 110%;
+  margin-left: 10px;
 }
 
 /* -------------------------------- CODE MIRROR ----------------------------------- */
@@ -279,6 +286,7 @@ div[contenteditable] {
   font-size: 13px; */
 
   /* font-family: "SF Mono","Monaco","Andale Mono","Lucida Console","Bitstream Vera Sans Mono","Courier New", Courier, monospace !important; */
+  /* font-weight: 600; */
   font-size: 14px;
 
   line-height: 20px;
@@ -293,15 +301,37 @@ div[contenteditable] {
 }
 
 
-/* .cm-header { font-family: arial; }
+.CodeMirror-line:first-child {
+  text-align: center;
+  margin-top: 15px !important;
+  /* margin-bottom: 20px !important; */
+  padding-bottom: 20px !important;
+  font-size: 17px !important;
+  color: #06736a !important;
+  font-weight: bold !important;
+  margin-left: 0px !important;
+  font-style: normal !important;
+}
+
+.CodeMirror-line:first-child span {
+  color: #06736a !important;
+  font-weight: bold !important;
+  font-size: 17px !important;
+  margin-left: 0px !important;
+  font-style: normal !important;
+}
+
+
+/* .cm-header { font-family: arial; } */
+.cm-header-1 { font-size: 110%; margin-left: 10px; }
 .cm-header-2 { font-size: 130%; }
 .cm-header-3 { font-size: 120%; }
 .cm-header-4 { font-size: 110%; }
 .cm-header-5 { font-size: 100%; }
 .cm-header-6 { font-size: 90%; }
-.cm-strong { font-size: 100%; } */
+.cm-strong { font-size: 100%; }
 
-.cm-header-1 {
+/* .cm-header-1 {
   text-align: center; 
   color: #06736a !important;
   font-size: 17px !important;
@@ -311,7 +341,7 @@ div[contenteditable] {
   margin-bottom: 10px;
 
   display: block !important;
-}
+} */
 
 
 .cm-formatting {
