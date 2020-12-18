@@ -25,6 +25,8 @@ class Editor {
 
     this.preview = document.getElementById('description-preview');
 
+    this.previewInp = null;
+
     // console.log({
     //   '': marked
     // });
@@ -124,6 +126,7 @@ class Editor {
       }
 
       if (action === 'preview') {
+        this.previewInp = item;
         item.onmouseup = this.$preview.bind(this);
       }
     }
@@ -192,6 +195,9 @@ class Editor {
         this.element.getWrapperElement().style.display = 'none';
         this.preview.style.display = '';
         this.preview.scrollTop = scrollInfo.top;
+
+        localStorage.preview = true;
+        this.previewInp.classList.add('preview');
       } else {
         this.preview.innerHTML = 'There is no title, please add a title';
       }
@@ -202,6 +208,8 @@ class Editor {
       this.element.getWrapperElement().style.display = '';
       this.preview.style.display = 'none';
       this.element.scrollTo(0, scrollInfo);
+      localStorage.preview = false;
+      this.previewInp.classList.remove('preview');
     }
 
     this.previewMode = !this.previewMode;
@@ -232,6 +240,10 @@ class Editor {
 
     if (this.element.setValue) {
       this.element.setValue(value);
+
+      if (localStorage.preview === 'true') {
+        this.$preview();
+      }
 
       return;
     }

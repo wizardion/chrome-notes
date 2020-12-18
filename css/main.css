@@ -31,8 +31,10 @@ code {
   background: ghostwhite;
   border: 1px solid lightgray;
   border-radius: 2px;
-  padding: 0px 4px;
+  padding: 1px 4px 1px 4px;
   color: #06736a;
+  font-family: 'Ubuntu2', sans-serif !important;
+  /* font-size: 16px; */
   /* font-family: Courier,monospace; */
   /* margin-right: 5px; */
   /* font-size: 13px; */
