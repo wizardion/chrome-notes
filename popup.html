@@ -2,114 +2,36 @@
 <html>
 
 <head>
-  <!-- This is for test only: background.js  -->
-  <script type="text/javascript" src="js/background.js"></script>
-  <script type="text/javascript" src="js/migration.js"></script>
-  <!-- edit test -->
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css" />
 
-  <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
-  
-  <link rel="stylesheet" type="text/css" href="css/details.css" />
-  <link rel="stylesheet" type="text/css" href="css/controls.css" />
-  <link rel="stylesheet" type="text/css" href="css/main.css" />
-
-  <script type="text/javascript" src="js/modules/components/editor.js"></script>
-
-  <script type="text/javascript" src="js/modules/components/validators.js"></script>
-  <script type="text/javascript" src="js/modules/components/scroll-bar.js"></script>
-  
-  <!-- components -->
-  <script type="text/javascript" src="js/modules/components/base.js"></script>
-  <script type="text/javascript" src="js/modules/components/sorting.js"></script>
-  <script type="text/javascript" src="js/modules/components/search.js"></script>
-  <script type="text/javascript" src="js/modules/components/new-note.js"></script>
-
-  <!-- notes -->
-  <script type="text/javascript" src="js/modules/notes/base-notes.js"></script>
-  <script type="text/javascript" src="js/modules/notes/simple-notes.js"></script>
-  
-  <!-- app -->
-  <script type="text/javascript" src="js/app.js"></script>
+    <script type="text/javascript" src="scripts/notes.js"></script>
+    <script type="text/javascript" src="scripts/main.js"></script>
 </head>
 
 <body>
-  <div id="notes" class="notes">
-    <div id="details-view" class="details-view">
-      <div id="details-controls" class="head">
-        <input id="to-list" type="button" class="button back" value="All Notes" />
-        <div id="delete-note" class="button delete">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="19">
-            <path d="m 11,1 0,2 -4,0 0,1 1,0 0,12 c 4.263e-4,0.58315 0.1537698,1.111243 0.5214844,1.480469 C 8.889199,17.849695 9.4187095,18.004381 10.003906,18 l 8.990235,0 c 0.586679,0.0079 1.116934,-0.147251 1.484375,-0.517578 C 20.845956,17.112095 20.998723,16.584733 21,16.001953 L 21,16 21,4 22,4 22,3 18,3 18,1 11,1 Z m 1,1 5,0 0,1 -5,0 0,-1 z m -3,2 11,0 0,11.998047 c -9.15e-4,0.41722 -0.09846,0.646249 -0.230469,0.779297 C 19.63752,16.910392 19.41918,17.00558 19.005859,17 l -0.002,0 -9.0058591,0 -0.00195,0 C 9.5812905,17.003105 9.3625714,16.908036 9.2304688,16.775391 9.0983661,16.642745 9.0003047,16.41685 9,16 L 9,4 Z m 2,2 0,9 1,0 0,-9 -1,0 z m 3,0 0,9 1,0 0,-9 -1,0 z m 3,0 0,9 1,0 0,-9 -1,0 z" />
-          </svg>
+<div id="notes" class="notes">
+    <div class="edit-view">
+        <div class="head">
+            <span class="title">Note 1</span>
+            <input type="button" class="button back" value="All Notes" />
+            <input type="button" class="button delete" />
         </div>
-
-        <div id="editor-controlls" class="editor-controlls">
-            <fieldset>
-              <div action="bold" name="bold" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">  
-                    <path d="m 12.65678,13 c -0.466102,0 -0.936441,-0.01695 -1.411017,-0.05085 -0.474577,-0.02543 -0.889831,-0.08475 -1.2457631,-0.177967 l 0,-8.5550843 c 0.1864411,-0.033898 0.3855931,-0.063559 0.5974581,-0.088983 0.211864,-0.033898 0.427966,-0.059322 0.648305,-0.076271 0.220339,-0.016949 0.43644,-0.029661 0.648305,-0.038136 0.220339,-0.00847 0.427966,-0.012712 0.622881,-0.012712 0.533899,0 1.029661,0.042373 1.487288,0.1271186 0.457627,0.076271 0.851695,0.2076271 1.182204,0.3940678 0.796918,0.4478179 1.045654,1.0440198 1.067796,1.8686441 0.02214,0.8246243 -0.530982,1.3256882 -1.131356,1.7796611 1.128027,0.3907992 1.564914,1.0934826 1.56356,2.1101697 -0.0014,1.016687 -0.330509,1.588983 -0.991526,2.04661 C 15.033898,12.775423 14.021187,13 12.65678,13 Z m -1.080509,-4.0677966 0,2.6822036 c 0.177966,0.01695 0.368644,0.02966 0.572034,0.03814 0.20339,0.0085 0.389831,0.01271 0.559322,0.01271 0.330509,0 0.635593,-0.02119 0.915254,-0.06356 0.288136,-0.04237 0.533899,-0.114407 0.737289,-0.216102 0.211864,-0.110169 0.377118,-0.254237 0.495762,-0.432203 0.127119,-0.177966 0.190678,-0.40678 0.190678,-0.686441 C 15.04661,9.7669511 14.864407,9.4194936 14.5,9.2245783 14.135593,9.029663 13.631356,8.9322054 12.987288,8.9322054 Z m 0,-1.2584746 1.131356,0 c 0.610169,0 1.088983,-0.084746 1.436441,-0.2542372 0.347457,-0.1779661 0.521186,-0.4915255 0.521186,-0.940678 0,-0.4237289 -0.182203,-0.7245763 -0.54661,-0.9025424 C 13.762712,5.3983051 13.29661,5.309322 12.720339,5.309322 c -0.245763,0 -0.466102,0.00424 -0.661017,0.012712 -0.186441,0.00847 -0.347458,0.021187 -0.483051,0.038136 z" />
-                  </svg>
-              </div><!--
-              --><div action="italic" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 13.625,4 h 1.639 l -1.776,9 h -1.639 z" />
-                  </svg>
-              </div><!--
-            --><div action="underline" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 10,4 0,5.5 c 0.0019,1.899515 1.546508,3.511383 3.503906,3.5 C 15.450982,12.988677 17,11.400436 17,9.5 l 0,-5.5 -1.5,0 0,5.5 c 0,1.099564 -0.853596,1.993311 -2.003906,2 C 12.356106,11.506629 11.5011,10.600485 11.5,9.5 L 11.5,4 10,4 Z" />
-                    <path d="m 10,14 0,1 7,0 0,-1 -7,0 z" />
-                  </svg>
-              </div><!--
-            --><div action="strikethrough" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 12.9425,12.845 q 2.09,0 2.09,-1.43 0,-0.44 -0.1925,-0.7425 -0.17875,-0.31625 -0.495,-0.53625 -0.31625,-0.2337502 -0.72875,-0.3987502 -0.39875,-0.165 -0.8525,-0.33 -0.5225,-0.17875 -0.99,-0.39875 -0.4675,-0.23375 -0.81125,-0.53625 -0.34375,-0.31625 -0.55,-0.7425 -0.1925,-0.42625 -0.1925,-1.03125 0,-1.25125 0.8525,-1.9525 0.8525,-0.70125 2.35125,-0.70125 0.86625,0 1.5675,0.1925 0.715,0.17875 1.045,0.39875 L 15.61,5.7224998 q -0.28875,-0.17875 -0.86625,-0.34375 -0.56375,-0.17875 -1.32,-0.17875 -0.385,0 -0.715,0.0825 -0.33,0.0825 -0.5775,0.2475 -0.2475,0.165 -0.39875,0.42625 -0.1375,0.2475 -0.1375,0.59125 0,0.385 0.15125,0.64625 0.15125,0.26125 0.42625,0.4675 0.275,0.1925 0.6325,0.3575 0.37125,0.165 0.81125,0.33 0.61875,0.2475 1.1275,0.495 0.5225,0.2475 0.89375,0.59125 0.385,0.34375 0.59125,0.8250002 0.20625,0.4675 0.20625,1.14125 0,1.25125 -0.92125,1.925 Q 14.60625,14 12.9425,14 12.37875,14 11.8975,13.9175 11.43,13.84875 11.05875,13.7525 10.6875,13.6425 10.4125,13.5325 10.15125,13.40875 10,13.32625 l 0.39875,-1.1 q 0.31625,0.17875 0.9625,0.39875 0.64625,0.22 1.58125,0.22 z" />
-                    <path d="M 18,7.485 18,8.724 9,10.5 9,9.261 Z" />
-                  </svg>
-              </div>
-            </fieldset>
-            <fieldset>
-                <div action="bullet-number" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 7,4 -1,0 0,1 1.0039062,0 0,4 L 6,9 l 0,1 4,0 0,-1 -1.5,0 0,-5 z m 4,0 0,2 12,0 0,-2 z m 0,4 0,2 12,0 0,-2 z m -3,4 0,2 15,0 0,-2 z" />
-                  </svg>
-                </div><!--
-                --><div action="bullet-list" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 6,8 0,2 3,0 0,-2 z M 6,4 6,6 9,6 9,4 Z m 2,8 0,2 16,0 0,-2 z m 3,-4 0,2 13,0 0,-2 z m 0,-4 0,2 13,0 0,-2 z" />
-                  </svg>
-                </div>
-            </fieldset>
-            <fieldset>
-                <div action="undo" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 10,2 -4,4 4,4 0,-3 5.5,0 C 16.96035,7 18,8.1736578 18,9.5 18,10.826342 16.96035,12 15.5,12 L 12,12 a 1.0001,1.0001 0 1 0 0,2 l 3.5,0 C 18.049802,14 20,11.897008 20,9.5 20,7.102992 18.049802,5 15.5,5 L 10,5 10,2 Z" />
-                  </svg>
-                </div><!--
-                --><div action="redo" class="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="17">
-                    <path d="m 16,2 0,3 -5.5,0 C 7.950198,5 6,7.102992 6,9.5 6,11.897008 7.950198,14 10.5,14 l 3.5,0 a 1.0001,1.0001 0 1 0 0,-2 l -3.5,0 C 9.03965,12 8,10.826342 8,9.5 8,8.1736578 9.03965,7 10.5,7 l 5.5,0 0,3 4,-4 -4,-4 z" />
-                  </svg>
-                </div>
-            </fieldset>
-          </div>
-      </div>
-
-      <div id="content" class="content">
-        <input id="title-note" type="text" maxlength="60" tabindex="1" class="edit-title details" placeholder="Enter a Title of Note">
-        <div id="description-note" class="content-description" contenteditable="true" tabindex="2"></div>
-      </div>
+        <textarea class="fast-note"></textarea>
     </div>
 
-    <div id="list-view" class="list-view disable-select">
-      <div id="list-controls" class="list-controls">
-        <input id="search-button" type="button" class="button search" />
-        <span>My Notes</span>
-        <input id="add-note" type="button" class="button add-note" />
-        <input id="search-notes" type="text" class="search-notes" placeholder="Enter keyword" maxlength="30">
-      </div>
-      <div id="list-items" class="list-items"></div>
+    <div class="list-view">
+        <div class="list-controls" >
+            <span>My Notes</span>
+            <input type="button" class="button add-note" value="New Note" />
+        </div>
+        <div class="list-items" >
+            <div class="list-item" >
+                <input type="button" class="button to-note" />
+            </div>
+        </div>
+        <input type="text" class="edit-title" value="" />
     </div>
-  </div>
+</div>
 </body>
 </html>
