@@ -1,0 +1,207 @@
+@font-face {
+	font-family: Calibri Light TTF;
+	src: url("/stylesheets/fonts/calibri_light.ttf");
+}
+
+html, body
+{
+	width: 600px;
+    height: 275px;
+	border:0;
+	margin: 0px;
+    padding: 0px;
+	
+	font:16px Calibri Light, Calibri Light TTF;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: white;
+}
+
+table
+{
+	margin: 0;	
+    padding: 0;
+	border-collapse:collapse;
+}
+
+.head
+{
+    height: 25px;
+    text-align: center;
+    color: #e8b600;
+    color: #07a698;
+    position: relative;
+    line-height: 23px;
+    border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+}
+
+.list-view
+{
+    display: none;
+}
+
+.list-items
+{
+    width: 620px;
+    height: 240px;
+    overflow-y: scroll;
+}
+
+.list-view .list-item
+{
+    display: none;
+    border-bottom: 1px solid #DBDBDB;
+    border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+    line-height: 25px;
+    height: 25px;
+    padding-left: 10px;
+}
+
+.list-view .list-item:hover
+{
+    background:rgba(7, 166, 152, 0.1);
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+}
+
+.list-view .list-item.edit-item:hover
+{
+    background: transparent;
+    cursor: default;
+    border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+}
+
+.edit-title
+{
+    display: none;
+    border: none;
+    width: 90%;
+    height: 24px;
+    background: transparent;
+    margin: 0px 0px 0px 0px;
+    padding-left: 15px;
+}
+
+.edit-title:focus
+{
+    outline: none;
+}
+
+.fast-note
+{
+    width: 620px;
+	height: 240px;
+    overflow-y: scroll;
+	
+	outline: none;
+	border: none;
+	margin: 5px 0 0 0;
+	padding: 2px;
+	resize: none;
+	border: none;
+	padding: 5px;
+    background: transparent;
+}
+
+.list-controls
+{
+    position: relative;
+    left: 0px;
+    height: 25px;
+    text-align:center;
+    border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+
+}
+
+.list-controls span
+{
+    color: #07a698;
+    line-height: 23px;
+}
+
+.button
+{
+    padding: 0px;
+	margin: 0px;
+    height:23px;
+    background: transparent;
+    border: none;
+    border: none;
+	cursor: pointer;
+
+    background-position: left;
+    background-repeat: no-repeat;
+    color: #e8b600;
+    color: #07a698;
+}
+
+.button:hover
+{
+    color: #e33636;
+}
+
+.button:active
+{
+   opacity: 0.5;
+}
+
+.button:focus
+{
+    outline: none;
+}
+
+
+.back
+{
+    padding-left: 15px;
+
+    position: absolute;
+    left: 2px;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVR42mNgGBmAY9m0/yA8qpkemkcNobEhNAMA4aIxw3jfnaoAAAAASUVORK5CYII=);
+}
+
+.back:hover
+{
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVR42mNgGBngsZnZfxAe1UwPzaOG0NgQmgEAyyoytXm7VbsAAAAASUVORK5CYII=);
+}
+
+.add-note
+{
+    color: #e8b600;
+    color: #07a698;
+    position: absolute;
+    right: 12px;
+    top: 0px;
+}
+
+.delete
+{
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAARklEQVR42mNgoCfgWDq1gWPZtP84MVCedEPxaIRZSJwhFGKcBpMVVPj00cVQZD4u9qiho4aOGjqghg7iAoVQaU/NWoBUAACMyPE/lOuBQQAAAABJRU5ErkJggg==);
+    position: absolute;
+    width: 21px;
+    right: 5px;
+}
+
+.delete:hover
+{
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAARElEQVR42mNgoCd4bGbWAMT/8eAGcgzFqRFmIbGGUIRxGkxmUP0nT5JahiLzcbFHDR01dNTQATV0UBcoDWSWpQ0MtAYA82P170MEKcgAAAAASUVORK5CYII=);
+}
+
+.to-note, .list-view .list-item.edit-item:hover .to-note
+{
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAG0lEQVR42mNgGJ6AY9m0/yA8ashgMmRU82AHAHUSMcOJ5OQvAAAAAElFTkSuQmCC);
+
+    width: 25px;
+    float: right;
+    cursor: pointer;
+}
+
+.list-view .list-item:hover .to-note
+{
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAG0lEQVR42mNgGJ7gsZnZfxAeNWQwGTKqebADAFyKMrVpYhmfAAAAAElFTkSuQmCC);
+}
+
+.to-note:hover
+{
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAG0lEQVR42mNgGJ7gsZnZfxAeNWQwGTKqebADAFyKMrVpYhmfAAAAAElFTkSuQmCC) !important;
+}
