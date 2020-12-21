@@ -3,6 +3,64 @@
 	src: url("/stylesheets/fonts/calibri_light.ttf");
 }
 
+#editor {
+  /* background-color: gold;  */
+  height: 200px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+#editor .cursor {
+  height: 16px;
+  width: 2px;
+  background-color: indigo;
+  display: none;
+  position: absolute;
+}
+
+/* #editor:focus {
+  background-color: orange;
+} */
+
+#editor:focus .cursor {
+  display: block;
+
+  /* animation: blink 1s infinite; */
+}
+
+#editor .editor-line {
+  padding: 0;
+  margin: 0;
+  /* font-family: inherit; */
+}
+
+#editor .editor-line span {
+  white-space: pre;
+}
+
+@keyframes blink {
+  0%, 100% { 
+    opacity: 0; 
+    /* visibility: hidden; */
+  }
+  50% { 
+    opacity: 1; 
+    /* visibility: visible; */
+  }
+}
+
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+@-webkit-keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
 html, body
 {
 	width: 600px;
