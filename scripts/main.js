@@ -48,7 +48,7 @@ function onPaste(e) {
   var text = clipboard.getData('text/plain');
 
   console.log({
-    '': text
+    'onPaste': text
   });
 
   e.preventDefault();
@@ -57,14 +57,22 @@ function onPaste(e) {
 
   editor.text += text;
   render();
+  log();
 }
 
 
 function onkeyDown(e) {
   var t1 = performance.now();
   // console.log(e);
+  // console.log({
+  //   'altKey': e.altKey,
+  //   'shiftKey': e.shiftKey,
+  //   'ctrlKey': e.ctrlKey,
+  //   'metaKey': e.metaKey,
+  //   'code': e.code,
+  // });
 
-  if (!e.ctrlKey && e.key === 'Backspace') {
+  if (!(e.ctrlKey || e.metaKey) && e.key === 'Backspace') {
     e.preventDefault();
     editor.text = editor.text.slice(0, -1);
     let t2 =  performance.now();
@@ -72,7 +80,7 @@ function onkeyDown(e) {
     render();
   }
 
-  if (!e.ctrlKey && e.key === 'Enter') {
+  if (!(e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     e.preventDefault();
     editor.text +='\n';
     let t2 =  performance.now();
@@ -80,13 +88,15 @@ function onkeyDown(e) {
     render();
   }
 
-  if (!e.ctrlKey && e.key.length === 1) {
+  if (!(e.ctrlKey || e.metaKey) && e.key.length === 1) {
     e.preventDefault();
     editor.text += e.key;
     let t2 =  performance.now();
     console.log({'t': t2 - t1});
     render();
   }
+
+  log();
 }
 
 function render() {
@@ -144,3 +154,9 @@ function onBlur() {
   console.log('blur');
 }
 
+// -------------------------------------------------------------------------------------------------
+function log() {
+  var div = document.getElementById('logging');
+
+  div.innerText = editor.text;
+}

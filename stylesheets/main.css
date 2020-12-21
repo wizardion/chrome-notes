@@ -263,3 +263,14 @@ table
 {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAG0lEQVR42mNgGJ7gsZnZfxAeNWQwGTKqebADAFyKMrVpYhmfAAAAAElFTkSuQmCC) !important;
 }
+
+.logging{
+    height: 251px;
+    width: 600px;
+    background-color: white;
+    border: 1px solid #8e8e8e;
+    position: absolute;
+    top: 25px;
+    left: 606px;
+    box-sizing: border-box;
+}
