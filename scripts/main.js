@@ -126,8 +126,8 @@ function render() {
 }
 
 function md(text) {
-  return text.replace(/(\s)\*\*([\S]+)/gi, '$1<b>$2').replace(/([\S]+)\*\*(\s)/gi, '$1</b>$2')
-  .replace(/(\s)\*([^\*][\S]+)/gi, '$1<i>$2').replace(/([^\*][\S]+)\*(\s)/gi, '$1</i>$2');
+  return text.replace(/(\s)\*\*([^\*][\S]+)\*\*(\s)/gi, '$1<b>$2</b>$3')
+  .replace(/(\s)\*([^\*][\S]+)\*(\s)/gi, '$1<i>$2</i>$3');
 }
 
 function renderCursor(x, y, h) {
