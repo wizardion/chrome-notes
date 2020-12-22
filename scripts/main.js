@@ -23,7 +23,7 @@ window.onload = function(){
     editor.element.addEventListener('keydown', onkeyDown);
     editor.element.addEventListener('focusin', onFocus);
     editor.element.addEventListener('focusout', onBlur);
-    editor.element.addEventListener('paste', onPaste);
+    document.addEventListener('paste', onPaste);
 
     editor.cursor = document.createElement('div');
     editor.cursor.classList.add('cursor');
@@ -44,20 +44,22 @@ window.onload = function(){
 }
 
 function onPaste(e) {
-  var clipboard = (e.originalEvent || e).clipboardData;
-  var text = clipboard.getData('text/plain');
+  if (document.activeElement === editor.element) {
+    var clipboard = (e.originalEvent || e).clipboardData;
+    var text = clipboard.getData('text/plain');
 
-  console.log({
-    'onPaste': text
-  });
+    console.log({
+      'onPaste': text
+    });
 
-  e.preventDefault();
+    e.preventDefault();
 
-  // console.log('onPaste')
+    // console.log('onPaste')
 
-  editor.text += text;
-  render();
-  log();
+    editor.text += text;
+    render();
+  // log();
+  }
 }
 
 
@@ -96,7 +98,7 @@ function onkeyDown(e) {
     render();
   }
 
-  log();
+  // log();
 }
 
 function render() {
