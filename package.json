@@ -1,0 +1,27 @@
+{
+  "name": "chrome-notes",
+  "version": "1.0.0",
+  "description": "Work-Note:",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^4.44.2",
+    "webp-cli": "^1.0.2",
+    "typescript": "3.4.3",
+    "ts-loader": "8.0.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wizardion/chrome-notes.git"
+  },
+  "keywords": [],
+  "author": "Alex Zarnitsa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wizardion/chrome-notes/issues"
+  },
+  "homepage": "https://github.com/wizardion/chrome-notes#readme"
+}
