@@ -59,6 +59,8 @@ function onPaste(e) {
     editor.text += text;
     render();
   // log();
+
+  editor.element.scrollTop = editor.element.scrollHeight;
   }
 }
 
@@ -112,12 +114,23 @@ function render() {
 
   let last = editor.code.childNodes[lines.length -1];
 
+  for (var i = lines.length; i < editor.code.childNodes.length; i++) {
+    const node = editor.code.childNodes[i];
+    node.remove();
+  }
+
   if (last) {
     let line = lines[lines.length -1] || '&#8203';
     codeSpan = last.childNodes[0];
+    // codeSpan.innerHTML = '';
+    // empty(codeSpan)
     codeSpan.innerHTML = md(line);
+    // codeSpan.insertAdjacentText('afterbegin', md(line));
+    // codeSpan.insertAdjacentHTML('afterbegin', md(line));
+    // codeSpan.textContent = line;
   } else {
     editor.code.innerHTML = '';
+    let fragment = document.createDocumentFragment();
 
     for (let index = 0; index < lines.length; index++) {
       const line = lines[index] || '&#8203';
@@ -127,14 +140,21 @@ function render() {
       codeSpan.innerHTML = md(line);
       
       codeLine.appendChild(codeSpan);
+      // fragment.appendChild(codeLine);
       editor.code.appendChild(codeLine);
     }
+
+    // editor.code.appendChild(fragment);
   }
 
   let t2 =  performance.now();
   renderCursor(codeSpan.offsetLeft + codeSpan.offsetWidth, codeSpan.offsetTop, codeSpan.offsetHeight);
   let t3 =  performance.now();
   console.log({'r0': t0 - t1, 'r': t2 - t1, 'r2': t3 - t2});
+}
+
+function empty(el) {
+  while (el.firstChild) el.removeChild(el.firstChild);
 }
 
 function md(text) {
