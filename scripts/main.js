@@ -1,4 +1,4 @@
-var editor = {element:  null, text: ''};
+var editor = { element: null, text: 'this is something **text** that'};
 
 window.onload = function(){
     //var bgr = chrome.extension.getBackgroundPage();
@@ -24,6 +24,7 @@ window.onload = function(){
     editor.element.addEventListener('focusin', onFocus);
     editor.element.addEventListener('focusout', onBlur);
     document.addEventListener('paste', onPaste);
+    editor.element.addEventListener('copy', onCopy);
 
     editor.cursor = document.createElement('div');
     editor.cursor.classList.add('cursor');
@@ -41,6 +42,51 @@ window.onload = function(){
     editor.element.appendChild(editor.code);
 
     editor.element.focus();
+    render();
+}
+
+function onCopy(e) {
+  let ranges = [];
+  var selection = window.getSelection();
+  var textarea = document.getElementById('text');
+  var text = selection.toString();
+
+  if (text.length) {
+    var nodes = getNodes(selection);
+    e.preventDefault();
+
+    for (let i = 0; i < selection.rangeCount; i++) {
+      ranges.push(selection.getRangeAt(i));
+    }
+
+    textarea.value = text;
+    textarea.select();
+    document.execCommand('copy', false);
+    selection.removeAllRanges();
+
+    for (let i = 0; i < ranges.length; i++) {
+      const range = ranges[i];
+      selection.addRange(range);
+    }
+  }
+}
+
+function getNodes(selection) {
+  var range = document.createRange();
+
+  range.setStart(selection.anchorNode, selection.anchorOffset);
+  range.setEnd(selection.focusNode, selection.focusOffset);
+
+  let [leftNode, rightNode, start, end] = (!range.collapsed) ?
+    [selection.anchorNode, selection.focusNode, selection.anchorOffset, selection.focusOffset] :
+    [selection.focusNode, selection.anchorNode, selection.focusOffset, selection.anchorOffset];
+
+  return {
+    left: leftNode,
+    right: rightNode,
+    start: start,
+    end: end,
+  }
 }
 
 function onPaste(e) {
