@@ -2,11 +2,17 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "noImplicitAny": true,
+    "sourceMap": true,
     "module": "es6",
     "target": "es5",
     "jsx": "react",
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-  }
+    "allowJs": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }
