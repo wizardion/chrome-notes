@@ -1,12 +1,16 @@
+'use strict';
+
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const __root__ = path.resolve(__dirname, '..');
 
 module.exports = {
   entry: {
     index: path.resolve(__root__, 'src/index.ts'),
+    background: path.resolve(__root__, 'src/background.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -61,13 +65,24 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       title: 'Custom template using Handlebars',
-      filename: 'index.html',
-      template: './src/index.html',
+      filename: 'popup.html',
+      template: './src/popup.html',
       chunks: [
         'vendors',
         'index'
       ]
     }),
+    new StatsWriterPlugin({
+      filename: "manifest.json",
+      transform({ assetsByChunkName }) {
+        let manifest = require(path.resolve(__root__, 'src/manifest.json'));
+
+        manifest.background.scripts = assetsByChunkName.background;
+        manifest.version = '1.0.6';
+        
+        return JSON.stringify(manifest, null, 2);
+      }
+    })
   ],
   stats: {
     errorDetails: true,

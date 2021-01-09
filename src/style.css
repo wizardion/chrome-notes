@@ -2,4 +2,15 @@ html, body {
   padding: 0;
   margin: 0;
   background: silver;
+
+  width: 600px;
+  height: 275px;
+}
+
+.editor {
+  padding: 5px;
+  width: 600px;
+  height: 240px;
+  background: white;
+  box-sizing: border-box; 
 }
