@@ -20,7 +20,10 @@
     "handlebars-loader": "^1.7.1",
     "webpack-stats-plugin": "^1.0.3",
     "@types/websql": "^0.0.27",
-    "@types/chrome": "^0.0.128"
+    "@types/chrome": "^0.0.128",
+    "node-sass": "^5.0.0",
+    "sass-loader": "^10.1.1",
+    "url-loader": "^4.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

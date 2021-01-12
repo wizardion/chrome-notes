@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const sass = require('node-sass');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
@@ -36,17 +37,33 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.css$/i,
+        test: /\.(sc|c)ss$/i,
         use: [{
           loader: MiniCssExtractPlugin.loader,
           options: {
             // publicPath: ''
           }
-        }, 'css-loader'],
+        }, 
+        'css-loader',
+        {
+          loader: 'sass-loader',
+          options: {
+            sourceMap: false,
+            // implementation: sass,
+          }
+        }
+      ],
       },
       {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
+        // test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        // type: 'asset/resource',
+        test: /\.(png|jp(e*)g|svg|gif|ico)$/,
+        include: [
+          path.resolve(__root__, 'src/images'),
+        ],
+        use: [{
+          loader: 'url-loader',
+        }]
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
@@ -64,7 +81,7 @@ module.exports = {
       filename: '[name].[chunkhash].css',
     }),
     new HtmlWebpackPlugin({
-      title: 'Custom template using Handlebars',
+      title: 'My Notes',
       filename: 'popup.html',
       template: './src/popup.html',
       chunks: [

@@ -1,0 +1,60 @@
+@import 'list-view';
+
+html, body {
+  background: silver;
+
+  width: 600px;
+  height: 270px;
+  border:0;
+  margin: 0px;
+  padding: 0px;
+}
+
+.notes {
+  background: white;
+  box-sizing: border-box;
+}
+
+input, button {
+  font-size: 12px;
+  outline: none;
+  font-family: 'Ubuntu2', sans-serif;
+}
+
+.disable-select
+{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.button
+{
+  padding: 0px;
+  margin: 0px;
+  height:24px;
+  width:24px;
+  line-height: 24px;
+  background: transparent;
+  border: none;
+  border: none;
+  cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #07a698;
+  fill:#07a698;
+  outline: none;
+}
+
+.button:hover,
+.button:active
+{
+  color: #e33636;
+  fill:#e33636;
+}
+
+.button:active
+{
+  opacity: 0.5;
+}
