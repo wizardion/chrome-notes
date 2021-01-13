@@ -5,20 +5,18 @@
     <title>{{htmlWebpackPlugin.options.title}}</title>
   </head>
   <body>
-    <!-- <div id="editor" class="editor"></div> -->
     <div id="notes" class="notes">
-      <!-- <input id="add-note" type="button" class="button add-note" /> -->
 
       <div id="list-view" class="list-view disable-select">
-        
         <div id="list-controls" class="list-controls">
           <span>My Notes</span>
           <input id="search-button" type="button" class="button search" />
           <input id="search-notes" type="text" class="search-notes" placeholder="Enter keyword" maxlength="30">
           <input id="add-note" type="button" class="button add-note" />
         </div>
-
-        <div id="list-items" class="list-items"></div>
+        <div id="list-items" class="list-items">
+          <div class="no-items">Add a new note here ...</div>
+        </div>
       </div>
     </div>
   </body>

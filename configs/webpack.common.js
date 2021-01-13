@@ -84,6 +84,7 @@ module.exports = {
       title: 'My Notes',
       filename: 'popup.html',
       template: './src/popup.html',
+      scriptLoading: 'blocking',
       chunks: [
         'vendors',
         'index'

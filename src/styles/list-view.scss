@@ -2,40 +2,69 @@
   background: white;
 }
 
-.list-view .list-controls
-{
+.list-view .list-controls {
   position: relative;
   left: 0px;
   height: 25px;
   text-align:center;
-  /* border-bottom: 1px solid rgba(7, 166, 152, 0.1); */
   border-bottom: 1px groove rgba(7, 166, 152, 0.075);
 }
 
-.list-items
-{
-  width: 100%;
-  height: 244px;
-  /* overflow-y: scroll; */
-  position: relative;
-  overflow-y: scroll;
-  overflow-x: hidden;
+.list-view .list-controls span {
+  color: #07a698;
+  display: inline-block;
+  line-height: 24px;
 }
 
-.button.search
-{
+.list-view .button.search {
   background-image: url(../images/search.png);
   float: left;
   margin-left: 5px;
 }
 
-.button.search:hover
-{
+.list-view .button.search:hover,
+.list-view .button.search:active {
   background-image: url(../images/search-active.png);
 }
 
-.button.search:active
-{
-  background-image: url(../images/search-active.png);
-  opacity: 0.5;
+.list-view .button.add-note {
+  background-image: url(../images/add-note.png);
+  float: right;
+  background-position: center;
+  margin-right: 5px;
+}
+ 
+.list-view .button.add-note:hover, 
+.list-view .button.add-note:active {
+  background-image: url(../images/add-note-active.png);
+}
+
+.list-view .search-notes {
+  border: none;
+  width: 230px;
+  position: absolute;
+  left: 35px;
+  top: 2px;
+  color: #07a698;
+  padding-bottom: 3px;
+  text-decoration: underline;
+  display: none;
+}
+
+.list-view .search-notes:focus, .button.search:focus {
+  outline: none;
+}
+
+.list-view .list-items {
+  width: 100%;
+  height: 244px;
+  position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.list-view .list-items .no-items {
+  color: #07a69835;
+  text-align: center;
+  padding-top: 100px;
 }
