@@ -109,7 +109,7 @@ export class Base {
     var wrapper: HTMLElement = this.controls.noteView.editor.getWrapperElement();
     var [title, description] = this.getData(this.controls.noteView.editor.getValue());
 
-    if (!Validator.required(title, wrapper) && description) {
+    if (!Validator.required(title, wrapper)) {
       note = new Note(null, this.notes.length);
       note.title = title;
       note.description = description;

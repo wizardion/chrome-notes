@@ -19,7 +19,7 @@ export class DbNote implements INote {
     this.created = created;
   }
 
-  static loadAll(callback: Function, errorCallback?: Function) {
+  public static loadAll(callback: Function, errorCallback?: Function) {
     var notes: DbNote[] = [];
 
     db.load(function (result: SQLResultSet) {
@@ -38,15 +38,21 @@ export class DbNote implements INote {
     });
   }
 
-  save() {
+  public save() {
     if (this.id && this.id > 0) {
       db.update(this, function(){});
     } else {
-      db.add(this, function(){});
+      db.add(this, this.noteAdded.bind(this));
     }
   }
 
-  remove() {
+  public remove() {
     db.remove(this.id, function(){});
+  }
+
+  private noteAdded(result: SQLResultSet){
+    if (result.insertId) {
+      this.id = result.insertId;
+    }
   }
 }
