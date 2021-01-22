@@ -54,7 +54,7 @@ export class Base {
       const note = new Note(notes[i], i);
       this.notes.push(note);
       fragment.appendChild(note.element);
-      note.onclick = this.selectNote.bind(this, note);
+      note.onclick = this.selectNote.bind(this, note, false);
     }
 
     return fragment;
@@ -79,15 +79,21 @@ export class Base {
     this.controls.noteView.editor.focus();
   }
 
-  private selectNote(note: Note) {
+  private selectNote(note: Note, binded?: boolean) {
     this.controls.listView.node.style.display = 'None';
     this.controls.noteView.node.style.display = 'inherit';
     this.controls.noteView.back.style.display = 'inherit';
     this.controls.noteView.delete.style.display = 'inherit';
 
-    this.controls.noteView.editor.setValue(note.title + '\n' + note.description);
+    console.log({
+      'binded': binded
+    });
 
-    this.controls.noteView.editor.focus();
+    if (!binded) {
+      this.controls.noteView.editor.setValue(note.title + '\n' + note.description);
+      this.controls.noteView.editor.focus();
+    }
+
     this.selected = note;
   }
 
@@ -123,12 +129,12 @@ export class Base {
 
       this.notes.push(note);
       this.controls.listView.items.appendChild(note.element);
-      note.onclick = this.selectNote.bind(this, note);
+      note.onclick = this.selectNote.bind(this, note, false);
 
       this.controls.newView.cancel.style.display = 'None';
       this.controls.newView.create.style.display = 'None';
 
-      this.selectNote(note);
+      this.selectNote(note, true);
     }
   }
 
