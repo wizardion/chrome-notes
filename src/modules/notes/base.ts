@@ -24,7 +24,7 @@ export class Base {
     this.controls.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 
     this.controls.listView.addButton.addEventListener('click', this.selectNew.bind(this));
-    this.controls.noteView.back.addEventListener('click', this.showList.bind(this));
+    this.controls.noteView.back.addEventListener('click', this.backToList.bind(this));
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
@@ -97,6 +97,12 @@ export class Base {
     this.controls.noteView.node.style.display = 'None';
   }
 
+  private backToList() {
+    if (!this.selected || this.onChange()) {
+      this.showList();
+    }
+  }
+
   private cancelCreation() {
     this.controls.newView.cancel.style.display = 'None';
     this.controls.newView.create.style.display = 'None';
@@ -137,21 +143,27 @@ export class Base {
     }
   }
 
-  private onChange() {
+  private onChange(): boolean {
     if (this.selected) {
       var [title, description] = this.getData(this.controls.noteView.editor.getValue());
+      var wrapper: HTMLElement = this.controls.noteView.editor.getWrapperElement();
+      var valid: boolean = !Validator.required(title, wrapper);
 
-      if (title && (this.selected.title !== title || this.selected.description !== description)) {
+      if (valid && (this.selected.title !== title || this.selected.description !== description)) {
         this.selected.title = title;
         this.selected.description = description;
         this.selected.save();
       }
+
+      return valid;
     }
+
+    return false;
   }
 
   private getData(value: string): string[] {
-    var data: string[] = (value || '').split(/(^[^\n]+)\r?\n/).filter(Boolean);
-    var title: string = (data && data.length) ? data[0] : '';
+    var data: string[] = (value || '').split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
+    var title: string = (data && data.length) ? data[0].trim() : '';
     var description: string = (data && data.length > 1)? data[1] : '';
 
     return [title, description];
