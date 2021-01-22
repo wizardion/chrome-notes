@@ -6,17 +6,59 @@
   </head>
   <body>
     <div id="notes" class="notes">
+      <div id="details-view" class="details-view">
+        <div id="details-controls" class="head">
+          <button id="to-list" class="button back">{{> ./images/back.svg}} All Notes</button>
+          <button id="delete-note" class="button delete">{{> ./images/delete.svg}}</button>
+          <button id="create-note" class="button save"></button>
+          <button id="cancel-note" class="button back cancel">{{> ./images/back.svg}} Cancel</button>
+          <div id="editor-controlls" class="editor-controlls">
+            <fieldset><!--
+            --><div action="bold" title="Bold Ctrl+B" class="button">{{> ./images/bold.svg}}</div><!--
+            --><div action="italic" title="Italic Ctrl+I" class="button">{{> ./images/italic.svg}}</div><!--
+            --><div action="underline" title="Underline Ctrl+U" class="button">{{> ./images/underline.svg}}</div><!--
+            --><div action="strikethrough" title="Strikethrough Ctrl+Y" class="button">{{> ./images/strikethrough.svg}}</div><!--
+            --><div action="link" title="Link Ctrl+L" class="button">{{> ./images/link.svg}}</div>
+            </fieldset>
+            <fieldset><!--
+            --><div action="insertOrderedList" title="Point List Ctrl+O" class="button">{{> ./images/insertOrderedList.svg}}</div><!--
+            --><div action="insertUnorderedList" title="Ordered List Ctrl+P" class="button">{{> ./images/insertUnorderedList.svg}}</div>
+            </fieldset>
+            <fieldset>
+              <div action="removeFormat" title="Remove Format Ctrl+G" class="button">{{> ./images/removeFormat.svg}}</div>
+            </fieldset>
+            <fieldset><!--
+            --><div action="undo" title="Undo Ctrl+Z" class="button">{{> ./images/undo.svg}}</div><!--
+            --><div action="redo" title="Redo Ctrl+Shift+Z" class="button">{{> ./images/redo.svg}}</div>
+            </fieldset>
+          </div>
+        </div>
+        
+        <div id="content" class="content">
+          <textarea id="description-note" class="content-description" placeholder="Enter a title...&#10;write a note..."></textarea>
+        </div>
+      </div>
 
       <div id="list-view" class="list-view disable-select">
         <div id="list-controls" class="list-controls">
           <span>My Notes</span>
           <input id="search-button" type="button" class="button search" />
-          <input id="search-notes" type="text" class="search-notes" placeholder="Enter keyword" maxlength="30">
+          <input id="search-input" type="text" class="search-notes" placeholder="Enter keyword" maxlength="30">
           <input id="add-note" type="button" class="button add-note" />
         </div>
         <div id="list-items" class="list-items">
-          <div class="no-items">Add a new note here ...</div>
+          <div class="no-items">Add a new note here, just press the <input disabled="disabled" type="button" class="button plus" /> button.</div>
         </div>
+        <template id="list-item">
+          <div class="list-item">
+            <span class="button sort"></span>
+            <span class="bullet">1</span>
+            <span>. </span>
+            <span class="list-title">title</span>
+            <span class="date-time">time</span>
+            <input type="button" class="button to-note" value="">
+          </div>
+        </template>
       </div>
     </div>
   </body>

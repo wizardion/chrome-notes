@@ -1,46 +1,39 @@
 import {Base} from './modules/notes/base';
-import {IControls} from './modules/notes/controls';
+import {IControls} from './modules/notes/interfaces';
 import './styles/style.scss';
-// import {DbNote} from './modules/db/note'
+import {fromTextArea} from 'codemirror'
 
-// var editor = document.getElementById('editor');
+var listView: HTMLElement = <HTMLElement>document.getElementById('list-view');
+var noteView: HTMLElement = <HTMLElement>document.getElementById('details-view');
+var codemirror = fromTextArea(<HTMLTextAreaElement>document.getElementById('description-note'), {
+  lineWrapping: true,
+  showCursorWhenSelecting: true,
+  mode: {
+    name: 'gfm'
+  }
+});
 
-// DbNote.loadAll(function (notes: DbNote[]) {
-//   for (let i = 0; i < notes.length; i++) {
-//     let div = document.createElement('div');
-//     const note = notes[i];
-
-//     div.innerText = `${note.id} - ${note.title}`;
-//     editor.appendChild(div);
-//   }
-
-//   let first = notes[0];
-
-//   first.save();
-// });
-
-var controls:IControls = {
-  // add: document.getElementById('editor')
+var controls: IControls = {
+  listView: {
+    node: listView,
+    items: <HTMLElement>document.getElementById('list-items'),
+    addButton: <HTMLButtonElement>document.getElementById('add-note'),
+    searchButton: <HTMLButtonElement>document.getElementById('search-button'),
+    searchInput: <HTMLInputElement>document.getElementById('search-input'),
+  },
+  noteView: {
+    node: noteView,
+    back: <HTMLButtonElement>document.getElementById('to-list'),
+    delete: <HTMLButtonElement>document.getElementById('delete-note'),
+    editor: codemirror
+  },
+  newView: {
+    node: noteView,
+    cancel: <HTMLButtonElement>document.getElementById('cancel-note'),
+    create: <HTMLButtonElement>document.getElementById('create-note'),
+  }
 };
 
 var editor = new Base(controls);
 
-/* 
-back: document.getElementById('to-list'),
-add: document.getElementById('add-note'),
-
-delete: document.getElementById('delete-note'),
-listView: document.getElementById('list-view'),
-listItems: document.getElementById('list-items'),
-detailsView: document.getElementById('details-view'),
-title: document.getElementById('title-note'),
-description: document.getElementById('description-note'),
-// description: editor,
-
-search: document.getElementById('search-button'),
-searchInput: document.getElementById('search-notes'),
-listControls: document.getElementById('list-controls'),
-
-editorControlls: editorControlls.getElementsByClassName('button'),
-content: document.getElementById('content')
-*/
+editor.init();

@@ -1,5 +1,3 @@
-@import 'list-view';
-
 html, body {
   background: silver;
 
@@ -47,6 +45,12 @@ input, button {
   color: #07a698;
   fill:#07a698;
   outline: none;
+  display: inline-block;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .button:hover,
@@ -60,3 +64,6 @@ input, button {
 {
   opacity: 0.5;
 }
+
+@import 'list-view';
+@import 'details-view';

@@ -17,18 +17,18 @@
 }
 
 .list-view .button.search {
-  background-image: url(../images/search.png);
+  background-image: url('../images/search.png');
   float: left;
   margin-left: 5px;
 }
 
 .list-view .button.search:hover,
 .list-view .button.search:active {
-  background-image: url(../images/search-active.png);
+  background-image: url('../images/search-active.png');
 }
 
 .list-view .button.add-note {
-  background-image: url(../images/add-note.png);
+  background-image: url('../images/add-note.png');
   float: right;
   background-position: center;
   margin-right: 5px;
@@ -36,7 +36,7 @@
  
 .list-view .button.add-note:hover, 
 .list-view .button.add-note:active {
-  background-image: url(../images/add-note-active.png);
+  background-image: url('../images/add-note-active.png');
 }
 
 .list-view .search-notes {
@@ -66,5 +66,22 @@
 .list-view .list-items .no-items {
   color: #07a69835;
   text-align: center;
-  padding-top: 100px;
+  padding-top: 90px;
 }
+
+.list-view .list-items .no-items .button.plus {
+  background-image: url('../images/add-note.png');
+  background-position: center;
+  margin-bottom: -5px;
+  opacity: 0.25;
+}
+
+.list-view .list-items .no-items .button.plus:hover {
+  cursor: initial;
+}
+
+.list-view .template {
+  display: none;
+}
+
+@import 'list-items';

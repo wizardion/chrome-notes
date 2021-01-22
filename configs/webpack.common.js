@@ -55,9 +55,7 @@ module.exports = {
       ],
       },
       {
-        // test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        // type: 'asset/resource',
-        test: /\.(png|jp(e*)g|svg|gif|ico)$/,
+        test: /\.(png|jp(e*)g|gif|ico)$/,
         include: [
           path.resolve(__root__, 'src/images'),
         ],
@@ -69,7 +67,7 @@ module.exports = {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
-      {test: /\.(hbs|html)$/, loader: 'handlebars-loader'}
+      {test: /\.(hbs|html|svg)$/, loader: 'handlebars-loader' }
     ]
   },
   resolve: {

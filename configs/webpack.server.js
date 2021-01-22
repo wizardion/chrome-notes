@@ -6,6 +6,7 @@ module.exports = merge(common, {
   devtool: 'inline-source-map',
   devServer: {
     contentBase: './dist',
+    index: 'popup.html',
     open: true,
     port: 9080,
     public: 'my-notes.com'

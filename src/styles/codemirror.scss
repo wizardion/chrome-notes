@@ -1,0 +1,22 @@
+.CodeMirror-wrap {
+  border-top: 1px solid transparent;
+}
+
+.CodeMirror-line:first-child {
+  text-align: center;
+  // margin-top: 15px !important;
+  // padding-bottom: 20px !important;
+  // font-size: 17px !important;
+  color: #06736a !important;
+  font-weight: bold !important;
+  margin-left: 0px !important;
+  font-style: normal !important;
+}
+
+.CodeMirror-line:first-child span {
+  color: #06736a !important;
+  font-weight: bold !important;
+  font-size: 17px !important;
+  margin-left: 0px !important;
+  font-style: normal !important;
+}
