@@ -28,7 +28,7 @@ export class Base {
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
-    this.controls.noteView.editor.on('blur', this.onChange.bind(this));
+    this.controls.noteView.editor.on('blur', this.save.bind(this));
   }
 
   public init() {
@@ -54,7 +54,7 @@ export class Base {
       const note = new Note(notes[i], i);
       this.notes.push(note);
       fragment.appendChild(note.element);
-      note.onclick = this.selectNote.bind(this, note, false);
+      note.onclick = this.selectNote.bind(this, note, true);
     }
 
     return fragment;
@@ -79,17 +79,13 @@ export class Base {
     this.controls.noteView.editor.focus();
   }
 
-  private selectNote(note: Note, binded?: boolean) {
+  private selectNote(note: Note, bind?: boolean) {
     this.controls.listView.node.style.display = 'None';
     this.controls.noteView.node.style.display = 'inherit';
     this.controls.noteView.back.style.display = 'inherit';
     this.controls.noteView.delete.style.display = 'inherit';
 
-    console.log({
-      'binded': binded
-    });
-
-    if (!binded) {
+    if (bind) {
       this.controls.noteView.editor.setValue(note.title + '\n' + note.description);
       this.controls.noteView.editor.focus();
     }
@@ -104,7 +100,7 @@ export class Base {
   }
 
   private backToList() {
-    if (!this.selected || this.onChange()) {
+    if (!this.selected || this.save()) {
       this.showList();
     }
   }
@@ -129,12 +125,12 @@ export class Base {
 
       this.notes.push(note);
       this.controls.listView.items.appendChild(note.element);
-      note.onclick = this.selectNote.bind(this, note, false);
+      note.onclick = this.selectNote.bind(this, note, true);
 
       this.controls.newView.cancel.style.display = 'None';
       this.controls.newView.create.style.display = 'None';
 
-      this.selectNote(note, true);
+      this.selectNote(note);
     }
   }
 
@@ -149,7 +145,7 @@ export class Base {
     }
   }
 
-  private onChange(): boolean {
+  private save(): boolean {
     if (this.selected) {
       var [title, description] = this.getData(this.controls.noteView.editor.getValue());
       var wrapper: HTMLElement = this.controls.noteView.editor.getWrapperElement();
