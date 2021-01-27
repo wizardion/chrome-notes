@@ -7,6 +7,7 @@ import 'codemirror/mode/markdown/markdown.js'
 import 'codemirror/mode/gfm/gfm.js';
 import 'codemirror/lib/codemirror.css';
 import '../../styles/codemirror.scss';
+import { Sorting } from './sorting';
 
 export class Base {
   private controls: IControls;
@@ -40,6 +41,9 @@ export class Base {
       this.controls.listView.items.innerHTML = '';
       this.controls.listView.items.appendChild(this.render(notes, 0, 10));
       
+      Sorting.notes = this.notes;
+      Sorting.items = this.controls.listView.items;
+
       setTimeout(function() {
         this.controls.listView.items.appendChild(this.render(notes, 10));
       }.bind(this), 10);
@@ -55,6 +59,7 @@ export class Base {
       this.notes.push(note);
       fragment.appendChild(note.element);
       note.onclick = this.selectNote.bind(this, note, true);
+      note.sortButton.onmousedown = Sorting.start.bind(Sorting, note);
     }
 
     return fragment;
@@ -80,6 +85,10 @@ export class Base {
   }
 
   private selectNote(note: Note, bind?: boolean) {
+    if (Sorting.busy) {
+      return;
+    }
+
     this.controls.listView.node.style.display = 'None';
     this.controls.noteView.node.style.display = 'inherit';
     this.controls.noteView.back.style.display = 'inherit';

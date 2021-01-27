@@ -87,11 +87,16 @@ export class Note {
     this.element.addEventListener('click', this.event);
   }
 
+  public get sortButton(): HTMLInputElement {
+    return this.controls.sort;
+  }
+
   public save() {
     this.note.save();
   }
 
   public remove() {
+    this.element.removeEventListener('mousedown', this.prevent);
     this.element.removeEventListener('click', this.event);
     this.element.remove();
     this.note.remove();

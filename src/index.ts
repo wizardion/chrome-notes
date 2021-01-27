@@ -1,7 +1,7 @@
 import {Base} from './modules/notes/base';
 import {IControls} from './modules/notes/interfaces';
 import './styles/style.scss';
-import {fromTextArea} from 'codemirror'
+import {fromTextArea} from 'codemirror';
 
 var listView: HTMLElement = <HTMLElement>document.getElementById('list-view');
 var noteView: HTMLElement = <HTMLElement>document.getElementById('details-view');
