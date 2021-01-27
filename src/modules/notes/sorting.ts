@@ -16,6 +16,7 @@ interface ISelectedNote {
 
 interface IListNote {
   top?: number,
+  maxY?: number,
   height?: number,
   scrollHeight?: number,
 }
@@ -40,6 +41,7 @@ export class Sorting {
   public static start(note: Note, e: MouseEvent) {
     var startY = (e.pageY - this.items.offsetTop) + this.items.scrollTop;
     var noteNeight = note.element.offsetHeight;
+    var maxTop = noteNeight * (this.notes.length - 1);
 
     this.busy = true;
     this.selected = {
@@ -53,6 +55,7 @@ export class Sorting {
 
     this.list = {
       top: this.items.offsetTop,
+      maxY: Math.min(maxTop, this.items.scrollHeight - this.selected.height),
       scrollHeight: this.items.scrollHeight,
       height: this.items.offsetHeight
     };
@@ -151,7 +154,7 @@ export class Sorting {
   private static getPoint(pageY: number, scrollTop: number): IPoint {
     var y = (pageY - this.list.top) + scrollTop;
     var min = (scrollTop + this.list.top - this.selected.height) + 3;
-    var max = (scrollTop + this.list.height - this.selected.height) - 2;
+    var max = Math.min((scrollTop + this.list.height - this.selected.height) - 2, this.list.maxY);
 
     return {
       top: Math.max(Math.min(y - this.selected.pageY, max), min),
