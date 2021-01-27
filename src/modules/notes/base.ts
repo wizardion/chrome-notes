@@ -44,9 +44,9 @@ export class Base {
       Sorting.notes = this.notes;
       Sorting.items = this.controls.listView.items;
 
-      setTimeout(function() {
+      setTimeout(() => {
         this.controls.listView.items.appendChild(this.render(notes, 10));
-      }.bind(this), 10);
+      }, 10);
     }
   }
 

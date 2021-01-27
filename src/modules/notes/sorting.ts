@@ -137,15 +137,13 @@ export class Sorting {
   }
 
   private static replace(first: number, second: number) {
-    var min = Math.min(first, second);
-    var max = Math.max(first, second);
     var temp: Note = this.notes[first];
 
     this.notes.splice(first, 1);
     this.notes.splice(second, 0, temp);
     this.items.insertBefore(this.selected.element, this.selected.placeholder);
 
-    for (var i = min; i <= max; i++) {
+    for (var i = Math.min(first, second); i <= Math.max(first, second); i++) {
       const item = this.notes[i];
       item.index = i;
     }
@@ -166,35 +164,38 @@ export class Sorting {
   private static animateUp(pageY: number) {
     var presure = ((this.list.top + this.selected.pageY) - pageY) * 2;
     var speed = Math.max(Math.min(70 - presure, 70), 0);
-
-    this.items.scrollTop--;
-    this.dragNote(((this.items.scrollTop + this.list.top) + 3) - this.selected.height);
-
-    this.interval = setInterval(function () {
-      if (!this.selected || this.items.scrollTop <= 0) {
+    
+    let point = () => ((this.items.scrollTop + this.list.top) + 3) - this.selected.height;
+    var animate = () => {
+      if (!this.selected ||  this.items.scrollTop <= 0) {
         return clearInterval(this.interval);
       }
 
       this.items.scrollTop--;
-      this.dragNote(((this.items.scrollTop + this.list.top) + 3) - this.selected.height);
-    }.bind(this), speed);
+      this.dragNote(point());
+    };
+
+    this.items.scrollTop--;
+    this.dragNote(point());
+    this.interval = setInterval(animate, speed);
   }
 
   private static animateDown(pageY: number) {
-    var distance = (this.selected.height - this.selected.pageY);
-    var presure = (pageY - (this.list.height + this.list.top - distance)) * 2;
+    var presure = (pageY - (this.list.height + this.list.top - (this.selected.height - this.selected.pageY))) * 2;
     var speed = Math.max(Math.min(70 - presure, 70), 1);
 
-    this.items.scrollTop++;
-    this.dragNote(((this.items.scrollTop + this.list.height) - 2) - this.selected.height);
-
-    this.interval = setInterval(function () {
+    let point = () => ((this.items.scrollTop + this.list.height) - 2) - this.selected.height;
+    var animate = () => {
       if (!this.selected || this.items.scrollTop + this.list.height >= this.list.scrollHeight) {
-        return clearInterval(this.interval);;
+        return clearInterval(this.interval);
       }
 
       this.items.scrollTop++;
-      this.dragNote(((this.items.scrollTop + this.list.height) - 2) - this.selected.height);
-    }.bind(this), speed);
+      this.dragNote(point());
+    };
+
+    this.items.scrollTop++;
+    this.dragNote(point());
+    this.interval = setInterval(animate, speed);
   }
 }
