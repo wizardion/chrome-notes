@@ -3,6 +3,7 @@ import { Note } from "./note";
 interface IEvents {
   move?: EventListener,
   end?: EventListener
+  wheel?: EventListener
 }
 
 interface ISelectedNote {
@@ -75,10 +76,12 @@ export class Sorting {
     this.events = {
       move: this.moveHandler.bind(this),
       end: this.endHandler.bind(this),
+      wheel: (e: MouseEvent) => { e.preventDefault(); }
     };
 
     document.addEventListener('mousemove', this.events.move);
     document.addEventListener('mouseup', this.events.end);
+    this.items.addEventListener('wheel', this.events.wheel);
   }
 
   private static moveHandler(e: MouseEvent) {
@@ -119,6 +122,7 @@ export class Sorting {
   }
 
   private static endHandler() {
+    this.items.removeEventListener('wheel', this.events.wheel);
     document.removeEventListener('mousemove', this.events.move);
     document.removeEventListener('mouseup', this.events.end);
 
@@ -133,7 +137,6 @@ export class Sorting {
     this.selected = null;
     this.list = null;
     this.busy = false;
-    // setTimeout(function () { this.busy = false; }.bind(this), 10);
   }
 
   private static replace(first: number, second: number) {
