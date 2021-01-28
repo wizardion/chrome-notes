@@ -14,6 +14,8 @@ export class Base {
   private notes: Note[];
   private selected?: Note;
 
+  private interval?: NodeJS.Timeout;
+
   constructor(elements: IControls) {
     this.notes = [];
     this.controls = elements;
@@ -30,6 +32,17 @@ export class Base {
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
     this.controls.noteView.editor.on('blur', this.save.bind(this));
+
+    // TODO need to move as global.
+    this.controls.listView.items.classList.add('hidden-scroll');
+    this.controls.listView.items.addEventListener('scroll', ()=>{
+      this.controls.listView.items.classList.remove('hidden-scroll');
+      clearInterval(this.interval);
+
+      this.interval = setTimeout(() => {
+        this.controls.listView.items.classList.add('hidden-scroll');
+      }, 1750);
+    });
   }
 
   public init() {

@@ -10,6 +10,9 @@ function executeSql(sql: string, data: (string | number)[], callback: Function, 
   database.transaction(function (transaction: SQLTransaction) {
     transaction.executeSql(sql, data, function (tx: SQLTransaction, result: SQLResultSet) {
       callback(result);
+    }, function (tx: SQLTransaction, error: SQLError) {
+        errorCallback(error);
+        return true;
     });
   });
 }
@@ -42,6 +45,13 @@ function update(item: INote, callback: Function, key?: string, errorCallback?: F
   executeSql(sql, data, callback, errorCallback);
 };
 
+function updateOrder(item: INote, callback: Function, errorCallback?: Function) {
+  var sql = 'UPDATE Notes SET displayOrder=? WHERE rowid=?';
+  var data = [item.displayOrder, item.id];
+
+  executeSql(sql, data, callback, errorCallback);
+};
+
 function add(item: INote, callback: Function, errorCallback?: Function) {
   var sql = 'INSERT INTO Notes(title, description, displayOrder, updated, created) VALUES(?,?,?,?,?)';
   var data = [item.title, item.description, item.displayOrder, item.updated, item.updated];
@@ -61,5 +71,6 @@ export default {
   load: load,
   add: add,
   update: update,
+  updateOrder: updateOrder,
   remove: remove,
 };

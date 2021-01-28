@@ -48,7 +48,8 @@ export class Note {
   public set index(value: number) {
     this.indexId = value;
     this.note.displayOrder = value + 1;
-    this.controls.bullet.innerText = `${(this.indexId + 1)}`;
+    this.controls.bullet.innerText = `${(this.note.displayOrder)}`;
+    this.note.saveOrder();
   }
 
   public get index(): number {

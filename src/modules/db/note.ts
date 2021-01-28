@@ -47,7 +47,11 @@ export class DbNote implements INote {
   }
 
   public remove() {
-    db.remove(this.id, function(){});
+    db.remove(this.id, function () { });
+  }
+
+  public saveOrder() {
+    db.updateOrder(this, function(){});
   }
 
   private noteAdded(result: SQLResultSet){

@@ -184,7 +184,8 @@ export class Sorting {
   }
 
   private static animateDown(pageY: number) {
-    var presure = (pageY - (this.list.height + this.list.top - (this.selected.height - this.selected.pageY))) * 2;
+    var distance = (this.selected.height - this.selected.pageY);
+    var presure = (pageY - (this.list.height + this.list.top - distance)) * 2;
     var speed = Math.max(Math.min(70 - presure, 70), 1);
 
     let point = () => ((this.items.scrollTop + this.list.height) - 2) - this.selected.height;
