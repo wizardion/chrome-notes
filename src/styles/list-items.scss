@@ -60,13 +60,16 @@
   opacity: 0.5 !important;
 }
 
-
 .sort[disabled]:hover, 
 .sort[disabled]:active, 
 .list-view .list-item:hover .sort[disabled] {
   background-image: url('../images/sort-note.png') !important;
   opacity: 0.5 !important;
 }
+
+// .hold .list-view .list-item .sort {
+//   background-image: url('../images/sort-note-disabled.png');
+// }
 
 .list-view .list-item:hover .sort,
 .list-view .hold .list-item.drag:hover .sort,
@@ -86,4 +89,26 @@
 .list-view .list-item:hover .to-note, 
 .to-note:active {
   background-image: url('../images/to-note-active.png');
+}
+
+.list-view .list-item.drag
+{
+  position: absolute;
+  background-color: #f4fbfb !important;  
+  left: 2px;
+  right: 4px;
+  border-bottom: 1px solid transparent !important;
+  box-shadow: 2px 2px 4px #ddd;
+  border-radius: 4px;
+  line-height: 23px !important;
+  height: 23px !important;
+}
+
+.list-view .list-item.drag .sort {
+  margin-left: -5px;
+  margin-right: 7px;
+}
+
+.hold {
+  cursor: pointer;
 }
