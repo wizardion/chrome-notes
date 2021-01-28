@@ -45,11 +45,15 @@ export class Note {
     this.element.appendChild(this.controls.date);
   }
 
+  public static saveOrders() {
+    DbNote.saveOrders();
+  }
+
   public set index(value: number) {
     this.indexId = value;
     this.note.displayOrder = value + 1;
     this.controls.bullet.innerText = `${(this.note.displayOrder)}`;
-    this.note.saveOrder();
+    this.note.setOrder();
   }
 
   public get index(): number {

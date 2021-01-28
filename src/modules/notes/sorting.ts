@@ -150,6 +150,8 @@ export class Sorting {
       const item = this.notes[i];
       item.index = i;
     }
+
+    Note.saveOrders();
   }
 
   private static getPoint(pageY: number, scrollTop: number): IPoint {

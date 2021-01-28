@@ -38,6 +38,10 @@ export class DbNote implements INote {
     });
   }
 
+  public static saveOrders() {
+    db.saveBatch(function () {});
+  }
+
   public save() {
     if (this.id && this.id > 0) {
       db.update(this, function(){});
@@ -50,8 +54,8 @@ export class DbNote implements INote {
     db.remove(this.id, function () { });
   }
 
-  public saveOrder() {
-    db.updateOrder(this, function(){});
+  public setOrder() {
+    db.setOrder(this);
   }
 
   private noteAdded(result: SQLResultSet){

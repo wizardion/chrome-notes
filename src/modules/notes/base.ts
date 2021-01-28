@@ -35,7 +35,7 @@ export class Base {
 
     // TODO need to move as global.
     this.controls.listView.items.classList.add('hidden-scroll');
-    this.controls.listView.items.addEventListener('scroll', ()=>{
+    this.controls.listView.items.addEventListener('scroll', ()=> {
       this.controls.listView.items.classList.remove('hidden-scroll');
       clearInterval(this.interval);
 
@@ -148,6 +148,7 @@ export class Base {
       this.notes.push(note);
       this.controls.listView.items.appendChild(note.element);
       note.onclick = this.selectNote.bind(this, note, true);
+      note.sortButton.onmousedown = Sorting.start.bind(Sorting, note);
 
       this.controls.newView.cancel.style.display = 'None';
       this.controls.newView.create.style.display = 'None';
