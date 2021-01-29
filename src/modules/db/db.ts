@@ -8,45 +8,6 @@ interface IBatchUpdate {
 var database: Database;
 var batchSql: IBatchUpdate[] = [];
 
-function executeSql(sql: string, data: (string | number)[], callback: Function, errorCallback?: Function) {
-  if (!database) {
-    init();
-  }
-
-  database.transaction(function (transaction: SQLTransaction) {
-    transaction.executeSql(sql, data, function (tx: SQLTransaction, result: SQLResultSet) {
-      callback(result);
-    }, function (tx: SQLTransaction, error: SQLError) {
-        errorCallback(error);
-        return true;
-    });
-  });
-}
-
-function executeBatchSql(callback?: Function, errorCallback?: Function) {
-  if (!database) {
-    init();
-  }
-
-  database.transaction(function (transaction: SQLTransaction) {
-    let successful: boolean = true;
-    let successHandler = (tx: SQLTransaction, result: SQLResultSet) => callback(result);
-    let errorHandler = (tx: SQLTransaction, error: SQLError) => {
-      errorCallback(error);
-      successful = false;
-      return successful;
-    };
-
-    batchSql.forEach((row: IBatchUpdate) => {
-      if (successful) {
-        transaction.executeSql(row.sqlStatement, row.data, successHandler, errorHandler);
-      }
-    });
-
-    batchSql = [];
-  });
-}
-
 function init() {
   if (!database) {
     database = window.openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
@@ -63,16 +24,68 @@ function init() {
   }
 }
 
+function executeSql(tx: SQLTransaction, sql: string, data: ObjectArray,
+  callback?: Function, errorCallback?: Function) {
+  tx.executeSql(sql, data, (tx: SQLTransaction, result: SQLResultSet) => {
+    if (callback) {
+      callback(result);
+    }
+  }, (tx: SQLTransaction, error: SQLError) => {
+    if (errorCallback) {
+      errorCallback(error);
+    }
+    return true;
+  });
+}
+
+function execTransaction(sql: string, data: ObjectArray, callback?: Function, errorCallback?: Function) {
+  if (!database) {
+    init();
+  }
+
+  database.transaction(function (transaction: SQLTransaction) {
+    executeSql(transaction, sql, data, callback, errorCallback);
+  });
+}
+
+function execBatchTransaction(callback?: Function, errorCallback?: Function) {
+  if (!database) {
+    init();
+  }
+
+  database.transaction(function (transaction: SQLTransaction) {
+    batchSql.forEach((row: IBatchUpdate) => {
+      executeSql(transaction, row.sqlStatement, row.data, callback, errorCallback);
+    });
+
+    batchSql = [];
+  });
+}
+
 function load(callback: Function, errorCallback?: Function) {
   let sql = 'SELECT rowid as id, * FROM Notes ORDER BY displayOrder ASC LIMIT 30';
-  executeSql(sql, [], callback, errorCallback);
+  execTransaction(sql, [], callback, errorCallback);
 };
 
-function update(item: INote, callback: Function, key?: string, errorCallback?: Function) {
+function update(item: INote, callback?: Function, errorCallback?: Function) {
   var sql = 'UPDATE Notes SET title=?, description=?, displayOrder=?, updated=? WHERE rowid=?';
   var data = [item.title, item.description, item.displayOrder, item.updated, item.id];
 
-  executeSql(sql, data, callback, errorCallback);
+  execTransaction(sql, data, callback, errorCallback);
+};
+
+function add(item: INote, callback?: Function, errorCallback?: Function) {
+  var sql = 'INSERT INTO Notes(title, description, displayOrder, updated, created) VALUES(?,?,?,?,?)';
+  var data = [item.title, item.description, item.displayOrder, item.updated, item.updated];
+
+  execTransaction(sql, data, callback, errorCallback);
+};
+
+function remove(id: number, callback?: Function, errorCallback?: Function) {
+  var sql = 'DELETE FROM Notes WHERE rowId = ?';
+  var data = [id];
+
+  execTransaction(sql, data, callback, errorCallback);
 };
 
 function setOrder(item: INote) {
@@ -82,23 +95,9 @@ function setOrder(item: INote) {
   });
 };
 
-function saveBatch(callback: Function, errorCallback?: Function) {
-  executeBatchSql(callback, errorCallback);
+function saveBatch(callback?: Function, errorCallback?: Function) {
+  execBatchTransaction(callback, errorCallback);
 }
-
-function add(item: INote, callback: Function, errorCallback?: Function) {
-  var sql = 'INSERT INTO Notes(title, description, displayOrder, updated, created) VALUES(?,?,?,?,?)';
-  var data = [item.title, item.description, item.displayOrder, item.updated, item.updated];
-
-  executeSql(sql, data, callback, errorCallback);
-};
-
-function remove(id: number, callback: Function, errorCallback?: Function) {
-  var sql = 'DELETE FROM Notes WHERE rowId = ?';
-  var data = [id];
-
-  executeSql(sql, data, callback, errorCallback);
-};
 
 export default {
   init: init,
