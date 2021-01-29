@@ -32,6 +32,7 @@ function executeSql(tx: SQLTransaction, sql: string, data: ObjectArray,
     }
   }, (tx: SQLTransaction, error: SQLError) => {
     if (errorCallback) {
+      console.error(error.code, error.message);
       errorCallback(error);
     }
     return true;
