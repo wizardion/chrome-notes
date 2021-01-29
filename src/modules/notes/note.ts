@@ -45,15 +45,17 @@ export class Note {
     this.element.appendChild(this.controls.date);
   }
 
-  public static saveOrders() {
-    DbNote.saveOrders();
+  public static saveQueue() {
+    DbNote.saveQueue();
   }
 
   public set index(value: number) {
-    this.indexId = value;
-    this.note.displayOrder = value + 1;
-    this.controls.bullet.innerText = `${(this.note.displayOrder)}`;
-    this.note.setOrder();
+    if (this.indexId !== value) {
+      this.indexId = value;
+      this.note.displayOrder = value + 1;
+      this.controls.bullet.innerText = `${(this.note.displayOrder)}`;
+      this.note.setOrder();
+    }
   }
 
   public get index(): number {
@@ -65,10 +67,12 @@ export class Note {
   }
 
   public set title(value: string) {
-    this.note.title = value;
-    this.note.updated = this.getTime();
-    this.controls.title.innerText = this.note.title;
-    this.controls.date.innerText = this.getDateString(this.note.updated);
+    if (this.note.title !== value) {
+      this.note.title = value;
+      this.note.updated = this.getTime();
+      this.controls.title.innerText = this.note.title;
+      this.controls.date.innerText = this.getDateString(this.note.updated);
+    }
   }
 
   public get description(): string {
@@ -76,9 +80,11 @@ export class Note {
   }
 
   public set description(value: string) {
-    this.note.description = value;
-    this.note.updated = this.getTime();
-    this.controls.date.innerText = this.getDateString(this.note.updated);
+    if (this.note.description !== value) {
+      this.note.description = value;
+      this.note.updated = this.getTime();
+      this.controls.date.innerText = this.getDateString(this.note.updated);
+    }
   }
 
   public set onclick(event: EventListener) {

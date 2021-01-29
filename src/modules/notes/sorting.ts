@@ -151,7 +151,7 @@ export class Sorting {
       item.index = i;
     }
 
-    Note.saveOrders();
+    Note.saveQueue();
   }
 
   private static getPoint(pageY: number, scrollTop: number): IPoint {

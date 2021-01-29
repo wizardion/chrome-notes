@@ -38,8 +38,8 @@ export class DbNote implements INote {
     });
   }
 
-  public static saveOrders() {
-    db.saveBatch(function () {});
+  public static saveQueue() {
+    db.saveQueue(function () {});
   }
 
   public save() {

@@ -95,8 +95,8 @@ function setOrder(item: INote) {
   });
 };
 
-function saveBatch(callback?: Function, errorCallback?: Function) {
-  execBatchTransaction(callback, errorCallback);
+function saveQueue(errorCallback?: Function) {
+  execBatchTransaction(null, errorCallback);
 }
 
 export default {
@@ -105,6 +105,6 @@ export default {
   add: add,
   update: update,
   setOrder: setOrder,
-  saveBatch: saveBatch,
+  saveQueue: saveQueue,
   remove: remove,
 };
