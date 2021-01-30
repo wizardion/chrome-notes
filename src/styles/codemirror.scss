@@ -1,16 +1,52 @@
+.CodeMirror {
+  height: 241px !important;
+  font-size: 14px;
+  line-height: 20px;
+  padding-left: 3px;
+  padding-right: 0px;
+}
+
 .CodeMirror-wrap {
   border-top: 1px solid transparent;
 }
 
+.CodeMirror-cursor {
+  border-left: 0 !important;
+  width: 2px !important;
+
+  border-radius: 4px !important;
+  // background-color: black;
+  background-color: #03534e;
+  opacity: 0.75;
+  margin-left: -1px;
+}
+
+.CodeMirror-selected {
+  background: #d9d9d9;
+  // background: #daebe9;
+}
+
+.CodeMirror-focused .CodeMirror-selected {
+  // background: #daebe9;
+  // background: #d9e9e9;
+  background: #d5e5e5;
+  // background: #d7d4f0;
+  // background: #d4eff0;
+}
+
 .CodeMirror-line:first-child {
   text-align: center;
-  // margin-top: 15px !important;
-  // padding-bottom: 20px !important;
-  // font-size: 17px !important;
   color: #06736a !important;
   font-weight: bold !important;
-  margin-left: 0px !important;
   font-style: normal !important;
+  max-height: 35px;
+}
+
+.CodeMirror-line:first-child>span::before,
+.CodeMirror-line:first-child>span::after {
+  content: ' ';
+  display: block;
+  height: 5px;
 }
 
 .CodeMirror-line:first-child span {

@@ -30,7 +30,7 @@ export class Base {
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
-    this.controls.noteView.editor.on('blur', this.save.bind(this));
+    this.controls.noteView.editor.on('change', this.save.bind(this));
 
     ScrollListener.listen(this.controls.listView.items);
     ScrollListener.listen(this.controls.noteView.wrapper.querySelector('.CodeMirror-vscrollbar'));
@@ -99,8 +99,10 @@ export class Base {
     this.controls.noteView.delete.style.display = 'inherit';
 
     if (bind) {
-      this.controls.noteView.editor.setValue(note.title + '\n' + note.description);
+      this.controls.noteView.editor.setValue('');
       this.controls.noteView.editor.focus();
+      this.controls.noteView.editor.replaceSelection(note.title + '\n' + note.description);
+      this.controls.noteView.editor.setCursor({line: 0, ch: 0});
     }
 
     this.selected = note;
@@ -164,6 +166,7 @@ export class Base {
       var valid: boolean = !Validator.required(title, this.controls.noteView.wrapper);
 
       if (valid && (this.selected.title !== title || this.selected.description !== description)) {
+        console.log('saving...');
         this.selected.title = title;
         this.selected.description = description;
         this.selected.save();
