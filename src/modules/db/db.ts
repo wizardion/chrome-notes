@@ -59,7 +59,7 @@ function execBatchTransaction(callback?: Function, errorCallback?: Function) {
       executeSql(transaction, row.sqlStatement, row.data, callback, errorCallback);
     });
 
-    batchSql = [];
+    batchSql.splice(0);
   });
 }
 

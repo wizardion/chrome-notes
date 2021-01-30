@@ -25,6 +25,7 @@ var controls: IControls = {
     node: noteView,
     back: <HTMLButtonElement>document.getElementById('to-list'),
     delete: <HTMLButtonElement>document.getElementById('delete-note'),
+    wrapper: codemirror.getWrapperElement(),
     editor: codemirror
   },
   newView: {

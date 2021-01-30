@@ -23,6 +23,7 @@ interface INoteView extends IView {
   delete?: HTMLButtonElement;
 
   editorControlls?: HTMLElement[];
+  wrapper?: HTMLElement;
   editor?: Editor;
 }
 

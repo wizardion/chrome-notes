@@ -8,13 +8,12 @@ import 'codemirror/mode/gfm/gfm.js';
 import 'codemirror/lib/codemirror.css';
 import '../../styles/codemirror.scss';
 import { Sorting } from './sorting';
+import { ScrollListener } from './scrolling';
 
 export class Base {
   private controls: IControls;
   private notes: Note[];
   private selected?: Note;
-
-  private interval?: NodeJS.Timeout;
 
   constructor(elements: IControls) {
     this.notes = [];
@@ -33,16 +32,8 @@ export class Base {
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
     this.controls.noteView.editor.on('blur', this.save.bind(this));
 
-    // TODO need to move as global.
-    this.controls.listView.items.classList.add('hidden-scroll');
-    this.controls.listView.items.addEventListener('scroll', ()=> {
-      this.controls.listView.items.classList.remove('hidden-scroll');
-      clearInterval(this.interval);
-
-      this.interval = setTimeout(() => {
-        this.controls.listView.items.classList.add('hidden-scroll');
-      }, 1750);
-    });
+    ScrollListener.listen(this.controls.listView.items);
+    ScrollListener.listen(this.controls.noteView.wrapper.querySelector('.CodeMirror-vscrollbar'));
   }
 
   public init() {
@@ -136,10 +127,9 @@ export class Base {
 
   private createNote() {
     var note: Note;
-    var wrapper: HTMLElement = this.controls.noteView.editor.getWrapperElement();
     var [title, description] = this.getData(this.controls.noteView.editor.getValue());
 
-    if (!Validator.required(title, wrapper)) {
+    if (!Validator.required(title, this.controls.noteView.wrapper)) {
       note = new Note(null, this.notes.length);
       note.title = title;
       note.description = description;
@@ -171,8 +161,7 @@ export class Base {
   private save(): boolean {
     if (this.selected) {
       var [title, description] = this.getData(this.controls.noteView.editor.getValue());
-      var wrapper: HTMLElement = this.controls.noteView.editor.getWrapperElement();
-      var valid: boolean = !Validator.required(title, wrapper);
+      var valid: boolean = !Validator.required(title, this.controls.noteView.wrapper);
 
       if (valid && (this.selected.title !== title || this.selected.description !== description)) {
         this.selected.title = title;
