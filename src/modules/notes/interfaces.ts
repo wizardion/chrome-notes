@@ -12,6 +12,7 @@ interface IView {
 
 interface IListView extends IView {
   items?: HTMLElement;
+  template?: HTMLElement;
 
   addButton?: HTMLButtonElement;
   searchButton?: HTMLButtonElement;

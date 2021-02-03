@@ -42,7 +42,7 @@ export class Base {
 
   private build(notes: DbNote[]) {
     if (notes.length > 0) {
-      this.controls.listView.items.innerHTML = '';
+      this.controls.listView.template.style.display = 'none';
       this.controls.listView.items.appendChild(this.render(notes, 0, 10));
       
       Sorting.notes = this.notes;
@@ -132,6 +132,10 @@ export class Base {
     var [title, description] = this.getData(this.controls.noteView.editor.getValue());
 
     if (!Validator.required(title, this.controls.noteView.wrapper)) {
+      if (!this.notes.length) {
+        this.controls.listView.template.style.display = 'none';
+      }
+
       note = new Note(null, this.notes.length);
       note.title = title;
       note.description = description;
@@ -156,6 +160,10 @@ export class Base {
       this.notes.splice(this.selected.index, 1);
       delete this.selected;
 
+      if (!this.notes.length) {
+        this.controls.listView.template.style.display = 'inherit';
+      }
+
       this.showList();
     }
   }
@@ -166,7 +174,7 @@ export class Base {
       var valid: boolean = !Validator.required(title, this.controls.noteView.wrapper);
 
       if (valid && (this.selected.title !== title || this.selected.description !== description)) {
-        console.log('saving...');
+        console.log('saving...2');
         this.selected.title = title;
         this.selected.description = description;
         this.selected.save();

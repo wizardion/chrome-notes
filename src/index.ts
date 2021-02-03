@@ -17,6 +17,7 @@ var controls: IControls = {
   listView: {
     node: listView,
     items: <HTMLElement>document.getElementById('list-items'),
+    template: <HTMLElement>document.getElementById('template'),
     addButton: <HTMLButtonElement>document.getElementById('add-note'),
     searchButton: <HTMLButtonElement>document.getElementById('search-button'),
     searchInput: <HTMLInputElement>document.getElementById('search-input'),
