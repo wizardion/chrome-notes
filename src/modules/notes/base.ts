@@ -115,7 +115,12 @@ export class Base {
   }
 
   private backToList() {
-    if (!this.selected || this.save()) {
+    if (this.selected && this.validate('', true)) {
+      this.save();
+      this.showList();
+    }
+
+    if (!this.selected) {
       this.showList();
     }
   }
@@ -131,7 +136,7 @@ export class Base {
     var note: Note;
     var [title, description] = this.getData(this.controls.noteView.editor.getValue());
 
-    if (!Validator.required(title, this.controls.noteView.wrapper)) {
+    if (this.validate(title, true)) {
       if (!this.notes.length) {
         this.controls.listView.template.style.display = 'none';
       }
@@ -168,10 +173,10 @@ export class Base {
     }
   }
 
-  private save(): boolean {
+  private save() {
     if (this.selected) {
       var [title, description] = this.getData(this.controls.noteView.editor.getValue());
-      var valid: boolean = !Validator.required(title, this.controls.noteView.wrapper);
+      var valid: boolean = this.validate(title);
 
       if (valid && (this.selected.title !== title || this.selected.description !== description)) {
         console.log('saving...2');
@@ -179,11 +184,11 @@ export class Base {
         this.selected.description = description;
         this.selected.save();
       }
-
-      return valid;
     }
+  }
 
-    return false;
+  private validate(title: string, animate: boolean = false): boolean {
+    return !Validator.required(title, animate && this.controls.noteView.wrapper);
   }
 
   private getData(value: string): string[] {
