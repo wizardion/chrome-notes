@@ -38,4 +38,10 @@ var controls: IControls = {
 
 var editor = new Base(controls);
 
+if (localStorage.description) {
+  editor.showNote(localStorage.description, true);
+} else {
+  editor.showList();
+}
+
 editor.init();

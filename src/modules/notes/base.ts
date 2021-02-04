@@ -50,7 +50,12 @@ export class Base {
       Sorting.items = this.controls.listView.items;
 
       setTimeout(() => {
+        let index = localStorage.getItem('index');
         this.controls.listView.items.appendChild(this.render(notes, 10));
+
+        if (index) {
+          this.selectNote(this.notes[parseInt(index)]);
+        }
       }, 10);
     }
   }
@@ -90,10 +95,15 @@ export class Base {
   }
 
   private selectNote(note: Note, bind?: boolean) {
-    if (Sorting.busy) {
-      return;
+    if (!Sorting.busy) {
+      this.showNote(note.title + '\n' + note.description, bind);
+      this.selected = note;
+      localStorage.setItem('index', note.index.toString());
+      localStorage.setItem('description', note.title + '\n' + note.description);
     }
+  }
 
+  public showNote(note: string, bind?: boolean) {
     this.controls.listView.node.style.display = 'None';
     this.controls.noteView.node.style.display = 'inherit';
     this.controls.noteView.back.style.display = 'inherit';
@@ -102,17 +112,17 @@ export class Base {
     if (bind) {
       this.controls.noteView.editor.setValue('');
       this.controls.noteView.editor.focus();
-      this.controls.noteView.editor.replaceSelection(note.title + '\n' + note.description);
-      this.controls.noteView.editor.setCursor({line: 0, ch: 0});
+      this.controls.noteView.editor.replaceSelection(note);
+      this.controls.noteView.editor.setCursor({ line: 0, ch: 0 });
     }
-
-    this.selected = note;
   }
 
-  private showList() {
+  public showList() {
     this.selected = null;
     this.controls.listView.node.style.display = 'inherit';
     this.controls.noteView.node.style.display = 'None';
+    localStorage.removeItem('index');
+    localStorage.removeItem('description');
   }
 
   private backToList() {
@@ -189,7 +199,10 @@ export class Base {
     clearInterval(this.interval);
 
     this.interval = setTimeout(() => {
-      var [title, description] = this.getData(this.controls.noteView.editor.getValue());
+      var value = this.controls.noteView.editor.getValue();
+      var [title, description] = this.getData(value);
+      
+      localStorage.setItem('description', value);
       return this.selected && this.validate(title) && this.save(title, description);
     }, 175);
   }
