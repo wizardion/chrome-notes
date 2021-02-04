@@ -41,6 +41,46 @@ export class Base {
     DbNote.loadAll(this.build.bind(this));
   }
 
+  public showNote(note: string, bind?: boolean) {
+    this.controls.listView.node.style.display = 'None';
+    this.controls.noteView.node.style.display = 'inherit';
+    this.controls.noteView.back.style.display = 'inherit';
+    this.controls.noteView.delete.style.display = 'inherit';
+
+    if (bind) {
+      this.controls.noteView.editor.setValue('');
+      this.controls.noteView.editor.focus();
+      this.controls.noteView.editor.replaceSelection(note);
+      this.controls.noteView.editor.setCursor({ line: 0, ch: 0 });
+    }
+  }
+
+  public showList() {
+    this.selected = null;
+    this.controls.listView.node.style.display = 'inherit';
+    this.controls.noteView.node.style.display = 'None';
+    localStorage.removeItem('index');
+    localStorage.removeItem('new');
+    localStorage.removeItem('description');
+  }
+
+  public selectNew(description: string) {
+    this.selected = null;
+    this.controls.listView.node.style.display = 'None';
+    this.controls.newView.node.style.display = 'inherit';
+
+    this.controls.newView.cancel.style.display = 'inherit';
+    this.controls.newView.create.style.display = 'inherit';
+
+    this.controls.noteView.back.style.display = 'none';
+    this.controls.noteView.delete.style.display = 'none';
+
+    this.controls.noteView.editor.setValue(description);
+    this.controls.noteView.editor.focus();
+    localStorage.setItem('description', description);
+    localStorage.setItem('new', 'true');
+  }
+
   private build(notes: DbNote[]) {
     if (notes.length > 0) {
       this.controls.listView.template.style.display = 'none';
@@ -79,23 +119,6 @@ export class Base {
     e.preventDefault();
   }
 
-  public selectNew(description: string) {
-    this.selected = null;
-    this.controls.listView.node.style.display = 'None';
-    this.controls.newView.node.style.display = 'inherit';
-
-    this.controls.newView.cancel.style.display = 'inherit';
-    this.controls.newView.create.style.display = 'inherit';
-
-    this.controls.noteView.back.style.display = 'none';
-    this.controls.noteView.delete.style.display = 'none';
-
-    this.controls.noteView.editor.setValue(description);
-    this.controls.noteView.editor.focus();
-    localStorage.setItem('description', description);
-    localStorage.setItem('new', 'true');
-  }
-
   private selectNote(note: Note, bind?: boolean) {
     if (!Sorting.busy) {
       this.showNote(note.title + '\n' + note.description, bind);
@@ -103,29 +126,6 @@ export class Base {
       localStorage.setItem('index', note.index.toString());
       localStorage.setItem('description', note.title + '\n' + note.description);
     }
-  }
-
-  public showNote(note: string, bind?: boolean) {
-    this.controls.listView.node.style.display = 'None';
-    this.controls.noteView.node.style.display = 'inherit';
-    this.controls.noteView.back.style.display = 'inherit';
-    this.controls.noteView.delete.style.display = 'inherit';
-
-    if (bind) {
-      this.controls.noteView.editor.setValue('');
-      this.controls.noteView.editor.focus();
-      this.controls.noteView.editor.replaceSelection(note);
-      this.controls.noteView.editor.setCursor({ line: 0, ch: 0 });
-    }
-  }
-
-  public showList() {
-    this.selected = null;
-    this.controls.listView.node.style.display = 'inherit';
-    this.controls.noteView.node.style.display = 'None';
-    localStorage.removeItem('index');
-    localStorage.removeItem('new');
-    localStorage.removeItem('description');
   }
 
   private backToList() {
