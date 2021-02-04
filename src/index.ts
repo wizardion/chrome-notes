@@ -3,6 +3,8 @@ import {IControls} from './modules/notes/interfaces';
 import './styles/style.scss';
 import {fromTextArea} from 'codemirror';
 
+var isNew = localStorage.getItem('new');
+var description = localStorage.getItem('description');
 var listView: HTMLElement = <HTMLElement>document.getElementById('list-view');
 var noteView: HTMLElement = <HTMLElement>document.getElementById('details-view');
 var codemirror = fromTextArea(<HTMLTextAreaElement>document.getElementById('description-note'), {
@@ -38,8 +40,12 @@ var controls: IControls = {
 
 var editor = new Base(controls);
 
-if (localStorage.description) {
-  editor.showNote(localStorage.description, true);
+if (description) {
+  if (isNew) {
+    editor.selectNew(description);
+  } else {
+    editor.showNote(description, true);
+  }
 } else {
   editor.showList();
 }

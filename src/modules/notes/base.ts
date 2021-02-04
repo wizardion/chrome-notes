@@ -26,7 +26,7 @@ export class Base {
     this.controls.newView.create.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 
-    this.controls.listView.addButton.addEventListener('click', this.selectNew.bind(this));
+    this.controls.listView.addButton.addEventListener('click', this.selectNew.bind(this, ''));
     this.controls.noteView.back.addEventListener('click', this.backToList.bind(this));
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
@@ -79,7 +79,7 @@ export class Base {
     e.preventDefault();
   }
 
-  private selectNew() {
+  public selectNew(description: string) {
     this.selected = null;
     this.controls.listView.node.style.display = 'None';
     this.controls.newView.node.style.display = 'inherit';
@@ -90,8 +90,10 @@ export class Base {
     this.controls.noteView.back.style.display = 'none';
     this.controls.noteView.delete.style.display = 'none';
 
-    this.controls.noteView.editor.setValue('');
+    this.controls.noteView.editor.setValue(description);
     this.controls.noteView.editor.focus();
+    localStorage.setItem('description', description);
+    localStorage.setItem('new', 'true');
   }
 
   private selectNote(note: Note, bind?: boolean) {
@@ -122,6 +124,7 @@ export class Base {
     this.controls.listView.node.style.display = 'inherit';
     this.controls.noteView.node.style.display = 'None';
     localStorage.removeItem('index');
+    localStorage.removeItem('new');
     localStorage.removeItem('description');
   }
 
