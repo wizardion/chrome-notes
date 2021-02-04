@@ -14,6 +14,7 @@ export class Base {
   private controls: IControls;
   private notes: Note[];
   private selected?: Note;
+  private interval?: NodeJS.Timeout;
 
   constructor(elements: IControls) {
     this.notes = [];
@@ -30,7 +31,7 @@ export class Base {
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
-    this.controls.noteView.editor.on('change', this.save.bind(this));
+    this.controls.noteView.editor.on('change', this.change.bind(this));
 
     ScrollListener.listen(this.controls.listView.items);
     ScrollListener.listen(this.controls.noteView.wrapper.querySelector('.CodeMirror-vscrollbar'));
@@ -115,8 +116,10 @@ export class Base {
   }
 
   private backToList() {
-    if (this.selected && this.validate('', true)) {
-      this.save();
+    var [title, description] = this.getData(this.controls.noteView.editor.getValue());
+
+    if (this.selected && this.validate(title, true)) {
+      this.save(title, description);
       this.showList();
     }
 
@@ -173,18 +176,22 @@ export class Base {
     }
   }
 
-  private save() {
-    if (this.selected) {
-      var [title, description] = this.getData(this.controls.noteView.editor.getValue());
-      var valid: boolean = this.validate(title);
-
-      if (valid && (this.selected.title !== title || this.selected.description !== description)) {
-        console.log('saving...2');
-        this.selected.title = title;
-        this.selected.description = description;
-        this.selected.save();
-      }
+  private save(title: string, description: string) {
+    if (this.selected && (this.selected.title !== title || this.selected.description !== description)) {
+      console.log('saving...');
+      this.selected.title = title;
+      this.selected.description = description;
+      this.selected.save();
     }
+  }
+
+  private change() {
+    clearInterval(this.interval);
+
+    this.interval = setTimeout(() => {
+      var [title, description] = this.getData(this.controls.noteView.editor.getValue());
+      return this.selected && this.validate(title) && this.save(title, description);
+    }, 175);
   }
 
   private validate(title: string, animate: boolean = false): boolean {
