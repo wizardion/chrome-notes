@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   var editor = new Base(controls);
+  editor.init();
 
   if (description) {
     if (isNew) {
@@ -51,8 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     editor.showList();
   }
-
-  editor.init();
 });
 
 

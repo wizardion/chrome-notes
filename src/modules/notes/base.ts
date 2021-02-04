@@ -171,6 +171,7 @@ export class Base {
       this.controls.newView.create.style.display = 'None';
 
       this.selectNote(note);
+      localStorage.removeItem('new');
     }
   }
 
