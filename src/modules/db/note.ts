@@ -6,17 +6,21 @@ export class DbNote implements INote {
   public title: string;
   public description: string;
   public displayOrder: number;
+  public sync: boolean;
+  public view: boolean;
   public updated: number;
   public created: number;
 
   constructor(id: number, title: string, description: string, order: number,
-    updated: number, created: number) {
+    updated: number, created: number, sync: boolean = false, view: boolean = false) {
     this.id = id;
     this.title = title;
     this.description = description;
     this.displayOrder = order;
     this.updated = updated;
     this.created = created;
+    this.sync = sync;
+    this.view = view;
   }
 
   public static loadAll(callback: Function, errorCallback?: Function) {
@@ -30,7 +34,9 @@ export class DbNote implements INote {
           result.rows.item(i)['description'],
           result.rows.item(i)['displayOrder'],
           result.rows.item(i)['updated'],
-          result.rows.item(i)['created']
+          result.rows.item(i)['created'],
+          result.rows.item(i)['sync'],
+          result.rows.item(i)['view']
         ));
       }
 

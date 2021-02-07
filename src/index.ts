@@ -1,21 +1,16 @@
+import {IControls} from './modules/notes/components/interfaces';
+import {Editor} from './modules/notes/editor';
 import {Base} from './modules/notes/base';
-import {IControls} from './modules/notes/interfaces';
 import './styles/style.scss';
-import {fromTextArea} from 'codemirror';
 
 var isNew = localStorage.getItem('new');
+var selection = localStorage.getItem('selection');
 var description = localStorage.getItem('description');
 
 document.addEventListener('DOMContentLoaded', () => {
   var listView: HTMLElement = <HTMLElement>document.getElementById('list-view');
   var noteView: HTMLElement = <HTMLElement>document.getElementById('details-view');
-  var codemirror = fromTextArea(<HTMLTextAreaElement>document.getElementById('description-note'), {
-    lineWrapping: true,
-    showCursorWhenSelecting: true,
-    mode: {
-      name: 'gfm'
-    }
-  });
+  var codemirror = new Editor(<HTMLTextAreaElement>document.getElementById('description-note'));
 
   var controls: IControls = {
     listView: {
@@ -30,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
       node: noteView,
       back: <HTMLButtonElement>document.getElementById('to-list'),
       delete: <HTMLButtonElement>document.getElementById('delete-note'),
-      wrapper: codemirror.getWrapperElement(),
       editor: codemirror
     },
     newView: {
@@ -45,13 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (description) {
     if (isNew) {
-      editor.selectNew(description);
+      editor.selectNew(description, selection);
     } else {
-      editor.showNote(description, true);
-    }
+      editor.showNote(description, true, selection);
+    }    
   } else {
     editor.showList();
   }
 });
-
-

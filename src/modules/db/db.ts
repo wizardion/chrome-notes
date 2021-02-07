@@ -11,10 +11,10 @@ var batchSql: IBatchUpdate[] = [];
 function init() {
   if (!database) {
     database = window.openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
-
     database.transaction(function (tx) {
-      var createSQL = `CREATE TABLE IF NOT EXISTS 
-      Notes (title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, updated REAL, created REAL)`;
+      var createSQL = 'CREATE TABLE IF NOT EXISTS Notes' + 
+                      '(title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, sync BOOLEAN NOT NULL,' + 
+                      ' view BOOLEAN NOT NULL updated REAL, created REAL)';
       tx.executeSql(createSQL, null);
     });
 
@@ -32,9 +32,9 @@ function executeSql(tx: SQLTransaction, sql: string, data: ObjectArray,
     }
   }, (tx: SQLTransaction, error: SQLError) => {
     if (errorCallback) {
-      console.error(error.code, error.message);
       errorCallback(error);
     }
+    console.error(error.code, error.message);
     return true;
   });
 }
@@ -64,20 +64,24 @@ function execBatchTransaction(callback?: Function, errorCallback?: Function) {
 }
 
 function load(callback: Function, errorCallback?: Function) {
-  let sql = 'SELECT rowid as id, * FROM Notes ORDER BY displayOrder ASC LIMIT 30';
+  let sql = 'SELECT rowid as id, * FROM Notes ORDER BY displayOrder ASC';
   execTransaction(sql, [], callback, errorCallback);
 };
 
 function update(item: INote, callback?: Function, errorCallback?: Function) {
-  var sql = 'UPDATE Notes SET title=?, description=?, displayOrder=?, updated=? WHERE rowid=?';
-  var data = [item.title, item.description, item.displayOrder, item.updated, item.id];
+  var sql = 'UPDATE Notes SET title=?, description=?, displayOrder=?, sync=?, view=?, updated=? ' + 
+            'WHERE rowid=?';
+  var data = [item.title, item.description, item.displayOrder, item.sync, item.view, item.updated, item.id];
 
   execTransaction(sql, data, callback, errorCallback);
 };
 
 function add(item: INote, callback?: Function, errorCallback?: Function) {
-  var sql = 'INSERT INTO Notes(title, description, displayOrder, updated, created) VALUES(?,?,?,?,?)';
-  var data = [item.title, item.description, item.displayOrder, item.updated, item.updated];
+  var sql = 'INSERT INTO Notes(title, description, displayOrder, sync, view, updated, created) ' + 
+            'VALUES(?,?,?,?,?,?,?)';
+  var data = [
+    item.title, item.description, item.displayOrder, item.sync, item.view, item.updated, item.updated
+  ];
 
   execTransaction(sql, data, callback, errorCallback);
 };

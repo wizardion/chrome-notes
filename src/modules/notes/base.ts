@@ -1,20 +1,16 @@
-import {IControls} from './interfaces';
+import {IControls} from './components/interfaces';
 import {DbNote} from '../db/note';
-import {Note} from './note';
-import {Validator} from './validation';
-// import 'codemirror/addon/display/placeholder'
-import 'codemirror/mode/markdown/markdown.js'
-import 'codemirror/mode/gfm/gfm.js';
-import 'codemirror/lib/codemirror.css';
-import '../../styles/codemirror.scss';
-import { Sorting } from './sorting';
-import { ScrollListener } from './scrolling';
+import {Note} from './components/note';
+import {Validator} from './components/validation';
+import {Sorting} from './components/sorting';
+import {ScrollListener} from './components/scrolling';
 
 export class Base {
   private controls: IControls;
   private notes: Note[];
   private selected?: Note;
   private interval?: NodeJS.Timeout;
+  private cursorInterval?: NodeJS.Timeout;
 
   constructor(elements: IControls) {
     this.notes = [];
@@ -26,32 +22,31 @@ export class Base {
     this.controls.newView.create.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 
-    this.controls.listView.addButton.addEventListener('click', this.selectNew.bind(this, ''));
+    this.controls.listView.addButton.addEventListener('click', this.selectNew.bind(this, '', null));
     this.controls.noteView.back.addEventListener('click', this.backToList.bind(this));
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
     this.controls.noteView.editor.on('change', this.change.bind(this));
+    this.controls.noteView.editor.on('cursorActivity', this.cursorActivity.bind(this));
 
     ScrollListener.listen(this.controls.listView.items);
-    ScrollListener.listen(this.controls.noteView.wrapper.querySelector('.CodeMirror-vscrollbar'));
+    ScrollListener.listen(this.controls.noteView.editor.scroll);
   }
 
   public init() {
     DbNote.loadAll(this.build.bind(this));
   }
 
-  public showNote(note: string, bind?: boolean) {
+  public showNote(description: string, bind?: boolean, selection?: string) {
     this.controls.listView.node.style.display = 'None';
     this.controls.noteView.node.style.display = 'inherit';
     this.controls.noteView.back.style.display = 'inherit';
     this.controls.noteView.delete.style.display = 'inherit';
 
     if (bind) {
-      this.controls.noteView.editor.setValue('');
-      this.controls.noteView.editor.focus();
-      this.controls.noteView.editor.replaceSelection(note);
-      this.controls.noteView.editor.setCursor({ line: 0, ch: 0 });
+      this.controls.noteView.editor.value = description;
+      this.controls.noteView.editor.setSelection(selection);
     }
   }
 
@@ -59,12 +54,14 @@ export class Base {
     this.selected = null;
     this.controls.listView.node.style.display = 'inherit';
     this.controls.noteView.node.style.display = 'None';
-    localStorage.removeItem('index');
-    localStorage.removeItem('new');
-    localStorage.removeItem('description');
+    localStorage.clear();
+    // localStorage.removeItem('new');
+    // localStorage.removeItem('index');
+    // localStorage.removeItem('selection');
+    // localStorage.removeItem('description');
   }
 
-  public selectNew(description: string) {
+  public selectNew(description: string, selection?: string) {
     this.selected = null;
     this.controls.listView.node.style.display = 'None';
     this.controls.newView.node.style.display = 'inherit';
@@ -75,8 +72,8 @@ export class Base {
     this.controls.noteView.back.style.display = 'none';
     this.controls.noteView.delete.style.display = 'none';
 
-    this.controls.noteView.editor.setValue(description);
-    this.controls.noteView.editor.focus();
+    this.controls.noteView.editor.value = description;
+    this.controls.noteView.editor.setSelection(selection);
     localStorage.setItem('description', description);
     localStorage.setItem('new', 'true');
   }
@@ -121,15 +118,17 @@ export class Base {
 
   private selectNote(note: Note, bind?: boolean) {
     if (!Sorting.busy) {
-      this.showNote(note.title + '\n' + note.description, bind);
+      let value = note.title + '\n' + note.description;
+
       this.selected = note;
+      this.showNote(value, bind);
+      localStorage.setItem('description', value);
       localStorage.setItem('index', note.index.toString());
-      localStorage.setItem('description', note.title + '\n' + note.description);
     }
   }
 
   private backToList() {
-    var [title, description] = this.getData(this.controls.noteView.editor.getValue());
+    var [title, description] = this.controls.noteView.editor.getData();
 
     if (this.selected && this.validate(title, true)) {
       this.save(title, description);
@@ -150,7 +149,7 @@ export class Base {
 
   private createNote() {
     var note: Note;
-    var [title, description] = this.getData(this.controls.noteView.editor.getValue());
+    var [title, description] = this.controls.noteView.editor.getData();
 
     if (this.validate(title, true)) {
       if (!this.notes.length) {
@@ -203,23 +202,22 @@ export class Base {
     clearInterval(this.interval);
 
     this.interval = setTimeout(() => {
-      var value = this.controls.noteView.editor.getValue();
-      var [title, description] = this.getData(value);
+      var [title, description] = this.controls.noteView.editor.getData();
       
-      localStorage.setItem('description', value);
+      localStorage.setItem('description', title + '\n' + description);
       return this.selected && this.validate(title) && this.save(title, description);
     }, 175);
   }
 
   private validate(title: string, animate: boolean = false): boolean {
-    return !Validator.required(title, animate && this.controls.noteView.wrapper);
+    return !Validator.required(title, animate && this.controls.noteView.editor.wrapper);
   }
 
-  private getData(value: string): string[] {
-    var data: string[] = (value || '').split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
-    var title: string = (data && data.length) ? data[0].trim() : '';
-    var description: string = (data && data.length > 1)? data[1] : '';
+  private cursorActivity() {
+    clearInterval(this.cursorInterval);
 
-    return [title, description];
+    this.cursorInterval = setTimeout(() => {
+      localStorage.setItem('selection', this.controls.noteView.editor.getSelection());
+    }, 300);
   }
 }
