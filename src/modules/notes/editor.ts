@@ -136,9 +136,7 @@ export class Editor {
 
       this.codemirror.setSelections(ranges);
       this.codemirror.scrollTo(0, selection.scrollTop);
-      console.log('set selection');
     } else {
-      console.log('set cursor');
       this.codemirror.setCursor({ line: 0, ch: 0 });
     }
   }
@@ -190,13 +188,16 @@ export class Editor {
   private insertLink(text: string) {
     let rule = /\s*\[(.+)\].*/gi;
     let template = '[${text}](url)';
-    let value = text.match(rule) ? text.replace(rule, '$1') : template.replace(/\$\{text\}/gim, text);
 
-    this.codemirror.replaceSelection(value, 'end');
-    let cursor: Position = this.codemirror.getCursor();
-    this.codemirror.setSelection(
-      { ch: cursor.ch - 4, line: cursor.line },
-      { ch: cursor.ch - 1, line: cursor.line }
-    );
+    if (!text.match(rule)) {
+      this.codemirror.replaceSelection(template.replace(/\$\{text\}/gim, text), 'end');
+      let cursor: Position = this.codemirror.getCursor();
+      this.codemirror.setSelection(
+        { ch: cursor.ch - 4, line: cursor.line },
+        { ch: cursor.ch - 1, line: cursor.line }
+      );
+    } else {
+      this.codemirror.replaceSelection(text.replace(rule, '$1'), 'around');
+    }
   }
 }
