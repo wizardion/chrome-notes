@@ -10,7 +10,10 @@ var description = localStorage.getItem('description');
 document.addEventListener('DOMContentLoaded', () => {
   var listView: HTMLElement = <HTMLElement>document.getElementById('list-view');
   var noteView: HTMLElement = <HTMLElement>document.getElementById('details-view');
-  var codemirror = new Editor(<HTMLTextAreaElement>document.getElementById('description-note'));
+  var codemirror = new Editor(
+    <HTMLTextAreaElement>document.getElementById('description-note'), 
+    <NodeList>document.getElementById('editor-controlls').querySelectorAll('div[action]')
+  );
 
   var controls: IControls = {
     listView: {
@@ -25,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
       node: noteView,
       back: <HTMLButtonElement>document.getElementById('to-list'),
       delete: <HTMLButtonElement>document.getElementById('delete-note'),
+      preview: <HTMLButtonElement>document.getElementById('preview-note'),
+      html: <HTMLElement>document.getElementById('html-preview'),
       editor: codemirror
     },
     newView: {
