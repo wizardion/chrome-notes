@@ -19,19 +19,23 @@ export class Base {
     this.controls.listView.addButton.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.noteView.back.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.noteView.delete.addEventListener('mousedown', this.prevent.bind(this));
+    this.controls.noteView.preview.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.create.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 
     this.controls.listView.addButton.addEventListener('click', this.selectNew.bind(this, '', null));
     this.controls.noteView.back.addEventListener('click', this.backToList.bind(this));
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
+    this.controls.noteView.preview.addEventListener('click', this.preview.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
+
     this.controls.noteView.editor.on('change', this.change.bind(this));
     this.controls.noteView.editor.on('cursorActivity', this.cursorActivity.bind(this));
 
     ScrollListener.listen(this.controls.listView.items);
     ScrollListener.listen(this.controls.noteView.editor.scroll);
+    ScrollListener.listen(this.controls.noteView.html);
   }
 
   public init() {
@@ -54,6 +58,8 @@ export class Base {
     this.selected = null;
     this.controls.listView.node.style.display = 'inherit';
     this.controls.noteView.node.style.display = 'None';
+
+    this.removePreview();
     localStorage.clear();
     // localStorage.removeItem('new');
     // localStorage.removeItem('index');
@@ -207,6 +213,28 @@ export class Base {
       localStorage.setItem('description', title + '\n' + description);
       return this.selected && this.validate(title) && this.save(title, description);
     }, 175);
+  }
+
+  private preview() {
+    if (!this.selected) {
+      return;
+    }
+
+    if (!this.selected.view) {
+      this.controls.noteView.html.innerHTML = this.controls.noteView.editor.render();
+      this.controls.noteView.html.style.display = '';
+      this.controls.noteView.preview.classList.add('checked');
+      this.selected.view = true;
+    } else {
+      this.removePreview();
+      this.controls.noteView.editor.focus();
+      this.selected.view = false;
+    }
+  }
+
+  private removePreview() {
+    this.controls.noteView.html.style.display = 'none';
+    this.controls.noteView.preview.classList.remove('checked');
   }
 
   private validate(title: string, animate: boolean = false): boolean {

@@ -87,6 +87,14 @@ export class Note {
     }
   }
 
+  public get view(): boolean {
+    return !!this.note.view;
+  }
+
+  public set view(value: boolean) {
+    this.note.view = value;
+  }
+
   public set onclick(event: EventListener) {
     if (this.event) {
       this.element.removeEventListener('mousedown', this.prevent);

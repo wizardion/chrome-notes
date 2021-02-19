@@ -13,8 +13,9 @@ function init() {
     database = window.openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
     database.transaction(function (tx) {
       var createSQL = 'CREATE TABLE IF NOT EXISTS Notes' + 
-                      '(title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, sync BOOLEAN NOT NULL,' + 
-                      ' view BOOLEAN NOT NULL updated REAL, created REAL)';
+                      '(title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, ' + 
+                      'sync BOOLEAN NOT NULL DEFAULT false, view BOOLEAN NOT NULL DEFAULT false, ' +
+                      'updated REAL, created REAL)';
       tx.executeSql(createSQL, null);
     });
 

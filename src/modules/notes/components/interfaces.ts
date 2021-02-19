@@ -25,6 +25,8 @@ interface INoteView extends IView {
 
   editorControlls?: HTMLElement[];
   editor?: Editor;
+  preview?: HTMLButtonElement;
+  html?: HTMLElement;
 }
 
 interface INewNoteView extends IView {

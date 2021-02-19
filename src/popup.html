@@ -12,29 +12,38 @@
           <button id="delete-note" class="button delete">{{> ./images/delete.svg}}</button>
           <button id="create-note" class="button save"></button>
           <button id="cancel-note" class="button back cancel">{{> ./images/back.svg}} Cancel</button>
+          <button id="preview-note" style="right: 35px;" class="button preview">{{> ./images/link.svg}}</button>
+
           <div id="editor-controlls" class="editor-controlls">
+            <!-- <fieldset style="position: absolute; left: 75px;">
+              <div action="sync" title="Redo Ctrl+Shift+Z" class="button">{{> ./images/removeFormat.svg}}</div>
+            </fieldset> -->
             <fieldset><!--
-            --><div action="bold" title="Bold Ctrl+B" class="button">{{> ./images/bold.svg}}</div><!--
-            --><div action="italic" title="Italic Ctrl+I" class="button">{{> ./images/italic.svg}}</div><!--
-            --><div action="underline" title="Underline Ctrl+U" class="button">{{> ./images/underline.svg}}</div><!--
-            --><div action="strikethrough" title="Strikethrough Ctrl+Y" class="button">{{> ./images/strikethrough.svg}}</div><!--
-            --><div action="link" title="Link Ctrl+L" class="button">{{> ./images/link.svg}}</div>
+            --><div action="bold" key="Cmd-B" title="Bold Ctrl+B" class="button">{{> ./images/bold.svg}}</div><!--
+            --><div action="italic" key="Cmd-I" title="Italic Ctrl+I" class="button">{{> ./images/italic.svg}}</div><!--
+            --><!--<div action="underline" title="Underline Ctrl+U" class="button">{{> ./images/underline.svg}}</div>--><!--
+            --><div action="strikethrough" key="Cmd-Y" title="Strikethrough Ctrl+Y" class="button">{{> ./images/strikethrough.svg}}</div><!--
+            --><div action="link" key="Cmd-L" title="Link Ctrl+L" class="button">{{> ./images/link.svg}}</div>
             </fieldset>
             <fieldset><!--
-            --><div action="insertOrderedList" title="Point List Ctrl+O" class="button">{{> ./images/insertOrderedList.svg}}</div><!--
-            --><div action="insertUnorderedList" title="Ordered List Ctrl+P" class="button">{{> ./images/insertUnorderedList.svg}}</div>
+            --><div action="insertOrderedList" key="Cmd-O" title="Ordered List Ctrl+O" class="button">{{> ./images/insertOrderedList.svg}}</div><!--
+            --><div action="insertUnorderedList" key="Cmd-U" title="Unordered List Ctrl+P" class="button">{{> ./images/insertUnorderedList.svg}}</div>
             </fieldset>
             <fieldset>
-              <div action="removeFormat" title="Remove Format Ctrl+G" class="button">{{> ./images/removeFormat.svg}}</div>
+              <div action="removeFormat" key="Cmd-G" title="Remove Format Ctrl+G" class="button">{{> ./images/removeFormat.svg}}</div>
             </fieldset>
             <fieldset><!--
             --><div action="undo" title="Undo Ctrl+Z" class="button">{{> ./images/undo.svg}}</div><!--
             --><div action="redo" title="Redo Ctrl+Shift+Z" class="button">{{> ./images/redo.svg}}</div>
             </fieldset>
+            <!-- <fieldset style="position: absolute; right: 35px;">
+              <div action="view" title="Redo Ctrl+Shift+Z" class="button">{{> ./images/removeFormat.svg}}</div>
+            </fieldset> -->
           </div>
         </div>
         
         <div id="content" class="content">
+          <pre id="html-preview" class="content-description" style="display: none;" tabindex="2"></pre>
           <textarea id="description-note" class="content-description" placeholder="Enter a title...&#10;write a note..."></textarea>
         </div>
       </div>

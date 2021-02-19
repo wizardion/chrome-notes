@@ -35,8 +35,8 @@ export class DbNote implements INote {
           result.rows.item(i)['displayOrder'],
           result.rows.item(i)['updated'],
           result.rows.item(i)['created'],
-          result.rows.item(i)['sync'],
-          result.rows.item(i)['view']
+          <boolean>(result.rows.item(i)['sync'] === 'true'),
+          <boolean>(result.rows.item(i)['view'] === 'true')
         ));
       }
 
