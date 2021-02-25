@@ -96,6 +96,15 @@ export class Note {
     this.note.setPreview();
   }
 
+  public get sync(): boolean {
+    return !!this.note.sync;
+  }
+
+  public set sync(value: boolean) {
+    this.note.sync = value;
+    this.note.setSync();
+  }
+
   public set onclick(event: EventListener) {
     if (this.event) {
       this.element.removeEventListener('mousedown', this.prevent);

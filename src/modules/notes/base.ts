@@ -22,6 +22,7 @@ export class Base {
     this.controls.noteView.back.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.noteView.delete.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.noteView.preview.addEventListener('mousedown', this.prevent.bind(this));
+    this.controls.noteView.sync.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.create.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 
@@ -29,6 +30,7 @@ export class Base {
     this.controls.noteView.back.addEventListener('click', this.backToList.bind(this));
     this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.controls.noteView.preview.addEventListener('click', this.previewClick.bind(this));
+    this.controls.noteView.sync.addEventListener('click', this.syncClick.bind(this));
     this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
     this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
 
@@ -139,6 +141,7 @@ export class Base {
 
       this.selected = note;
       this.controls.noteView.preview.checked = this.selected.preview;
+      this.controls.noteView.sync.checked = this.selected.sync;
 
       localStorage.setItem('description', value);
       localStorage.setItem('index', note.index.toString());
@@ -262,6 +265,10 @@ export class Base {
       this.selected.preview = false;
       localStorage.removeItem('html');
     }
+  }
+
+  private syncClick() {
+    this.selected.sync = this.controls.noteView.sync.checked;
   }
 
   private showPreview(value?: string) {
