@@ -83,6 +83,14 @@ export class Editor {
     this.codemirror.clearHistory();
   }
 
+  public get scrollTop(): number {
+    return this.codemirror.getScrollInfo().top;
+  }
+
+  public set scrollTop(top: number) {
+    this.codemirror.scrollTo(0, top);
+  }
+
   public on(event: string, callback: Function) {
     this.codemirror.on(event, () => callback());
   }
@@ -146,6 +154,14 @@ export class Editor {
     var html = this.md.render(text);
 
     return `<div class="preview-title">${title}</div>${html}`;
+  }
+
+  public hide() {
+    this.wrapper.style.display = 'none';
+  }
+
+  public show() {
+    this.wrapper.style.display = '';
   }
 
   private command(action: Function, ...args: any[]) {

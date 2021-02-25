@@ -5,22 +5,22 @@ export class DbNote implements INote {
   public id: number;
   public title: string;
   public description: string;
-  public displayOrder: number;
+  public viewOrder: number;
   public sync: boolean;
-  public view: boolean;
+  public preview: boolean;
   public updated: number;
   public created: number;
 
-  constructor(id: number, title: string, description: string, order: number,
-    updated: number, created: number, sync: boolean = false, view: boolean = false) {
+  constructor(id: number, title: string, description: string, viewOrder: number,
+    updated: number, created: number, sync: boolean = false, preview: boolean = false) {
     this.id = id;
     this.title = title;
     this.description = description;
-    this.displayOrder = order;
+    this.viewOrder = viewOrder;
     this.updated = updated;
     this.created = created;
     this.sync = sync;
-    this.view = view;
+    this.preview = preview;
   }
 
   public static loadAll(callback: Function, errorCallback?: Function) {
@@ -32,11 +32,11 @@ export class DbNote implements INote {
           result.rows.item(i)['id'],
           result.rows.item(i)['title'],
           result.rows.item(i)['description'],
-          result.rows.item(i)['displayOrder'],
+          result.rows.item(i)['viewOrder'],
           result.rows.item(i)['updated'],
           result.rows.item(i)['created'],
           <boolean>(result.rows.item(i)['sync'] === 'true'),
-          <boolean>(result.rows.item(i)['view'] === 'true')
+          <boolean>(result.rows.item(i)['preview'] === 'true')
         ));
       }
 
@@ -62,6 +62,14 @@ export class DbNote implements INote {
 
   public setOrder() {
     db.setOrder(this);
+  }
+
+  public setPreview() {
+    db.setFlag('preview', this.preview, this.id);
+  }
+
+  public setSync() {
+    db.setFlag('sync', this.sync, this.id);
   }
 
   private noteAdded(result: SQLResultSet){

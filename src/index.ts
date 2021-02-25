@@ -3,6 +3,8 @@ import {Editor} from './modules/notes/editor';
 import {Base} from './modules/notes/base';
 import './styles/style.scss';
 
+var html = localStorage.getItem('html');
+var preview = !!html;
 var isNew = localStorage.getItem('new');
 var selection = localStorage.getItem('selection');
 var description = localStorage.getItem('description');
@@ -28,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
       node: noteView,
       back: <HTMLButtonElement>document.getElementById('to-list'),
       delete: <HTMLButtonElement>document.getElementById('delete-note'),
-      preview: <HTMLButtonElement>document.getElementById('preview-note'),
+      preview: <HTMLInputElement>document.getElementById('preview-note'),
+      sync: <HTMLInputElement>document.getElementById('sync-note'),
       html: <HTMLElement>document.getElementById('html-preview'),
       editor: codemirror
     },
@@ -46,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNew) {
       editor.selectNew(description, selection);
     } else {
-      editor.showNote(description, true, selection);
+      editor.showNote(description, true, selection, preview, html);
     }    
   } else {
     editor.showList();

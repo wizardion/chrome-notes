@@ -25,7 +25,8 @@ interface INoteView extends IView {
 
   editorControlls?: HTMLElement[];
   editor?: Editor;
-  preview?: HTMLButtonElement;
+  preview?: HTMLInputElement;
+  sync?: HTMLInputElement;
   html?: HTMLElement;
 }
 

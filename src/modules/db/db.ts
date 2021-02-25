@@ -13,8 +13,8 @@ function init() {
     database = window.openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
     database.transaction(function (tx) {
       var createSQL = 'CREATE TABLE IF NOT EXISTS Notes' + 
-                      '(title TEXT, description TEXT, displayOrder UNSIGNED INTEGER, ' + 
-                      'sync BOOLEAN NOT NULL DEFAULT false, view BOOLEAN NOT NULL DEFAULT false, ' +
+                      '(title TEXT, description TEXT, viewOrder UNSIGNED INTEGER, ' + 
+                      'sync BOOLEAN NOT NULL DEFAULT false, preview BOOLEAN NOT NULL DEFAULT false, ' +
                       'updated REAL, created REAL)';
       tx.executeSql(createSQL, null);
     });
@@ -26,7 +26,7 @@ function init() {
 }
 
 function executeSql(tx: SQLTransaction, sql: string, data: ObjectArray,
-  callback?: Function, errorCallback?: Function) {
+                    callback?: Function, errorCallback?: Function) {
   tx.executeSql(sql, data, (tx: SQLTransaction, result: SQLResultSet) => {
     if (callback) {
       callback(result);
@@ -35,7 +35,7 @@ function executeSql(tx: SQLTransaction, sql: string, data: ObjectArray,
     if (errorCallback) {
       errorCallback(error);
     }
-    console.error(error.code, error.message);
+    console.error(error.code, error.message, sql);
     return true;
   });
 }
@@ -65,23 +65,23 @@ function execBatchTransaction(callback?: Function, errorCallback?: Function) {
 }
 
 function load(callback: Function, errorCallback?: Function) {
-  let sql = 'SELECT rowid as id, * FROM Notes ORDER BY displayOrder ASC';
+  let sql = 'SELECT rowid as id, * FROM Notes ORDER BY viewOrder ASC';
   execTransaction(sql, [], callback, errorCallback);
 };
 
 function update(item: INote, callback?: Function, errorCallback?: Function) {
-  var sql = 'UPDATE Notes SET title=?, description=?, displayOrder=?, sync=?, view=?, updated=? ' + 
+  var sql = 'UPDATE Notes SET title=?, description=?, viewOrder=?, sync=?, preview=?, updated=? ' + 
             'WHERE rowid=?';
-  var data = [item.title, item.description, item.displayOrder, item.sync, item.view, item.updated, item.id];
+  var data = [item.title, item.description, item.viewOrder, item.sync, item.preview, item.updated, item.id];
 
   execTransaction(sql, data, callback, errorCallback);
 };
 
 function add(item: INote, callback?: Function, errorCallback?: Function) {
-  var sql = 'INSERT INTO Notes(title, description, displayOrder, sync, view, updated, created) ' + 
+  var sql = 'INSERT INTO Notes(title, description, viewOrder, sync, preview, updated, created) ' + 
             'VALUES(?,?,?,?,?,?,?)';
   var data = [
-    item.title, item.description, item.displayOrder, item.sync, item.view, item.updated, item.updated
+    item.title, item.description, item.viewOrder, item.sync, item.preview, item.updated, item.updated
   ];
 
   execTransaction(sql, data, callback, errorCallback);
@@ -96,9 +96,17 @@ function remove(id: number, callback?: Function, errorCallback?: Function) {
 
 function setOrder(item: INote) {
   batchSql.push({
-    sqlStatement: 'UPDATE Notes SET displayOrder=? WHERE rowid=?',
-    data: [item.displayOrder, item.id]
+    sqlStatement: 'UPDATE Notes SET viewOrder=? WHERE rowid=?',
+    data: [item.viewOrder, item.id]
   });
+};
+
+function setFlag(flag: string, value: (boolean|number), id: number, 
+                 callback?: Function, errorCallback?: Function) {
+  var sql = `UPDATE Notes SET ${flag}=? WHERE rowid=?`;
+  var data = [value, id];
+
+  execTransaction(sql, data, callback, errorCallback);
 };
 
 function saveQueue(errorCallback?: Function) {
@@ -111,6 +119,7 @@ export default {
   add: add,
   update: update,
   setOrder: setOrder,
+  setFlag: setFlag,
   saveQueue: saveQueue,
   remove: remove,
 };

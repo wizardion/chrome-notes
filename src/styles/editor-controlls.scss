@@ -8,30 +8,8 @@
   height: 17px;
   margin: 3px 1px 0 0;
   background: rgba(7, 166, 152, 0.015);
-  border: 1px solid rgba(7, 166, 152, 0.025);
   border-color: transparent;
   border: 1px solid rgba(7, 166, 152, 0.035);
-}
-
-.editor-controlls .button.preview {
-  color: #07a698;
-  fill:#07a698;
-  background: rgba(7, 166, 152, 0.085);
-  border: 1px solid rgba(7, 166, 152, 0.065);
-}
-
-.editor-controlls .button.preview:hover {
-  background: rgba(7, 166, 152, 0.085);
-}
-
-.editor-controlls .button.preview:active {
-  background: rgba(7, 166, 152, 0.085);
-  opacity: 0.85;
-}
-
-.editor-controlls .button.bold .svg-icon path {
-  color: red;
-  fill: red;
 }
 
 .editor-controlls .button:hover {
@@ -47,6 +25,74 @@
   color: #07a698;
   fill:#07a698;
 }
+
+// ------------------------------------------------
+.checkbox {
+  cursor: pointer;
+  position: relative;
+  
+  width: 28px;
+  height: 17px;
+  margin: 3px 1px 0 0;
+  
+  border: 1px solid transparent;
+
+  color: #07a69875;
+  fill:#07a69875;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.checkbox.edit {
+  position: absolute;
+  right: 35px;
+}
+
+.checkbox.sync {
+  position: absolute;
+  right: 63px;
+}
+
+.checkbox input {
+  cursor: pointer;
+  position: absolute;
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+.checkbox span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 17px;
+}
+
+.checkbox input ~ .checkmark .active {
+  display: none;
+}
+
+.checkbox input ~ .checkmark .inactive {
+  display: block;
+}
+
+.checkbox input:checked ~ .checkmark {
+  color: #07a698;
+  fill:#07a698;
+}
+
+.checkbox input:checked ~ .checkmark .active {
+  display: block;
+}
+
+.checkbox input:checked ~ .checkmark .inactive {
+  display: none;
+}
+// ------------------------------------------------
 
 .editor-controlls fieldset {
   border: none;

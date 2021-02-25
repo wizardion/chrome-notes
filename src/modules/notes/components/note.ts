@@ -52,8 +52,8 @@ export class Note {
   public set index(value: number) {
     if (this.indexId !== value) {
       this.indexId = value;
-      this.note.displayOrder = value + 1;
-      this.controls.bullet.innerText = `${(this.note.displayOrder)}`;
+      this.note.viewOrder = value + 1;
+      this.controls.bullet.innerText = `${(this.note.viewOrder)}`;
       this.note.setOrder();
     }
   }
@@ -87,12 +87,13 @@ export class Note {
     }
   }
 
-  public get view(): boolean {
-    return !!this.note.view;
+  public get preview(): boolean {
+    return !!this.note.preview;
   }
 
-  public set view(value: boolean) {
-    this.note.view = value;
+  public set preview(value: boolean) {
+    this.note.preview = value;
+    this.note.setPreview();
   }
 
   public set onclick(event: EventListener) {

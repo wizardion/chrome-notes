@@ -2,9 +2,9 @@ export interface INote {
   id: number;
   title: string;
   description: string;
-  displayOrder: number;
+  viewOrder: number;
   sync: boolean;
-  view: boolean;
+  preview: boolean;
   updated: number;
   created: number;
 }

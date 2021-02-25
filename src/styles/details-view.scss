@@ -35,11 +35,12 @@
   height: 244px;
 }
 
-// --------------------------------------------------------
-.content-description > * {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
+// -----------------------------------------------------------------------------------------------------------
+// REFACTOR
+// .content-description > * {
+//   margin-top: 20px;
+//   margin-bottom: 20px;
+// }
 
 .content-description > p {
   white-space: pre-wrap;
@@ -139,7 +140,7 @@
 .edit-title.details::selection {
   background: #07a6983d;
 }
-
+// -----------------------------------------------------------------------------------------------------------
 .back
 {
   width: inherit;
@@ -164,21 +165,6 @@
 
 .button.delete svg {
   margin-top: 3px;
-}
-
-.button.preview {
-  position: absolute;
-  width: 30px;
-  right: 35px;
-}
-
-.button.preview svg {
-  margin-top: 4px;
-}
-
-.button.checked {
-  fill: darkgrey;
-  color: darkgrey;
 }
 
 .details-view .button.save {
@@ -212,7 +198,14 @@
 
 @import 'editor-controlls';
 
-// .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+
+// .preview-title {
+//   text-align: center;
+//   color: #06736a !important;
+//   font-weight: bold !important;
+//   font-style: normal !important;
+//   max-height: 35px;
+// }
 
 .preview-title {
   text-align: center;
@@ -220,4 +213,7 @@
   font-weight: bold !important;
   font-style: normal !important;
   max-height: 35px;
+  font-size: 17px !important;
+  margin-left: 0px !important;
+  margin-top: 10px;
 }
