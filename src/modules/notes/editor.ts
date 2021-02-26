@@ -2,8 +2,7 @@ import 'codemirror/mode/markdown/markdown.js'
 import 'codemirror/lib/codemirror.css';
 import '../../styles/codemirror.scss';
 import {fromTextArea, EditorFromTextArea, KeyMap, Position, commands} from 'codemirror';
-import * as MarkdownIt from 'markdown-it';
-const taskLists = require('markdown-it-task-lists');
+import {MDRender} from './components/md-render';
 
 
 interface IRange {
@@ -19,7 +18,7 @@ interface ISelection {
 }
 
 export class Editor {
-  private md: MarkdownIt.MarkdownIt;
+  private md: MDRender;
   private codemirror: EditorFromTextArea;
   public wrapper: HTMLTextAreaElement;
   public scroll: HTMLElement;
@@ -37,7 +36,7 @@ export class Editor {
   };
 
   constructor(textarea: HTMLTextAreaElement, controls?: NodeList) {
-    this.md = new MarkdownIt({linkify: true}).use(taskLists);
+    this.md = new MDRender();
     this.codemirror = fromTextArea(textarea, {
       lineWrapping: true,
       showCursorWhenSelecting: true,
@@ -153,7 +152,7 @@ export class Editor {
     var [title, text] = this.getData();
     var html = this.md.render(text);
 
-    return `<div class="preview-title">${title}</div>${html}`;
+    return `<div class="title">${title}</div>${html}`;
   }
 
   public hide() {
@@ -181,7 +180,7 @@ export class Editor {
 
   private removeFormat(text: string) {
     var html = this.md.render(text).replace(/(th|td)\>\n\<(th|td)/gi, '$1\> \<$2');
-    var dirt = this.md.utils.unescapeAll(html.replace(/(<([^>]+)>)/gi, ''));
+    var dirt = this.md.unescapeAll(html.replace(/(<([^>]+)>)/gi, ''));
     var plain = dirt.replace(/^[\s\n\r]+|[\s\n\r]+$|(\n)[\s\n\r]+/gi, '$1');
 
     this.codemirror.replaceSelection(plain, 'around');
