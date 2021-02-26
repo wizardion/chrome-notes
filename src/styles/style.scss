@@ -59,10 +59,10 @@ input, button {
   fill:#e33636;
 }
 
-// .button:active
-// {
-//   // opacity: 0.5;
-// }
+.button:active
+{
+  opacity: 0.5;
+}
 
 @import 'list-view';
 @import 'details-view';

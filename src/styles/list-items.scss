@@ -21,7 +21,11 @@
 .list-view .list-item:active {
   color: #06736a;
   background:rgba(7, 166, 152, 0.045);
-  // opacity: 0.75;
+}
+
+// TODO review
+.list-view .list-item:active .to-note {
+  opacity: 0.5;
 }
 
 .list-view .list-item.edit-item:hover {
