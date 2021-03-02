@@ -21,8 +21,8 @@ export class Base {
     this.controls.listView.addButton.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.noteView.back.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.noteView.delete.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.noteView.preview.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.noteView.sync.addEventListener('mousedown', this.prevent.bind(this));
+    this.controls.noteView.preview.parentElement.addEventListener('mousedown', this.prevent.bind(this));
+    this.controls.noteView.sync.parentElement.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.create.addEventListener('mousedown', this.prevent.bind(this));
     this.controls.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 

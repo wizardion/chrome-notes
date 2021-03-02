@@ -15,16 +15,19 @@
 .hold .list-item.drag:hover {
   cursor: pointer;
   color: #06736a;
-  background:rgba(7, 166, 152, 0.025);
+  background: linear-gradient(to right, #07a69810, #07a69801);
 }
 
 .list-view .list-item:active {
-  color: #06736a;
-  background:rgba(7, 166, 152, 0.045);
+  color: #06736a99;
+  background: linear-gradient(to right, #07a69809, #07a69801);
 }
 
-// TODO review
-.list-view .list-item:active .to-note {
+.list-view .list-item:active .date-time{
+  color: #07a69899;
+}
+
+.list-view .list-item:active .sort{
   opacity: 0.5;
 }
 
@@ -65,7 +68,7 @@
 }
 
 .sort[disabled]:hover, 
-.sort[disabled]:active, 
+.sort[disabled]:active,
 .list-view .list-item:hover .sort[disabled] {
   background-image: url('../images/sort-note.png') !important;
   opacity: 0.5 !important;
@@ -75,6 +78,11 @@
 .list-view .hold .list-item.drag:hover .sort,
 .sort:active {
   background-image: url('../images/sort-note-active.png');
+}
+
+.list-view .list-item:active .sort {
+  background-image: url('../images/sort-note-active.png');
+  opacity: 0.5;
 }
 
 .to-note, 
@@ -91,10 +99,15 @@
   background-image: url('../images/to-note-active.png');
 }
 
+.list-view .list-item:active .to-note {
+  background-image: url('../images/to-note-active.png');
+  opacity: 0.5;
+}
+
 .list-view .list-item.drag
 {
   position: absolute;
-  background-color: #f4fbfb !important;  
+  background: linear-gradient(to right, #e9f8f7, white) !important;
   left: 2px;
   right: 4px;
   border-bottom: 1px solid transparent !important;
@@ -107,6 +120,11 @@
 .list-view .list-item.drag .sort {
   margin-left: -5px;
   margin-right: 7px;
+  margin-top: -1px;
+}
+
+.list-view .list-item.drag .date-time{
+  color:#07a698 !important;
 }
 
 .hold {
