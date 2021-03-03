@@ -28,25 +28,31 @@
   background: #d9e9e9;
 }
 
-.CodeMirror-line:first-child {
+.CodeMirror-code > .CodeMirror-line:first-child {
   text-align: center;
-  color: #06736a !important;
-  font-weight: bold !important;
-  font-style: normal !important;
-  max-height: 35px;
+  padding: 5px 0px 10px 0px;
 }
 
-.CodeMirror-line:first-child>span::before,
-.CodeMirror-line:first-child>span::after {
-  content: ' ';
-  display: block;
-  height: 5px;
+.CodeMirror-code > .CodeMirror-line:first-child > span {
+  font-weight: bold;
+  font-style: normal;
+  font-size: 17px;
 }
 
-.CodeMirror-line:first-child span {
-  color: #06736a !important;
-  font-weight: bold !important;
-  font-size: 17px !important;
-  margin-left: 0px !important;
-  font-style: normal !important;
+.CodeMirror-code > .CodeMirror-line:first-child span {
+  color: #06736a;
 }
+
+.CodeMirror-line .cm-link {
+  // color: #00c;
+  color: #06736a;
+}
+
+.CodeMirror-line .cm-header {
+  color: black;
+}
+
+// .CodeMirror-line .cm-url {
+//   // color: #a11;
+//   // color: #e33636;
+// }
