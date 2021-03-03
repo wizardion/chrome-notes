@@ -1,27 +1,27 @@
 .content-preview {
   outline: none;
-    margin: 0;
-    resize: none;
-    border: none;
-    background: transparent;
-    flex: 1 1 auto;
-    white-space: normal;
-    word-break: break-word;
-    font-weight: 400;
-    display: inline-block;
-    width: 100%;
-    min-height: 203px;
-    box-sizing: border-box;
-    line-height: 20px;
-    padding: 7px;
-    padding-right: 3px;
-    padding-bottom: 0px;
-    padding-top: 0px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    height: 241px !important;
-    font-size: 14px;
-    font-family: monospace, 'Ubuntu2', sans-serif;
+  margin: 0;
+  resize: none;
+  border: none;
+  background: transparent;
+  flex: 1 1 auto;
+  white-space: normal;
+  word-break: break-word;
+  font-weight: 400;
+  display: inline-block;
+  width: 100%;
+  min-height: 203px;
+  box-sizing: border-box;
+  line-height: 20px;
+  padding: 7px;
+  padding-right: 3px;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: 241px !important;
+  font-size: 14px;
+  font-family: monospace, 'Ubuntu2', sans-serif;
 }
 
 .content-preview .title {
@@ -29,11 +29,14 @@
   color: #06736a !important;
   font-weight: bold !important;
   font-style: normal !important;
-  max-height: 35px;
   font-size: 17px !important;
+  line-height: 21px;
   margin-left: -1px !important;
-  margin-top: 10px;
-  margin-bottom: -10px;
+  padding: 10px 5px 10px 5px;
+}
+
+.content-preview .title + p {
+  margin-top: 0px;
 }
 
 .content-preview > p {
@@ -42,33 +45,12 @@
   margin-bottom: 20px;
 }
 
-// reviewing
-.content-preview > p + ul,
-.content-preview > p + ol,
-.content-preview h1 + * {
-  margin-top: -20px;
-}
-
-.content-preview h1 {
-  font-size: 110%;
-  margin-left: 10px;
-}
-
 .content-preview ul, ul,
 .content-preview ol {
   margin: -1px;
   padding-left: 30px;
   white-space: normal;
 }
-
-/* .content-preview ul li:first-child::selection {
-  background: red;
-  height: 30px;
-} */
-
-/* .content-preview ol li {
-  line-height: normal;
-} */
 
 .content-preview ul li:first-child,
 .content-preview ol li:first-child {
@@ -81,22 +63,117 @@
 }
 
 .content-preview a {
-  // color: dodgerblue;
-  text-decoration: none;
   color: #06736a;
 }
 
 .content-preview a:hover {
   text-decoration: underline !important;
+  color: #e33636;
 }
 
-.content-preview a:visited,
 .content-preview a:active {
+  color: #a32626;
+}
+
+.content-preview a:visited {
+  // color: #0673Aa;
   color: #06736a;
 }
 
 .content-preview::selection,
 .content-preview ::selection,
 .edit-title.details::selection {
-  background: #07a6983d;
+  // background: #07a6983d;
+  background: #d9e9e9;
+}
+
+.content-preview table {
+  border-spacing: 0;
+  border-collapse: collapse;
+
+  display: block;
+  width: 100%;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.content-preview table tr {
+  background-color: white;
+  border-top: 1px solid #c6cbd1;
+}
+
+.content-preview table td, .content-preview table th {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+.content-preview table th {
+  font-weight: 600;
+  text-align: left;
+}
+
+.content-preview table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+.content-preview p code {
+  background: ghostwhite;
+  background-color: #f6f8fa;
+
+  border: 1px solid transparent;
+  // border: 1px solid lightgray;
+
+  border-radius: 2px;
+  padding: 1px 4px 1px 4px;
+  margin: 0;
+  // color: #06736a;
+}
+
+.content-preview pre {
+  display: block;
+  background: ghostwhite;
+  background-color: #f6f8fa;
+
+  border: 1px solid lightgray;
+  border-radius: 2px;
+  padding: 2px 7px 2px 7px;
+  color: #06736a;
+  font-family: Courier,monospace;
+  margin: 3px 0px 3px 0;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.content-preview > h1 + *,
+.content-preview > h2 + *,
+.content-preview > h3 + *,
+.content-preview > h4 + *,
+.content-preview > h5 + *,
+.content-preview > h6 + * {
+  margin-top: 2px !important;
+}
+
+.content-preview h1, 
+.content-preview h2,
+.content-preview h3,
+.content-preview h4,
+.content-preview h5,
+.content-preview h6 {
+  padding-bottom: .2em;
+  border-bottom: 1px solid #eaecef;
+  margin: 0;
+  font-size: 100%;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+.content-preview > p + ul,
+.content-preview > p + ol,
+.content-preview p + pre,
+.content-preview p + table {
+  margin-top: -20px;
 }
