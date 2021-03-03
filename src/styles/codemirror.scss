@@ -30,13 +30,26 @@
 
 .CodeMirror-code > .CodeMirror-line:first-child {
   text-align: center;
-  padding: 5px 0px 10px 0px;
 }
 
 .CodeMirror-code > .CodeMirror-line:first-child > span {
   font-weight: bold;
   font-style: normal;
   font-size: 17px;
+  line-height: 21px;
+}
+
+.CodeMirror-code > .CodeMirror-line:first-child > span::before {
+  content: ' ';
+  display: block;
+  height: 5px;
+}
+
+.CodeMirror-code > .CodeMirror-line:first-child > span::after {
+  content: ' ';
+  display: block;
+  height: 10px;
+  margin-bottom: -21px;
 }
 
 .CodeMirror-code > .CodeMirror-line:first-child span {
