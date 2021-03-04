@@ -287,6 +287,7 @@ export class Base {
     this.controls.noteView.html.style.display = 'none';
   }
 
+  // TODO Review
   private validate(title: string, animate: boolean = false): boolean {
     return !Validator.required(title, animate && this.controls.noteView.editor.wrapper);
   }

@@ -43,8 +43,9 @@ export class Editor {
     this.codemirror = fromTextArea(textarea, {
       lineWrapping: true,
       showCursorWhenSelecting: true,
-      spellcheck: true,
-      autocorrect: true,
+      // spellcheck: true,
+      // autocorrect: true,
+      // inputStyle: 'contenteditable',
       mode: {
         name: 'markdown',
       }

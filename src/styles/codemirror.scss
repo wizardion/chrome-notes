@@ -28,6 +28,12 @@
   background: #d9e9e9;
 }
 
+.CodeMirror-line::selection, 
+.CodeMirror-line > span::selection, 
+.CodeMirror-line > span > span::selection {
+  background: #d9e9e9; 
+}
+
 .CodeMirror-code > .CodeMirror-line:first-child {
   text-align: center;
 }
