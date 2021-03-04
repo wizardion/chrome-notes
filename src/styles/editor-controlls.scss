@@ -7,13 +7,22 @@
   width: 28px;
   height: 17px;
   margin: 3px 1px 0 0;
-  background: rgba(7, 166, 152, 0.015);
-  border-color: transparent;
-  border: 1px solid rgba(7, 166, 152, 0.035);
+  background: #07a69804;
+  border: 1px solid #07a69809;
+}
+
+.editor-controlls .button.disabled,
+.editor-controlls .button.disabled:hover,
+.editor-controlls .button.disabled:active {
+  cursor: inherit;
+  color: #d9e9e9;
+  fill:#d9e9e9;
+  background: #07a69804;
+  border-color: #07a69804;
+  opacity: 1;
 }
 
 .editor-controlls .button:hover {
-  background: rgba(7, 166, 152, 0.035);
   background: rgba(7, 166, 152, 0.055);
   color: #07a698;
   fill:#07a698;

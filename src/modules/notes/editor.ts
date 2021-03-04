@@ -18,8 +18,10 @@ interface ISelection {
 }
 
 export class Editor {
+  private visible: boolean;
   private md: MDRender;
   private codemirror: EditorFromTextArea;
+  private controls: NodeList;
   public wrapper: HTMLTextAreaElement;
   public scroll: HTMLElement;
 
@@ -31,15 +33,18 @@ export class Editor {
     'insertUnorderedList':  () => this.command(this.insertList, '- '),
     'removeFormat':         () => this.command(this.removeFormat),
     'link':                 () => this.command(this.insertLink),
-    'undo':                 () => this.codemirror.undo(),
-    'redo':                 () => this.codemirror.redo(),
+    'undo':                 () => this.visible && this.codemirror.undo(),
+    'redo':                 () => this.visible && this.codemirror.redo(),
   };
 
   constructor(textarea: HTMLTextAreaElement, controls?: NodeList) {
     this.md = new MDRender();
+    this.controls = controls;
     this.codemirror = fromTextArea(textarea, {
       lineWrapping: true,
       showCursorWhenSelecting: true,
+      spellcheck: true,
+      autocorrect: true,
       mode: {
         name: 'markdown',
       }
@@ -47,13 +52,14 @@ export class Editor {
 
     this.wrapper = <HTMLTextAreaElement>this.codemirror.getWrapperElement();
     this.scroll = this.wrapper.querySelector('.CodeMirror-vscrollbar');
-    this.init(controls);
+    this.init();
+    this.visible = true;
   }
 
-  private init(controls?: NodeList) {
+  private init() {
     var mapping: KeyMap = {};
 
-    controls.forEach((item: HTMLElement) => {
+    this.controls.forEach((item: HTMLElement) => {
       const action: string = item.getAttribute('action');
       const key: string = item.getAttribute('key');
       const event: EventListener = this.actions[action];
@@ -156,18 +162,24 @@ export class Editor {
   }
 
   public hide() {
+    this.visible = false;
     this.wrapper.style.display = 'none';
+    this.controls.forEach((item: HTMLElement) => item.classList.add('disabled'));
   }
 
   public show() {
+    this.visible = true;
     this.wrapper.style.display = '';
+    this.controls.forEach((item: HTMLElement) => item.classList.remove('disabled'));
   }
 
   private command(action: Function, ...args: any[]) {
-    var text = this.codemirror.getSelection().trim();
+    if (this.visible) {
+      var text = this.codemirror.getSelection().trim();
 
-    if (text.length) {
-      action.call(this, text, ...args);
+      if (text.length) {
+        action.call(this, text, ...args);
+      }
     }
   }
 
