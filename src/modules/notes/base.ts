@@ -1,4 +1,4 @@
-import {IControls} from './components/interfaces';
+import {IListView, INewNoteView, INoteView} from './components/interfaces';
 import {DbNote} from '../db/note';
 import {Note} from './components/note';
 import {Validator} from './components/validation';
@@ -7,39 +7,44 @@ import {ScrollListener} from './components/scrolling';
 
 
 export class Base {
-  private controls: IControls;
   private notes: Note[];
   private selected?: Note;
   private interval?: NodeJS.Timeout;
   private cursorInterval?: NodeJS.Timeout;
 
-  constructor(elements: IControls) {
+  private listView: IListView;
+  private noteView: INoteView;
+  private newView: INewNoteView;
+
+  constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     this.notes = [];
-    this.controls = elements;
     this.selected = null;
+    this.listView = listView;
+    this.noteView = noteView;
+    this.newView = newView;
 
-    this.controls.listView.addButton.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.noteView.back.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.noteView.delete.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.noteView.preview.parentElement.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.noteView.sync.parentElement.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.newView.create.addEventListener('mousedown', this.prevent.bind(this));
-    this.controls.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
+    this.listView.addButton.addEventListener('mousedown', this.prevent.bind(this));
+    this.noteView.back.addEventListener('mousedown', this.prevent.bind(this));
+    this.noteView.delete.addEventListener('mousedown', this.prevent.bind(this));
+    this.noteView.preview.parentElement.addEventListener('mousedown', this.prevent.bind(this));
+    this.noteView.sync.parentElement.addEventListener('mousedown', this.prevent.bind(this));
+    this.newView.create.addEventListener('mousedown', this.prevent.bind(this));
+    this.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 
-    this.controls.listView.addButton.addEventListener('click', this.selectNew.bind(this, '', null));
-    this.controls.noteView.back.addEventListener('click', this.backToList.bind(this));
-    this.controls.noteView.delete.addEventListener('click', this.remove.bind(this));
-    this.controls.noteView.preview.addEventListener('click', this.previewClick.bind(this));
-    this.controls.noteView.sync.addEventListener('click', this.syncClick.bind(this));
-    this.controls.newView.create.addEventListener('click', this.createNote.bind(this));
-    this.controls.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
+    this.listView.addButton.addEventListener('click', this.selectNew.bind(this, '', null));
+    this.noteView.back.addEventListener('click', this.backToList.bind(this));
+    this.noteView.delete.addEventListener('click', this.remove.bind(this));
+    this.noteView.preview.addEventListener('click', this.previewClick.bind(this));
+    this.noteView.sync.addEventListener('click', this.syncClick.bind(this));
+    this.newView.create.addEventListener('click', this.createNote.bind(this));
+    this.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
 
-    this.controls.noteView.editor.on('change', this.descriptionChanged.bind(this));
-    this.controls.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
+    this.noteView.editor.on('change', this.descriptionChanged.bind(this));
+    this.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
 
-    ScrollListener.listen(this.controls.listView.items);
-    ScrollListener.listen(this.controls.noteView.editor.scroll);
-    ScrollListener.listen(this.controls.noteView.html);
+    ScrollListener.listen(this.listView.items);
+    ScrollListener.listen(this.noteView.editor.scroll);
+    ScrollListener.listen(this.noteView.html);
   }
 
   public init() {
@@ -47,48 +52,48 @@ export class Base {
   }
 
   public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean, html?: string) {
-    this.controls.listView.node.style.display = 'None';
-    this.controls.noteView.node.style.display = 'inherit';
-    this.controls.noteView.back.style.display = 'inherit';
-    this.controls.noteView.delete.style.display = 'inherit';
-    this.controls.noteView.sync.parentElement.style.display = 'inherit';
-    this.controls.noteView.preview.parentElement.style.display = 'inherit';
+    this.listView.node.style.display = 'None';
+    this.noteView.node.style.display = 'inherit';
+    this.noteView.back.style.display = 'inherit';
+    this.noteView.delete.style.display = 'inherit';
+    this.noteView.sync.parentElement.style.display = 'inherit';
+    this.noteView.preview.parentElement.style.display = 'inherit';
 
     if (bind) {
-      this.controls.noteView.editor.value = description;
-      this.controls.noteView.editor.setSelection(selection);
+      this.noteView.editor.value = description;
+      this.noteView.editor.setSelection(selection);
 
       if (preview) {
         this.showPreview(html);
-        this.controls.noteView.preview.checked = true;
+        this.noteView.preview.checked = true;
       }
     }
   }
 
   public showList() {
     this.selected = null;
-    this.controls.listView.node.style.display = 'inherit';
-    this.controls.noteView.node.style.display = 'None';
+    this.listView.node.style.display = 'inherit';
+    this.noteView.node.style.display = 'None';
 
     this.hidePreview();
     localStorage.clear();
   }
 
   public selectNew(description: string, selection?: string) {
-    this.controls.listView.node.style.display = 'None';
-    this.controls.newView.node.style.display = 'inherit';
+    this.listView.node.style.display = 'None';
+    this.newView.node.style.display = 'inherit';
 
-    this.controls.newView.cancel.style.display = 'inherit';
-    this.controls.newView.create.style.display = 'inherit';
+    this.newView.cancel.style.display = 'inherit';
+    this.newView.create.style.display = 'inherit';
 
-    this.controls.noteView.back.style.display = 'none';
-    this.controls.noteView.delete.style.display = 'none';
-    this.controls.noteView.sync.parentElement.style.display = 'none';
-    this.controls.noteView.preview.parentElement.style.display = 'none';
+    this.noteView.back.style.display = 'none';
+    this.noteView.delete.style.display = 'none';
+    this.noteView.sync.parentElement.style.display = 'none';
+    this.noteView.preview.parentElement.style.display = 'none';
 
-    // this.controls.noteView.preview.checked = false;
-    this.controls.noteView.editor.value = description;
-    this.controls.noteView.editor.setSelection(selection);
+    // this.noteView.preview.checked = false;
+    this.noteView.editor.value = description;
+    this.noteView.editor.setSelection(selection);
 
     localStorage.setItem('description', description);
     localStorage.setItem('new', 'true');
@@ -97,15 +102,15 @@ export class Base {
 
   private build(notes: DbNote[]) {
     if (notes.length > 0) {
-      this.controls.listView.template.style.display = 'none';
-      this.controls.listView.items.appendChild(this.render(notes, 0, 10));
+      this.listView.template.style.display = 'none';
+      this.listView.items.appendChild(this.render(notes, 0, 10));
       
       Sorting.notes = this.notes;
-      Sorting.items = this.controls.listView.items;
+      Sorting.items = this.listView.items;
 
       setTimeout(() => {
         let index = localStorage.getItem('index');
-        this.controls.listView.items.appendChild(this.render(notes, 10));
+        this.listView.items.appendChild(this.render(notes, 10));
 
         if (index) {
           this.selectNote(this.notes[parseInt(index)]);
@@ -140,20 +145,20 @@ export class Base {
       this.showNote(value, bind, null, note.preview);
 
       this.selected = note;
-      this.controls.noteView.preview.checked = this.selected.preview;
-      this.controls.noteView.sync.checked = this.selected.sync;
+      this.noteView.preview.checked = this.selected.preview;
+      this.noteView.sync.checked = this.selected.sync;
 
       localStorage.setItem('description', value);
       localStorage.setItem('index', note.index.toString());
 
       if (note.preview) {
-        localStorage.setItem('html', this.controls.noteView.html.innerHTML);
+        localStorage.setItem('html', this.noteView.html.innerHTML);
       }
     }
   }
 
   private backToList() {
-    var [title, description] = this.controls.noteView.editor.getData();
+    var [title, description] = this.noteView.editor.getData();
 
     if (this.selected && this.validate(title, true)) {
       this.save(title, description);
@@ -166,19 +171,19 @@ export class Base {
   }
 
   private cancelCreation() {
-    this.controls.newView.cancel.style.display = 'None';
-    this.controls.newView.create.style.display = 'None';
+    this.newView.cancel.style.display = 'None';
+    this.newView.create.style.display = 'None';
 
     this.showList();
   }
 
   private createNote() {
     var note: Note;
-    var [title, description] = this.controls.noteView.editor.getData();
+    var [title, description] = this.noteView.editor.getData();
 
     if (this.validate(title, true)) {
       if (!this.notes.length) {
-        this.controls.listView.template.style.display = 'none';
+        this.listView.template.style.display = 'none';
       }
 
       note = new Note(null, this.notes.length);
@@ -187,12 +192,12 @@ export class Base {
       note.save();
 
       this.notes.push(note);
-      this.controls.listView.items.appendChild(note.element);
+      this.listView.items.appendChild(note.element);
       note.onclick = this.selectNote.bind(this, note, true);
       note.sortButton.onmousedown = Sorting.start.bind(Sorting, note);
 
-      this.controls.newView.cancel.style.display = 'None';
-      this.controls.newView.create.style.display = 'None';
+      this.newView.cancel.style.display = 'None';
+      this.newView.create.style.display = 'None';
 
       this.selectNote(note);
       localStorage.removeItem('new');
@@ -207,7 +212,7 @@ export class Base {
       delete this.selected;
 
       if (!this.notes.length) {
-        this.controls.listView.template.style.display = 'inherit';
+        this.listView.template.style.display = 'inherit';
       }
 
       this.showList();
@@ -228,7 +233,7 @@ export class Base {
       clearInterval(this.interval);
 
       this.interval = setTimeout(() => {
-        var [title, description] = this.controls.noteView.editor.getData();
+        var [title, description] = this.noteView.editor.getData();
 
         if (this.selected && this.validate(title)) {
           this.save(title, description);
@@ -244,7 +249,7 @@ export class Base {
       clearInterval(this.cursorInterval);
 
       this.cursorInterval = setTimeout(() => {
-        var selection = this.controls.noteView.editor.getSelection();
+        var selection = this.noteView.editor.getSelection();
         localStorage.setItem('selection', selection);
       }, 300);
     }
@@ -252,43 +257,42 @@ export class Base {
 
   // TODO review evernts
   private previewClick() {
-    if (this.controls.noteView.preview.checked) {
+    if (this.noteView.preview.checked) {
       this.showPreview();
       this.selected.preview = true;
-      localStorage.setItem('html', this.controls.noteView.html.innerHTML);
+      localStorage.setItem('html', this.noteView.html.innerHTML);
     } else {
-      var scrollTop = this.controls.noteView.html.scrollTop;
+      var scrollTop = this.noteView.html.scrollTop;
 
       this.hidePreview();
-      this.controls.noteView.editor.focus();
-      this.controls.noteView.editor.scrollTop = scrollTop;
+      this.noteView.editor.focus();
+      this.noteView.editor.scrollTop = scrollTop;
       this.selected.preview = false;
       localStorage.removeItem('html');
     }
   }
 
   private syncClick() {
-    this.selected.sync = this.controls.noteView.sync.checked;
+    this.selected.sync = this.noteView.sync.checked;
   }
 
   private showPreview(value?: string) {
-    var scrollTop = this.controls.noteView.editor.scrollTop;
-    var html = value || this.controls.noteView.editor.render();
+    var scrollTop = this.noteView.editor.scrollTop;
+    var html = value || this.noteView.editor.render();
 
-    this.controls.noteView.html.innerHTML = html;
-
-    this.controls.noteView.editor.hide();
-    this.controls.noteView.html.style.display = '';
-    this.controls.noteView.html.scrollTop = scrollTop;
+    this.noteView.editor.hide();
+    this.noteView.html.innerHTML = html;
+    this.noteView.html.style.display = '';
+    this.noteView.html.scrollTop = scrollTop;
   }
 
   private hidePreview() {
-    this.controls.noteView.editor.show();
-    this.controls.noteView.html.style.display = 'none';
+    this.noteView.editor.show();
+    this.noteView.html.style.display = 'none';
   }
 
   // TODO Review
   private validate(title: string, animate: boolean = false): boolean {
-    return !Validator.required(title, animate && this.controls.noteView.editor.wrapper);
+    return !Validator.required(title, animate && this.noteView.editor.wrapper);
   }
 }

@@ -1,16 +1,11 @@
 import {Editor} from '../editor';
 
-export interface IControls {
-  listView?: IListView;
-  noteView?: INoteView;
-  newView?: INewNoteView;
-}
 
 interface IView {
   node?: HTMLElement;
 }
 
-interface IListView extends IView {
+export interface IListView extends IView {
   items?: HTMLElement;
   template?: HTMLElement;
 
@@ -19,7 +14,7 @@ interface IListView extends IView {
   searchInput?: HTMLInputElement;
 }
 
-interface INoteView extends IView {
+export interface INoteView extends IView {
   back?: HTMLButtonElement;
   delete?: HTMLButtonElement;
 
@@ -30,7 +25,7 @@ interface INoteView extends IView {
   html?: HTMLElement;
 }
 
-interface INewNoteView extends IView {
+export interface INewNoteView extends IView {
   cancel?: HTMLButtonElement;
   create?: HTMLButtonElement;
 }
