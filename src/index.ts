@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   var noteView: HTMLElement = <HTMLElement>document.getElementById('details-view');
   var codemirror = new Editor(
     <HTMLTextAreaElement>document.getElementById('description-note'), 
-    <NodeList>document.getElementById('editor-controlls').querySelectorAll('div[action]')
+    <NodeList>document.getElementById('editor-controls').querySelectorAll('div[action]')
   );
 
   var controls: IControls = {
