@@ -1,23 +1,22 @@
-import {IListView, INewNoteView, INoteView} from './components/interfaces';
+import {IListView, INewNoteView, INoteView, Intervals} from './components/interfaces';
 import {DbNote} from '../db/note';
 import {Note} from './components/note';
 import {Validator} from './components/validation';
 import {Sorting} from './components/sorting';
-import {ScrollListener} from './components/scrolling';
+import { ScrollListener } from './components/scrolling';
 
 
 export class Base {
   private notes: Note[];
   private selected?: Note;
-  private interval?: NodeJS.Timeout;
-  private cursorInterval?: NodeJS.Timeout;
-
+  private intervals: Intervals;
   private listView: IListView;
   private noteView: INoteView;
   private newView: INewNoteView;
 
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     this.notes = [];
+    this.intervals = {};
     this.selected = null;
     this.listView = listView;
     this.noteView = noteView;
@@ -38,6 +37,8 @@ export class Base {
     this.noteView.sync.addEventListener('click', this.syncClick.bind(this));
     this.newView.create.addEventListener('click', this.createNote.bind(this));
     this.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
+    this.noteView.html.addEventListener('scroll', this.previewScroll.bind(this));
+
 
     this.noteView.editor.on('change', this.descriptionChanged.bind(this));
     this.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
@@ -51,7 +52,9 @@ export class Base {
     DbNote.loadAll(this.build.bind(this));
   }
 
-  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean, html?: string) {
+  //TODO review params
+  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean, html?: string,
+    scrollTop?: number) {
     this.listView.node.style.display = 'None';
     this.noteView.node.style.display = 'inherit';
     this.noteView.back.style.display = 'inherit';
@@ -64,7 +67,7 @@ export class Base {
       this.noteView.editor.setSelection(selection);
 
       if (preview) {
-        this.showPreview(html);
+        this.showPreview(html, scrollTop);
         this.noteView.preview.checked = true;
       }
     }
@@ -230,9 +233,9 @@ export class Base {
 
   private descriptionChanged() {
     if (this.selected || this.selected === undefined) {
-      clearInterval(this.interval);
+      clearInterval(this.intervals.document);
 
-      this.interval = setTimeout(() => {
+      this.intervals.document = setTimeout(() => {
         var [title, description] = this.noteView.editor.getData();
 
         if (this.selected && this.validate(title)) {
@@ -246,9 +249,9 @@ export class Base {
 
   private cursorMoved() {
     if (this.selected || this.selected === undefined) {
-      clearInterval(this.cursorInterval);
+      clearInterval(this.intervals.cursor);
 
-      this.cursorInterval = setTimeout(() => {
+      this.intervals.cursor = setTimeout(() => {
         var selection = this.noteView.editor.getSelection();
         localStorage.setItem('selection', selection);
       }, 300);
@@ -276,14 +279,24 @@ export class Base {
     this.selected.sync = this.noteView.sync.checked;
   }
 
-  private showPreview(value?: string) {
-    var scrollTop = this.noteView.editor.scrollTop;
+  private previewScroll() {
+    if (this.selected && this.selected.preview) {
+      clearInterval(this.intervals.scroll);
+
+      this.intervals.scroll = setTimeout(() => {
+        localStorage.setItem('previewScroll', this.noteView.html.scrollTop.toString());
+      }, 300);
+    }
+  }
+
+  private showPreview(value?: string, scrollTop?: number) {
+    var top = scrollTop || this.noteView.editor.scrollTop;
     var html = value || this.noteView.editor.render();
 
     this.noteView.editor.hide();
     this.noteView.html.innerHTML = html;
     this.noteView.html.style.display = '';
-    this.noteView.html.scrollTop = scrollTop;
+    this.noteView.html.scrollTop = top;
   }
 
   private hidePreview() {

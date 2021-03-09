@@ -8,6 +8,7 @@ var preview = !!html;
 var isNew = localStorage.getItem('new');
 var selection = localStorage.getItem('selection');
 var description = localStorage.getItem('description');
+var previewScroll = localStorage.getItem('previewScroll');
 
 document.addEventListener('DOMContentLoaded', () => {
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNew) {
       editor.selectNew(description, selection);
     } else {
-      editor.showNote(description, true, selection, preview, html);
+      editor.showNote(description, true, selection, preview, html, previewScroll && parseInt(previewScroll));
     }    
   } else {
     editor.showList();

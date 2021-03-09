@@ -38,3 +38,9 @@ export interface INoteControls {
   sort?: HTMLInputElement, // Button
   toNote?: HTMLInputElement, // Button
 }
+
+export interface Intervals {
+  document?: NodeJS.Timeout,
+  cursor?: NodeJS.Timeout,
+  scroll?: NodeJS.Timeout,
+}
