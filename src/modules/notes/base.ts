@@ -77,12 +77,17 @@ export class Base {
   }
 
   public showList() {
-    this.selected = null;
     this.listView.node.style.display = 'inherit';
     this.noteView.node.style.display = 'None';
 
     this.hidePreview();
     localStorage.clear();
+
+    if (this.selected) {
+      this.selected.element.scrollIntoView();
+    }
+
+    this.selected = null;
   }
 
   public selectNew(description: string, selection?: string) {
