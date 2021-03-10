@@ -4,8 +4,9 @@ import {Note} from './components/note';
 import {Validator} from './components/validation';
 import {Sorting} from './components/sorting';
 import { ScrollListener } from './components/scrolling';
+import { NodeHelper } from './components/node-helper';
 
-
+// TODO refacore implement base simple class
 export class Base {
   private notes: Note[];
   private selected?: Note;
@@ -37,8 +38,8 @@ export class Base {
     this.noteView.sync.addEventListener('click', this.syncClick.bind(this));
     this.newView.create.addEventListener('click', this.createNote.bind(this));
     this.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
-    this.noteView.html.addEventListener('scroll', this.previewScroll.bind(this));
-
+    this.noteView.html.addEventListener('scroll', this.previewSelectiChanged.bind(this));
+    document.addEventListener('selectionchange', this.previewSelectiChanged.bind(this));
 
     this.noteView.editor.on('change', this.descriptionChanged.bind(this));
     this.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
@@ -53,8 +54,8 @@ export class Base {
   }
 
   //TODO review params
-  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean, html?: string,
-    scrollTop?: number) {
+  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean,
+    html?: string, previewSelection?: string) {
     this.listView.node.style.display = 'None';
     this.noteView.node.style.display = 'inherit';
     this.noteView.back.style.display = 'inherit';
@@ -67,7 +68,9 @@ export class Base {
       this.noteView.editor.setSelection(selection);
 
       if (preview) {
-        this.showPreview(html, scrollTop);
+        this.showPreview(html || this.noteView.editor.render());
+        this.setPreviewSelection(previewSelection);
+        // TODO too many usage
         this.noteView.preview.checked = true;
       }
     }
@@ -145,6 +148,7 @@ export class Base {
     if (!Sorting.busy) {
       let value = note.title + '\n' + note.description;
 
+      // TODO do we need this here?
       this.showNote(value, bind, null, note.preview);
 
       this.selected = note;
@@ -154,6 +158,7 @@ export class Base {
       localStorage.setItem('description', value);
       localStorage.setItem('index', note.index.toString());
 
+      // TODO Review double calls
       if (note.preview) {
         localStorage.setItem('html', this.noteView.html.innerHTML);
       }
@@ -258,20 +263,16 @@ export class Base {
     }
   }
 
-  // TODO review evernts
-  private previewClick() {
-    if (this.noteView.preview.checked) {
-      this.showPreview();
-      this.selected.preview = true;
-      localStorage.setItem('html', this.noteView.html.innerHTML);
-    } else {
-      var scrollTop = this.noteView.html.scrollTop;
+  private previewSelectiChanged() {
+    if (this.selected && this.selected.preview) {
+      clearInterval(this.intervals.scroll);
 
-      this.hidePreview();
-      this.noteView.editor.focus();
-      this.noteView.editor.scrollTop = scrollTop;
-      this.selected.preview = false;
-      localStorage.removeItem('html');
+      this.intervals.scroll = setTimeout(() => {
+        let scrollTop = this.noteView.html.scrollTop;
+        let selection = NodeHelper.getSelection(this.noteView.html);
+
+        localStorage.setItem('previewSelection', `${scrollTop}|${selection}`);
+      }, 600);
     }
   }
 
@@ -279,24 +280,43 @@ export class Base {
     this.selected.sync = this.noteView.sync.checked;
   }
 
-  private previewScroll() {
-    if (this.selected && this.selected.preview) {
-      clearInterval(this.intervals.scroll);
+  // TODO review evernts
+  private previewClick() {
+    this.selected.preview = this.noteView.preview.checked;
 
-      this.intervals.scroll = setTimeout(() => {
-        localStorage.setItem('previewScroll', this.noteView.html.scrollTop.toString());
-      }, 300);
+    if (this.noteView.preview.checked) {
+      var scrollTop = this.noteView.editor.scrollTop;
+
+      this.showPreview(this.noteView.editor.render());
+      this.noteView.html.scrollTop = scrollTop;
+
+      localStorage.setItem('html', this.noteView.html.innerHTML);
+    } else {
+      var scrollTop = this.noteView.html.scrollTop;
+
+      this.hidePreview();
+      this.noteView.editor.focus();
+      this.noteView.editor.scrollTop = scrollTop;
+      
+      localStorage.removeItem('html');
     }
   }
 
-  private showPreview(value?: string, scrollTop?: number) {
-    var top = scrollTop || this.noteView.editor.scrollTop;
-    var html = value || this.noteView.editor.render();
-
+  private showPreview(value: string) {
     this.noteView.editor.hide();
-    this.noteView.html.innerHTML = html;
+    this.noteView.html.innerHTML = value;
     this.noteView.html.style.display = '';
-    this.noteView.html.scrollTop = top;
+  }
+
+  private setPreviewSelection(previewSelection?: string) {
+    if (previewSelection) {
+      let [scrollTop, selection] = previewSelection.split('|');
+
+      this.noteView.html.scrollTop = parseInt(scrollTop);
+      NodeHelper.setSelection(selection, this.noteView.html);
+    } else {
+      this.noteView.html.scrollTop = 0;
+    }
   }
 
   private hidePreview() {

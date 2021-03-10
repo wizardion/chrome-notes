@@ -4,11 +4,10 @@ import {Base} from './modules/notes/base';
 import './styles/style.scss';
 
 var html = localStorage.getItem('html');
-var preview = !!html;
 var isNew = localStorage.getItem('new');
 var selection = localStorage.getItem('selection');
 var description = localStorage.getItem('description');
-var previewScroll = localStorage.getItem('previewScroll');
+var previewSelection = localStorage.getItem('previewSelection');
 
 document.addEventListener('DOMContentLoaded', () => {
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
@@ -50,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNew) {
       editor.selectNew(description, selection);
     } else {
-      editor.showNote(description, true, selection, preview, html, previewScroll && parseInt(previewScroll));
+      editor.showNote(description, true, selection, !!html, html, previewSelection);
     }    
   } else {
     editor.showList();
