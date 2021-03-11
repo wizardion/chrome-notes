@@ -75,7 +75,9 @@ module.exports = {
   },
   plugins: [
     // new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanAfterEveryBuildPatterns: ['**/*']
+    }),
     new MiniCssExtractPlugin({
       filename: '[name].[chunkhash].css',
     }),

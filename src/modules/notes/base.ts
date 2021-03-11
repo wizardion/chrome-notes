@@ -65,7 +65,6 @@ export class Base {
 
     if (bind) {
       this.noteView.editor.value = description;
-      this.noteView.editor.setSelection(selection);
 
       if (preview) {
         this.showPreview(html || this.noteView.editor.render());
@@ -73,6 +72,9 @@ export class Base {
         // TODO too many usage
         this.noteView.preview.checked = true;
       }
+
+      // To prevent stealing nodes selection.
+      this.noteView.editor.setSelection(selection);
     }
   }
 
