@@ -3,17 +3,17 @@ import {DbNote} from '../db/note';
 import {Note} from './components/note';
 import {Validator} from './components/validation';
 import {Sorting} from './components/sorting';
-import { ScrollListener } from './components/scrolling';
-import { NodeHelper } from './components/node-helper';
+import {ScrollListener} from './components/scrolling';
+import {NodeHelper} from './components/node-helper';
 
-// TODO refacore implement base simple class
+
 export class Base {
-  private notes: Note[];
-  private selected?: Note;
-  private intervals: Intervals;
-  private listView: IListView;
-  private noteView: INoteView;
-  private newView: INewNoteView;
+  protected notes: Note[];
+  protected selected?: Note;
+  protected intervals: Intervals;
+  protected listView: IListView;
+  protected noteView: INoteView;
+  protected newView: INewNoteView;
 
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     this.notes = [];
@@ -53,71 +53,15 @@ export class Base {
     DbNote.loadAll(this.build.bind(this));
   }
 
-  //TODO review params
-  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean,
-    html?: string, previewSelection?: string) {
-    this.listView.node.style.display = 'None';
-    this.noteView.node.style.display = 'inherit';
-    this.noteView.back.style.display = 'inherit';
-    this.noteView.delete.style.display = 'inherit';
-    this.noteView.sync.parentElement.style.display = 'inherit';
-    this.noteView.preview.parentElement.style.display = 'inherit';
-
-    if (bind) {
-      this.noteView.editor.value = description;
-
-      if (preview) {
-        this.showPreview(html || this.noteView.editor.render());
-        this.setPreviewSelection(previewSelection);
-        // TODO too many usage
-        this.noteView.preview.checked = true;
-      }
-
-      // To prevent stealing nodes selection.
-      this.noteView.editor.setSelection(selection);
-    }
-  }
-
-  public showList() {
-    this.listView.node.style.display = 'inherit';
-    this.noteView.node.style.display = 'None';
-
-    this.hidePreview();
-    localStorage.clear();
-
-    if (this.selected) {
-      this.selected.element.scrollIntoView();
-    }
-
-    this.selected = null;
-  }
-
-  public selectNew(description: string, selection?: string) {
-    this.listView.node.style.display = 'None';
-    this.newView.node.style.display = 'inherit';
-
-    this.newView.cancel.style.display = 'inherit';
-    this.newView.create.style.display = 'inherit';
-
-    this.noteView.back.style.display = 'none';
-    this.noteView.delete.style.display = 'none';
-    this.noteView.sync.parentElement.style.display = 'none';
-    this.noteView.preview.parentElement.style.display = 'none';
-
-    // this.noteView.preview.checked = false;
-    this.noteView.editor.value = description;
-    this.noteView.editor.setSelection(selection);
-
-    localStorage.setItem('description', description);
-    localStorage.setItem('new', 'true');
-    this.selected = undefined;
+  private prevent(e: MouseEvent) {
+    e.preventDefault();
   }
 
   private build(notes: DbNote[]) {
     if (notes.length > 0) {
       this.listView.template.style.display = 'none';
       this.listView.items.appendChild(this.render(notes, 0, 10));
-      
+
       Sorting.notes = this.notes;
       Sorting.items = this.listView.items;
 
@@ -147,52 +91,16 @@ export class Base {
     return fragment;
   }
 
-  private prevent(e: MouseEvent) {
-    e.preventDefault();
+  public selectNew(description: string, selection?: string) {
+    this.noteView.editor.value = description;
+    this.noteView.editor.setSelection(selection);
+
+    localStorage.setItem('description', description);
+    localStorage.setItem('new', 'true');
+    this.selected = undefined;
   }
 
-  private selectNote(note: Note, bind?: boolean) {
-    if (!Sorting.busy) {
-      let value = note.title + '\n' + note.description;
-
-      // TODO do we need this here?
-      this.showNote(value, bind, null, note.preview);
-
-      this.selected = note;
-      this.noteView.preview.checked = this.selected.preview;
-      this.noteView.sync.checked = this.selected.sync;
-
-      localStorage.setItem('description', value);
-      localStorage.setItem('index', note.index.toString());
-
-      // TODO Review double calls
-      if (note.preview) {
-        localStorage.setItem('html', this.noteView.html.innerHTML);
-      }
-    }
-  }
-
-  private backToList() {
-    var [title, description] = this.noteView.editor.getData();
-
-    if (this.selected && this.validate(title, true)) {
-      this.save(title, description);
-      this.showList();
-    }
-
-    if (!this.selected) {
-      this.showList();
-    }
-  }
-
-  private cancelCreation() {
-    this.newView.cancel.style.display = 'None';
-    this.newView.create.style.display = 'None';
-
-    this.showList();
-  }
-
-  private createNote() {
+  protected createNote() {
     var note: Note;
     var [title, description] = this.noteView.editor.getData();
 
@@ -219,7 +127,30 @@ export class Base {
     }
   }
 
-  private remove() {
+  protected cancelCreation() {}
+
+  protected selectNote(note: Note, bind?: boolean) {
+    if (!Sorting.busy) {
+      let value = note.title + '\n' + note.description;
+
+      // TODO do we need this here?
+      this.showNote(value, bind, null, note.preview);
+
+      this.selected = note;
+      this.noteView.preview.checked = this.selected.preview;
+      this.noteView.sync.checked = this.selected.sync;
+
+      localStorage.setItem('description', value);
+      localStorage.setItem('index', note.index.toString());
+
+      // TODO Review double calls
+      if (note.preview) {
+        localStorage.setItem('html', this.noteView.html.innerHTML);
+      }
+    }
+  }
+
+  protected remove() {
     if (this.selected) {
       this.selected.remove();
 
@@ -229,21 +160,24 @@ export class Base {
       if (!this.notes.length) {
         this.listView.template.style.display = 'inherit';
       }
+    }
+  }
 
+  protected backToList() {
+    var [title, description] = this.noteView.editor.getData();
+
+    if (this.selected && this.validate(title, true)) {
+      this.save(title, description);
+      this.showList();
+    }
+
+    if (!this.selected) {
       this.showList();
     }
   }
 
-  private save(title: string, description: string) {
-    if (this.selected && (this.selected.title !== title || this.selected.description !== description)) {
-      console.log('saving...');
-      this.selected.title = title;
-      this.selected.description = description;
-      this.selected.save();
-    }
-  }
-
-  private descriptionChanged() {
+  // TODO review delayed events
+  protected descriptionChanged() {
     if (this.selected || this.selected === undefined) {
       clearInterval(this.intervals.document);
 
@@ -259,36 +193,8 @@ export class Base {
     }
   }
 
-  private cursorMoved() {
-    if (this.selected || this.selected === undefined) {
-      clearInterval(this.intervals.cursor);
-
-      this.intervals.cursor = setTimeout(() => {
-        var selection = this.noteView.editor.getSelection();
-        localStorage.setItem('selection', selection);
-      }, 300);
-    }
-  }
-
-  private previewSelectiChanged() {
-    if (this.selected && this.selected.preview) {
-      clearInterval(this.intervals.scroll);
-
-      this.intervals.scroll = setTimeout(() => {
-        let scrollTop = this.noteView.html.scrollTop;
-        let selection = NodeHelper.getSelection(this.noteView.html);
-
-        localStorage.setItem('previewSelection', `${scrollTop}|${selection}`);
-      }, 600);
-    }
-  }
-
-  private syncClick() {
-    this.selected.sync = this.noteView.sync.checked;
-  }
-
   // TODO review evernts
-  private previewClick() {
+  protected previewClick() {
     this.selected.preview = this.noteView.preview.checked;
 
     if (this.noteView.preview.checked) {
@@ -304,35 +210,65 @@ export class Base {
       this.hidePreview();
       this.noteView.editor.focus();
       this.noteView.editor.scrollTop = scrollTop;
-      
+
       localStorage.removeItem('html');
     }
   }
 
-  private showPreview(value: string) {
+  protected previewSelectiChanged() {
+    if (this.selected && this.selected.preview) {
+      clearInterval(this.intervals.scroll);
+
+      this.intervals.scroll = setTimeout(() => {
+        let scrollTop = this.noteView.html.scrollTop;
+        let selection = NodeHelper.getSelection(this.noteView.html);
+
+        localStorage.setItem('previewSelection', `${scrollTop}|${selection}`);
+      }, 600);
+    }
+  }
+
+  protected cursorMoved() {
+    if (this.selected || this.selected === undefined) {
+      clearInterval(this.intervals.cursor);
+
+      this.intervals.cursor = setTimeout(() => {
+        var selection = this.noteView.editor.getSelection();
+        localStorage.setItem('selection', selection);
+      }, 300);
+    }
+  }
+
+  protected syncClick() {
+    this.selected.sync = this.noteView.sync.checked;
+  }
+
+  protected save(title: string, description: string) {
+    if (this.selected && (this.selected.title !== title || this.selected.description !== description)) {
+      this.selected.title = title;
+      this.selected.description = description;
+      this.selected.save();
+    }
+  }
+
+  protected showList() {}
+
+  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean,
+    html?: string, previewSelection?: string) {}
+
+  protected showPreview(value: string) {
     this.noteView.editor.hide();
     this.noteView.html.innerHTML = value;
     this.noteView.html.style.display = '';
   }
 
-  private setPreviewSelection(previewSelection?: string) {
-    if (previewSelection) {
-      let [scrollTop, selection] = previewSelection.split('|');
-
-      this.noteView.html.scrollTop = parseInt(scrollTop);
-      NodeHelper.setSelection(selection, this.noteView.html);
-    } else {
-      this.noteView.html.scrollTop = 0;
-    }
-  }
-
-  private hidePreview() {
+  protected hidePreview() {
     this.noteView.editor.show();
     this.noteView.html.style.display = 'none';
   }
 
   // TODO Review
-  private validate(title: string, animate: boolean = false): boolean {
+  protected validate(title: string, animate: boolean = false): boolean {
     return !Validator.required(title, animate && this.noteView.editor.wrapper);
   }
 }

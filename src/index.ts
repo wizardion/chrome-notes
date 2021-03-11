@@ -1,6 +1,6 @@
 import {IListView, INewNoteView, INoteView} from './modules/notes/components/interfaces';
 import {Editor} from './modules/notes/editor';
-import {Base} from './modules/notes/base';
+import {Simple} from './modules/notes/simple';
 import './styles/style.scss';
 
 var html = localStorage.getItem('html');
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     create: <HTMLButtonElement>document.getElementById('create-note'),
   }
 
-  var editor = new Base(listView, noteView, newView);
+  var editor = new Simple(listView, noteView, newView);
   editor.init();
 
   if (description) {
