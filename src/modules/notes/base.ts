@@ -176,23 +176,6 @@ export class Base {
     }
   }
 
-  // TODO review delayed events
-  protected descriptionChanged() {
-    if (this.selected || this.selected === undefined) {
-      clearInterval(this.intervals.document);
-
-      this.intervals.document = setTimeout(() => {
-        var [title, description] = this.noteView.editor.getData();
-
-        if (this.selected && this.validate(title)) {
-          this.save(title, description);
-        }
-
-        localStorage.setItem('description', title + '\n' + description);
-      }, 175);
-    }
-  }
-
   // TODO review evernts
   protected previewClick() {
     this.selected.preview = this.noteView.preview.checked;
@@ -212,6 +195,26 @@ export class Base {
       this.noteView.editor.scrollTop = scrollTop;
 
       localStorage.removeItem('html');
+    }
+  }
+
+  protected syncClick() {
+    this.selected.sync = this.noteView.sync.checked;
+  }
+
+  protected descriptionChanged() {
+    if (this.selected || this.selected === undefined) {
+      clearInterval(this.intervals.document);
+
+      this.intervals.document = setTimeout(() => {
+        var [title, description] = this.noteView.editor.getData();
+
+        if (this.selected && this.validate(title)) {
+          this.save(title, description);
+        }
+
+        localStorage.setItem('description', title + '\n' + description);
+      }, 175);
     }
   }
 
@@ -235,12 +238,8 @@ export class Base {
       this.intervals.cursor = setTimeout(() => {
         var selection = this.noteView.editor.getSelection();
         localStorage.setItem('selection', selection);
-      }, 300);
+      }, 600);
     }
-  }
-
-  protected syncClick() {
-    this.selected.sync = this.noteView.sync.checked;
   }
 
   protected save(title: string, description: string) {
@@ -253,6 +252,7 @@ export class Base {
 
   protected showList() {}
 
+  //TODO review params
   public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean,
     html?: string, previewSelection?: string) {}
 
@@ -267,7 +267,6 @@ export class Base {
     this.noteView.html.style.display = 'none';
   }
 
-  // TODO Review
   protected validate(title: string, animate: boolean = false): boolean {
     return !Validator.required(title, animate && this.noteView.editor.wrapper);
   }

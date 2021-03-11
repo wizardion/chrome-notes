@@ -3,45 +3,6 @@ import {Base} from './base';
 
 
 export class Simple extends Base {
-  //TODO review params
-  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean,
-    html?: string, previewSelection?: string) {
-    this.listView.node.style.display = 'None';
-    this.noteView.node.style.display = 'inherit';
-    this.noteView.back.style.display = 'inherit';
-    this.noteView.delete.style.display = 'inherit';
-    this.noteView.sync.parentElement.style.display = 'inherit';
-    this.noteView.preview.parentElement.style.display = 'inherit';
-
-    if (bind) {
-      this.noteView.editor.value = description;
-
-      if (preview) {
-        this.showPreview(html || this.noteView.editor.render());
-        this.setPreviewSelection(previewSelection);
-        // TODO too many usage
-        this.noteView.preview.checked = true;
-      }
-
-      // To prevent stealing nodes selection.
-      this.noteView.editor.setSelection(selection);
-    }
-  }
-
-  public showList() {
-    this.listView.node.style.display = 'inherit';
-    this.noteView.node.style.display = 'None';
-
-    this.hidePreview();
-    localStorage.clear();
-
-    if (this.selected) {
-      this.selected.element.scrollIntoView();
-    }
-
-    this.selected = null;
-  }
-
   public selectNew(description: string, selection?: string) {
     this.listView.node.style.display = 'None';
     this.newView.node.style.display = 'inherit';
@@ -68,6 +29,44 @@ export class Simple extends Base {
   protected remove() {
     super.remove();
     this.showList();
+  }
+
+  public showList() {
+    this.listView.node.style.display = 'inherit';
+    this.noteView.node.style.display = 'None';
+
+    this.hidePreview();
+    localStorage.clear();
+
+    if (this.selected) {
+      this.selected.element.scrollIntoView();
+    }
+
+    this.selected = null;
+  }
+
+  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean,
+    html?: string, previewSelection?: string) {
+    this.listView.node.style.display = 'None';
+    this.noteView.node.style.display = 'inherit';
+    this.noteView.back.style.display = 'inherit';
+    this.noteView.delete.style.display = 'inherit';
+    this.noteView.sync.parentElement.style.display = 'inherit';
+    this.noteView.preview.parentElement.style.display = 'inherit';
+
+    if (bind) {
+      this.noteView.editor.value = description;
+
+      if (preview) {
+        this.showPreview(html || this.noteView.editor.render());
+        this.setPreviewSelection(previewSelection);
+        // TODO too many usage
+        this.noteView.preview.checked = true;
+      }
+
+      // To prevent stealing nodes selection.
+      this.noteView.editor.setSelection(selection);
+    }
   }
 
   protected setPreviewSelection(previewSelection?: string) {
