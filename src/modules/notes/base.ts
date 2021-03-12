@@ -109,9 +109,11 @@ export class Base {
         this.listView.template.style.display = 'none';
       }
 
+      // TODO Review state savings, synch and preview.
       note = new Note(null, this.notes.length);
       note.title = title;
       note.description = description;
+      note.cursor = this.noteView.editor.getSelection();
       note.save();
 
       this.notes.push(note);
