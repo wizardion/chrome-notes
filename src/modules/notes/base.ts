@@ -38,8 +38,8 @@ export class Base {
     this.noteView.sync.addEventListener('click', this.syncClick.bind(this));
     this.newView.create.addEventListener('click', this.createNote.bind(this));
     this.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
-    this.noteView.html.addEventListener('scroll', this.previewSelectiChanged.bind(this));
-    document.addEventListener('selectionchange', this.previewSelectiChanged.bind(this));
+    this.noteView.html.addEventListener('scroll', this.previewStateChanged.bind(this));
+    document.addEventListener('selectionchange', this.previewStateChanged.bind(this));
 
     this.noteView.editor.on('change', this.descriptionChanged.bind(this));
     this.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
@@ -127,14 +127,16 @@ export class Base {
     }
   }
 
-  protected cancelCreation() {}
+  protected cancelCreation() {
+
+  }
 
   protected selectNote(note: Note, bind?: boolean) {
     if (!Sorting.busy) {
       let value = note.title + '\n' + note.description;
 
       // TODO do we need this here?
-      this.showNote(value, bind, null, note.preview);
+      this.showNote(value, bind, note.cursor, note.html, note.previewState);
 
       this.selected = note;
       this.noteView.preview.checked = this.selected.preview;
@@ -187,6 +189,7 @@ export class Base {
       this.noteView.html.scrollTop = scrollTop;
 
       localStorage.setItem('html', this.noteView.html.innerHTML);
+      this.selected.html = this.noteView.html.innerHTML;
     } else {
       var scrollTop = this.noteView.html.scrollTop;
 
@@ -195,6 +198,8 @@ export class Base {
       this.noteView.editor.scrollTop = scrollTop;
 
       localStorage.removeItem('html');
+      this.selected.html = null;
+      this.selected.previewState = null;
     }
   }
 
@@ -218,7 +223,7 @@ export class Base {
     }
   }
 
-  protected previewSelectiChanged() {
+  protected previewStateChanged() {
     if (this.selected && this.selected.preview) {
       clearInterval(this.intervals.scroll);
 
@@ -226,7 +231,11 @@ export class Base {
         let scrollTop = this.noteView.html.scrollTop;
         let selection = NodeHelper.getSelection(this.noteView.html);
 
-        localStorage.setItem('previewSelection', `${scrollTop}|${selection}`);
+        if (this.selected) {
+          this.selected.previewState = `${scrollTop}|${selection}`;
+        }
+
+        localStorage.setItem('previewState', `${scrollTop}|${selection}`);
       }, 600);
     }
   }
@@ -237,6 +246,11 @@ export class Base {
 
       this.intervals.cursor = setTimeout(() => {
         var selection = this.noteView.editor.getSelection();
+
+        if (this.selected) {
+          this.selected.cursor = selection;
+        }
+        
         localStorage.setItem('selection', selection);
       }, 600);
     }
@@ -250,11 +264,14 @@ export class Base {
     }
   }
 
-  protected showList() {}
+  protected showList() {
+
+  }
 
   //TODO review params
-  public showNote(description: string, bind?: boolean, selection?: string, preview?: boolean,
-    html?: string, previewSelection?: string) {}
+  public showNote(description: string, bind?: boolean, selection?: string, html?: string, pState?: string) {
+    
+  }
 
   protected showPreview(value: string) {
     this.noteView.editor.hide();

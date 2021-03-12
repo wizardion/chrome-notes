@@ -87,6 +87,39 @@ export class Note {
     }
   }
 
+  public get html(): string {
+    return this.note.html;
+  }
+
+  public set html(value: string) {
+    if (this.note.html !== value) {
+      this.note.html = value;
+      this.note.saveHtml();
+    }
+  }
+
+  public get cursor(): string {
+    return this.note.cState;
+  }
+
+  public set cursor(value: string) {
+    if (this.note.cState !== value) {
+      this.note.cState = value;
+      this.note.saveCursor();
+    }
+  }
+
+  public get previewState(): string {
+    return this.note.pState;
+  }
+
+  public set previewState(value: string) {
+    if (this.note.pState !== value) {
+      this.note.pState = value;
+      this.note.savePreviewState();
+    }
+  }
+
   public get preview(): boolean {
     return !!this.note.preview;
   }

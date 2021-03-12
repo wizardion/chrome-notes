@@ -8,11 +8,15 @@ export class DbNote implements INote {
   public viewOrder: number;
   public sync: boolean;
   public preview: boolean;
+  public cState: string;
+  public pState: string;
+  public html: string;
   public updated: number;
   public created: number;
 
   constructor(id: number, title: string, description: string, viewOrder: number,
-    updated: number, created: number, sync: boolean = false, preview: boolean = false) {
+    updated: number, created: number, sync: boolean = false, preview: boolean = false,
+    cState?: string, pState?: string, html?: string) {
     this.id = id;
     this.title = title;
     this.description = description;
@@ -21,6 +25,9 @@ export class DbNote implements INote {
     this.created = created;
     this.sync = sync;
     this.preview = preview;
+    this.cState = cState;
+    this.pState = pState;
+    this.html = html;
   }
 
   public static loadAll(callback: Function, errorCallback?: Function) {
@@ -36,7 +43,10 @@ export class DbNote implements INote {
           result.rows.item(i)['updated'],
           result.rows.item(i)['created'],
           <boolean>(result.rows.item(i)['sync'] === 'true'),
-          <boolean>(result.rows.item(i)['preview'] === 'true')
+          <boolean>(result.rows.item(i)['preview'] === 'true'),
+          result.rows.item(i)['cState'],
+          result.rows.item(i)['pState'],
+          result.rows.item(i)['html']
         ));
       }
 
@@ -65,11 +75,23 @@ export class DbNote implements INote {
   }
 
   public setPreview() {
-    db.setFlag('preview', this.preview, this.id);
+    db.setField('preview', this.preview, this.id);
   }
 
   public setSync() {
-    db.setFlag('sync', this.sync, this.id);
+    db.setField('sync', this.sync, this.id);
+  }
+
+  public saveHtml() {
+    db.setField('html', this.html, this.id);
+  }
+
+  public saveCursor() {
+    db.setField('cState', this.cState, this.id);
+  }
+
+  public savePreviewState() {
+    db.setField('pState', this.pState, this.id);
   }
 
   private noteAdded(result: SQLResultSet){

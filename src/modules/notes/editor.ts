@@ -117,41 +117,35 @@ export class Editor {
   public getSelection(): string {
     let scrollInfo = this.codemirror.getScrollInfo();
     var ranges = this.codemirror.listSelections();
-    var selection: ISelection = {
-      ranges: [],
-      scrollTop: scrollInfo.top
-    };
+    var selection: number[][] = [];
 
     ranges.forEach((range) => {
-      selection.ranges.push({
-        x1: range.anchor.ch,
-        x2: range.head.ch,
-        y1: range.anchor.line,
-        y2: range.head.line
-      })
+      selection.push([range.anchor.ch, range.head.ch, range.anchor.line, range.head.line]);
     });
 
-    return JSON.stringify(selection);
+    return `${scrollInfo.top}|${selection.join(':')}`;
   }
 
   public setSelection(data?: string) {
     this.codemirror.focus();
 
     if (data) {
-      let selection: ISelection = <ISelection>JSON.parse(data);
+      let [scrollTop, selection] = data.split('|');
       let ranges: ObjectArray = [];
 
-      selection.ranges.forEach((range: IRange) => {
+      selection.split(':').forEach((range) => {
+        const [x1, x2, y1, y2] = range.split(',');
+
         ranges.push({
-          anchor: {ch: range.x1, line: range.y1},
-          head: {ch: range.x2, line: range.y2}
+          anchor: {ch: parseInt(x1), line: parseInt(y1)},
+          head: {ch: parseInt(x2), line: parseInt(y2)}
         });
       });
 
       this.codemirror.setSelections(ranges);
-      this.codemirror.scrollTo(0, selection.scrollTop);
+      this.codemirror.scrollTo(0, parseInt(scrollTop));
     } else {
-      this.codemirror.setCursor({ line: 0, ch: 0 });
+      this.codemirror.setCursor({line: 0, ch: 0});
     }
   }
 

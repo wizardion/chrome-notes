@@ -15,6 +15,7 @@ function init() {
       var createSQL = 'CREATE TABLE IF NOT EXISTS Notes' + 
                       '(title TEXT, description TEXT, viewOrder UNSIGNED INTEGER, ' + 
                       'sync BOOLEAN NOT NULL DEFAULT false, preview BOOLEAN NOT NULL DEFAULT false, ' +
+                      'cState TEXT NULL, pState TEXT NULL, html TEXT NULL, ' +
                       'updated REAL, created REAL)';
       tx.executeSql(createSQL, null);
     });
@@ -101,9 +102,9 @@ function setOrder(item: INote) {
   });
 };
 
-function setFlag(flag: string, value: (boolean|number), id: number, 
+function setField(name: string, value: (boolean|number|string), id: number, 
                  callback?: Function, errorCallback?: Function) {
-  var sql = `UPDATE Notes SET ${flag}=? WHERE rowid=?`;
+  var sql = `UPDATE Notes SET ${name}=? WHERE rowid=?`;
   var data = [value, id];
 
   execTransaction(sql, data, callback, errorCallback);
@@ -119,7 +120,7 @@ export default {
   add: add,
   update: update,
   setOrder: setOrder,
-  setFlag: setFlag,
+  setField: setField,
   saveQueue: saveQueue,
   remove: remove,
 };

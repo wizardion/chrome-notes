@@ -7,7 +7,7 @@ var html = localStorage.getItem('html');
 var isNew = localStorage.getItem('new');
 var selection = localStorage.getItem('selection');
 var description = localStorage.getItem('description');
-var previewSelection = localStorage.getItem('previewSelection');
+var previewState = localStorage.getItem('previewState');
 
 document.addEventListener('DOMContentLoaded', () => {
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNew) {
       editor.selectNew(description, selection);
     } else {
-      editor.showNote(description, true, selection, !!html, html, previewSelection);
+      editor.showNote(description, true, selection, html, previewState);
     }    
   } else {
     editor.showList();
