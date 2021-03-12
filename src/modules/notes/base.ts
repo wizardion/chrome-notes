@@ -110,6 +110,7 @@ export class Base {
       }
 
       // TODO Review state savings, synch and preview.
+      // TODO new note doesn't have id yet, state needs to bew reviewed.
       note = new Note(null, this.notes.length);
       note.title = title;
       note.description = description;
