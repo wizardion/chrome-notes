@@ -18,18 +18,19 @@
   background: linear-gradient(to right, #07a69810, #07a69801);
 }
 
-.list-view .list-item:active {
-  color: #06736a99;
-  background: linear-gradient(to right, #07a69809, #07a69801);
-}
+// .list-view .list-item:active {
+//   // color: #06736a99;
+//   // background: linear-gradient(to right, #07a69809, #07a69801);
+//   // margin-left: 1px;
+// }
 
-.list-view .list-item:active .date-time{
-  color: #07a69899;
-}
+// .list-view .list-item:active .date-time{
+//   // color: #07a69899;
+// }
 
-.list-view .list-item:active .sort{
-  opacity: 0.5;
-}
+// .list-view .list-item:active .sort{
+//   // opacity: 0.5;
+// }
 
 .list-view .list-item.edit-item:hover {
   background: transparent;
@@ -82,7 +83,7 @@
 
 .list-view .list-item:active .sort {
   background-image: url('../images/sort-note-active.png');
-  opacity: 0.5;
+  // opacity: 0.5;
 }
 
 .to-note, 
@@ -101,7 +102,7 @@
 
 .list-view .list-item:active .to-note {
   background-image: url('../images/to-note-active.png');
-  opacity: 0.5;
+  // opacity: 0.5;
 }
 
 .list-view .list-item.drag
