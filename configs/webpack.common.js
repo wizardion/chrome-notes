@@ -20,6 +20,7 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
+      minSize: 1,
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
