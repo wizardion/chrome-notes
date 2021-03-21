@@ -1,6 +1,7 @@
 import {NodeHelper} from './components/node-helper';
 import {Base} from './base';
 import {IListView, INewNoteView, INoteView} from './components/interfaces';
+import {Validator} from './components/validation';
 
 
 export class Simple extends Base {
@@ -44,7 +45,8 @@ export class Simple extends Base {
     localStorage.clear();
 
     if (this.selected) {
-      this.selected.element.scrollIntoView();
+      this.selected.element.scrollIntoView({block: 'center'});
+      Validator.animateSelected(this.selected.element);
     }
 
     this.selected = null;

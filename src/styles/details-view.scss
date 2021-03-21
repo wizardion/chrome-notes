@@ -81,13 +81,27 @@
 }
 
 .required {
-  animation: colorchange 1.5s;
+  animation: borderchange 1.5s;
+}
+
+.animate {
+  animation: colorchange 0.8s;
+}
+
+@keyframes borderchange
+{
+  0% { border-top: 1px solid #e3363699; }
+  100% { border-top: 1px solid transparent; }
 }
 
 @keyframes colorchange
 {
-  0% { border-top: 1px solid #e3363699; }
-  100% { border-top: 1px solid transparent; }
+  0% { 
+    background-color: #07a69810;
+  }
+  100% { 
+    background-color: transparent;
+  }
 }
 
 @import 'editor-controls';

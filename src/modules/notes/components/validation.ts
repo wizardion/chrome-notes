@@ -7,15 +7,19 @@ export class Validator {
     }
 
     if (control) {
-      this.requiredAnimation(control);
+      this.animate(control, 'required');
     }
 
     return true;
   }
 
-  private static requiredAnimation(control: HTMLElement) {
-    if (!control.classList.contains('required')) {
-      control.classList.add('required');
+  public static animateSelected(control: HTMLElement) {
+    this.animate(control, 'animate');
+  }
+
+  private static animate(control: HTMLElement, name: string) {
+    if (!control.classList.contains(name)) {
+      control.classList.add(name);
     } else {
       control.style.animation = 'none';
       control.offsetHeight; // trigger reflow
@@ -23,10 +27,10 @@ export class Validator {
     }
 
     clearInterval(this.timer);
-    this.timer = setTimeout(this.removeRequired.bind(this, control), 1510);
+    this.timer = setTimeout(this.removeAnimation.bind(this, control, name), 1510);
   }
 
-  private static removeRequired(control: HTMLElement){
-    control.classList.remove('required');
+  private static removeAnimation(control: HTMLElement, name: string){
+    control.classList.remove(name);
   }
 }
