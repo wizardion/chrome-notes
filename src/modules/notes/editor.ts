@@ -5,18 +5,6 @@ import {fromTextArea, EditorFromTextArea, KeyMap, Position, commands} from 'code
 import {MDRender} from './components/md-render';
 
 
-interface IRange {
-  x1: number;
-  x2: number;
-  y1: number;
-  y2: number;
-}
-
-interface ISelection {
-  ranges: IRange[],
-  scrollTop: number
-}
-
 export class Editor {
   private visible: boolean;
   private md: MDRender;
