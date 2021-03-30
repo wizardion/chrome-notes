@@ -56,7 +56,7 @@ class Tracker {
 
         if (columns[i] === 'page' && page !== name) {
           if (page !== null) {
-            rows.push(`..${Array(head.length).fill('.').join('')}..`);
+            rows.push(`··${Array(head.length).fill('·').join('')}··`);
           }
 
           page = name;
