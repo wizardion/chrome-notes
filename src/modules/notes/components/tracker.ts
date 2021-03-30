@@ -4,25 +4,33 @@ interface ITime {
   page: string,
   name: string,
   spent: number,
-  time: number
+  time: number,
+  total: number
 }
 
 class Tracker {
   private times: ITime[];
+  private start: number;
 
   constructor() {
     this.times = [];
+    this.start = null;
   }
 
   public track(page: string, name: string) {
     var prev = this.times.length ? this.times[this.times.length - 1] : null
     var current = Math.round((performance.now() - START) * 100) / 100;
 
+    if (this.start === null && prev !== null) {
+      this.start = prev.total;
+    }
+
     this.times.push({
       page: page,
       name: name,
-      spent: Math.round((prev ? current - prev.time : 0) * 100) / 100,
-      time: current
+      spent: Math.round((prev ? current - prev.total : 0) * 100) / 100,
+      time: Math.round((this.start ? current - this.start : 0) * 100) / 100,
+      total: current,
     });
   }
 
