@@ -1,7 +1,7 @@
 import 'codemirror/mode/markdown/markdown.js'
 import 'codemirror/lib/codemirror.css';
 import '../../styles/codemirror.scss';
-import {fromTextArea, EditorFromTextArea, KeyMap, Position, commands} from 'codemirror';
+import {fromTextArea, EditorFromTextArea, KeyMap, Position, Doc} from 'codemirror';
 import {MDRender} from './components/md-render';
 
 
@@ -10,6 +10,7 @@ export class Editor {
   private md: MDRender;
   private codemirror: EditorFromTextArea;
   private controls: NodeList;
+  private doc: Doc;
   public wrapper: HTMLTextAreaElement;
   public scroll: HTMLElement;
 
@@ -26,26 +27,28 @@ export class Editor {
   };
 
   constructor(textarea: HTMLTextAreaElement, controls?: NodeList) {
-    this.md = new MDRender();
     this.controls = controls;
     this.codemirror = fromTextArea(textarea, {
       lineWrapping: true,
       showCursorWhenSelecting: true,
-      // spellcheck: true,
-      // autocorrect: true,
-      // inputStyle: 'contenteditable',
+      spellcheck: true,
+      autocorrect: true,
+      inputStyle: 'contenteditable',
       mode: {
         name: 'markdown',
       }
     });
 
+    this.doc = this.codemirror.getDoc();
     this.wrapper = <HTMLTextAreaElement>this.codemirror.getWrapperElement();
     this.scroll = this.wrapper.querySelector('.CodeMirror-vscrollbar');
-    this.init();
     this.visible = true;
+
+    setTimeout(() => this.init());
   }
 
   private init() {
+    this.md = new MDRender();
     var mapping: KeyMap = {};
 
     this.controls.forEach((item: HTMLElement) => {
@@ -72,9 +75,7 @@ export class Editor {
   }
 
   public set value(text: string) {
-    this.codemirror.setValue('');
-    this.codemirror.replaceSelection(text);
-    this.codemirror.clearHistory();
+    this.doc.setValue(text);
   }
 
   public get scrollTop(): number {
@@ -130,10 +131,10 @@ export class Editor {
         });
       });
 
-      this.codemirror.setSelections(ranges);
+      this.doc.setSelections(ranges);
       this.codemirror.scrollTo(0, parseInt(scrollTop));
     } else {
-      this.codemirror.setCursor({line: 0, ch: 0});
+      this.doc.setCursor({line: 0, ch: 0});
     }
   }
 
