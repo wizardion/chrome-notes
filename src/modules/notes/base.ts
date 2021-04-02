@@ -147,6 +147,7 @@ export class Base {
 
       localStorage.setItem('description', value);
       localStorage.setItem('index', note.index.toString());
+      localStorage.setItem('selection', note.cursor);
 
       // TODO Review double calls
       if (note.preview) {
