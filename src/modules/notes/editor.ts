@@ -31,9 +31,9 @@ export class Editor {
     this.codemirror = fromTextArea(textarea, {
       lineWrapping: true,
       showCursorWhenSelecting: true,
-      spellcheck: true,
-      autocorrect: true,
-      inputStyle: 'contenteditable',
+      // spellcheck: false,
+      // autocorrect: false,
+      // inputStyle: 'contenteditable',
       mode: {
         name: 'markdown',
       }
@@ -76,6 +76,7 @@ export class Editor {
 
   public set value(text: string) {
     this.doc.setValue(text);
+    this.codemirror.refresh();
   }
 
   public get scrollTop(): number {
