@@ -39,10 +39,15 @@
   margin-top: 0px;
 }
 
-.content-preview > p {
-  white-space: pre-wrap;
-  margin-top: 20px;
-  margin-bottom: 20px;
+// .content-preview > p {
+//   // white-space: pre-wrap;
+//   // margin-top: 20px;
+//   // margin-bottom: 20px;
+// }
+
+.content-preview > * {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .content-preview ul, ul,
@@ -80,7 +85,7 @@
   color: #06736a;
 }
 
-.content-preview::selection {
+.content-preview ::selection {
   // background: #07a6983d;
   background: #d9e9e9;
 }
@@ -169,9 +174,9 @@
   font-weight: 600;
 }
 
-.content-preview > p + ul,
-.content-preview > p + ol,
-.content-preview p + pre,
-.content-preview p + table {
-  margin-top: -20px;
-}
+// .content-preview > p + ul,
+// .content-preview > p + ol,
+// .content-preview p + pre,
+// .content-preview p + table {
+//   margin-top: -20px;
+// }
