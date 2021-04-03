@@ -1,31 +1,80 @@
 class Editor {
   constructor(element) {
-    this.$element = element;
+    this.element = element;
+    this.value = '';
+    this.cursor = 0;
+    this.line = 0;
+
+    this.eLine = null; //tmp
+
+    this.background = {
+      cursor: null,
+      line: null,
+    };
 
     this.init();
   }
 
   init() {
-    this.$element = document.getElementById('editor');
+    this.element.style.zIndex = '1';
 
-    this.$element.addEventListener('keydown', onkeyDown);
-    this.$element.addEventListener('focusin', onFocus);
-    this.$element.addEventListener('focusout', onBlur);
-    document.addEventListener('paste', onPaste);
+    this.background.cursor = document.createElement('div');
+    this.background.cursor.style.background = 'black';
+    this.background.cursor.style.width = '1px';
+    this.background.cursor.style.position = 'absolute';
 
-    this.$cursor = document.createElement('div');
-    this.$cursor.classList.add('cursor');
+    this.background.line = document.createElement('span');
+    this.background.line.style.position = 'absolute';
+    this.background.line.style.zIndex = '0';
+    
+    this.eLine = document.createElement('span');
+    this.eLine.classList.add('line');
 
-    this.$code = document.createElement('div');
-    this.$code.classList.add('editor-code');
+    this.element.parentNode.insertBefore(this.background.line, this.element);
+    this.element.parentNode.insertBefore(this.background.cursor, this.element);
+    this.element.appendChild(this.eLine);
 
-    this.$line = document.createElement('pre');
-    this.$line.classList.add('editor-line');
+    this.element.addEventListener('keydown', this.onkeyDown.bind(this));
+    this.element.addEventListener('focusin', this.onFocus.bind(this));
+    this.element.addEventListener('focusout', this.onBlur.bind(this));
+  }
 
-    this.$span = document.createElement('span');
-    this.$span.classList.add('editor-span');
+  onFocus() {
 
-    this.$element.appendChild(editor.cursor);
-    this.$element.appendChild(editor.code);
+  }
+
+  onBlur() {
+
+  }
+
+  onkeyDown(e) {
+    if (!(e.ctrlKey || e.metaKey) && e.key === 'Backspace') {
+      e.preventDefault();
+      this.value = this.value.slice(0, -1);
+      this.cursor -= 1;
+    }
+    
+    if (!(e.ctrlKey || e.metaKey) && e.key.length === 1) {
+      e.preventDefault();
+      this.value += e.key;
+      this.cursor += 1;
+    }
+
+    this.render();
+  }
+
+  render() {
+    var lines = [];
+    
+    
+    this.eLine.innerText = this.value;
+    this.renderCursor();
+  }
+
+  renderCursor() {
+    // this.background.line.innerText = this.value;
+    // var top = this.element.offcetTop;
+
+
   }
 }
