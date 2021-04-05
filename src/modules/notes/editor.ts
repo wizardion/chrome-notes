@@ -30,6 +30,7 @@ export class Editor {
     this.controls = controls;
     this.codemirror = fromTextArea(textarea, {
       lineWrapping: true,
+      viewportMargin: 10000,
       showCursorWhenSelecting: true,
       // spellcheck: false,
       // autocorrect: false,
