@@ -120,7 +120,7 @@ export class Editor {
   public setSelection(data?: string) {
     this.codemirror.focus();
 
-    if (data) {
+    if (data && data.length > 1) {
       let [scrollTop, selection] = data.split('|');
       let ranges: ObjectArray = [];
 

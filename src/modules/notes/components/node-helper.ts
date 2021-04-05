@@ -14,7 +14,7 @@ export class NodeHelper {
   }
 
   public static setSelection(data: string, element: Node) {
-    if (data && data.length) {
+    if (data && data.length > 1) {
       let [left, right, start, end] = data.split(':');
       
       let leftNode: Node = this.getNode(left.split(','), element);

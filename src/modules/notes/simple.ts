@@ -74,10 +74,10 @@ export class Simple extends Base {
   }
 
   protected setPreviewSelection(previewState?: string) {
-    if (previewState) {
+    if (previewState && previewState.length > 1) {
       let [scrollTop, selection] = previewState.split('|');
 
-      this.noteView.html.scrollTop = parseInt(scrollTop);
+      this.noteView.html.scrollTop = parseInt(scrollTop) || 0;
       NodeHelper.setSelection(selection, this.noteView.html);
     } else {
       this.noteView.html.scrollTop = 0;
