@@ -146,7 +146,7 @@ export class Base {
 
       localStorage.setItem('description', value);
       localStorage.setItem('index', note.index.toString());
-      localStorage.setItem('selection', note.cursor);
+      localStorage.setItem('selection', note.cursor.toString());
 
       if (note.preview) {
         localStorage.setItem('html', this.noteView.html.innerHTML);

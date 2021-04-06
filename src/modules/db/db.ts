@@ -20,7 +20,7 @@ function init() {
       tx.executeSql(createSQL, null);
     });
 
-    if (localStorage.notes) {
+    if (localStorage.getItem('notes')) {
       // migrate();
     }
   }
