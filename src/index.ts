@@ -1,13 +1,14 @@
 import {IListView, INewNoteView, INoteView} from './modules/notes/components/interfaces';
 import {Editor} from './modules/notes/editor';
 import {Simple} from './modules/notes/simple';
+import storage from './modules/storage/storage';
 import './styles/style.scss';
 
-var html = localStorage.getItem('html');
-var isNew = localStorage.getItem('new');
-var selection = localStorage.getItem('selection');
-var description = localStorage.getItem('description');
-var previewState = localStorage.getItem('previewState');
+var html = storage.get('html');
+var isNew = storage.get('new');
+var selection = storage.get('selection');
+var description = storage.get('description');
+var previewState = storage.get('previewState');
 
 document.addEventListener('DOMContentLoaded', () => {
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');

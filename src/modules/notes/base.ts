@@ -5,6 +5,7 @@ import {Validator} from './components/validation';
 import {Sorting} from './components/sorting';
 import {ScrollListener} from './components/scrolling';
 import {NodeHelper} from './components/node-helper';
+import storage from '../storage/storage';
 
 
 export class Base {
@@ -66,7 +67,7 @@ export class Base {
       Sorting.items = this.listView.items;
 
       setTimeout(() => {
-        let index = localStorage.getItem('index');
+        let index = storage.get('index');
         this.listView.items.appendChild(this.render(notes, 10));
 
         if (index) {
@@ -95,8 +96,8 @@ export class Base {
     this.noteView.editor.value = description;
     this.noteView.editor.setSelection(selection);
 
-    localStorage.setItem('description', description);
-    localStorage.setItem('new', 'true');
+    storage.set('description', description);
+    storage.set('new', 'true');
     this.selected = undefined;
   }
 
@@ -126,7 +127,7 @@ export class Base {
       this.newView.create.style.display = 'None';
 
       this.selectNote(note);
-      localStorage.removeItem('new');
+      storage.remove('new');
     }
   }
 
@@ -144,12 +145,12 @@ export class Base {
       this.selected = note;
       this.noteView.sync.checked = this.selected.sync;
 
-      localStorage.setItem('description', value);
-      localStorage.setItem('index', note.index.toString());
-      localStorage.setItem('selection', note.cursor.toString());
+      storage.set('description', value);
+      storage.set('index', note.index);
+      storage.set('selection', note.cursor);
 
       if (note.preview) {
-        localStorage.setItem('html', this.noteView.html.innerHTML);
+        storage.set('html', this.noteView.html.innerHTML);
       }
     }
   }
@@ -190,7 +191,7 @@ export class Base {
       this.showPreview(this.noteView.editor.render());
       this.noteView.html.scrollTop = scrollTop;
 
-      localStorage.setItem('html', this.noteView.html.innerHTML);
+      storage.set('html', this.noteView.html.innerHTML);
       this.selected.html = this.noteView.html.innerHTML;
     } else {
       var scrollTop = this.noteView.html.scrollTop;
@@ -199,7 +200,7 @@ export class Base {
       this.noteView.editor.focus();
       this.noteView.editor.scrollTop = scrollTop;
 
-      localStorage.removeItem('html');
+      storage.remove('html');
       this.selected.html = null;
       this.selected.previewState = null;
     }
@@ -220,7 +221,7 @@ export class Base {
           this.save(title, description);
         }
 
-        localStorage.setItem('description', title + '\n' + description);
+        storage.set('description', title + '\n' + description);
       }, 175);
     }
   }
@@ -237,7 +238,7 @@ export class Base {
           this.selected.previewState = `${scrollTop}|${selection}`;
         }
 
-        localStorage.setItem('previewState', `${scrollTop}|${selection}`);
+        storage.set('previewState', `${scrollTop}|${selection}`);
       }, 600);
     }
   }
@@ -253,7 +254,7 @@ export class Base {
           this.selected.cursor = selection;
         }
         
-        localStorage.setItem('selection', selection);
+        storage.set('selection', selection);
       }, 600);
     }
   }

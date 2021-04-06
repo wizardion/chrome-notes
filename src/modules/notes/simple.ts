@@ -2,6 +2,7 @@ import {NodeHelper} from './components/node-helper';
 import {Base} from './base';
 import {IListView, INewNoteView, INoteView} from './components/interfaces';
 import {Validator} from './components/validation';
+import storage from '../storage/storage';
 
 
 export class Simple extends Base {
@@ -42,7 +43,7 @@ export class Simple extends Base {
     this.noteView.node.style.display = 'None';
 
     this.hidePreview();
-    localStorage.clear();
+    storage.clear();
 
     if (this.selected) {
       this.selected.element.scrollIntoView({block: 'center'});
