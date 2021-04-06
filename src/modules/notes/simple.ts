@@ -67,7 +67,6 @@ export class Simple extends Base {
       if (html) {
         this.showPreview(html);
         this.setPreviewSelection(pState);
-        // TODO too many usage
         this.noteView.preview.checked = true;
       }
     }
@@ -77,7 +76,7 @@ export class Simple extends Base {
     if (previewState && previewState.length > 1) {
       let [scrollTop, selection] = previewState.split('|');
 
-      this.noteView.html.scrollTop = parseInt(scrollTop) || 0;
+      this.noteView.html.scrollTop = Number(scrollTop) || 0;
       NodeHelper.setSelection(selection, this.noteView.html);
     } else {
       this.noteView.html.scrollTop = 0;

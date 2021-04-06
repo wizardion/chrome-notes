@@ -125,16 +125,16 @@ export class Editor {
       let ranges: ObjectArray = [];
 
       selection.split(':').forEach((range) => {
-        const [x1, x2, y1, y2] = range.split(',');
+        const [x1, x2, y1, y2]: string[] = range.split(',');
 
         ranges.push({
-          anchor: {ch: parseInt(x1), line: parseInt(y1)},
-          head: {ch: parseInt(x2), line: parseInt(y2)}
+          anchor: {ch: Number(x1) || 0, line: Number(y1) || 0},
+          head: {ch: Number(x2) || 0, line: Number(y2) || 0}
         });
       });
 
       this.doc.setSelections(ranges);
-      this.codemirror.scrollTo(0, parseInt(scrollTop));
+      this.codemirror.scrollTo(0, Number(scrollTop) || 0);
     } else {
       this.doc.setCursor({line: 0, ch: 0});
     }

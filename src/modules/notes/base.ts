@@ -70,7 +70,7 @@ export class Base {
         this.listView.items.appendChild(this.render(notes, 10));
 
         if (index) {
-          this.selectNote(this.notes[parseInt(index)]);
+          this.selectNote(this.notes[Number(index)]);
         }
       }, 10);
     }
@@ -142,14 +142,12 @@ export class Base {
       this.showNote(value, bind, note.cursor, note.html, note.previewState);
 
       this.selected = note;
-      this.noteView.preview.checked = this.selected.preview;
       this.noteView.sync.checked = this.selected.sync;
 
       localStorage.setItem('description', value);
       localStorage.setItem('index', note.index.toString());
       localStorage.setItem('selection', note.cursor);
 
-      // TODO Review double calls
       if (note.preview) {
         localStorage.setItem('html', this.noteView.html.innerHTML);
       }

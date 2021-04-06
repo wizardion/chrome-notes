@@ -21,7 +21,7 @@ export class NodeHelper {
       let rightNode: Node = this.getNode(right.split(','), element);
       let selection: Selection = document.getSelection();
 
-      selection.setBaseAndExtent(leftNode, parseInt(start), rightNode, parseInt(end));
+      selection.setBaseAndExtent(leftNode, Number(start), rightNode, Number(end));
     }
   }
 
@@ -52,10 +52,10 @@ export class NodeHelper {
 
   private static getNode(possition: string[], $root: Node): Node {
     var index = possition.length - 1;
-    var node = $root.childNodes[parseInt(possition[index])];
+    var node = $root.childNodes[Number(possition[index])];
 
     for (var i = index - 1; i >= 0; i--) {
-      node = node.childNodes[parseInt(possition[i])];
+      node = node.childNodes[Number(possition[i])];
     }
 
     return node;
