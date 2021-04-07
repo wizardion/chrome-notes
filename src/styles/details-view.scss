@@ -85,7 +85,9 @@
 }
 
 .animate {
-  animation: colorchange 0.8s;
+  background: linear-gradient(to right, #07a69812, #07a69801, #07a69800);
+  background-size: 200% 100%;
+  animation: colorchange 1.520s;
 }
 
 @keyframes borderchange
@@ -96,12 +98,14 @@
 
 @keyframes colorchange
 {
-  0% { 
-    background-color: #07a69810;
-  }
-  100% { 
-    background-color: transparent;
-  }
+  0% {
+    color: #06736a;
+		background-position: 0% 0%;
+	}
+	100% {
+    color: inherit;
+		background-position: 100% 0%;
+	}
 }
 
 @import 'editor-controls';
