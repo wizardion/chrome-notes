@@ -143,6 +143,7 @@ export class Base {
       this.showNote(value, bind, note.cursor, note.html, note.previewState);
 
       this.selected = note;
+      this.noteView.preview.checked = note.preview;
       this.noteView.sync.checked = this.selected.sync;
 
       storage.set('description', value);

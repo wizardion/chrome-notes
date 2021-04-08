@@ -68,7 +68,6 @@ export class Simple extends Base {
       if (html) {
         this.showPreview(html);
         this.setPreviewSelection(pState);
-        this.noteView.preview.checked = true;
       }
     }
   }
