@@ -7,32 +7,42 @@
   width: 28px;
   height: 17px;
   margin: 3px 1px 0 0;
-  background: #07a69804;
-  border: 1px solid #07a69809;
+
+  // background: #07a69804;
+  // border: 1px solid #07a69809;
 }
 
 .editor-controls .button.disabled,
 .editor-controls .button.disabled:hover,
 .editor-controls .button.disabled:active {
+  
   cursor: inherit;
   color: #d7e9e9;
   fill:#d7e9e9;
-  background: #07a69804;
-  border-color: #07a69809;
+  // color: #07a69875;
+  // fill:#07a69875;
+
+  // background: #07a69804;
+  // border-color: #07a69809;
+  
   opacity: 1;
 }
 
 .editor-controls .button:hover {
-  background: rgba(7, 166, 152, 0.055);
-  color: #07a698;
-  fill:#07a698;
+  // background: #07a6980e;
+  // color: #07a698;
+  // fill:#07a698;
+  color: #e33636;
+  fill:#e33636;
 }
 
 .editor-controls .button:active {
-  background: rgba(7, 166, 152, 0.17);
-  border: 1px solid rgba(183, 241, 237, 0.1);
-  color: #07a698;
-  fill:#07a698;
+  // background: #07a6982b;
+  // border: 1px solid #b7f1ed1a;
+  // color: #07a698;
+  // fill:#07a698;
+  color: #e3363685;
+  fill:#e3363685;
 }
 
 .editor-controls fieldset {
@@ -70,6 +80,8 @@
 
   color: #07a69875;
   fill:#07a69875;
+  // color: #d7e9e9;
+  // fill:#d7e9e9;
 
   -webkit-user-select: none;
   -moz-user-select: none;
