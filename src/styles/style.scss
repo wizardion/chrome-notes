@@ -30,7 +30,8 @@ input, button {
   user-select: none;
 }
 
-.button
+.button, 
+.link
 {
   padding: 0px;
   margin: 0px;
@@ -54,7 +55,7 @@ input, button {
 }
 
 .button:hover,
-.button:active
+.link:hover
 {
   color: #e33636;
   fill:#e33636;
@@ -62,7 +63,8 @@ input, button {
 
 .button:active
 {
-  // opacity: 0.5;
+  color: #e3363685;
+  fill:#e3363685;
 }
 
 @import 'list-view';
