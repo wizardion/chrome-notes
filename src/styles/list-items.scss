@@ -1,13 +1,12 @@
 .list-view .list-item,
 .list-view .hold .list-item:hover {
-  border-bottom: 1px solid rgba(7, 166, 152, 0.1);
   line-height: 25px;
   height: 25px;
   padding-left: 10px;
   // background:inherit;
   color: inherit;
   cursor: inherit;
-  border-bottom: 1px dashed rgba(7, 66, 152, 0.075);
+  border-bottom: 1px dashed #07429813;
 }
 
 .list-view .list-item:hover,
@@ -35,7 +34,7 @@
 .list-view .list-item.edit-item:hover {
   background: transparent;
   cursor: default;
-  border-bottom: 1px solid rgba(7, 166, 152, 0.1);
+  border-bottom: 1px solid #07429813;
 }
 
 .list-item .date-time {
