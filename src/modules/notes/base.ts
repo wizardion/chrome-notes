@@ -111,7 +111,7 @@ export class Base {
       }
 
       // TODO Review state savings, synch and preview.
-      // TODO new note doesn't have id yet, state needs to bew reviewed.
+      // TODO new note doesn't have id yet, state needs to be reviewed.
       note = new Note(null, this.notes.length);
       note.title = title;
       note.description = description;
@@ -122,6 +122,9 @@ export class Base {
       this.listView.items.appendChild(note.element);
       note.onclick = this.selectNote.bind(this, note, true);
       note.sortButton.onmousedown = Sorting.start.bind(Sorting, note);
+
+      Sorting.notes = this.notes;
+      Sorting.items = this.listView.items;
 
       this.newView.cancel.style.display = 'None';
       this.newView.create.style.display = 'None';
