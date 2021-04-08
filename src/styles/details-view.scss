@@ -85,7 +85,8 @@
 }
 
 .animate {
-  background: linear-gradient(to right, #07a69812, #07a69801, #07a69800);
+  // background: linear-gradient(to right, #07a69812, #07a69801, #07a69800);
+  background: linear-gradient(to right, #07a69815, #07a69800 45%);
   background-size: 200% 100%;
   animation: colorchange 1.520s;
 }
