@@ -8,13 +8,14 @@ export class MDRender {
   private default: TokenRender;
 
   constructor() {
-    this.md = new MarkdownIt({ linkify: true }).use(taskLists);
+    this.md = new MarkdownIt({ linkify: true, breaks: true }).use(taskLists);
     this.default = this.md.renderer.rules['link_open'] || this.tokenRender.bind(this);
     this.md.renderer.rules['link_open'] = this.linkOpen.bind(this);
   }
 
   public render(text: string): string {
-    return this.md.render(text);
+    var html = this.md.render(text.replace(/^(\n|[ ]+\n)/gim, '$1\=\?$1'));
+    return html.replace(/\=\?/gi, '&nbsp;');
   }
 
   public unescapeAll(text: string): string {
