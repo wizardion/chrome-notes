@@ -1,6 +1,6 @@
 export default class Storage {
   public static set(key: string, value: (string|number|object)) {
-    if (!value) {
+    if (!value && value !== 0) {
       return this.remove(key);
     }
 
