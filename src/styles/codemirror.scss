@@ -1,9 +1,11 @@
 .CodeMirror {
   height: 241px !important;
-  font-size: 14px;
   line-height: 20px;
   padding-left: 3px;
   padding-right: 3px;
+
+  font-size: 14px;
+  font-family: monospace, sans-serif !important;
 }
 
 .CodeMirror-wrap {
