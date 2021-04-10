@@ -54,11 +54,13 @@ export class Editor {
 
     this.controls.forEach((item: HTMLElement) => {
       const action: string = item.getAttribute('action');
-      const key: string = item.getAttribute('key');
+      const keys: string = item.getAttribute('keys');
       const event: EventListener = this.actions[action];
 
-      if (event && key) {
-        mapping[key] = event.bind(this);
+      if (event && keys) {
+        keys.split(',').forEach(key => {
+          mapping[key] = event.bind(this);
+        });
       }
 
       if (event) {
@@ -78,6 +80,7 @@ export class Editor {
   public set value(text: string) {
     this.doc.setValue(text);
     this.codemirror.refresh();
+    setTimeout(() => this.codemirror.clearHistory());
   }
 
   public get scrollTop(): number {
