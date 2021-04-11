@@ -9,7 +9,7 @@ html, body {
   padding: 0px;
 
   overflow: hidden;
-  font: 15px 'Ubuntu', Sans-Serif;
+  font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
 }
 
 .notes {
@@ -52,6 +52,7 @@ input, button {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  font-family: 'Roboto', 'Ubuntu', Sans-Serif;
 }
 
 .button:hover,
