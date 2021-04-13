@@ -88,6 +88,7 @@ module.exports = {
       template: './src/popup.html',
       scriptLoading: 'blocking',
       inject: 'head',
+      minify: true,
       chunks: [
         'vendors',
         'index'
