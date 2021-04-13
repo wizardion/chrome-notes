@@ -48,6 +48,7 @@
 .back svg {
   margin-top: 4px;
   margin-bottom: -4px;
+  margin-left: -4px;
 }
 
 .button.delete {
@@ -62,7 +63,6 @@
 
 .details-view .button.save {
   display: none;
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMElEQVR42mNgGAUkA45l0/5TpJlsA4jSjEsB0TZjU0iys5E1kO1nmEaKQ3w00RIHAFy0LT30T7pAAAAAAElFTkSuQmCC');
   width: 25px;
   float: right;
   cursor: pointer;
@@ -71,8 +71,8 @@
   right: 5px;
 }
 
-.details-view .button.save:hover, .button.save:active {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMElEQVR42mNgGAUkg8dmZv8p0ky2AURpxqWAaJuxKSTZ2cgayPYzTCPFIT6aaIkDACP6LhnfJ3KmAAAAAElFTkSuQmCC');
+.details-view .button.save svg {
+  margin-top: 2px;
 }
 
 .details-view .cancel {
