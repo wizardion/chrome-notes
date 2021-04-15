@@ -75,7 +75,6 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
-    // new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*']
     }),
