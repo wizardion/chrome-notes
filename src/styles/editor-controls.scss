@@ -87,16 +87,17 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  box-sizing: border-box;
 }
 
 .checkbox.edit {
   position: absolute;
-  right: 35px;
+  right: 33px;
 }
 
 .checkbox.sync {
   position: absolute;
-  right: 63px;
+  right: 60px;
 }
 
 .checkbox input {
