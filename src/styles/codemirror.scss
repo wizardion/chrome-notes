@@ -1,0 +1,81 @@
+.CodeMirror {
+  height: 241px !important;
+  line-height: 18px;
+  padding-left: 3px;
+  padding-right: 3px;
+
+  font-size: 13px;
+  // font-family: 'Roboto Mono1', monospace, sans-serif !important;
+  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+}
+
+.CodeMirror-wrap {
+  border-top: 1px solid transparent;
+}
+
+.CodeMirror-cursor {
+  border-left: 0 !important;
+  width: 2px !important;
+
+  border-radius: 4px !important;
+  // background-color: #03534e;
+  background-color: #023a36;
+  opacity: 0.75;
+  margin-left: -1px;
+}
+
+.CodeMirror-selected {
+  background: #d9d9d9;
+}
+
+.CodeMirror-focused .CodeMirror-selected {
+  background: #d9e9e9;
+}
+
+.CodeMirror-line::selection, 
+.CodeMirror-line > span::selection, 
+.CodeMirror-line > span > span::selection {
+  background: #d9e9e9; 
+}
+
+.CodeMirror-code > .CodeMirror-line:first-child {
+  text-align: center;
+}
+
+.CodeMirror-code > .CodeMirror-line:first-child > span {
+  font-weight: bold;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 21px;
+}
+
+.CodeMirror-code > .CodeMirror-line:first-child > span::before {
+  content: ' ';
+  display: block;
+  height: 5px;
+}
+
+.CodeMirror-code > .CodeMirror-line:first-child > span::after {
+  content: ' ';
+  display: block;
+  height: 10px;
+  margin-bottom: -21px;
+}
+
+.CodeMirror-code > .CodeMirror-line:first-child span {
+  color: #06736a;
+}
+
+.CodeMirror-line .cm-link {
+  // color: #00c;
+  color: #06736a;
+}
+
+.CodeMirror-line .cm-header {
+  color: black;
+}
+
+// .CodeMirror-line .cm-url {
+//   // color: #a11;
+//   // color: #e33636;
+// }

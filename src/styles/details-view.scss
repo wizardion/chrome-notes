@@ -1,0 +1,112 @@
+.details-view {
+  display: none;
+  background: #07a69801;
+}
+
+.details-view .head
+{
+  height: 25px;
+  text-align: center;
+  color: #e8b600;
+  color: #07a698;
+  position: relative;
+  line-height: 23px;
+  // border-bottom: 1px dotted #07a69826;
+  border-bottom: 1px dotted transparent;
+}
+
+.content
+{
+  height: 228px;
+
+  overflow-y: hidden;
+  overflow-x: hidden;
+  outline: none;
+  border: none;
+  padding: 2px;
+  resize: none;
+  border: none;
+  padding: 6px;
+  background: transparent;
+  padding-top: 10px;
+
+  padding: 0px;
+  height: 244px;
+}
+
+.back
+{
+  width: inherit;
+  background-position: left;
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  line-height: 26px;
+  font-size: 12px;
+}
+
+.back svg {
+  margin-top: 4px;
+  margin-bottom: -4px;
+  margin-left: -4px;
+}
+
+.button.delete {
+  position: absolute;
+  width: 28px;
+  right: 5px;
+}
+
+.button.delete svg {
+  margin-top: 3px;
+}
+
+.details-view .button.save {
+  display: none;
+  width: 25px;
+  float: right;
+  cursor: pointer;
+  position: absolute;
+  z-index: 1;
+  right: 5px;
+}
+
+.details-view .button.save svg {
+  margin-top: 2px;
+}
+
+.details-view .cancel {
+  display: none;
+}
+
+.required {
+  animation: borderchange 1.5s;
+}
+
+.animate {
+  // background: linear-gradient(to right, #07a69812, #07a69801, #07a69800);
+  background: linear-gradient(to right, #07a69815, #07a69800 45%);
+  background-size: 200% 100%;
+  animation: colorchange 1.520s;
+}
+
+@keyframes borderchange
+{
+  0% { border-top: 1px solid #e3363699; }
+  100% { border-top: 1px solid transparent; }
+}
+
+@keyframes colorchange
+{
+  0% {
+    color: #06736a;
+		background-position: 0% 0%;
+	}
+	100% {
+    color: inherit;
+		background-position: 100% 0%;
+	}
+}
+
+@import 'editor-controls';
+@import 'preview';

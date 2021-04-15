@@ -1,0 +1,138 @@
+.editor-controls {
+  height: 100%;
+  display: inline-block;
+}
+
+.editor-controls .button {
+  width: 28px;
+  height: 17px;
+  margin: 3px 1px 0 0;
+
+  // background: #07a69804;
+  // border: 1px solid #07a69809;
+}
+
+.editor-controls .button.disabled,
+.editor-controls .button.disabled:hover,
+.editor-controls .button.disabled:active {
+  
+  cursor: inherit;
+  color: #d7e9e9;
+  fill:#d7e9e9;
+  // color: #07a69875;
+  // fill:#07a69875;
+
+  // background: #07a69804;
+  // border-color: #07a69809;
+  
+  opacity: 1;
+}
+
+.editor-controls .button:hover {
+  // background: #07a6980e;
+  // color: #07a698;
+  // fill:#07a698;
+  color: #e33636;
+  fill:#e33636;
+}
+
+.editor-controls .button:active {
+  // background: #07a6982b;
+  // border: 1px solid #b7f1ed1a;
+  // color: #07a698;
+  // fill:#07a698;
+  color: #e3363685;
+  fill:#e3363685;
+}
+
+.editor-controls fieldset {
+  border: none;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.editor-controls fieldset input:first-child,
+.editor-controls fieldset button:first-child,
+.editor-controls fieldset div:first-child {
+  border-top-left-radius: 4px; 
+  border-bottom-left-radius: 4px; 
+}
+
+.editor-controls fieldset input:last-child,
+.editor-controls fieldset button:last-child,
+.editor-controls fieldset div:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.checkbox {
+  cursor: pointer;
+  position: relative;
+  
+  width: 28px;
+  height: 17px;
+  margin: 3px 1px 0 0;
+  border: 1px solid transparent;
+
+  color: #07a69875;
+  fill:#07a69875;
+  // color: #d7e9e9;
+  // fill:#d7e9e9;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.checkbox.edit {
+  position: absolute;
+  right: 33px;
+}
+
+.checkbox.sync {
+  position: absolute;
+  right: 60px;
+}
+
+.checkbox input {
+  cursor: pointer;
+  position: absolute;
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+.checkbox span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 17px;
+}
+
+.checkbox input ~ .checkmark .active {
+  display: none;
+}
+
+.checkbox input ~ .checkmark .inactive {
+  display: block;
+}
+
+.checkbox input:checked ~ .checkmark {
+  color: #07a698;
+  fill:#07a698;
+}
+
+.checkbox input:checked ~ .checkmark .active {
+  display: block;
+}
+
+.checkbox input:checked ~ .checkmark .inactive {
+  display: none;
+}

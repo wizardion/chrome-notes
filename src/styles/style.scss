@@ -1,0 +1,72 @@
+html, body {
+  // background: white;
+  background: silver;
+
+  width: 600px;
+  height: 270px;
+  border:0;
+  margin: 0px;
+  padding: 0px;
+
+  overflow: hidden;
+  font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
+}
+
+.notes {
+  background: white;
+  box-sizing: border-box;
+}
+
+input, button {
+  font-size: 12px;
+  outline: none;
+}
+
+.disable-select
+{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.button, 
+.link
+{
+  padding: 0px;
+  margin: 0px;
+  height:24px;
+  width:24px;
+  line-height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #07a698;
+  fill:#07a698;
+  outline: none;
+  display: inline-block;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-family: 'Roboto', 'Ubuntu', Sans-Serif;
+}
+
+.button:hover,
+.link:hover
+{
+  color: #e33636;
+  fill:#e33636;
+}
+
+.button:active
+{
+  color: #e3363685;
+  fill:#e3363685;
+}
+
+@import 'list-view';
+@import 'details-view';

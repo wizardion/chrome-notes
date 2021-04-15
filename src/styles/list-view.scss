@@ -1,0 +1,85 @@
+.list-view {
+  display: none;
+  background: white;
+}
+
+.list-view .list-controls {
+  position: relative;
+  left: 0px;
+  height: 25px;
+  text-align:center;
+  border-bottom: 1px groove transparent;
+}
+
+.list-view .list-controls span {
+  color: #07a698;
+  display: inline-block;
+  line-height: 24px;
+}
+
+.list-view .button.search {
+  float: left;
+  margin-left: 5px;
+}
+
+.list-view .button.search svg {
+  margin-top: 4px;
+}
+
+.list-view .button.add {
+  float: right;
+  margin-right: 5px;
+}
+
+.list-view .button.add svg {
+  margin-top: 4px;
+}
+
+.list-view .search-notes {
+  border: none;
+  width: 230px;
+  position: absolute;
+  left: 35px;
+  top: 2px;
+  color: #07a698;
+  padding-bottom: 3px;
+  text-decoration: underline;
+  display: none;
+}
+
+.list-view .search-notes:focus, .button.search:focus {
+  outline: none;
+}
+
+.list-view .list-items {
+  width: 100%;
+  height: 244px;
+  position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.list-view .list-items .no-items {
+  color: #07a69835;
+  text-align: center;
+  padding-top: 90px;
+}
+
+.list-view .list-items .no-items .plus {
+  color: #07a698;
+  fill: #07a698;
+  opacity: 0.25;
+  position: relative;
+  top: 2px;
+}
+
+.list-view .list-items .no-items .plus:hover {
+  cursor: initial;
+}
+
+.list-view .template {
+  display: none;
+}
+
+@import 'list-items';
+@import 'scroll-bar';
