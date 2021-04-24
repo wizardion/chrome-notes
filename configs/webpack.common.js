@@ -1,7 +1,6 @@
 'use strict';
 
 const path = require('path');
-const sass = require('node-sass');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
@@ -50,7 +49,7 @@ module.exports = {
           loader: 'sass-loader',
           options: {
             sourceMap: false,
-            // implementation: sass,
+            implementation: require("dart-sass"),
           }
         }
       ],
