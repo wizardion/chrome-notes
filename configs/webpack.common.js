@@ -85,8 +85,9 @@ module.exports = {
       filename: 'popup.html',
       template: './src/popup.html',
       scriptLoading: 'blocking',
-      inject: 'head',
-      minify: true,
+      // inject: 'head',
+      inject: "body",
+      // minify: true,
       chunks: [
         'vendors',
         'index'
@@ -97,7 +98,7 @@ module.exports = {
       transform({ assetsByChunkName }) {
         let manifest = require(path.resolve(__root__, 'src/manifest.json'));
 
-        manifest.background.scripts = assetsByChunkName.background;
+        manifest.background.service_worker = assetsByChunkName.background[0];
         manifest.version = '1.0.6';
         
         return JSON.stringify(manifest, null, 2);
