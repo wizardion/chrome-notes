@@ -10,7 +10,8 @@ var selection = storage.get('selection');
 var description = storage.get('description');
 var previewState = storage.get('previewState');
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
+  var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
   var noteViewElement: HTMLElement = <HTMLElement>document.getElementById('details-view');
   var codemirror = new Editor(
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var editor = new Simple(listView, noteView, newView);
   editor.init();
+  notes.style.display = '';
 
   if (description) {
     if (isNew) {
@@ -55,4 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     editor.showList();
   }
+
+  notes.style.opacity = '1';
 });
