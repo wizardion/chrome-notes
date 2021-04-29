@@ -10,8 +10,13 @@ var selection = storage.get('selection');
 var description = storage.get('description');
 var previewState = storage.get('previewState');
 
-window.addEventListener('load', () => {
-  var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
+var notes: HTMLElement = null;
+var listView: IListView = null;
+var noteView: INoteView = null;
+var newView: INewNoteView = null;
+
+function domLoad() {
+  notes = <HTMLElement>document.getElementById('notes');
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
   var noteViewElement: HTMLElement = <HTMLElement>document.getElementById('details-view');
   var codemirror = new Editor(
@@ -19,7 +24,7 @@ window.addEventListener('load', () => {
     <NodeList>document.getElementById('editor-controls').querySelectorAll('div[action]')
   );
 
-  var listView: IListView = {
+  listView = {
     node: listViewElement,
     items: <HTMLElement>document.getElementById('list-items'),
     template: <HTMLElement>document.getElementById('template'),
@@ -28,7 +33,7 @@ window.addEventListener('load', () => {
     searchInput: <HTMLInputElement>document.getElementById('search-input'),
   }
 
-  var noteView: INoteView = {
+  noteView = {
     node: noteViewElement,
     back: <HTMLButtonElement>document.getElementById('to-list'),
     delete: <HTMLButtonElement>document.getElementById('delete-note'),
@@ -38,12 +43,14 @@ window.addEventListener('load', () => {
     editor: codemirror
   };
 
-  var newView: INewNoteView ={
+  newView ={
     node: noteViewElement,
     cancel: <HTMLButtonElement>document.getElementById('cancel-note'),
     create: <HTMLButtonElement>document.getElementById('create-note'),
   }
+};
 
+function load() {
   var editor = new Simple(listView, noteView, newView);
   editor.init();
   notes.style.display = '';
@@ -59,4 +66,7 @@ window.addEventListener('load', () => {
   }
 
   notes.style.opacity = '1';
-});
+};
+
+document.addEventListener('DOMContentLoaded', domLoad);
+window.addEventListener('load', load);
