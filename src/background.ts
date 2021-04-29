@@ -1,11 +1,18 @@
 // import db from './modules/db/db'
 
-// document.addEventListener('DOMContentLoaded', function () {
-//   db.init();
-//   console.log('DOMContentLoaded');
-// });
+chrome.runtime.onInstalled.addListener(function() {
+  // console.log('app installed');
 
-chrome.alarms.create('alarmName', {periodInMinutes: 2});
+  chrome.alarms.getAll((alarms) => {
+    console.log('all', alarms);
+  });
+
+  chrome.alarms.clearAll((aaa) => {
+    console.log('removed', aaa);
+  });
+
+  chrome.alarms.create('start-1', {periodInMinutes: 1});
+});
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
   console.log("Got an alarm!", {
