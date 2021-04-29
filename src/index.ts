@@ -15,7 +15,7 @@ var listView: IListView = null;
 var noteView: INoteView = null;
 var newView: INewNoteView = null;
 
-function domLoad() {
+function loadDomElements() {
   notes = <HTMLElement>document.getElementById('notes');
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
   var noteViewElement: HTMLElement = <HTMLElement>document.getElementById('details-view');
@@ -50,7 +50,7 @@ function domLoad() {
   }
 };
 
-function load() {
+function loadApp() {
   var editor = new Simple(listView, noteView, newView);
   editor.init();
   notes.style.display = '';
@@ -68,5 +68,5 @@ function load() {
   notes.style.opacity = '1';
 };
 
-document.addEventListener('DOMContentLoaded', domLoad);
-window.addEventListener('load', load);
+document.addEventListener('DOMContentLoaded', loadDomElements);
+window.addEventListener('load', loadApp);
