@@ -18,5 +18,8 @@
       "alarms",
       "storage"
    ],
-   "version": null
+   "version": null,
+   "optional_permissions": [
+      "unlimitedStorage"
+   ]
 }
