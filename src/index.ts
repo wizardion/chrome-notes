@@ -53,7 +53,7 @@ function loadDomElements() {
 function loadApp() {
   var editor = new Simple(listView, noteView, newView);
   editor.init();
-  notes.style.display = '';
+  notes.style.display = 'inherit';
 
   if (description) {
     if (isNew) {
