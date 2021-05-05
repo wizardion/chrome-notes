@@ -16,10 +16,8 @@
    "permissions": [
       "tabs",
       "alarms",
-      "storage"
-   ],
-   "version": null,
-   "optional_permissions": [
+      "storage",
       "unlimitedStorage"
-   ]
+   ],
+   "version": null
 }
