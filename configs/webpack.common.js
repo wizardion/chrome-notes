@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 const __root__ = path.resolve(__dirname, '..');
 
 module.exports = {
@@ -76,6 +77,11 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*']
+    }),
+    new CopyPlugin({
+      patterns: [
+        {from: "src/images/check.png", to: "dist/assets/icon-128.png"}
+      ],
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[chunkhash].css',
