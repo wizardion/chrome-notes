@@ -2,10 +2,11 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const htmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyPlugin = require("copy-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const __root__ = path.resolve(__dirname, '..');
 
 module.exports = {
@@ -78,10 +79,10 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*']
     }),
-    new CopyPlugin({
+    new CopyWebpackPlugin({
       patterns: [
-        {from: "src/images/check.png", to: "dist/assets/icon-128.png"}
-      ],
+        {from: 'src/images/check.png', to: 'icon-128.png'},
+      ]
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[chunkhash].css',
@@ -97,8 +98,22 @@ module.exports = {
       chunks: [
         'vendors',
         'index'
-      ]
+      ],
+      attributes: {
+        'async': function (tag, compilation, index, a, b) {
+          if (tag.tagName === 'script' && tag.attributes.src.match(/^index/gi)) {
+            return true;
+          }
+          return false;
+        }
+      },
     }),
+    new htmlWebpackInjectAttributesPlugin(),
+    // new htmlWebpackInjectAttributesPlugin({
+    //   // inject: "true",
+    //   async: true,
+    //   // test: {}
+    // }),
     new StatsWriterPlugin({
       filename: "manifest.json",
       transform({ assetsByChunkName }) {

@@ -16,11 +16,26 @@ var noteView: INoteView = null;
 var newView: INewNoteView = null;
 
 function loadDomElements() {
+  
+};
+
+// function loadApp() {
+ 
+  
+//   // notes.style.display = 'inherit';
+//   // notes.style.opacity = '1';
+// };
+
+// document.addEventListener('DOMContentLoaded', loadDomElements);
+// window.addEventListener('load', loadApp);
+
+
+(() => {
   notes = <HTMLElement>document.getElementById('notes');
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
   var noteViewElement: HTMLElement = <HTMLElement>document.getElementById('details-view');
   var codemirror = new Editor(
-    <HTMLTextAreaElement>document.getElementById('description-note'), 
+    <HTMLTextAreaElement>document.getElementById('description-note'),
     <NodeList>document.getElementById('editor-controls').querySelectorAll('div[action]')
   );
 
@@ -43,14 +58,12 @@ function loadDomElements() {
     editor: codemirror
   };
 
-  newView ={
+  newView = {
     node: noteViewElement,
     cancel: <HTMLButtonElement>document.getElementById('cancel-note'),
     create: <HTMLButtonElement>document.getElementById('create-note'),
   }
-};
 
-function loadApp() {
   var editor = new Simple(listView, noteView, newView);
   editor.init();
   notes.style.display = 'inherit';
@@ -60,13 +73,10 @@ function loadApp() {
       editor.selectNew(description, selection);
     } else {
       editor.showNote(description, true, selection, html, previewState);
-    }    
+    }
   } else {
     editor.showList();
   }
 
   notes.style.opacity = '1';
-};
-
-document.addEventListener('DOMContentLoaded', loadDomElements);
-window.addEventListener('load', loadApp);
+})();
