@@ -158,7 +158,7 @@ export class Editor {
 
   public show() {
     this.visible = true;
-    this.wrapper.style.display = '';
+    this.wrapper.style.display = 'inherit';
     this.controls.forEach((item: HTMLElement) => item.classList.remove('disabled'));
   }
 

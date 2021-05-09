@@ -283,7 +283,7 @@ export class Base {
   protected showPreview(value: string) {
     this.noteView.editor.hide();
     this.noteView.html.innerHTML = value;
-    this.noteView.html.style.display = '';
+    this.noteView.html.style.display = 'inherit';
   }
 
   protected hidePreview() {
