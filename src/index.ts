@@ -15,20 +15,6 @@ var listView: IListView = null;
 var noteView: INoteView = null;
 var newView: INewNoteView = null;
 
-function loadDomElements() {
-  
-};
-
-// function loadApp() {
- 
-  
-//   // notes.style.display = 'inherit';
-//   // notes.style.opacity = '1';
-// };
-
-// document.addEventListener('DOMContentLoaded', loadDomElements);
-// window.addEventListener('load', loadApp);
-
 
 (() => {
   notes = <HTMLElement>document.getElementById('notes');
