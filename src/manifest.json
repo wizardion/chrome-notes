@@ -4,18 +4,17 @@
    },
    "action": {
       "default_popup": "popup.html",
-      "default_title": "My-Notes"
+      "default_title": "My-Notes-Testers"
    },
    "icons": {
       "128": "icon-128.png"
    },
-   "description": "My-Notes - save your notes wherever you are.",
+   "description": "My-Notes-Testers - save your notes wherever you are.",
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAot+j6ZF6RdKhXjiDkw1fW6zlLdyOtIjYU6hi2gDPk0kBDouqqEjA/fHtldXkmJUB9+4i6/BdfJQWYstebGr5bzYvBlmiOJEaBIblSm0ylCOTsQ7F4v0Z84RrngudA6Hg1myy/ioM+dO1yS0n3USt+V6DfaCnwapbU0euYNY8kkinhq1S2QlyOHQsHdv0G7zPA46s8JItYAts6zdisAn0Kv8meyPywVDSimSgXbUUEg1pKUf10BRBhTXtotwUqBey2ijtpf1jnBiQmfz3ozQT37fFArZztUfTMqwXQecz4x8Qt9yTBspEvwncBcQgmM8el6SkZIcuZ3qa8lsSY/aV1QIDAQAB",
    "manifest_version": 3,
-   "name": "My-Notes",
+   "name": "My-Notes-Testers",
    "update_url": "https://clients2.google.com/service/update2/crx",
    "permissions": [
-      "tabs",
       "alarms",
       "storage",
       "unlimitedStorage"

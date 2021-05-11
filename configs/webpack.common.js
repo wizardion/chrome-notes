@@ -120,7 +120,11 @@ module.exports = {
         let manifest = require(path.resolve(__root__, 'src/manifest.json'));
 
         manifest.background.service_worker = assetsByChunkName.background[0];
-        manifest.version = '1.0.6';
+        manifest.version = process.__version__;
+
+        if (!manifest.version) {
+          delete manifest.key;
+        }
         
         return JSON.stringify(manifest, null, 2);
       }
