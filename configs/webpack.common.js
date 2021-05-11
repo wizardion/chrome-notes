@@ -125,6 +125,8 @@ module.exports = {
         if (!manifest.version) {
           delete manifest.key;
           manifest.version = "0"
+          manifest.name += ' (Dev)';
+          manifest.action.default_title += ' (Dev)';
         }
         
         return JSON.stringify(manifest, null, 2);
