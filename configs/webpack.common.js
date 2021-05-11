@@ -124,6 +124,7 @@ module.exports = {
 
         if (!manifest.version) {
           delete manifest.key;
+          manifest.version = "0"
         }
         
         return JSON.stringify(manifest, null, 2);
