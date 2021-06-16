@@ -1,15 +1,26 @@
 .CodeMirror {
-  height: 241px !important;
+  height: 243px !important;
   line-height: 18px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding: 0px !important;
+  padding: 0px !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
 
-  font-size: 13px;
+  font-size: 13px !important;
   font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+  border: none !important;
+  border-radius: 0 !important;
 }
 
 .CodeMirror-wrap {
   border-top: 1px solid transparent;
+}
+
+.CodeMirror-scroll {
+  padding-bottom: 50px !important;
+  overflow: scroll !important;
+  margin-bottom: -50px !important;
+  margin-right: -50px !important;
 }
 
 .CodeMirror-cursor {
@@ -67,14 +78,37 @@
 
 .CodeMirror-line .cm-link {
   // color: #00c;
-  color: #06736a;
+  color: #06736a !important;
+  text-decoration: none;
 }
 
 .CodeMirror-line .cm-header {
   color: black;
 }
 
-// .CodeMirror-line .cm-url {
-//   // color: #a11;
-//   // color: #e33636;
+.CodeMirror-line .cm-url {
+  color: #a11 !important;
+  // color: #e33636;
+}
+
+//.cm-null 
+.cm-spell-error {
+  background: none !important;
+  border-bottom: 1px dashed red !important;
+}
+
+// .cm-bracket, 
+.cm-tag {
+  color: dimgray !important;
+  border-bottom: 1px dashed red !important;
+}
+
+.cm-comment, 
+.cm-comment.cm-spell-error {
+  background: none !important;
+  color: dimgray;
+}
+
+// .cm-formatting {
+//   opacity: 0.25;
 // }

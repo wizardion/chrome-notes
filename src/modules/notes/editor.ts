@@ -1,16 +1,22 @@
 import 'codemirror/mode/markdown/markdown.js'
+import 'codemirror/mode/gfm/gfm.js'
+import 'codemirror/addon/edit/continuelist.js';
+import 'codemirror/addon/mode/overlay.js';
+// import 'codemirror/addon/selection/mark-selection.js'; // for search control
 import 'codemirror/lib/codemirror.css';
 import '../../styles/codemirror.scss';
-import {fromTextArea, EditorFromTextArea, KeyMap, Position, Doc} from 'codemirror';
+// import {fromTextArea, EditorFromTextArea, KeyMap, Position, Doc} from 'codemirror';
+import * as CodeMirror from 'codemirror';
 import {MDRender} from './components/md-render';
+var CodeMirrorSpellChecker = require('codemirror-spell-checker');
 
 
 export class Editor {
   private visible: boolean;
   private md: MDRender;
-  private codemirror: EditorFromTextArea;
+  private codemirror: CodeMirror.EditorFromTextArea;
   private controls: NodeList;
-  private doc: Doc;
+  private doc: CodeMirror.Doc;
   public wrapper: HTMLTextAreaElement;
   public scroll: HTMLElement;
 
@@ -28,16 +34,33 @@ export class Editor {
 
   constructor(textarea: HTMLTextAreaElement, controls?: NodeList) {
     this.controls = controls;
-    this.codemirror = fromTextArea(textarea, {
+
+    CodeMirrorSpellChecker({
+        codeMirrorInstance: CodeMirror
+    });
+
+    this.codemirror = CodeMirror.fromTextArea(textarea, {
+      theme: 'paper',
+      mode: 'spell-checker',
+      // @ts-ignore
+      backdrop: {
+        name: 'gfm',
+        gitHubSpice: false
+      },
       lineWrapping: true,
-      // viewportMargin: 10000,
       showCursorWhenSelecting: true,
+      tabSize: 2,
+      indentUnit: 2,
+      indentWithTabs: false,
+      lineNumbers: false,
+      allowDropFileTypes: ['text/plain']
+      // viewportMargin: 10000,
       // spellcheck: false,
       // autocorrect: false,
       // inputStyle: 'contenteditable',
-      mode: {
-        name: 'markdown',
-      }
+      // mode: {
+      //   name: 'markdown',
+      // }
     });
 
     this.doc = this.codemirror.getDoc();
@@ -50,7 +73,7 @@ export class Editor {
 
   private init() {
     this.md = new MDRender();
-    var mapping: KeyMap = {};
+    var mapping: CodeMirror.KeyMap = {};
 
     this.controls.forEach((item: HTMLElement) => {
       const action: string = item.getAttribute('action');
@@ -69,6 +92,10 @@ export class Editor {
 
       item.onmousedown = (e: MouseEvent) => e.preventDefault();
     });
+
+    mapping['Enter'] = 'newlineAndIndentContinueMarkdownList';
+    mapping['Tab'] = () => this.indentTab();
+    mapping['Shift-Tab'] = () => this.shiftTab();
 
     this.codemirror.setOption("extraKeys", mapping);
   }
@@ -189,7 +216,7 @@ export class Editor {
 
   private insertList(text: string, prefix: string) {
     if (!text.match(/^1.\s|^-\s/gi)) {
-      let cursor: Position = this.codemirror.getCursor();
+      let cursor: CodeMirror.Position = this.codemirror.getCursor();
 
       if ((cursor.ch > 0 ? text.length - cursor.ch : cursor.ch) !== 0) {
         this.codemirror.replaceSelection(`\n`);
@@ -207,13 +234,46 @@ export class Editor {
 
     if (!text.match(rule)) {
       this.codemirror.replaceSelection(template.replace(/\$\{text\}/gim, text), 'end');
-      let cursor: Position = this.codemirror.getCursor();
+      let cursor: CodeMirror.Position = this.codemirror.getCursor();
       this.codemirror.setSelection(
         { ch: cursor.ch - 4, line: cursor.line },
         { ch: cursor.ch - 1, line: cursor.line }
       );
     } else {
       this.codemirror.replaceSelection(text.replace(rule, '$1'), 'around');
+    }
+  }
+
+  private indentTab() {
+    var linesSelected =  document.getElementsByClassName('CodeMirror-selected').length;
+
+    if (linesSelected > 1) {
+      return this.codemirror.execCommand('indentMore');
+    }
+
+    var spaces = Array((this.codemirror.getOption('tabSize') || 2) + 1).join(' ');
+    this.codemirror.replaceSelection(spaces);
+
+    // var ranges = this.codemirror.listSelections();
+    // var pos = ranges[0].head;
+    // var eolState = this.codemirror.getStateAfter(pos.line);
+    // var inList = !!eolState.list;
+  }
+
+  private shiftTab() {
+    var linesSelected =  document.getElementsByClassName('CodeMirror-selected').length;
+
+    if (linesSelected > 1) {
+      return this.codemirror.execCommand('indentLess');
+    }
+
+    var cursor = this.doc.getCursor();
+    var line = this.doc.getLine(cursor.line);
+
+    if (line.substring(0, cursor.ch).match(/[ ]{2,}$/)) {
+      var position = {ch: cursor.ch - (this.codemirror.getOption('tabSize') || 2), line: cursor.line};
+      this.doc.setSelection(position, cursor);
+      this.doc.replaceSelection('');
     }
   }
 }

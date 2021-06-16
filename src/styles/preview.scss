@@ -33,7 +33,7 @@
   font-size: 16px !important;
   line-height: 21px;
   margin-left: -1px !important;
-  padding: 10px 5px 10px 5px;
+  padding: 9px 5px 10px 5px;
 }
 
 .content-preview .title + p {
@@ -125,7 +125,7 @@
 
 .content-preview p code {
   background: ghostwhite;
-  background-color: #f6f8fa;
+  background-color: #f0f4f6;
 
   border: 1px solid transparent;
   // border: 1px solid lightgray;
@@ -134,6 +134,13 @@
   padding: 1px 4px 1px 4px;
   margin: 0;
   // color: #06736a;
+
+  // border: 1px solid lightgray;
+  border-radius: 4px;
+
+  font-size: 13px;
+  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+  color: #06736a;
 }
 
 .content-preview pre {
@@ -149,6 +156,11 @@
 
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.content-preview pre code {
+  font-size: 13px;
+  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
 }
 
 .content-preview > h1 + *,

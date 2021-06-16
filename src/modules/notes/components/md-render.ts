@@ -14,7 +14,7 @@ export class MDRender {
   }
 
   public render(text: string): string {
-    var html = this.md.render(text.replace(/^(\n|[ ]+\n)/gim, '$1\=\?$1'));
+    var html = this.md.render(text.replace(/^(\n|[ ]+\n|[ ]{2,3}(?=\w))/gim, '$1\=\?$1'));
     return html.replace(/\=\?/gi, '&nbsp;');
   }
 
