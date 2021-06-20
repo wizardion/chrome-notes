@@ -8,6 +8,7 @@ const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const __root__ = path.resolve(__dirname, '..');
+const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
 
 module.exports = {
   entry: {
@@ -81,7 +82,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        {from: 'src/images/check.png', to: 'icon-128.png'},
+        {from: icon, to: 'icon-128.png'},
       ]
     }),
     new MiniCssExtractPlugin({
