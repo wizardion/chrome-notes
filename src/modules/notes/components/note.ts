@@ -52,8 +52,8 @@ export class Note {
   public set index(value: number) {
     if (this.indexId !== value) {
       this.indexId = value;
-      this.note.viewOrder = value + 1;
-      this.controls.bullet.innerText = `${(this.note.viewOrder)}`;
+      this.note.order = value + 1;
+      this.controls.bullet.innerText = `${(this.note.order)}`;
       this.note.setOrder();
     }
   }
