@@ -3,19 +3,24 @@ export interface IDBNote {
   title: string;
   description: string;
   order: number;
-  sync: boolean;
-  preview: boolean;
-  cState: string;
-  pState: string;
-  html: string;
+  sync?: boolean;
+  preview?: boolean;
+  cState?: string;
+  pState?: string;
+  html?: string;
   updated: number;
   created: number;
 }
 
-export interface IDBEvent {
-  then: Function,
-  result?: any
+export interface IDBCommand {
+  item: IDBNote,
+  name: string
 }
+
+// export interface IDBEvent {
+//   then: Function,
+//   result?: any
+// }
 
 // export interface INote {
 //   id: number;

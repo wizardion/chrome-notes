@@ -1,11 +1,11 @@
-import {IDBNote, IDBEvent} from './interfaces';
+import {IDBNote,IDBCommand} from './interfaces';
 
 var database: IDBDatabase;
+var queueList: IDBCommand[] = [];
 
-
-function logError(event: Event) {
+function logError(e: Event) {
   // @ts-ignoree
-  console.error('Database error: ', event.target.error);
+  console.error('Database error: ', e.target.error || e.target.result || e.target);
 }
 
 function upgradeNeeded(event: Event) {
@@ -30,115 +30,108 @@ function upgradeNeeded(event: Event) {
   }
 }
 
-function init(event: IDBEvent) {
-  console.log('init', {'database': database});
-
+function init(callback: Function) {
   if (!database) {
     var request = indexedDB.open('MyNotes', 1);
-
     request.onerror = logError;
     request.onupgradeneeded = upgradeNeeded;
-    request.onsuccess = (e: Event) => {
+    
+    return request.onsuccess = (e: Event) => {
       // @ts-ignore
       database = e.target.result;
-      event.then();
-
-      console.log('init.onsuccess', {'database': database});
+      callback();
     };
-
-    return;
   }
 
-  event.then();
+  callback();
 }
 
-function initObjectStore(prommise: IDBEvent) {
-  var event: IDBEvent = {then: () => {
+function initObjectStore(callback: Function, mode: string) {
+  var prommise: Function = () => {
     var transaction:IDBTransaction = database.transaction('notes', "readwrite");
 
     transaction.onerror = logError;
-    prommise.then(transaction.objectStore("notes"));
-  }};
+    callback(transaction.objectStore("notes"));
+  };
 
-  init(event);
-  /* if (!result.result) {
-    init().then = () => {
-      var transaction:IDBTransaction = database.transaction('notes', "readwrite");
-  
-      transaction.onerror = logError;
-      result.then(transaction.objectStore("notes"));
-    };
-  } else {
-    var transaction:IDBTransaction = database.transaction('notes', "readwrite");
-  
-    transaction.onerror = logError;
-    result.result = transaction.objectStore("notes");
-  } */
+  init(prommise);
 }
 
 function load(callback: Function) {
-  var event: IDBEvent = {then: (objectStore: IDBObjectStore) => {
-    console.log('load.initObjectStore.then');
-
+  var prommise: Function = (objectStore: IDBObjectStore) => {
     var index = objectStore.index("order");
     var request = index.getAll();
 
-    //@ts-ignore
+    // @ts-ignores
     request.onsuccess = (e: Event) => callback(<IDBNote[]>e.target.result);
     request.onerror = logError;
-  }};
+  };
 
-  initObjectStore(event);
-  /* console.log('load.initObjectStore');
-  var event = initObjectStore();
-
-  event.then = (objectStore: IDBObjectStore) => {
-    console.log('load.initObjectStore.then');
-
-    var index = objectStore.index("order");
-    var request = index.getAll();
-
-    //@ts-ignore
-    request.onsuccess = (e: Event) => callback(<IDBNote[]>e.target.result);
-    request.onerror = logError;
-  }; */
+  initObjectStore(prommise, 'readonly');
 }
 
 function add(item: IDBNote, callback?: Function) {
-  var event: IDBEvent = {then: (objectStore: IDBObjectStore) => {
-    var draft = Object.assign({}, item);
-    delete draft.id;
-    console.log('db.add', draft, item);
+  var prommise: Function = (objectStore: IDBObjectStore) => {
+    let {id, ...draft} = item;
     var request = objectStore.add(draft);
 
-    //@ts-ignore
+    // @ts-ignore
     request.onsuccess = (e: Event) => callback(<number>e.target.result);
     request.onerror = logError;
-  }};
+  };
 
-  initObjectStore(event);
-  /* console.log('add.initObjectStore');
-  var event = initObjectStore();
+  initObjectStore(prommise, 'readwrite');
+}
 
-  event.then = (objectStore: IDBObjectStore) => {
-    console.log('add.initObjectStore.then');
-    // delete item.id;
-    // console.log('db.add', Object.assign({}, item, {id: undefined}));
-    var request = objectStore.add(item);
+// TODO review frequency
+function update(item: IDBNote) {
+  var prommise: Function = (objectStore: IDBObjectStore) => {
+    var request = objectStore.put(item);
 
-    //@ts-ignore
-    request.onsuccess = (e: Event) => callback(<number>e.target.result);
     request.onerror = logError;
-  }; */
+  };
+
+  initObjectStore(prommise, 'readwrite');
+}
+
+function remove(id: number) {
+  var prommise: Function = (objectStore: IDBObjectStore) => {
+    var request = objectStore.delete(id);
+
+    request.onerror = logError;
+  };
+
+  initObjectStore(prommise, 'readwrite');
+}
+
+function enqueue(item: IDBNote, command: string) {
+  queueList.push({
+    item: item,
+    name: command
+  });
+};
+
+function dequeue(errorCallback?: Function) {
+  var prommise: Function = (objectStore: IDBObjectStore) => {
+    queueList.forEach((command: IDBCommand) => {      
+      var request = objectStore.put(command.item);
+
+      request.onerror = logError;
+    });
+
+    queueList.splice(0);
+  };
+
+  initObjectStore(prommise, 'readwrite');
 }
 
 export default {
   init: init,
   load: load,
   add: add,
-  update: () => {}, //update,
-  setOrder: () => {}, //setOrder,
-  setField: () => {}, //setField,
-  saveQueue: () => {}, //saveQueue,
-  remove: () => {}, //remove,
+  update: update,
+  enqueue: enqueue,
+  // setField: () => {}, //setField,
+  dequeue: dequeue,
+  remove: remove,
 };

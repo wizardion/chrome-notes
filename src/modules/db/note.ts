@@ -1,6 +1,18 @@
 import {IDBNote} from './interfaces'
 import idb from './idb'
 
+export function loadAll(callback: Function, errorCallback?: Function) {
+  var notes: DbNote[] = [];
+
+  idb.load((result: IDBNote[]) => {
+    for(var i = 0; i < result.length; i++) {
+      notes.push(new DbNote(result[i]));
+    }
+    
+    callback(notes);
+  });
+}
+
 export class DbNote implements IDBNote {
   public id: number;
   public title: string;
@@ -15,111 +27,40 @@ export class DbNote implements IDBNote {
   public created: number;
   public testW: number = 123;
 
-  constructor(id: number, title: string, description: string, viewOrder: number,
-    updated: number, created: number, sync: boolean = false, preview: boolean = false,
-    cState?: string, pState?: string, html?: string) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.order = viewOrder;
-    this.updated = updated;
-    this.created = created;
-    this.sync = sync;
-    this.preview = preview;
-    this.cState = cState;
-    this.pState = pState;
-    this.html = html;
+  constructor(item: IDBNote) {
+    this.id = item.id;
+    this.title = item.title;
+    this.description = item.description;
+    this.order = item.order;
+    this.updated = item.updated;
+    this.created = item.created;
+
+    this.preview = item.preview || null;
+    this.cState = item.cState   || null;
+    this.pState = item.pState   || null;
+    this.html = item.html       || null;
+    
+    this.sync = (item.sync === undefined || item.sync === null)? false : item.sync;
   }
-
-  private static initNotes(result: IDBNote[]): DbNote[] {
-    var notes: DbNote[] = [];
-
-    // console.log('initNotes', result);
-
-    for (var i = 0; i < result.length; i++) {
-      const note: IDBNote = result[i];
-      console.log('initNote', note);
-      // notes.push(new DbNote(
-      //   note.id,
-      //   note.title,
-      //   note.description,
-      //   note.order,
-      //   note.updated,
-      //   note.created,
-      //   note.sync,
-      //   note.preview,
-
-
-
-      //   // result.rows.item(i)['id'],
-      //   // result.rows.item(i)['title'],
-      //   // result.rows.item(i)['description'],
-      //   // result.rows.item(i)['viewOrder'],
-      //   // result.rows.item(i)['updated'],
-      //   // result.rows.item(i)['created'],
-      //   // <boolean>(result.rows.item(i)['sync'] === 'true'),
-      //   // <boolean>(result.rows.item(i)['preview'] === 'true'),
-      //   // result.rows.item(i)['cState'],
-      //   // result.rows.item(i)['pState'],
-      //   // result.rows.item(i)['html']
-      // ));
-    }
-
-    // for (var i = 0; i < result.rows.length; i++) {
-    //   notes.push(new DbNote(
-    //     result.rows.item(i)['id'],
-    //     result.rows.item(i)['title'],
-    //     result.rows.item(i)['description'],
-    //     result.rows.item(i)['viewOrder'],
-    //     result.rows.item(i)['updated'],
-    //     result.rows.item(i)['created'],
-    //     <boolean>(result.rows.item(i)['sync'] === 'true'),
-    //     <boolean>(result.rows.item(i)['preview'] === 'true'),
-    //     result.rows.item(i)['cState'],
-    //     result.rows.item(i)['pState'],
-    //     result.rows.item(i)['html']
-    //   ));
-    // }
-
-    return notes;
-  }
-
-  public static loadAll(callback: Function, errorCallback?: Function) {
-    var notes: DbNote[] = [];
-
-    idb.load((result: IDBNote[]) => {
-      notes = DbNote.initNotes(result);
-      callback(notes);
-    });
-  }
-
-  // public static loadSync(callback: Function, errorCallback?: Function) {
-  //   var notes: DbNote[] = [];
-
-  //   db.loadSync(function (result: SQLResultSet) {
-  //     notes = DbNote.initNotes(result);
-  //     callback(notes);
-  //   });
-  // }
 
   public static saveQueue() {
-    idb.saveQueue();
+    idb.dequeue();
   }
 
   public save() {
     if (this.id && this.id > 0) {
-      // db.update(this, function(){});
+      idb.update(this);
     } else {
       idb.add(this, this.noteAdded.bind(this));
     }
   }
 
   public remove() {
-    // db.remove(this.id, function () { });
+    idb.remove(this.id);
   }
-
+  
   public setOrder() {
-    // db.setOrder(this);
+    idb.enqueue(this, 'update');
   }
 
   public setPreview() {
@@ -127,6 +68,8 @@ export class DbNote implements IDBNote {
   }
 
   public setSync() {
+    idb.update(this);
+
     // db.setField('sync', this.sync, this.id);
 
     // var hashCode = function(s: string) {
@@ -159,7 +102,5 @@ export class DbNote implements IDBNote {
 
   private noteAdded(id: number){
     this.id = id;
-
-    console.log('noteAdded', {'id': id});
   }
 }

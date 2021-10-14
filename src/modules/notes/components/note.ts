@@ -165,7 +165,15 @@ export class Note {
   }
 
   private createNew(index: number): DbNote {
-    return new DbNote(0, '', '', index + 1, this.getTime(), this.getTime());
+    return new DbNote({
+      id: 0, 
+      title: '', 
+      description: '', 
+      order: index + 1, 
+      updated: this.getTime(), 
+      created: this.getTime(),
+      sync: null
+    });
   }
 
   private prevent(e: MouseEvent) {

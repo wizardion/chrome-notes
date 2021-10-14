@@ -1,5 +1,5 @@
 import {IListView, INewNoteView, INoteView, Intervals} from './components/interfaces';
-import {DbNote} from '../db/note';
+import {DbNote, loadAll} from '../db/note';
 import {Note} from './components/note';
 import {Validator} from './components/validation';
 import {Sorting} from './components/sorting';
@@ -51,7 +51,7 @@ export class Base {
   }
 
   public init() {
-    DbNote.loadAll(this.build.bind(this));
+    loadAll(this.build.bind(this));
   }
 
   private prevent(e: MouseEvent) {
@@ -163,12 +163,18 @@ export class Base {
     if (this.selected) {
       this.selected.remove();
 
+      for (let i = this.selected.index + 1; i < this.notes.length; i++) {
+        this.notes[i].index = i - 1;
+      }
+
       this.notes.splice(this.selected.index, 1);
       delete this.selected;
 
       if (!this.notes.length) {
         this.listView.template.style.display = 'inherit';
       }
+
+      Note.saveQueue();
     }
   }
 
