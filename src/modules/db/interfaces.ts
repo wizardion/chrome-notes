@@ -3,7 +3,7 @@ export interface IDBNote {
   title: string;
   description: string;
   order: number;
-  sync?: boolean;
+  sync?: number;
   preview?: boolean;
   cState?: string;
   pState?: string;

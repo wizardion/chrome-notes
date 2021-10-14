@@ -18,7 +18,7 @@ export class DbNote implements IDBNote {
   public title: string;
   public description: string;
   public order: number;
-  public sync: boolean;
+  public sync: number;
   public preview: boolean;
   public cState: string;
   public pState: string;
@@ -40,7 +40,7 @@ export class DbNote implements IDBNote {
     this.pState = item.pState   || null;
     this.html = item.html       || null;
     
-    this.sync = (item.sync === undefined || item.sync === null)? false : item.sync;
+    this.sync = (item.sync === undefined || item.sync === null)? 0 : item.sync;
   }
 
   public static saveQueue() {

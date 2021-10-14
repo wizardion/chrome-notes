@@ -134,7 +134,7 @@ export class Note {
   }
 
   public set sync(value: boolean) {
-    this.note.sync = value;
+    this.note.sync = value? 1 : 0;
     this.note.setSync();
   }
 
