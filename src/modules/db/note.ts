@@ -25,7 +25,6 @@ export class DbNote implements IDBNote {
   public html: string;
   public updated: number;
   public created: number;
-  public testW: number = 123;
 
   constructor(item: IDBNote) {
     this.id = item.id;
@@ -56,20 +55,28 @@ export class DbNote implements IDBNote {
   }
 
   public remove() {
-    idb.remove(this.id);
+    if (this.id && this.id > 0) {
+      idb.remove(this.id);
+    }
   }
   
   public setOrder() {
-    idb.enqueue(this, 'update');
+    if (this.id && this.id > 0) {
+      idb.enqueue(this, 'update');
+    }
   }
 
   public setPreview() {
+    if (this.id && this.id > 0) {
+      idb.update(this);
+    }
     // db.setField('preview', this.preview, this.id);
   }
 
   public setSync() {
-    idb.update(this);
-
+    if (this.id && this.id > 0) {
+      idb.update(this);
+    }
     // db.setField('sync', this.sync, this.id);
 
     // var hashCode = function(s: string) {
@@ -89,14 +96,23 @@ export class DbNote implements IDBNote {
   }
 
   public saveHtml() {
+    if (this.id && this.id > 0) {
+      idb.update(this);
+    }
     // db.setField('html', this.html, this.id);
   }
 
   public saveCursor() {
+    if (this.id && this.id > 0) {
+      idb.update(this);
+    }
     // db.setField('cState', this.cState, this.id);
   }
 
   public savePreviewState() {
+    if (this.id && this.id > 0) {
+      idb.update(this);
+    }
     // db.setField('pState', this.pState, this.id);
   }
 
