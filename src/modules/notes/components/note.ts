@@ -49,6 +49,20 @@ export class Note {
     DbNote.saveQueue();
   }
 
+  public set(note: DbNote) {
+    this.note.id = note.id;
+    this.note.title = note.title;
+    this.note.description = note.description;
+    this.note.order = note.order;
+    this.note.sync = note.sync;
+    this.note.preview = note.preview;
+    this.note.cState = note.cState;
+    this.note.pState = note.pState;
+    this.note.html = note.html;
+    this.note.updated = note.updated;
+    this.note.created = note.created;
+  }
+
   public set index(value: number) {
     if (this.indexId !== value) {
       this.indexId = value;
@@ -136,6 +150,15 @@ export class Note {
   public set sync(value: boolean) {
     this.note.sync = value? 1 : 0;
     this.note.setSync();
+  }
+
+  public get updated(): number {
+    return this.note.updated;
+  }
+
+  public set updated(value: number) {
+    this.note.updated = value;
+    this.controls.date.innerText = this.getDateString(this.note.updated);
   }
 
   public set onclick(event: EventListener) {

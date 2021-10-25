@@ -24,8 +24,7 @@ input, button {
   outline: none;
 }
 
-.disable-select
-{
+.disable-select {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -33,8 +32,7 @@ input, button {
 }
 
 .button, 
-.link
-{
+.link {
   padding: 0px;
   margin: 0px;
   height:24px;
@@ -58,17 +56,28 @@ input, button {
 }
 
 .button:hover,
-.link:hover
-{
+.link:hover {
   color: #e33636;
   fill:#e33636;
 }
 
-.button:active
-{
+.button:active {
   color: #e3363685;
   fill:#e3363685;
 }
+
+.sync-indicator {
+  display: none; 
+  width: 4px; 
+  height: 4px; 
+  border-radius: 2px; 
+  background-color: red; 
+  position: absolute; 
+  z-index: 1; 
+  left: 35px; 
+  top: 6px;
+}
+
 
 @import 'list-view';
 @import 'details-view';

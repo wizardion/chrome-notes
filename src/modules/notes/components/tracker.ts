@@ -34,7 +34,7 @@ class Tracker {
     });
   }
 
-  print() {
+  print(): string {
     var columns: string[] = ['#'].concat(this.times.length > 0 ? Object.keys(this.times[0]) : []);
     var sizes: number[] = this.calcSizes(columns);
     var spaces = Array(300).fill(' ').join('');
@@ -68,7 +68,10 @@ class Tracker {
       rows.push(`| ${row.join(' | ')} |`);
     });
 
-    console.log(rows.join('\n'));
+    var result: string = rows.join('\n');
+
+    console.log(result);
+    return result;
   }
 
   private calcSizes(columns: string[]): number[] {

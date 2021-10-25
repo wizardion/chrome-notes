@@ -35,7 +35,7 @@ function init(callback: Function) {
     var request = indexedDB.open('MyNotes', 1);
     request.onerror = logError;
     request.onupgradeneeded = upgradeNeeded;
-    
+
     return request.onsuccess = (e: Event) => {
       // @ts-ignore
       database = e.target.result;
@@ -46,9 +46,9 @@ function init(callback: Function) {
   callback();
 }
 
-function initObjectStore(callback: Function, mode: string) {
+function initObjectStore(callback: Function, mode: IDBTransactionMode) {
   var prommise: Function = () => {
-    var transaction:IDBTransaction = database.transaction('notes', "readwrite");
+    var transaction:IDBTransaction = database.transaction('notes', mode);
 
     transaction.onerror = logError;
     callback(transaction.objectStore("notes"));
@@ -63,7 +63,20 @@ function load(callback: Function) {
     var request = index.getAll();
 
     // @ts-ignores
-    request.onsuccess = (e: Event) => callback(<IDBNote[]>e.target.result);
+    request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
+    request.onerror = logError;
+  };
+
+  initObjectStore(prommise, 'readonly');
+}
+
+function getSync(callback: Function) {
+  var prommise: Function = (objectStore: IDBObjectStore) => {
+    var index = objectStore.index("sync");
+    var request = index.getAll();
+
+    // @ts-ignores
+    request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
     request.onerror = logError;
   };
 
@@ -134,4 +147,5 @@ export default {
   // setField: () => {}, //setField,
   dequeue: dequeue,
   remove: remove,
+  getSync: getSync,
 };
