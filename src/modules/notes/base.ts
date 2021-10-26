@@ -1,5 +1,5 @@
 import {IListView, INewNoteView, INoteView, Intervals} from './components/interfaces';
-import {DbNote} from '../db/note';
+import {DbNote,load,loadAll} from '../db/note';
 import {Note} from './components/note';
 import {Validator} from './components/validation';
 import {Sorting} from './components/sorting';
@@ -50,43 +50,68 @@ export class Base {
     ScrollListener.listen(this.noteView.html);
   }
 
-  public init() {
-    DbNote.loadAll(this.build.bind(this));
+  public init(list?: string) {
+    load(this.preBuild.bind(this), list);
+    loadAll(this.build.bind(this));
+
+    if (chrome && chrome.runtime) {
+      chrome.runtime.sendMessage('get-sync-notes', (response) => {
+        if (response.working) {
+          let time: number = 30000 - (new Date().getTime() - response.time);
+          let indicator:HTMLElement = <HTMLElement>document.getElementById('sync-indicator');
+          
+          indicator.style.display = 'inherit';
+          setTimeout(() => {
+            indicator.style.display = 'none';
+          }, time);
+        }
+      });
+    }
   }
 
   private prevent(e: MouseEvent) {
     e.preventDefault();
   }
 
+  private preBuild(notes: DbNote[]) {
+    if (notes.length > 0) {
+      this.listView.template.style.display = 'none';
+      this.listView.items.appendChild(this.render(notes));
+    }
+  }
+
   private build(notes: DbNote[]) {
     if (notes.length > 0) {
       this.listView.template.style.display = 'none';
-      this.listView.items.appendChild(this.render(notes, 0, 10));
+      this.listView.items.appendChild(this.render(notes));
 
       Sorting.notes = this.notes;
       Sorting.items = this.listView.items;
 
-      setTimeout(() => {
-        let index = storage.get('index');
-        this.listView.items.appendChild(this.render(notes, 10));
-
-        if (index) {
-          this.selectNote(this.notes[Number(index)]);
-        }
-      }, 10);
+      let index = storage.get('index');
+      if (index) {
+        this.selectNote(this.notes[Number(index)]);
+      }
     }
   }
 
-  private render(notes: DbNote[], start: number = 0, limit?: number) {
+  private render(items: DbNote[]) {
     var fragment = <DocumentFragment>document.createDocumentFragment();
-    var length: number = limit && notes.length > limit ? limit : notes.length;
 
-    for (var i = start; i < length; i++) {
-      const note = new Note(notes[i], i);
-      this.notes.push(note);
-      fragment.appendChild(note.element);
-      note.onclick = this.selectNote.bind(this, note, true);
-      note.sortButton.onmousedown = Sorting.start.bind(Sorting, note);
+    for (var i = 0; i < items.length; i++) {
+      const item = items[i];
+      const note = this.notes[i];
+
+      if (!note) {
+        const newNote = new Note(item, i);
+
+        this.notes.push(newNote);
+        fragment.appendChild(newNote.element);
+        newNote.onclick = this.selectNote.bind(this, newNote, true);
+        newNote.sortButton.onmousedown = Sorting.start.bind(Sorting, newNote);
+      } else {
+        note.set(item);
+      }
     }
 
     return fragment;
@@ -131,7 +156,20 @@ export class Base {
 
       this.selectNote(note);
       storage.remove('new');
+      this.saveList();
     }
+  }
+
+  private saveList() {
+    var notes: (string|number)[] = [];
+
+    for (let i = 0; i < Math.min(10, this.notes.length); i++) {
+      const note = this.notes[i];
+
+      notes = notes.concat([note.title, note.updated]);
+    }
+
+    storage.set('list', JSON.stringify(notes).replace(/^\[|\]$/gi, ''), true);
   }
 
   protected cancelCreation() {
@@ -163,12 +201,18 @@ export class Base {
     if (this.selected) {
       this.selected.remove();
 
+      for (let i = this.selected.index + 1; i < this.notes.length; i++) {
+        this.notes[i].index = i - 1;
+      }
+
       this.notes.splice(this.selected.index, 1);
       delete this.selected;
 
       if (!this.notes.length) {
         this.listView.template.style.display = 'inherit';
       }
+
+      Note.saveQueue();
     }
   }
 
@@ -177,7 +221,7 @@ export class Base {
 
     if (this.selected && this.validate(title, true)) {
       this.save(title, description);
-      this.showList();
+      return this.showList();
     }
 
     if (!this.selected) {
@@ -268,6 +312,7 @@ export class Base {
       this.selected.title = title;
       this.selected.description = description;
       this.selected.save();
+      this.saveList();
     }
   }
 

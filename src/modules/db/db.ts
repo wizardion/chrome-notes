@@ -1,4 +1,5 @@
-import {INote} from './interfaces';
+/*import {INote} from './interfaces';
+// import idb from './idb-test';
 
 interface IBatchUpdate {
   sqlStatement?: string,
@@ -9,6 +10,7 @@ var database: Database;
 var batchSql: IBatchUpdate[] = [];
 
 function init() {
+  // idb.init();
   if (!database) {
     database = window.openDatabase("MyNotes", "0.1", "A list of to do items.", 200000);
     database.transaction(function (tx) {
@@ -124,3 +126,5 @@ export default {
   saveQueue: saveQueue,
   remove: remove,
 };
+
+*/

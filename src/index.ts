@@ -6,6 +6,7 @@ import './styles/style.scss';
 
 var html = storage.get('html');
 var isNew = storage.get('new');
+var list = storage.get('list', true);
 var selection = storage.get('selection');
 var description = storage.get('description');
 var previewState = storage.get('previewState');
@@ -51,7 +52,8 @@ var newView: INewNoteView = null;
   }
 
   var editor = new Simple(listView, noteView, newView);
-  setTimeout(() => editor.init(), 1);
+  editor.init();
+  // setTimeout(() => editor.init(list), 1);
   notes.style.display = 'inherit';
 
   if (description) {

@@ -36,7 +36,7 @@ export class Editor {
     this.controls = controls;
 
     CodeMirrorSpellChecker({
-        codeMirrorInstance: CodeMirror
+      codeMirrorInstance: CodeMirror
     });
 
     this.codemirror = CodeMirror.fromTextArea(textarea, {
