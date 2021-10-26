@@ -52,8 +52,8 @@ var newView: INewNoteView = null;
   }
 
   var editor = new Simple(listView, noteView, newView);
-  // editor.init();
-  setTimeout(() => editor.init(list), 1);
+  editor.init();
+  // setTimeout(() => editor.init(list), 1);
   notes.style.display = 'inherit';
 
   if (description) {
