@@ -267,11 +267,13 @@ export class Base {
       this.intervals.document = setTimeout(() => {
         var [title, description] = this.noteView.editor.getData();
 
-        if (this.selected && this.validate(title)) {
-          this.save(title, description);
-        }
+        if (this.validate(title)) {
+          if (this.selected) {
+            this.save(title, description);
+          }
 
-        storage.set('description', title + '\n' + description);
+          storage.set('description', title + '\n' + description);
+        }
       }, 175);
     }
   }
