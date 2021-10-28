@@ -87,6 +87,7 @@ export class Base {
 
       Sorting.notes = this.notes;
       Sorting.items = this.listView.items;
+      Sorting.onEndSorting = this.cacheList.bind(this);
 
       let index = storage.get('index');
       if (index) {
@@ -156,11 +157,11 @@ export class Base {
 
       this.selectNote(note);
       storage.remove('new');
-      this.saveList();
+      this.cacheList();
     }
   }
 
-  private saveList() {
+  private cacheList() {
     var notes: (string|number)[] = [];
 
     for (let i = 0; i < Math.min(10, this.notes.length); i++) {
@@ -213,6 +214,7 @@ export class Base {
       }
 
       Note.saveQueue();
+      this.cacheList();
     }
   }
 
@@ -312,7 +314,7 @@ export class Base {
       this.selected.title = title;
       this.selected.description = description;
       this.selected.save();
-      this.saveList();
+      this.cacheList();
     }
   }
 
