@@ -300,13 +300,11 @@ export class Base {
       clearInterval(this.intervals.cursor);
 
       this.intervals.cursor = setTimeout(() => {
-        var selection = this.noteView.editor.getSelection();
-
         if (this.selected) {
-          this.selected.cursor = selection;
+          this.selected.cursor = this.noteView.editor.getCursor();
         }
         
-        storage.set('selection', selection);
+        storage.set('selection', this.noteView.editor.getSelection());
       }, 600);
     }
   }

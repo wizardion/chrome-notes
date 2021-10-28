@@ -147,6 +147,14 @@ export class Editor {
     return `${scrollInfo.top}|${selection.join(':')}`;
   }
 
+  public getCursor(): string {
+    var scrollInfo = this.codemirror.getScrollInfo();
+    var cursor = this.codemirror.getCursor();
+    var selection: number[] = [cursor.ch, cursor.ch, cursor.line, cursor.line];
+
+    return `${scrollInfo.top}|${selection.join(',')}`;
+  }
+
   public setSelection(data?: string) {
     this.codemirror.focus();
 
