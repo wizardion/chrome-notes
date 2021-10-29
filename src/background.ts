@@ -30,7 +30,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+chrome.runtime.onUpdateAvailable.addListener(function() {
+  console.warn('update is available');
+});
+
 chrome.runtime.onInstalled.addListener(function() {
+  console.log('app was installed');
   chrome.alarms.clearAll((alarm) => {});
 
   chrome.alarms.create('alert', {periodInMinutes: 1});
