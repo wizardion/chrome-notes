@@ -188,9 +188,11 @@ export class Base {
       this.noteView.preview.checked = note.preview;
       this.noteView.sync.checked = this.selected.sync;
 
-      storage.set('description', value);
-      storage.set('index', note.index);
-      storage.set('selection', note.cursor);
+      if (bind) {
+        storage.set('description', value);
+        storage.set('index', note.index);
+        storage.set('selection', note.cursor);
+      }
 
       if (note.preview) {
         storage.set('html', this.noteView.html.innerHTML);
