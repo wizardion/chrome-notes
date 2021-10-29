@@ -33,6 +33,9 @@ export class Sorting {
   public static notes: Note[];
   public static items: HTMLElement;
 
+  public static onStartSorting?: Function;
+  public static onEndSorting?: Function;
+
   private static selected?: ISelectedNote;
   private static list?: IListNote;
 
@@ -127,7 +130,15 @@ export class Sorting {
     document.removeEventListener('mouseup', this.events.end);
 
     clearInterval(this.interval);
-    this.replace(this.selected.note.index, this.selected.index);
+    this.items.insertBefore(this.selected.element, this.selected.placeholder);
+
+    if (this.selected.note.index !== this.selected.index) {
+      this.replace(this.selected.note.index, this.selected.index);
+
+      if (this.onEndSorting) {
+        this.onEndSorting();
+      }
+    }
 
     document.body.classList.remove('hold');
     this.selected.element.classList.remove('drag');
@@ -144,7 +155,6 @@ export class Sorting {
 
     this.notes.splice(first, 1);
     this.notes.splice(second, 0, temp);
-    this.items.insertBefore(this.selected.element, this.selected.placeholder);
 
     for (var i = Math.min(first, second); i <= Math.max(first, second); i++) {
       const item = this.notes[i];
