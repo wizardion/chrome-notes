@@ -2,10 +2,8 @@ import 'codemirror/mode/markdown/markdown.js'
 import 'codemirror/mode/gfm/gfm.js'
 import 'codemirror/addon/edit/continuelist.js';
 import 'codemirror/addon/mode/overlay.js';
-// import 'codemirror/addon/selection/mark-selection.js'; // for search control
 import 'codemirror/lib/codemirror.css';
 import '../../styles/codemirror.scss';
-// import {fromTextArea, EditorFromTextArea, KeyMap, Position, Doc} from 'codemirror';
 import * as CodeMirror from 'codemirror';
 import {MDRender} from './components/md-render';
 var CodeMirrorSpellChecker = require('codemirror-spell-checker');

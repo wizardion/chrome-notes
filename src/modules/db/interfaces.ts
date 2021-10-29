@@ -16,19 +16,3 @@ export interface IDBCommand {
   item: IDBNote,
   name: string
 }
-
-// export interface IDBEvent {
-//   then: Function,
-//   result?: any
-// }
-
-// export interface INote {
-//   id: number;
-//   title: string;
-//   description: string;
-//   viewOrder: number;
-//   sync: boolean;
-//   preview: boolean;
-//   updated: number;
-//   created: number;
-// }

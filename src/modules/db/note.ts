@@ -93,50 +93,30 @@ export class DbNote implements IDBNote {
     if (this.id && this.id > 0) {
       idb.update(this);
     }
-    // db.setField('preview', this.preview, this.id);
   }
 
   public setSync() {
     if (this.id && this.id > 0) {
       idb.update(this);
     }
-    // db.setField('sync', this.sync, this.id);
-
-    // var hashCode = function(s: string) {
-    //   let h = 0;
-    //   for(let i = 0; i < s.length; i++) 
-    //         h = Math.imul(31, h) + s.charCodeAt(i) | 0;
-    //   return h;
-    // };
-
-    // console.warn('saved sync', {sync: this.sync, title: this.title, hash: hashCode(this.title)});
-
-    
-
-    // // chrome.storage.sync.set({key: value}, function() {
-    // //   console.log('Value is set to ' + value);
-    // // });
   }
 
   public saveHtml() {
     if (this.id && this.id > 0) {
       idb.update(this);
     }
-    // db.setField('html', this.html, this.id);
   }
 
   public saveCursor() {
     if (this.id && this.id > 0) {
       idb.update(this);
     }
-    // db.setField('cState', this.cState, this.id);
   }
 
   public savePreviewState() {
     if (this.id && this.id > 0) {
       idb.update(this);
     }
-    // db.setField('pState', this.pState, this.id);
   }
 
   private noteAdded(id: number){
