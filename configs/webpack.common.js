@@ -7,6 +7,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const svgToMiniDataURI = require('mini-svg-data-uri');
 const __root__ = path.resolve(__dirname, '..');
 const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
 
@@ -66,11 +67,23 @@ module.exports = {
           loader: 'url-loader',
         }]
       },
+      { // https://v4.webpack.js.org/loaders/url-loader/#svg
+        test: /\.svg$/i,
+        exclude: [path.resolve(__root__, 'src/popup.html')],
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              generator: (content) => svgToMiniDataURI(content.toString()),
+            },
+          },
+        ],
+      },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
-      {test: /\.(hbs|html|svg)$/, loader: 'handlebars-loader' }
+      {test: /\.(hbs|html|xml)$/, loader: 'handlebars-loader'}
     ]
   },
   resolve: {
