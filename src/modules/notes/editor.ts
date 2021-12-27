@@ -98,12 +98,16 @@ export class Editor {
     this.codemirror.setOption("extraKeys", mapping);
   }
 
+  public get displayed(): boolean {
+    return this.visible;
+  }
+
   public get value(): string {
     return this.codemirror.getValue();
   }
 
   public set value(text: string) {
-    this.doc.setValue(text);
+    this.doc.setValue(text || '');
     this.codemirror.refresh();
     setTimeout(() => this.codemirror.clearHistory());
   }
@@ -124,8 +128,8 @@ export class Editor {
     this.codemirror.focus();
   }
 
-  public getData() {
-    var value = this.codemirror.getValue();
+  public getData(text?: string) {
+    var value = text || this.codemirror.getValue();
     var data: string[] = (value || '').split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
     var title: string = (data && data.length) ? data[0].trim() : '';
     var description: string = (data && data.length > 1) ? data[1] : '';

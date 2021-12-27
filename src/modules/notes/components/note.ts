@@ -1,5 +1,6 @@
-import {INoteControls} from './interfaces';
+import {INoteControls, ISTNote} from './interfaces';
 import {DbNote} from '../../db/note';
+
 
 export class Note {
   private controls: INoteControls;
@@ -20,6 +21,7 @@ export class Note {
     this.controls = {
       title: <HTMLElement>document.createElement('span'),
       bullet: <HTMLElement>document.createElement('span'),
+      static: <HTMLElement>document.createElement('span'),
       date: <HTMLElement>document.createElement('span'),
       sort: <HTMLInputElement>document.createElement('input'),
       toNote: <HTMLInputElement>document.createElement('input'),
@@ -29,6 +31,9 @@ export class Note {
     this.controls.date.className = 'date-time';
     this.controls.title.className = 'list-title';
     this.controls.sort.className = 'button sort';
+    this.controls.bullet.className = 'list-index';
+    this.controls.static.className = 'list-static';
+    this.controls.static.innerText = '. ';
 
     this.controls.sort.type = 'button';
     this.controls.toNote.className = 'button to-note';
@@ -40,7 +45,7 @@ export class Note {
     this.element.appendChild(this.controls.toNote);
     this.element.appendChild(this.controls.sort);
     this.element.appendChild(this.controls.bullet);
-    this.element.appendChild(document.createTextNode('. '));
+    this.element.appendChild(this.controls.static);
     this.element.appendChild(this.controls.title);
     this.element.appendChild(this.controls.date);
   }
@@ -49,7 +54,7 @@ export class Note {
     DbNote.saveQueue();
   }
 
-  public set(note: DbNote) {
+  public set(note: (DbNote|ISTNote)) {
     this.note.id = note.id;
     this.note.title = note.title;
     this.note.description = note.description;
@@ -185,6 +190,25 @@ export class Note {
     this.element.removeEventListener('click', this.event);
     this.element.remove();
     this.note.remove();
+  }
+
+  public toString(): string {
+    var note: ISTNote = {
+      index: this.index,
+      id: this.note.id || undefined,
+      title: this.note.title || undefined,
+      description: this.note.description || undefined,
+      sync: this.note.sync || undefined,
+      preview: this.note.preview || undefined,
+      cState: this.note.cState || undefined,
+      pState: this.note.pState || undefined,
+      html: this.note.html || undefined,
+      updated: this.note.updated || undefined,
+      order: undefined,
+      created: undefined
+    };
+
+    return JSON.stringify(note).replace(/^\{|\}$/gi, '');
   }
 
   private createNew(index: number): DbNote {

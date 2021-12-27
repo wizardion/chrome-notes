@@ -2,9 +2,12 @@
 export class ScrollListener {
   private static interval?: NodeJS.Timeout;
 
-  public static listen(element: HTMLElement) {
+  public static listen(element: HTMLElement, delay=0) {
     element.classList.add('hidden-scroll');
-    element.addEventListener('scroll', () => this.scroll(element));
+
+    setTimeout(() => {
+      element.addEventListener('scroll', () => this.scroll(element));
+    }, delay);
   }
 
   private static scroll(element: HTMLElement) {

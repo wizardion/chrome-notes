@@ -6,6 +6,7 @@
       "default_popup": "popup.html",
       "default_title": "My-Notes-Testers"
    },
+   "options_page": "options.html",
    "icons": {
       "128": "icon-128.png"
    },

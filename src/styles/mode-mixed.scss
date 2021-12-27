@@ -1,0 +1,106 @@
+
+.list-view.mixed {
+  display: inline-block !important;
+  float: left;
+}
+
+.list-view.mixed .list-items {
+  // width: 130px;
+  width: 129px;
+  border-right: 1px solid #07a69825;
+  // linear-gradient(to right, #07a69815, #07a69800 45%);
+}
+
+// .list-view.mixed .list-item {
+  
+// }
+
+.list-view.mixed .list-items .list-title {
+  max-width: 73px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.list-view.mixed .list-items .date-time {
+  display: none;
+}
+
+.list-view.mixed .list-item .list-index,
+.list-view.mixed .list-item .list-static {
+  // display: inline-block;
+  // overflow: hidden;
+  // height: 25px;
+  display: none;
+}
+
+.list-view.mixed .list-item:hover {
+  background: white;
+}
+
+.list-view.mixed .list-item.selected,
+.list-view .list-item.selected:active {
+  // background-color: #e9f8f7;
+  cursor: default;
+  color: #06736a;
+  background: linear-gradient(to right, #07a69825, #07a69801);
+}
+
+.list-view .list-item.selected .to-note,
+.list-view .list-item.selected:hover .to-note,
+.list-view .list-item.selected:active .to-note {
+  background-color: #07a69845 !important;
+}
+
+
+.list-view .list-item.selected .sort,
+.list-view .list-item.selected:hover .sort,
+.list-view .list-item.selected:active .sort {
+  background-color: #07a698 !important;
+}
+
+.list-view.mixed .list-item.drag {
+  right: 2px !important;
+}
+
+.list-view.mixed .sync-indicator {
+  left: 27px; 
+}
+
+.details-view.mixed {
+  width: 470px;
+  display: inline-block;
+}
+
+.details-view.mixed .head {
+  text-align: inherit;
+}
+
+.details-view.mixed .head .editor-controls {
+  // margin-left: 25px;
+  // margin-left: 50px;
+  margin-left: 80px;
+}
+
+.details-view.mixed .head .back {
+  display: none;
+}
+
+.details-view.mixed .head .cancel {
+  left: -9px; 
+  top: -1px;
+  width: 16px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.list-view.mixed .button.add {
+  margin-right: -11px;
+  margin-left: 11px;
+}
+
+.details-view.mixed .head .sync {
+  left: 22px;
+  right: inherit;
+}

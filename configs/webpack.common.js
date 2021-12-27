@@ -15,6 +15,7 @@ module.exports = {
   entry: {
     index: path.resolve(__root__, 'src/index.ts'),
     background: path.resolve(__root__, 'src/background.ts'),
+    settings: path.resolve(__root__, 'src/settings.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -123,6 +124,16 @@ module.exports = {
       },
     }),
     new htmlWebpackInjectAttributesPlugin(),
+    new HtmlWebpackPlugin({
+      title: 'My Options',
+      filename: 'options.html',
+      template: './src/options.html',
+      scriptLoading: 'blocking',
+      inject: "body",
+      chunks: [
+        'settings'
+      ],
+    }),
     // new htmlWebpackInjectAttributesPlugin({
     //   // inject: "true",
     //   async: true,

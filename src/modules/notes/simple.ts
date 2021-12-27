@@ -8,6 +8,21 @@ import storage from '../storage/storage';
 export class Simple extends Base {
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     super(listView, noteView, newView);
+
+    this.noteView.back.addEventListener('click', this.backToList.bind(this));
+  }
+
+  protected backToList() {
+    var [title, description] = this.noteView.editor.getData();
+
+    if (this.selected && this.validate(title, true)) {
+      this.save(title, description);
+      return this.showList();
+    }
+
+    if (!this.selected) {
+      this.showList();
+    }
   }
 
   public selectNew(description: string, selection?: string) {
@@ -69,17 +84,6 @@ export class Simple extends Base {
         this.showPreview(html);
         this.setPreviewSelection(pState);
       }
-    }
-  }
-
-  protected setPreviewSelection(previewState?: string) {
-    if (previewState && previewState.length > 1) {
-      let [scrollTop, selection] = previewState.split('|');
-
-      this.noteView.html.scrollTop = Number(scrollTop) || 0;
-      NodeHelper.setSelection(selection, this.noteView.html);
-    } else {
-      this.noteView.html.scrollTop = 0;
     }
   }
 }

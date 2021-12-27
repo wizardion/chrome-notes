@@ -7,6 +7,9 @@
   color: inherit;
   cursor: inherit;
   border-bottom: 1px dashed #07429813;
+  /* Required for text-overflow to do anything */
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .list-view .list-item:hover,
@@ -50,9 +53,14 @@
 }
 
 .list-item:active .date-time,
-.list-view .list-item.drag .date-time{
+.list-view .list-item.drag .date-time {
   color: darkgreen;
 }
+
+// .list-view .list-item .list-index,
+// .list-view .list-item .list-static {
+//   // display: inline-block;
+// }
 
 // .list-view .list-item.drag .date-time{
 //   color:#07a698 !important;
@@ -60,10 +68,20 @@
 
 .list-item .list-title {
   max-width: 400px;
-  display: inline-flex;
-  overflow: hidden;
+  // display: inline-block;
   height: 25px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
+
+// .list-item .list-index {
+//   // display: inline-block;
+//   // overflow: hidden;
+//   // height: 25px;
+//   display: none;
+// }
 
 .sort,
 .list-view .hold .list-item:hover .sort {
@@ -91,14 +109,10 @@
 
 .list-view .list-item:hover .sort,
 .list-view .hold .list-item.drag:hover .sort,
-.sort:active {
+.sort:active,
+.list-view .list-item:active .sort {
   background-color: seagreen;
 }
-
-.list-view .list-item:active .sort {
-  background-color: darkgreen;
-}
-
 
 .to-note, 
 .list-view .list-item.edit-item:hover .to-note,

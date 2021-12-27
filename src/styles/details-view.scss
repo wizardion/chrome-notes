@@ -43,7 +43,7 @@
   background-position: left;
   position: absolute;
   top: 0px;
-  left: 5px;
+  left: 0px;
   line-height: 26px;
   font-size: 13px;
 }
@@ -51,7 +51,7 @@
 .back svg {
   margin-top: 4px;
   margin-bottom: -4px;
-  margin-left: -4px;
+  margin-left: 0px;
 }
 
 .button.delete {
@@ -80,6 +80,7 @@
 
 .details-view .cancel {
   display: none;
+  left: 4px;
 }
 
 .required {
