@@ -1,5 +1,6 @@
 
 .list-view.mixed {
+  position: relative;
   display: inline-block !important;
   float: left;
 }
@@ -103,4 +104,19 @@
 .details-view.mixed .head .sync {
   left: 22px;
   right: inherit;
+}
+
+.mixed .hidden-scroll::-webkit-scrollbar-thumb:hover {
+  visibility: hidden;
+}
+
+.list-view.mixed ::-webkit-scrollbar {
+  width: 2px;
+}
+
+.list-view.mixed ::-webkit-scrollbar-thumb {
+  width: 3px;
+  border-radius: 9999px;
+  background: #D6D6D6;
+  border: none;
 }

@@ -3,6 +3,7 @@ import {Editor} from './modules/notes/editor';
 import {Mixed} from './modules/notes/mixed';
 import {Base} from './modules/notes/base';
 import {Simple} from './modules/notes/simple';
+import {Comact} from './modules/notes/compact';
 
 
 export function buildEditor(mode: number): Base {
@@ -39,6 +40,10 @@ export function buildEditor(mode: number): Base {
 
   if (mode === 1) {
     return new Mixed(listView, noteView, newView);
+  }
+
+  if (mode === 2) {
+    return new Comact(listView, noteView, newView);
   }
 
   return new Simple(listView, noteView, newView);

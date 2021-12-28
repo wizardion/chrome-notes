@@ -1,5 +1,5 @@
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 7px;
 }
 
 .hidden-scroll::-webkit-scrollbar-thumb {
@@ -10,10 +10,6 @@
   visibility: initial;
 }
 
-.mixed .hidden-scroll::-webkit-scrollbar-thumb:hover {
-  visibility: hidden;
-}
-
 /* Track */
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -21,14 +17,13 @@
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  width: 3px;
-  border-radius: 4px;
-  background: #D6D6D6;
-  border: none;
-  border-right: 2px solid white;
+  border: 2px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  border-radius: 9999px;
+  background-color: #D6D6D6;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background-color: #555;
 }

@@ -64,6 +64,7 @@ export class Editor {
     this.doc = this.codemirror.getDoc();
     this.wrapper = <HTMLTextAreaElement>this.codemirror.getWrapperElement();
     this.scroll = this.wrapper.querySelector('.CodeMirror-vscrollbar');
+    this.scroll.classList.add('hidden-scroll');
     this.visible = true;
 
     setTimeout(() => this.init());
