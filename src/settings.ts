@@ -1,12 +1,33 @@
 import './styles/settings.scss';
 import storage from './modules/storage/storage';
 
-// var mode:number = Number(storage.get('mode', true) || '0');
 var mode:string = storage.get('mode', true) || '0';
+var popupMode:string = storage.get('popupMode');
+var backBtn:HTMLElement;
 
-function viewChanged(event: Event) {
+
+function initBackButton() {
+  backBtn = document.getElementById('back');
+  backBtn.style.display = '';
+}
+
+function getBackButtonVisibility(md: number, value: number): string {
+  var index = [0, 1, 2, 3, 4].indexOf(md);
+
+  if ((index >= 3 && md !== value) || (index < 3 && value >= 3)) {
+    return 'none';
+  }
+
+  return '';
+}
+
+function viewChanged() {
+  if (backBtn) {
+    backBtn.style.display = getBackButtonVisibility(Number(mode), Number(this.value));
+  }
+
   if (chrome && chrome.action && chrome.storage) {
-    if (this.value === '3') {
+    if (this.value === '3' || this.value === '4') {
       chrome.action.setPopup({popup: ''});
     } else {
       chrome.action.setPopup({popup: 'popup.html'});
@@ -23,9 +44,8 @@ function viewChanged(event: Event) {
 (() => {
   var views:NodeList = document.querySelectorAll('input[name="views"]');
 
-  if (isPopUpView()) {
-    var backBtn:HTMLElement = document.getElementById('back');
-    backBtn.style.display = '';
+  if(popupMode) {
+    initBackButton();
   }
   
   for (let i = 0; i < views.length; i++) {
@@ -35,14 +55,8 @@ function viewChanged(event: Event) {
       view.checked = true;
     }
     
-    view.onclick = viewChanged;
+    view.onchange = viewChanged;
   }
+
+  storage.remove('popupMode');
 })();
-
-function isPopUpView(): boolean {
-  var queryString = window.location.search;
-  var urlParams = new URLSearchParams(queryString);
-  var viewMode = urlParams.get('mode')
-
-  return viewMode === 'popup';
-}

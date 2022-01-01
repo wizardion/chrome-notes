@@ -10,10 +10,20 @@ const list = storage.get('list', true);
 const selected:ISTNote = getSelected(storage.get('selected'));
 
 
+function redirectToSettingsPage(e: MouseEvent) {
+  e.preventDefault();
+
+  storage.set('popupMode', mode);
+  window.location.replace(this.href);
+}
+
+
 (() => {
   var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
   var editor: Base = buildEditor(mode);
+  var titleLink: HTMLLinkElement = <HTMLLinkElement>document.getElementById('title');
 
+  titleLink.onclick = redirectToSettingsPage;
   // setTimeout(() => editor.init(list), 1);
   notes.style.display = 'inherit';
 
