@@ -44,6 +44,7 @@ export class Simple extends Base {
   protected cancelCreation() {
     this.newView.cancel.style.display = 'None';
     this.newView.create.style.display = 'None';
+    this.new = false;
 
     this.showList();
   }

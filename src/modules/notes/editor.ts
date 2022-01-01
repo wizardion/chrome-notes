@@ -18,6 +18,7 @@ export class Editor {
   public wrapper: HTMLTextAreaElement;
   public scroll: HTMLElement;
 
+  private customEvents: {[action: string]: Function} = {};
   private actions: {[action: string]: EventListener} = {
     'bold':                 () => this.command(this.simpleCommand, '**${text}**'),
     'strikethrough':        () => this.command(this.simpleCommand, '~~${text}~~'),
@@ -95,6 +96,7 @@ export class Editor {
     mapping['Enter'] = 'newlineAndIndentContinueMarkdownList';
     mapping['Tab'] = () => this.indentTab();
     mapping['Shift-Tab'] = () => this.shiftTab();
+    mapping['Esc'] = () => this.cancelHandler();
 
     this.codemirror.setOption("extraKeys", mapping);
   }
@@ -122,6 +124,15 @@ export class Editor {
   }
 
   public on(event: string, callback: Function) {
+    if (event === 'save') {
+      // @ts-ignore
+      return CodeMirror.commands.save = () => callback();
+    }
+
+    if (event === 'cancel') {
+      this.customEvents['cancel'] = () => callback();
+    }
+
     this.codemirror.on(event, () => callback());
   }
 
@@ -198,6 +209,10 @@ export class Editor {
     this.visible = true;
     this.wrapper.style.display = 'inherit';
     this.controls.forEach((item: HTMLElement) => item.classList.remove('disabled'));
+  }
+
+  public refresh() {
+    this.codemirror.refresh();
   }
 
   private command(action: Function, ...args: any[]) {
@@ -287,4 +302,20 @@ export class Editor {
       this.doc.replaceSelection('');
     }
   }
+
+  private cancelHandler() {
+    if (this.customEvents['cancel']) {
+      this.customEvents['cancel']();
+    }
+  }
+
+  // private saveHandler(instance?: CodeMirror.Editor, e?: KeyboardEvent) {
+  //   // if ((e.metaKey || (e.ctrlKey && !e.altKey)) && e.key === 's') {
+  //   //   e.preventDefault();
+
+  //   //   console.log('save ...');
+  //   // }
+
+  //   console.log('save ...');
+  // }
 }

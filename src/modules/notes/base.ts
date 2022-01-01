@@ -17,6 +17,7 @@ export class Base {
   protected noteView: INoteView;
   protected newView: INewNoteView;
   private cacheIndex?: number;
+  protected new?: boolean;
 
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     this.notes = [];
@@ -106,6 +107,8 @@ export class Base {
 
     this.noteView.editor.on('change', this.descriptionChanged.bind(this));
     this.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
+    this.noteView.editor.on('save', this.saveHandler.bind(this));
+    this.noteView.editor.on('cancel', this.cancelHandler.bind(this));
 
     ScrollListener.listen(this.listView.items, 550);
     ScrollListener.listen(this.noteView.editor.scroll, 550);
@@ -142,6 +145,7 @@ export class Base {
 
     storage.set('new', 'true');
     this.selected = undefined;
+    this.new = true;
   }
 
   protected createNote(): Note {
@@ -180,13 +184,15 @@ export class Base {
     var note: Note = this.createNote();
 
     if (note) {
+      this.new = false;
+
       this.selectNote(note, false, true);
       this.cacheList();
     }
   }
 
   protected cancelCreation() {
-
+    this.new = false;
   }
 
   protected selectNote(note: Note, bind?: boolean, save?: boolean) {
@@ -302,6 +308,25 @@ export class Base {
     }
   }
 
+  protected saveHandler() {
+    if (this.new) {
+      this.placeNote();
+    } else if (this.selected) {
+      var [title, description] = this.noteView.editor.getData();
+
+      if (this.validate(title, true)) {
+        this.save(title, description);
+        storage.set('selected', this.selected.toString());
+      }
+    }
+  }
+
+  protected cancelHandler() {
+    if (this.new) {
+      this.cancelCreation();
+    }
+  }
+
   protected save(title: string, description: string) {
     if (this.selected && (this.selected.title !== title || this.selected.description !== description)) {
       this.selected.title = title;
@@ -354,7 +379,7 @@ export class Base {
   protected cacheList() {
     var notes: (string|number)[] = [];
 
-    for (let i = 0; i < Math.min(11, this.notes.length); i++) {
+    for (let i = 0; i < Math.min(21, this.notes.length); i++) {
       const note = this.notes[i];
 
       notes = notes.concat([note.title, note.updated]);

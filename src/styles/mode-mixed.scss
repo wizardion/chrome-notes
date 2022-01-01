@@ -1,7 +1,7 @@
 
 .list-view.mixed {
   position: relative;
-  display: inline-block !important;
+  display: block !important;
   float: left;
 }
 
@@ -24,15 +24,9 @@
   display: inline-block;
 }
 
-.list-view.mixed .list-items .date-time {
-  display: none;
-}
-
+.list-view.mixed .list-items .date-time,
 .list-view.mixed .list-item .list-index,
 .list-view.mixed .list-item .list-static {
-  // display: inline-block;
-  // overflow: hidden;
-  // height: 25px;
   display: none;
 }
 
@@ -69,10 +63,20 @@
   left: 27px; 
 }
 
+// ----------------------------------------------------------------------------------------------------
+
 .details-view.mixed {
   width: 470px;
   display: inline-block;
+  // display: initial;
+  // float: right;
 }
+
+// .notes:after {
+//   content: "";
+//   display: table;
+//   clear: both;
+// }
 
 .details-view.mixed .head {
   text-align: inherit;
@@ -96,11 +100,6 @@
   z-index: 1;
 }
 
-.list-view.mixed .button.add {
-  margin-right: -11px;
-  margin-left: 11px;
-}
-
 .details-view.mixed .head .sync {
   left: 22px;
   right: inherit;
@@ -108,6 +107,11 @@
 
 .mixed .hidden-scroll::-webkit-scrollbar-thumb:hover {
   visibility: hidden;
+}
+
+.list-view.mixed .button.add {
+  margin-right: -11px;
+  margin-left: 11px;
 }
 
 .list-view.mixed ::-webkit-scrollbar {

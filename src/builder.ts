@@ -4,6 +4,7 @@ import {Mixed} from './modules/notes/mixed';
 import {Base} from './modules/notes/base';
 import {Simple} from './modules/notes/simple';
 import {Comact} from './modules/notes/compact';
+import {FullScreen} from './modules/notes/full-screen';
 
 
 export function buildEditor(mode: number): Base {
@@ -44,6 +45,10 @@ export function buildEditor(mode: number): Base {
 
   if (mode === 2) {
     return new Comact(listView, noteView, newView);
+  }
+
+  if (mode === 3 || mode === 4) {
+    return new FullScreen(listView, noteView, newView);
   }
 
   return new Simple(listView, noteView, newView);

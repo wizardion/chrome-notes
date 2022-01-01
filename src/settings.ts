@@ -1,15 +1,27 @@
 import './styles/settings.scss';
 import storage from './modules/storage/storage';
 
-var mode:number = Number(storage.get('mode', true) || '0');
+// var mode:number = Number(storage.get('mode', true) || '0');
+var mode:string = storage.get('mode', true) || '0';
 
 function viewChanged(event: Event) {
+  if (chrome && chrome.action && chrome.storage) {
+    if (this.value === '3') {
+      chrome.action.setPopup({popup: ''});
+    } else {
+      chrome.action.setPopup({popup: 'popup.html'});
+    }
+
+    if (chrome && chrome.storage) {
+      chrome.storage.local.set({mode: this.value});
+    }
+  }
+
   storage.set('mode', this.value, true);
 }
 
 (() => {
   var views:NodeList = document.querySelectorAll('input[name="views"]');
-  var view:HTMLInputElement = <HTMLInputElement>views[mode];
 
   if (isPopUpView()) {
     var backBtn:HTMLElement = document.getElementById('back');
@@ -17,12 +29,14 @@ function viewChanged(event: Event) {
   }
   
   for (let i = 0; i < views.length; i++) {
-    const element: HTMLInputElement = <HTMLInputElement>views[i];
+    const view: HTMLInputElement = <HTMLInputElement>views[i];
+
+    if (view.value === mode) {
+      view.checked = true;
+    }
     
-    element.onclick = viewChanged;
+    view.onclick = viewChanged;
   }
-  
-  view.checked = true;
 })();
 
 function isPopUpView(): boolean {

@@ -38,6 +38,7 @@ export class Note {
     this.controls.sort.type = 'button';
     this.controls.toNote.className = 'button to-note';
 
+    this.element.title = this.note.title;
     this.controls.bullet.innerText = `${(this.indexId + 1)}`;
     this.controls.title.innerText = this.note.title;
     this.controls.date.innerText = this.getDateString(this.note.updated);

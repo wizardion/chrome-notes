@@ -7,7 +7,6 @@ import storage from '../storage/storage';
 
 export class Mixed extends Base {
   private reserved?: Note;
-  protected new?: boolean;
 
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     super(listView, noteView, newView);
@@ -49,7 +48,6 @@ export class Mixed extends Base {
       this.reserved = this.selected;
     }
 
-    this.new = true;
     this.hidePreview();
     super.selectNew(description, selection);
   }

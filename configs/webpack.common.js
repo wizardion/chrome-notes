@@ -149,9 +149,10 @@ module.exports = {
 
         if (!manifest.version) {
           delete manifest.key;
+
           manifest.version = "0"
-          manifest.name += ' (Dev)';
-          manifest.action.default_title += ' (Dev)';
+          manifest.name = 'My-Notes-Testers (Dev)';
+          manifest.action.default_title = 'My-Notes-Testers (Dev)';
         }
         
         return JSON.stringify(manifest, null, 2);
