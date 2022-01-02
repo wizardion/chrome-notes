@@ -1,4 +1,3 @@
-import {migrate} from './migration';
 import idb from './modules/db/idb';
 import {IDBNote} from './modules/db/interfaces';
 
@@ -11,44 +10,6 @@ interface IWindow {
   width: number;
   height: number;
 }
-
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.alarms.clearAll((alarm) => {});
-
-  chrome.alarms.create('alert', {periodInMinutes: 1});
-  chrome.alarms.create('sync', {periodInMinutes: 2});
-
-  chrome.storage.local.get(['mode'], function(result) {
-    setPopup(Number(result.mode));
-  });
-
-  idb.exists((exist: boolean) => {
-    if(!exist || 1) {
-      // migrate();
-      // chrome.scripting.executeScript({file: 'logic.js', 1});
-    }
-  });
-});
-
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   // 2. A page requested user data, respond with a copy of `user`
-//   if (message === 'get-user-data') {
-//     if (notes) {
-//       sendResponse(notes);
-//     } else {
-//       sendResponse(null);
-//       // initNotes(sendResponse);
-//     }
-//   }
-// });
-
-// chrome.runtime.onConnect.addListener(function(port) {
-//   port.onMessage.addListener(function(msg) {
-//     if (msg.joke === "Knock knock") {
-//       port.postMessage({joke: "notes", notes: notes});
-//     }
-//   });
-// });
 
 chrome.action.onClicked.addListener(() => {
   var url = chrome.runtime.getURL('popup.html');
@@ -73,6 +34,26 @@ chrome.action.onClicked.addListener(() => {
   });
 });
 
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   // 2. A page requested user data, respond with a copy of `user`
+//   if (message === 'get-user-data') {
+//     if (notes) {
+//       sendResponse(notes);
+//     } else {
+//       sendResponse(null);
+//       // initNotes(sendResponse);
+//     }
+//   }
+// });
+
+// chrome.runtime.onConnect.addListener(function(port) {
+//   port.onMessage.addListener(function(msg) {
+//     if (msg.joke === "Knock knock") {
+//       port.postMessage({joke: "notes", notes: notes});
+//     }
+//   });
+// });
+
 chrome.storage.onChanged.addListener(function (changes, namespace) {
   for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
     if (key === 'mode' && oldValue !== newValue) {
@@ -89,6 +70,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 chrome.runtime.onUpdateAvailable.addListener(function() {
   console.warn('update is available');
+});
+
+chrome.runtime.onInstalled.addListener(function() {
+  console.log('app was installed');
+  chrome.alarms.clearAll((alarm) => {});
+
+  chrome.alarms.create('alert', {periodInMinutes: 1});
+  chrome.alarms.create('sync', {periodInMinutes: 2});
+
+  chrome.storage.local.get(['mode'], function(result) {
+    setPopup(Number(result.mode));
+  });
 });
 
 chrome.alarms.onAlarm.addListener(function(alarm) {

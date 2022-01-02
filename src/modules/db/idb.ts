@@ -138,20 +138,6 @@ function dequeue(errorCallback?: Function) {
   initObjectStore(prommise, 'readwrite');
 }
 
-function exists(callback?: Function) {
-  indexedDB.databases().then((result) => {
-    for(let i = 0; i < result.length; i++) {
-      const db = result[0];
-
-      if (db.name === 'MyNotes') {
-        return callback(true);
-      }
-    }
-
-    callback(false);
-  });
-}
-
 export default {
   init: init,
   load: load,
@@ -162,5 +148,4 @@ export default {
   dequeue: dequeue,
   remove: remove,
   getSync: getSync,
-  exists: exists,
 };

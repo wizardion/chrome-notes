@@ -16,7 +16,6 @@ module.exports = {
     index: path.resolve(__root__, 'src/index.ts'),
     background: path.resolve(__root__, 'src/background.ts'),
     settings: path.resolve(__root__, 'src/settings.ts'),
-    migration: path.resolve(__root__, 'src/migration.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
