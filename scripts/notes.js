@@ -184,7 +184,12 @@ $.fn.Notes = function(options)
 
     //----------------------------------------------------------------------------------------------------
     function saveNotes() {
-        localStorage.notes = toString(_notes);
+        var data = toString(_notes);
+        localStorage.notes = data;
+
+        if (chrome && chrome.storage) {
+          chrome.storage.local.set({oldNotes: data});
+        }
     }
 
     //----------------------------------------------------------------------------------------------------
