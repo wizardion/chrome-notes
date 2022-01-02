@@ -1,6 +1,14 @@
 window.onload = function(){
     //var bgr = chrome.extension.getBackgroundPage();
 
+    if (chrome && chrome.storage) {
+      chrome.storage.local.get(['migrate', 'oldNotes'], function(resutl) {
+        console.log('storage.resutl', resutl);
+      });
+
+      chrome.storage.local.set({migrate: true});
+    }
+
     $('#notes').Notes({
         back_bt: 'back',
         add_bt: 'add-note',
