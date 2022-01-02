@@ -38,21 +38,20 @@
   height: 244px;
 }
 
-.back
-{
+.back {
   width: inherit;
   background-position: left;
   position: absolute;
   top: 0px;
-  left: 5px;
+  left: 0px;
   line-height: 26px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .back svg {
   margin-top: 4px;
   margin-bottom: -4px;
-  margin-left: -4px;
+  margin-left: 0px;
 }
 
 .button.delete {
@@ -62,7 +61,7 @@
 }
 
 .button.delete svg {
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .details-view .button.save {
@@ -81,6 +80,7 @@
 
 .details-view .cancel {
   display: none;
+  left: 4px;
 }
 
 .required {

@@ -1,18 +1,28 @@
+interface IElementHolder {
+  element: HTMLElement;
+  interval: NodeJS.Timeout;
+}
 
 export class ScrollListener {
-  private static interval?: NodeJS.Timeout;
+  public static listen(element: HTMLElement, delay=0) {
+    var holder: IElementHolder = {
+      element: element,
+      interval: null,
+    };
 
-  public static listen(element: HTMLElement) {
     element.classList.add('hidden-scroll');
-    element.addEventListener('scroll', () => this.scroll(element));
+
+    setTimeout(() => {
+      element.addEventListener('scroll', () => this.scroll(holder));
+    }, delay);
   }
 
-  private static scroll(element: HTMLElement) {
-    element.classList.remove('hidden-scroll');
-    clearInterval(this.interval);
+  private static scroll(holder: IElementHolder) {
+    holder.element.classList.remove('hidden-scroll');
+    clearInterval(holder.interval);
 
-    this.interval = setTimeout(() => {
-      element.classList.add('hidden-scroll');
+    holder.interval = setTimeout(() => {
+      holder.element.classList.add('hidden-scroll');
     }, 1750);
   }
 }

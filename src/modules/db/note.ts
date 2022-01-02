@@ -1,40 +1,6 @@
 import {IDBNote} from './interfaces'
 import idb from './idb';
-import storage from '../storage/storage';
 
-export function load(callback: Function, list?: string) {
-  var items = JSON.parse(`[${(list || storage.get('list', true) || '')}]`);
-  var notes: DbNote[] = [];
-
-  for (let i = 1; i < items.length; i += 2) {
-    const title = items[i - 1];
-    const updated = items[i];
-    
-    notes.push(new DbNote({
-      id: 0, 
-      title: title, 
-      description: '', 
-      order: i + 1, 
-      updated: updated, 
-      created: null,
-      sync: null
-    }));
-  }
-
-  callback(notes);
-}
-
-export function loadAll(callback: Function) {
-  var notes: DbNote[] = [];
-
-  idb.load((result: IDBNote[]) => {
-    for(var i = 0; i < result.length; i++) {
-      notes.push(new DbNote(result[i]));
-    }
-    
-    callback(notes);
-  });
-}
 
 export class DbNote implements IDBNote {
   public id: number;

@@ -1,0 +1,164 @@
+html, body {
+  // background: white;
+  background: #f1f3f4;
+
+  min-width: 400px;
+  min-height: 150px;
+
+  border:0;
+  margin: 0px;
+  padding: 0px;
+
+  overflow: hidden;
+  overflow-y: scroll;
+
+  font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
+}
+
+.row {
+  width: 70%;
+  margin: 5px auto;
+  // padding: 10px;
+  background: white;
+
+  border: silver;
+  border-radius: 3px;
+  border: 1px solid #e0e0df;
+}
+
+input[type='radio'] {
+  -webkit-appearance: none;
+  appearance: none;
+  
+}
+
+input[type='radio']:after {
+  width: 7px;
+  height: 7px;
+  border-radius: 7px;
+  top: 0px;
+  left: -2px;
+  position: relative;
+  background-color: #f1f3f4;
+  content: "";
+  display: inline-block;
+  visibility: visible;
+  border: 3px solid #06736a64;
+  border-style: double;
+
+  transform: scale(0.75);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em var(--form-control-color);
+}
+
+input[type='radio']:checked:after {
+  // background-color: #ffa500;
+  background-color: #06736a;
+  // border-color: #e0e0df;
+  border-color: white;
+
+  transform: scale(1);
+}
+
+div .left {
+  float: left;
+  // width: 40%;
+  width: 100px;
+  padding: 10px 0px 10px 10px;
+}
+
+div .right {
+  float: left;
+  padding: 10px 10px 10px 0px;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+div ul {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+.title {
+  color: #06736a;
+  font-weight: normal;
+  text-align: center;
+  font-size: 25px;
+  padding: 0px;
+  margin: 30px 0 20px 0px;
+}
+
+label:hover, input:hover {
+  cursor: pointer;
+}
+
+// ----------------------------------
+.button, 
+.link {
+  padding: 0px;
+  margin: 0px;
+  height:24px;
+  width:24px;
+  line-height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #06736a;
+  fill: #06736a;
+  outline: none;
+  display: inline-block;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-family: 'Roboto', 'Ubuntu', Sans-Serif;
+  text-decoration: none;
+}
+
+.button:hover,
+.link:hover {
+  color: #e33636;
+  fill:#e33636;
+  text-decoration: underline;
+}
+
+.button:active,
+.link:active {
+  color: #e3363685;
+  fill:#e3363685;
+}
+
+.back {
+  width: inherit;
+  background-position: left;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  line-height: 26px;
+  font-size: 13px;
+}
+
+.back svg {
+  margin-top: 4px;
+  margin-bottom: -4px;
+  margin-left: 0px;
+}
+
+@media only screen and (max-width: 600px) {
+  html, body {
+    width: 600px;
+    height: 270px;
+  }
+}
+
+// @media only screen and (max-height: 270px) {
+
+// }

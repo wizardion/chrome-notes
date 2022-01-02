@@ -73,7 +73,7 @@ function load(callback: Function) {
 function getSync(callback: Function) {
   var prommise: Function = (objectStore: IDBObjectStore) => {
     var index = objectStore.index("sync");
-    var request = index.getAll();
+    var request = index.getAll(1);
 
     // @ts-ignores
     request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};

@@ -1,70 +1,45 @@
-import {IListView, INewNoteView, INoteView} from './modules/notes/components/interfaces';
-import {Editor} from './modules/notes/editor';
-import {Simple} from './modules/notes/simple';
+import {ISTNote} from './modules/notes/components/interfaces';
+import {Base} from './modules/notes/base';
 import storage from './modules/storage/storage';
+import {buildEditor, getSelected} from './builder';
 import './styles/style.scss';
 
-var html = storage.get('html');
-var isNew = storage.get('new');
-var list = storage.get('list', true);
-var selection = storage.get('selection');
-var description = storage.get('description');
-var previewState = storage.get('previewState');
+const mode: number = Number(storage.get('mode', true) || '0');
+const isNew = storage.get('new');
+const list = storage.get('list', true);
+const selected:ISTNote = getSelected(storage.get('selected'));
 
-var notes: HTMLElement = null;
-var listView: IListView = null;
-var noteView: INoteView = null;
-var newView: INewNoteView = null;
+
+function redirectToSettingsPage(e: MouseEvent) {
+  e.preventDefault();
+
+  storage.set('popupMode', mode);
+  window.location.replace(this.href);
+}
 
 
 (() => {
-  notes = <HTMLElement>document.getElementById('notes');
-  var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
-  var noteViewElement: HTMLElement = <HTMLElement>document.getElementById('details-view');
-  var codemirror = new Editor(
-    <HTMLTextAreaElement>document.getElementById('description-note'),
-    <NodeList>document.getElementById('editor-controls').querySelectorAll('div[action]')
-  );
+  var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
+  var editor: Base = buildEditor(mode);
+  var titleLink: HTMLLinkElement = <HTMLLinkElement>document.getElementById('title');
 
-  listView = {
-    node: listViewElement,
-    items: <HTMLElement>document.getElementById('list-items'),
-    template: <HTMLElement>document.getElementById('template'),
-    addButton: <HTMLButtonElement>document.getElementById('add-note'),
-    searchButton: <HTMLButtonElement>document.getElementById('search-button'),
-    searchInput: <HTMLInputElement>document.getElementById('search-input'),
-  }
-
-  noteView = {
-    node: noteViewElement,
-    back: <HTMLButtonElement>document.getElementById('to-list'),
-    delete: <HTMLButtonElement>document.getElementById('delete-note'),
-    preview: <HTMLInputElement>document.getElementById('preview-note'),
-    sync: <HTMLInputElement>document.getElementById('sync-note'),
-    html: <HTMLElement>document.getElementById('html-preview'),
-    editor: codemirror
-  };
-
-  newView = {
-    node: noteViewElement,
-    cancel: <HTMLButtonElement>document.getElementById('cancel-note'),
-    create: <HTMLButtonElement>document.getElementById('create-note'),
-  }
-
-  var editor = new Simple(listView, noteView, newView);
-  editor.init(list);
+  titleLink.onclick = redirectToSettingsPage;
   // setTimeout(() => editor.init(list), 1);
   notes.style.display = 'inherit';
 
-  if (description) {
-    if (isNew) {
-      editor.selectNew(description, selection);
-    } else {
-      editor.showNote(description, true, selection, html, previewState);
-    }
+  if (list) {
+    editor.initFromCache(list);
+  }
+
+  if (isNew) {
+    editor.selectNew(storage.get('description'), storage.get('selection'));
+  } else if (selected) {
+    editor.selectFromCache(selected);
   } else {
     editor.showList();
   }
+
+  editor.init();
 
   notes.style.opacity = '1';
 })();

@@ -6,7 +6,7 @@ export default class Storage {
       return this.remove(key);
     }
 
-    if (!permament && !this.keys[key]) {
+    if (permament && !this.keys[key]) {
       this.keys[key] = true;
     }
 
@@ -14,7 +14,7 @@ export default class Storage {
   }
 
   public static get(key: string, permament: boolean = false): string {
-    if (!permament && !this.keys[key]) {
+    if (permament && !this.keys[key]) {
       this.keys[key] = true;
     }
 
@@ -22,8 +22,14 @@ export default class Storage {
   }
 
   public static clear() {
-    for(let key in this.keys) {
-      this.remove(key);
+    var keys: string[] = Object.keys(localStorage);
+
+    for(let i = 0; i < keys.length; i++) {
+      const key: string = keys[i];
+
+      if (!this.keys[key]) {
+        localStorage.removeItem(key);
+      }
     }
   }
 

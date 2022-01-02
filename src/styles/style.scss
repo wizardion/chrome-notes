@@ -61,7 +61,8 @@ input, button {
   fill:#e33636;
 }
 
-.button:active {
+.button:active,
+.link:active {
   color: #e3363685;
   fill:#e3363685;
 }
@@ -81,3 +82,6 @@ input, button {
 
 @import 'list-view';
 @import 'details-view';
+@import 'mode-mixed';
+@import 'mode-compact';
+@import 'mode-full';

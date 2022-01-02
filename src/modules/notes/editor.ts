@@ -18,6 +18,7 @@ export class Editor {
   public wrapper: HTMLTextAreaElement;
   public scroll: HTMLElement;
 
+  private customEvents: {[action: string]: Function} = {};
   private actions: {[action: string]: EventListener} = {
     'bold':                 () => this.command(this.simpleCommand, '**${text}**'),
     'strikethrough':        () => this.command(this.simpleCommand, '~~${text}~~'),
@@ -64,6 +65,7 @@ export class Editor {
     this.doc = this.codemirror.getDoc();
     this.wrapper = <HTMLTextAreaElement>this.codemirror.getWrapperElement();
     this.scroll = this.wrapper.querySelector('.CodeMirror-vscrollbar');
+    this.scroll.classList.add('hidden-scroll');
     this.visible = true;
 
     setTimeout(() => this.init());
@@ -94,8 +96,13 @@ export class Editor {
     mapping['Enter'] = 'newlineAndIndentContinueMarkdownList';
     mapping['Tab'] = () => this.indentTab();
     mapping['Shift-Tab'] = () => this.shiftTab();
+    mapping['Esc'] = () => this.cancelHandler();
 
     this.codemirror.setOption("extraKeys", mapping);
+  }
+
+  public get displayed(): boolean {
+    return this.visible;
   }
 
   public get value(): string {
@@ -103,7 +110,7 @@ export class Editor {
   }
 
   public set value(text: string) {
-    this.doc.setValue(text);
+    this.doc.setValue(text || '');
     this.codemirror.refresh();
     setTimeout(() => this.codemirror.clearHistory());
   }
@@ -117,6 +124,15 @@ export class Editor {
   }
 
   public on(event: string, callback: Function) {
+    if (event === 'save') {
+      // @ts-ignore
+      return CodeMirror.commands.save = () => callback();
+    }
+
+    if (event === 'cancel') {
+      this.customEvents['cancel'] = () => callback();
+    }
+
     this.codemirror.on(event, () => callback());
   }
 
@@ -124,8 +140,8 @@ export class Editor {
     this.codemirror.focus();
   }
 
-  public getData() {
-    var value = this.codemirror.getValue();
+  public getData(text?: string) {
+    var value = text || this.codemirror.getValue();
     var data: string[] = (value || '').split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
     var title: string = (data && data.length) ? data[0].trim() : '';
     var description: string = (data && data.length > 1) ? data[1] : '';
@@ -193,6 +209,10 @@ export class Editor {
     this.visible = true;
     this.wrapper.style.display = 'inherit';
     this.controls.forEach((item: HTMLElement) => item.classList.remove('disabled'));
+  }
+
+  public refresh() {
+    this.codemirror.refresh();
   }
 
   private command(action: Function, ...args: any[]) {
@@ -282,4 +302,20 @@ export class Editor {
       this.doc.replaceSelection('');
     }
   }
+
+  private cancelHandler() {
+    if (this.customEvents['cancel']) {
+      this.customEvents['cancel']();
+    }
+  }
+
+  // private saveHandler(instance?: CodeMirror.Editor, e?: KeyboardEvent) {
+  //   // if ((e.metaKey || (e.ctrlKey && !e.altKey)) && e.key === 's') {
+  //   //   e.preventDefault();
+
+  //   //   console.log('save ...');
+  //   // }
+
+  //   console.log('save ...');
+  // }
 }
