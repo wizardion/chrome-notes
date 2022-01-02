@@ -299,8 +299,9 @@ export class Base {
 
       this.intervals.cursor = setTimeout(() => {
         if (this.selected) {
-          this.selected.cursor = this.noteView.editor.getCursor();
+          this.selected.selection = this.noteView.editor.getSelection();
           storage.set('selected', this.selected.toString());
+          this.selected.cursor = this.noteView.editor.getCursor();
         } else {
           storage.set('selection', this.noteView.editor.getSelection());
         }

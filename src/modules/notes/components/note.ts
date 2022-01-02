@@ -129,6 +129,12 @@ export class Note {
     }
   }
 
+  public set selection(value: string) {
+    if (this.note.cState !== value) {
+      this.note.cState = value;
+    }
+  }
+
   public get previewState(): string {
     return this.note.pState;
   }
