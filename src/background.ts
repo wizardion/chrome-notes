@@ -11,7 +11,7 @@ interface IWindow {
   height: number;
 }
 
-chrome.action.onClicked.addListener((tab) => {
+chrome.action.onClicked.addListener(() => {
   var url = chrome.runtime.getURL('popup.html');
 
   chrome.storage.local.get(['mode', 'window'], function(result) {
@@ -77,12 +77,7 @@ chrome.runtime.onInstalled.addListener(function() {
   chrome.alarms.clearAll((alarm) => {});
 
   chrome.alarms.create('alert', {periodInMinutes: 1});
-  chrome.alarms.create('sync', {periodInMinutes: 0.5});
-
-  // console.log('storage.get.mode');
-
-  // console.log('storage.get.mode', storage.get('mode', true));  
-  // console.log('storage.get.mode', chrome.storage.local.get('mode', ));  
+  chrome.alarms.create('sync', {periodInMinutes: 2});
 
   chrome.storage.local.get(['mode'], function(result) {
     setPopup(Number(result.mode));
@@ -98,34 +93,30 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 });
 
 function initNotes(callback?: Function) {
-  if (!notes) {
-    return idb.getSync((data: IDBNote[]) => {
-      notes = data;
+  idb.getSync((data: IDBNote[]) => {
+    notes = data;
 
-      if (callback && notes) {
-        callback(notes);
-      }
-    });
-  }
-
-  if (callback) {
-    callback(notes);
-  }
+    if (callback && notes) {
+      callback(notes);
+    }
+  });
 }
 
 function startSync() {
   initNotes((notes: IDBNote[]) => {
     console.log('startSync.notes', notes.length);
-    // for (let i = 0; i < notes.length; i++) {
-    //   const item: IDBNote = notes[i];
-      
-    //   console.log('note:', item.id);
-    // }
 
-    // console.log('notes', notes);
-    // notes.forEach((item: IDBNote)=> {
-    //   console.log('note:', item);
-    // });
+    for (let i = 0; i < notes.length; i++) {
+      const item: IDBNote = notes[i];
+      
+      // console.log('note:', {
+      //   'id': item.id,
+      //   'title': item.title,
+      //   'sync': item.sync,
+      // });
+
+      chrome.storage.sync.set(item);
+    }
   });
 }
 
@@ -164,11 +155,3 @@ function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: nu
     }
   }
 }
-
-// chrome.storage.local.get('signed_in', function(data) {
-//   if (data.signed_in) {
-//     chrome.browserAction.setPopup({popup: 'popup.html'});
-//   } else {
-//     chrome.browserAction.setPopup({popup: 'popup_sign_in.html'});
-//   }
-// });
