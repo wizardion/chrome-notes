@@ -19,8 +19,8 @@ chrome.runtime.onInstalled.addListener(function() {
   chrome.alarms.create('sync', {periodInMinutes: 2});
 
   chrome.storage.local.get(['mode', 'migrate'], function(result) {
-    if (result.migrate || 1) {
-      setPopup(4);
+    if (result.migrate) {
+      chrome.action.setPopup({popup: ''}, ()=>{});
       chrome.storage.local.set({mode: 4});
       chrome.tabs.create({url: chrome.runtime.getURL('migration.html')});
       return;
@@ -57,7 +57,7 @@ chrome.action.onClicked.addListener(() => {
     let mode: number = Number(result.mode);
     let window: IWindow = result.window;
 
-    if (result.migrate || 1) {
+    if (result.migrate) {
       return openMigration();
     }
 
