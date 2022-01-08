@@ -11,26 +11,22 @@ interface IWindow {
   height: number;
 }
 
-chrome.action.onClicked.addListener(() => {
-  var url = chrome.runtime.getURL('popup.html');
+chrome.runtime.onInstalled.addListener(function() {
+  console.log('app was installed');
+  chrome.alarms.clearAll((alarm) => {});
 
-  chrome.storage.local.get(['mode', 'window'], function(result) {
-    let mode: number = Number(result.mode);
-    let window: IWindow = result.window;
+  chrome.alarms.create('alert', {periodInMinutes: 1});
+  chrome.alarms.create('sync', {periodInMinutes: 2});
 
-    chrome.tabs.query({url: url, currentWindow: true}, function (tabs) {
-      if (tabs.length) {
-        let tab = tabs[0];
-  
-        openPopup(mode, window, tab && tab.id);
-      } else {
-        chrome.tabs.query({url: url}, function (allTabs) {
-          let tab = allTabs[0];
-          
-          openPopup(mode, window, tab && tab.id, tab && tab.windowId);
-        });
-      }
-    });
+  chrome.storage.local.get(['mode', 'migrate'], function(result) {
+    if (result.migrate || 1) {
+      setPopup(4);
+      chrome.storage.local.set({mode: 4});
+      chrome.tabs.create({url: chrome.runtime.getURL('migration.html')});
+      return;
+    }
+
+    setPopup(Number(result.mode));
   });
 });
 
@@ -54,6 +50,34 @@ chrome.action.onClicked.addListener(() => {
 //   });
 // });
 
+chrome.action.onClicked.addListener(() => {
+  var url = chrome.runtime.getURL('popup.html');
+
+  chrome.storage.local.get(['mode', 'window', 'migrate'], function(result) {
+    let mode: number = Number(result.mode);
+    let window: IWindow = result.window;
+
+    if (result.migrate || 1) {
+      return openMigration();
+    }
+
+    chrome.tabs.query({url: url, currentWindow: true}, function (tabs) {
+      if (tabs.length) {
+
+        let tab = tabs[0];
+  
+        openPopup(mode, window, tab && tab.id);
+      } else {
+        chrome.tabs.query({url: url}, function (allTabs) {
+          let tab = allTabs[0];
+          
+          openPopup(mode, window, tab && tab.id, tab && tab.windowId);
+        });
+      }
+    });
+  });
+});
+
 chrome.storage.onChanged.addListener(function (changes, namespace) {
   for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
     if (key === 'mode' && oldValue !== newValue) {
@@ -72,23 +96,15 @@ chrome.runtime.onUpdateAvailable.addListener(function() {
   console.warn('update is available');
 });
 
-chrome.runtime.onInstalled.addListener(function() {
-  console.log('app was installed');
-  chrome.alarms.clearAll((alarm) => {});
-
-  chrome.alarms.create('alert', {periodInMinutes: 1});
-  chrome.alarms.create('sync', {periodInMinutes: 2});
-
-  chrome.storage.local.get(['mode'], function(result) {
-    setPopup(Number(result.mode));
-  });
-});
-
 chrome.alarms.onAlarm.addListener(function(alarm) {
   time = new Date().getTime();
 
   if (alarm.name === 'sync') {
     return startSync();
+  } else {
+    chrome.storage.local.get(['mode'], function(result) {
+      setPopup(Number(result.mode));
+    });
   }
 });
 
@@ -154,4 +170,30 @@ function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: nu
       chrome.windows.create({focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup'});
     }
   }
+}
+
+function openMigration() {
+  var url = chrome.runtime.getURL('migration.html');
+
+  chrome.tabs.query({url: url, currentWindow: true}, function (tabs) {
+    if (tabs.length) {
+      let tab = tabs[0];
+      
+      chrome.tabs.update(tab.id, {active: true});
+    } else {
+      chrome.tabs.query({url: url}, function (allTabs) {
+        if (tabs.length) {
+          let tab = allTabs[0];
+
+          if (tab.windowId) {
+            chrome.windows.update(tab.windowId, {focused: true});
+          }
+      
+          chrome.tabs.update(tab.id, {active: true});
+        } else {
+          chrome.tabs.create({url: url});
+        }
+      });
+    }
+  });
 }

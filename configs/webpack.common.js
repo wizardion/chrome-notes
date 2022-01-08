@@ -16,6 +16,7 @@ module.exports = {
     index: path.resolve(__root__, 'src/index.ts'),
     background: path.resolve(__root__, 'src/background.ts'),
     settings: path.resolve(__root__, 'src/settings.ts'),
+    migration: path.resolve(__root__, 'src/migration.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -60,17 +61,17 @@ module.exports = {
       ],
       },
       {
-        test: /\.(png|jp(e*)g|gif|ico)$/,
+        test: /\.(png|jp(e*)g|gif|ico)$/i,
         include: [
           path.resolve(__root__, 'src/images'),
         ],
-        use: [{
-          loader: 'url-loader',
-        }]
+        loader: 'file-loader',
+        options: {
+          esModule: false,
+        },
       },
-      { // https://v4.webpack.js.org/loaders/url-loader/#svg
+      {
         test: /\.svg$/i,
-        exclude: [path.resolve(__root__, 'src/popup.html')],
         use: [
           {
             loader: 'url-loader',
@@ -84,7 +85,13 @@ module.exports = {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
-      {test: /\.(hbs|html|xml)$/, loader: 'handlebars-loader'}
+      {
+        test: /\.(hbs|html|xml)$/, 
+        loader: 'handlebars-loader', 
+        options: {
+          inlineRequires: "/images/"
+        }
+      }
     ]
   },
   resolve: {
@@ -92,7 +99,8 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      cleanAfterEveryBuildPatterns: ['**/*']
+      cleanStaleWebpackAssets: false,
+      // cleanAfterEveryBuildPatterns: ['**/*']
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -132,6 +140,16 @@ module.exports = {
       inject: "body",
       chunks: [
         'settings'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Migration',
+      filename: 'migration.html',
+      template: './src/migration.html',
+      scriptLoading: 'blocking',
+      inject: "body",
+      chunks: [
+        'migration'
       ],
     }),
     // new htmlWebpackInjectAttributesPlugin({

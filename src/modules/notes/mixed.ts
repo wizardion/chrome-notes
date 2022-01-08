@@ -1,7 +1,7 @@
 import {Base} from './base';
 import {Note} from './components/note';
 import {DbNote} from '../db/note';
-import {IListView, INewNoteView, INoteView} from './components/interfaces';
+import {IListView, INewNoteView, INoteView, ISTNote} from './components/interfaces';
 import storage from '../storage/storage';
 
 
@@ -19,6 +19,14 @@ export class Mixed extends Base {
     this.noteView.preview.parentElement.style.display = 'none';
 
     this.noteView.editor.hide();
+  }
+
+  public selectFromCache(note: ISTNote) {
+    super.selectFromCache(note);
+
+    if (this.selected && !this.new) {
+      this.selected.element.scrollIntoView({block: 'nearest'});
+    }
   }
 
   protected build(notes: DbNote[]) {
