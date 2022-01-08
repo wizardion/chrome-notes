@@ -5,7 +5,7 @@ import {migrate} from './modules/storage/migrate';
 var oldNotes: string;
 
 (() => {
-  chrome.storage.local.get(['migrate'], function(result) {
+  chrome.storage.local.get(['migrate', 'oldNotes'], function(result) {
     oldNotes = localStorage.notes || result.oldNotes;
 
     if (!oldNotes) {
