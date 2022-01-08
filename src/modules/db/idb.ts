@@ -88,8 +88,11 @@ function add(item: IDBNote, callback?: Function) {
     let {id, ...draft} = item;
     var request = objectStore.add(draft);
 
-    // @ts-ignore
-    request.onsuccess = (e: Event) => callback(<number>e.target.result);
+    if(callback) {
+      // @ts-ignore
+      request.onsuccess = (e: Event) => callback(<number>e.target.result);
+    }
+    
     request.onerror = logError;
   };
 
