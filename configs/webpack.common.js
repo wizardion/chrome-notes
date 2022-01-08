@@ -98,9 +98,10 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
-    new CleanWebpackPlugin({
+    new CleanWebpackPlugin(process.__version__? {
+      cleanAfterEveryBuildPatterns: ['**/*']
+    } : {
       cleanStaleWebpackAssets: false,
-      // cleanAfterEveryBuildPatterns: ['**/*']
     }),
     new CopyWebpackPlugin({
       patterns: [

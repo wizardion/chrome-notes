@@ -1,9 +1,14 @@
 import './styles/migration.scss';
 import {migrate} from './modules/storage/migrate';
 
+
+var oldNotes: string;
+
 (() => {
   chrome.storage.local.get(['migrate'], function(result) {
-    if (result.migrate) {
+    oldNotes = localStorage.notes || result.oldNotes;
+
+    if (!oldNotes) {
       clearInterface();
     } else {
       countDown();
@@ -78,12 +83,13 @@ function startMigrate() {
   var finished = document.getElementById('finished');
   var progress = document.getElementById('progress');
 
-  migrate(localStorage.notes);
+  migrate(oldNotes);
   
   setTimeout(() => {
     progress.classList.add('hidden');
     finished.classList.remove('hidden');
     whatsnew.classList.remove('hidden');
+
     chrome.storage.local.clear();
     localStorage.clear();
   }, 8000);  
