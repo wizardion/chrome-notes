@@ -41,9 +41,18 @@ function closeWindow() {
 function cancelMigration(countdown: HTMLElement, interval: NodeJS.Timeout, e: PointerEvent) {
   e.preventDefault();
   clearInterval(interval);
-
   countdown.classList.add('disabled');
-  this.setAttribute('disabled', 'disabled');
+
+  this.value = ' Start  ';
+  this.onclick = () => {
+    var seconds: number = 30;
+    var countdownSeconds: HTMLElement = document.getElementById('countdown-seconds');
+
+    countdown.classList.remove('disabled');
+    countdownSeconds.innerText = seconds.toString();
+    this.value = 'Cancel';
+    countDown();
+  };
 }
 
 function countDown() {

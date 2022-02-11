@@ -243,6 +243,10 @@ img {
   fill:#e3363685;
 }
 
+.disabled {
+  color: silver;
+}
+
 @media only screen and (max-width: 600px) {
   html, body {
     width: 600px;
