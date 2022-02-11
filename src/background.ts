@@ -1,5 +1,6 @@
 import idb from './modules/db/idb';
 import {IDBNote} from './modules/db/interfaces';
+import {migrate} from './modules/storage/migrate';
 
 var notes: IDBNote[];
 var time: number;
@@ -18,12 +19,16 @@ chrome.runtime.onInstalled.addListener(function() {
   chrome.alarms.create('alert', {periodInMinutes: 1});
   chrome.alarms.create('sync', {periodInMinutes: 2});
 
-  chrome.storage.local.get(['mode', 'migrate'], function(result) {
+  chrome.storage.local.get(['mode', 'migrate', 'oldNotes'], function(result) {
+    if (result.migrate && result.oldNotes) {
+      migrate(result.oldNotes);
+      return chrome.storage.local.clear();
+    }
+    
     if (result.migrate) {
       chrome.action.setPopup({popup: ''}, ()=>{});
       chrome.storage.local.set({mode: 4});
-      chrome.tabs.create({url: chrome.runtime.getURL('migration.html')});
-      return;
+      return chrome.tabs.create({url: chrome.runtime.getURL('migration.html')});
     }
 
     setPopup(Number(result.mode));
