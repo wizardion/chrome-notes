@@ -25,6 +25,18 @@ export class FullScreen extends Mixed {
     setInterval(this.timer.bind(this), 1000);
   }
 
+  // public init() {
+  //   super.init();
+
+  //   if (chrome && chrome.tabs) {
+  //     chrome.tabs.query({active: true}, (tabs: chrome.tabs.Tab[]) => {
+  //       if (tabs.length === 1) {
+  //         this.saveTabInfo(tabs[0]);
+  //       }
+  //     });
+  //   }
+  // }
+
   protected build(notes: DbNote[]) {
     super.build(notes);
 
@@ -43,6 +55,15 @@ export class FullScreen extends Mixed {
       this.saveScreenPossition();
     }
   }
+
+  // protected saveTabInfo(tab: chrome.tabs.Tab) {
+  //   chrome.storage.local.set({tabInfo: {
+  //     id: tab.id, 
+  //     windowId: tab.windowId,
+  //     width: tab.width,
+  //     height: tab.height
+  //   }});
+  // }
 
   protected saveScreenPossition() {
     if (this.mode === 4 && chrome && chrome.storage) {

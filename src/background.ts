@@ -55,6 +55,34 @@ chrome.runtime.onInstalled.addListener(function() {
 //   });
 // });
 
+// chrome.tabs.onRemoved.addListener((tabId: number) => {
+//   chrome.storage.local.get('tabInfo', function(result) {
+//     if (result.tabInfo && result.tabInfo.id === tabId) {
+//       console.log('remove.tabInfo');
+//       chrome.storage.local.remove('tabInfo');
+//     }
+//   });
+// });
+
+// chrome.tabs.onDetached.addListener((tabId: number) => {
+//   chrome.storage.local.get('tabInfo', function(result) {
+//     if (result.tabInfo && result.tabInfo.id === tabId) {
+//       console.log('remove.tabInfo');
+//       chrome.storage.local.remove('tabInfo');
+//     }
+//   });
+// });
+
+// chrome.tabs.onAttached.addListener((tabId: number) => {
+//   findTab(tabId, (tab: chrome.tabs.Tab) => {
+//     console.log('onAttached.save.info', tab);
+//   });
+// });
+
+// chrome.tabs.onUpdated.addListener((tabId: number, info: object) => {
+//   console.log('onUpdated', tabId, info);
+// });
+
 chrome.action.onClicked.addListener(() => {
   var url = chrome.runtime.getURL('popup.html');
 
@@ -66,20 +94,36 @@ chrome.action.onClicked.addListener(() => {
       return openMigration();
     }
 
-    chrome.tabs.query({url: url, currentWindow: true}, function (tabs) {
-      if (tabs.length) {
+    openPopup(mode, window);
 
-        let tab = tabs[0];
+    // -----------------------------------------------------------------------------------------------
+    // if (result.tabInfo) {
+    //   getOpenedTab(result.tabInfo.id, (tab: chrome.tabs.Tab) => {
+    //     console.log('update.tab', tab);
+    //     // chrome.storage.local.remove('tabInfo');
+    //   }, () => {
+    //     console.log('not.found.create');
+    //     chrome.tabs.create({url: chrome.runtime.getURL('popup.html')});
+    //   });
+    // } else {
+    //   console.log('first.create');
+    //   chrome.tabs.create({url: chrome.runtime.getURL('popup.html')});
+    // }
+    // -----------------------------------------------------------------------------------------------
+    // chrome.tabs.query({url: url, currentWindow: true}, function (tabs) {
+    //   if (tabs.length) {
+
+    //     let tab = tabs[0];
   
-        openPopup(mode, window, tab && tab.id);
-      } else {
-        chrome.tabs.query({url: url}, function (allTabs) {
-          let tab = allTabs[0];
+    //     openPopup(mode, window, tab && tab.id);
+    //   } else {
+    //     chrome.tabs.query({url: url}, function (allTabs) {
+    //       let tab = allTabs[0];
           
-          openPopup(mode, window, tab && tab.id, tab && tab.windowId);
-        });
-      }
-    });
+    //       openPopup(mode, window, tab && tab.id, tab && tab.windowId);
+    //     });
+    //   }
+    // });
   });
 });
 
@@ -112,6 +156,20 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     });
   }
 });
+
+// function getOpenedTab(tabId: number, findback: Function, noneback?: Function) {
+//   chrome.tabs.query({}, function (tabs) {
+//     for(let i = 0; i < tabs.length; i++) {
+//       if (tabs[i].id === tabId) {
+//         return findback(tabs[i]);
+//       }
+//     }
+
+//     if (noneback) {
+//       noneback();
+//     }
+//   });
+// }
 
 function initNotes(callback?: Function) {
   idb.getSync((data: IDBNote[]) => {
