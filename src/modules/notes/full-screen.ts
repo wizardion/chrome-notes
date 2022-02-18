@@ -25,23 +25,20 @@ export class FullScreen extends Mixed {
     setInterval(this.timer.bind(this), 1000);
   }
 
-  // public init() {
-  //   super.init();
+  public init() {
+    super.init();
 
-  //   if (chrome && chrome.tabs) {
-  //     chrome.tabs.query({active: true}, (tabs: chrome.tabs.Tab[]) => {
-  //       if (tabs.length === 1) {
-  //         this.saveTabInfo(tabs[0]);
-  //       }
-  //     });
-  //   }
-  // }
+    if (chrome && chrome.tabs) {
+      chrome.tabs.getCurrent((tab: chrome.tabs.Tab) => {
+        this.saveTabInfo(tab.id, tab.windowId);
+      });
+    }
+  }
 
   protected build(notes: DbNote[]) {
     super.build(notes);
 
     window.addEventListener('resize', this.screenResize.bind(this));
-
     this.mode = Number(storage.get('mode', true) || '0');
   }
 
@@ -56,14 +53,14 @@ export class FullScreen extends Mixed {
     }
   }
 
-  // protected saveTabInfo(tab: chrome.tabs.Tab) {
-  //   chrome.storage.local.set({tabInfo: {
-  //     id: tab.id, 
-  //     windowId: tab.windowId,
-  //     width: tab.width,
-  //     height: tab.height
-  //   }});
-  // }
+  protected saveTabInfo(tabId: number, windowId?: number) {
+    chrome.storage.local.set({tabInfo: {
+      id: tabId, 
+      windowId: windowId,
+      width: null,
+      height: null
+    }});
+  }
 
   protected saveScreenPossition() {
     if (this.mode === 4 && chrome && chrome.storage) {

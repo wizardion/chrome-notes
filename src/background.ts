@@ -35,58 +35,8 @@ chrome.runtime.onInstalled.addListener(function() {
   });
 });
 
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   // 2. A page requested user data, respond with a copy of `user`
-//   if (message === 'get-user-data') {
-//     if (notes) {
-//       sendResponse(notes);
-//     } else {
-//       sendResponse(null);
-//       // initNotes(sendResponse);
-//     }
-//   }
-// });
-
-// chrome.runtime.onConnect.addListener(function(port) {
-//   port.onMessage.addListener(function(msg) {
-//     if (msg.joke === "Knock knock") {
-//       port.postMessage({joke: "notes", notes: notes});
-//     }
-//   });
-// });
-
-// chrome.tabs.onRemoved.addListener((tabId: number) => {
-//   chrome.storage.local.get('tabInfo', function(result) {
-//     if (result.tabInfo && result.tabInfo.id === tabId) {
-//       console.log('remove.tabInfo');
-//       chrome.storage.local.remove('tabInfo');
-//     }
-//   });
-// });
-
-// chrome.tabs.onDetached.addListener((tabId: number) => {
-//   chrome.storage.local.get('tabInfo', function(result) {
-//     if (result.tabInfo && result.tabInfo.id === tabId) {
-//       console.log('remove.tabInfo');
-//       chrome.storage.local.remove('tabInfo');
-//     }
-//   });
-// });
-
-// chrome.tabs.onAttached.addListener((tabId: number) => {
-//   findTab(tabId, (tab: chrome.tabs.Tab) => {
-//     console.log('onAttached.save.info', tab);
-//   });
-// });
-
-// chrome.tabs.onUpdated.addListener((tabId: number, info: object) => {
-//   console.log('onUpdated', tabId, info);
-// });
-
 chrome.action.onClicked.addListener(() => {
-  var url = chrome.runtime.getURL('popup.html');
-
-  chrome.storage.local.get(['mode', 'window', 'migrate'], function(result) {
+  chrome.storage.local.get(['mode', 'window', 'migrate', 'tabInfo'], function(result) {
     let mode: number = Number(result.mode);
     let window: IWindow = result.window;
 
@@ -94,36 +44,15 @@ chrome.action.onClicked.addListener(() => {
       return openMigration();
     }
 
-    openPopup(mode, window);
-
-    // -----------------------------------------------------------------------------------------------
-    // if (result.tabInfo) {
-    //   getOpenedTab(result.tabInfo.id, (tab: chrome.tabs.Tab) => {
-    //     console.log('update.tab', tab);
-    //     // chrome.storage.local.remove('tabInfo');
-    //   }, () => {
-    //     console.log('not.found.create');
-    //     chrome.tabs.create({url: chrome.runtime.getURL('popup.html')});
-    //   });
-    // } else {
-    //   console.log('first.create');
-    //   chrome.tabs.create({url: chrome.runtime.getURL('popup.html')});
-    // }
-    // -----------------------------------------------------------------------------------------------
-    // chrome.tabs.query({url: url, currentWindow: true}, function (tabs) {
-    //   if (tabs.length) {
-
-    //     let tab = tabs[0];
-  
-    //     openPopup(mode, window, tab && tab.id);
-    //   } else {
-    //     chrome.tabs.query({url: url}, function (allTabs) {
-    //       let tab = allTabs[0];
-          
-    //       openPopup(mode, window, tab && tab.id, tab && tab.windowId);
-    //     });
-    //   }
-    // });
+    if (result.tabInfo) {
+      findTab(result.tabInfo.id, (tab: chrome.tabs.Tab) => {
+        openPopup(mode, window, tab.id, tab.windowId);
+      }, () => {
+        openPopup(mode, window);
+      });
+    } else {
+      openPopup(mode, window);
+    }
   });
 });
 
@@ -157,19 +86,21 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
   }
 });
 
-// function getOpenedTab(tabId: number, findback: Function, noneback?: Function) {
-//   chrome.tabs.query({}, function (tabs) {
-//     for(let i = 0; i < tabs.length; i++) {
-//       if (tabs[i].id === tabId) {
-//         return findback(tabs[i]);
-//       }
-//     }
+function findTab(tabId: number, findback: Function, noneback?: Function) {
 
-//     if (noneback) {
-//       noneback();
-//     }
-//   });
-// }
+  chrome.tabs.query({}, function (tabs) {
+    for(let i = 0; i < tabs.length; i++) {
+      if (tabs[i].id === tabId) {
+        return findback(tabs[i]);
+      }
+    }
+
+    if (noneback) {
+      noneback();
+    }
+  });
+
+}
 
 function initNotes(callback?: Function) {
   idb.getSync((data: IDBNote[]) => {
@@ -260,3 +191,51 @@ function openMigration() {
     }
   });
 }
+
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   // 2. A page requested user data, respond with a copy of `user`
+//   if (message === 'get-user-data') {
+//     if (notes) {
+//       sendResponse(notes);
+//     } else {
+//       sendResponse(null);
+//       // initNotes(sendResponse);
+//     }
+//   }
+// });
+
+// chrome.runtime.onConnect.addListener(function(port) {
+//   port.onMessage.addListener(function(msg) {
+//     if (msg.joke === "Knock knock") {
+//       port.postMessage({joke: "notes", notes: notes});
+//     }
+//   });
+// });
+
+// chrome.tabs.onRemoved.addListener((tabId: number) => {
+//   chrome.storage.local.get('tabInfo', function(result) {
+//     if (result.tabInfo && result.tabInfo.id === tabId) {
+//       console.log('remove.tabInfo');
+//       chrome.storage.local.remove('tabInfo');
+//     }
+//   });
+// });
+
+// chrome.tabs.onDetached.addListener((tabId: number) => {
+//   chrome.storage.local.get('tabInfo', function(result) {
+//     if (result.tabInfo && result.tabInfo.id === tabId) {
+//       console.log('remove.tabInfo');
+//       chrome.storage.local.remove('tabInfo');
+//     }
+//   });
+// });
+
+// chrome.tabs.onAttached.addListener((tabId: number) => {
+//   findTab(tabId, (tab: chrome.tabs.Tab) => {
+//     console.log('onAttached.save.info', tab);
+//   });
+// });
+
+// chrome.tabs.onUpdated.addListener((tabId: number, info: object) => {
+//   console.log('onUpdated', tabId, info);
+// });
