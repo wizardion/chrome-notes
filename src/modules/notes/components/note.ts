@@ -6,6 +6,7 @@ export class Note {
   private controls: INoteControls;
   private note: DbNote;
   private indexId: number;
+  private selectionState: string;
   private event?: EventListener;
   public element: HTMLElement;
 
@@ -130,8 +131,8 @@ export class Note {
   }
 
   public set selection(value: string) {
-    if (this.note.cState !== value) {
-      this.note.cState = value;
+    if (this.selectionState !== value) {
+      this.selectionState = value;
     }
   }
 
@@ -207,7 +208,7 @@ export class Note {
       description: this.note.description || undefined,
       sync: this.note.sync || undefined,
       preview: this.note.preview || undefined,
-      cState: this.note.cState || undefined,
+      cState: this.selectionState || undefined,
       pState: this.note.pState || undefined,
       html: this.note.html || undefined,
       updated: this.note.updated || undefined,
