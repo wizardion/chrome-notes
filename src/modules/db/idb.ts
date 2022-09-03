@@ -3,9 +3,13 @@ import {IDBNote,IDBCommand} from './interfaces';
 var database: IDBDatabase;
 var queueList: IDBCommand[] = [];
 
-function logError(e: Event) {
+function logError(e: (Error|Event)) {
   // @ts-ignoree
-  console.error('Database error: ', e.target.error || e.target.result || e.target);
+  console.error('Database error: ', e.message || e.target.error || e.target.result || e.target);
+}
+
+function generateId(): number {
+  return new Date().getTime();
 }
 
 function upgradeNeeded(event: Event) {
@@ -16,7 +20,9 @@ function upgradeNeeded(event: Event) {
   var objectStore:IDBObjectStore = null;
 
   if (!db.objectStoreNames.contains('notes')) {
-    objectStore = db.createObjectStore("notes", {autoIncrement : true, keyPath: "id",});
+    //TODO use different type of ID
+    // objectStore = db.createObjectStore("notes", {autoIncrement : true, keyPath: "id",});
+    objectStore = db.createObjectStore("notes", {autoIncrement : false, keyPath: "id",});
   } else {
     objectStore = request.transaction.objectStore('notes');
   }
@@ -25,99 +31,123 @@ function upgradeNeeded(event: Event) {
     objectStore.createIndex("order", "order", {unique: false});
   }
 
-  if (!objectStore.indexNames.contains('sync')) {
-    objectStore.createIndex("sync", "sync", {unique: false});
-  }
+  // if (!objectStore.indexNames.contains('sync')) {
+  //   objectStore.createIndex("sync", "sync", {unique: false});
+  // }
 }
 
-function init(callback: Function) {
+function init(callback: Function, errorCallBack?: (e: (Error|Event)) => void) {
   if (!database) {
     var request = indexedDB.open('MyNotes', 1);
-    request.onerror = logError;
+    var eCallback = errorCallBack || logError;
+
+    request.onerror = eCallback;
     request.onupgradeneeded = upgradeNeeded;
 
     return request.onsuccess = (e: Event) => {
-      // @ts-ignore
-      database = e.target.result;
-      callback();
+      try {
+        // @ts-ignore
+        database = e.target.result;
+        callback();
+      } catch (er) {
+        eCallback(er);
+      }
     };
   }
 
   callback();
 }
 
-function initObjectStore(callback: Function, mode: IDBTransactionMode) {
+function initObjectStore(callback: Function, mode: IDBTransactionMode, errorCallBack?: (e: (Error|Event)) => void) {
+  const eCallback = errorCallBack || logError;
   var prommise: Function = () => {
-    var transaction:IDBTransaction = database.transaction('notes', mode);
+    try {
+      var transaction:IDBTransaction = database.transaction('notes', mode);
 
-    transaction.onerror = logError;
-    callback(transaction.objectStore("notes"));
-  };
-
-  init(prommise);
-}
-
-function load(callback: Function) {
-  var prommise: Function = (objectStore: IDBObjectStore) => {
-    var index = objectStore.index("order");
-    var request = index.getAll();
-
-    // @ts-ignores
-    request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
-    request.onerror = logError;
-  };
-
-  initObjectStore(prommise, 'readonly');
-}
-
-function getSync(callback: Function) {
-  var prommise: Function = (objectStore: IDBObjectStore) => {
-    var index = objectStore.index("sync");
-    var request = index.getAll(1);
-
-    // @ts-ignores
-    request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
-    request.onerror = logError;
-  };
-
-  initObjectStore(prommise, 'readonly');
-}
-
-function add(item: IDBNote, callback?: Function) {
-  var prommise: Function = (objectStore: IDBObjectStore) => {
-    let {id, ...draft} = item;
-    var request = objectStore.add(draft);
-
-    if(callback) {
-      // @ts-ignore
-      request.onsuccess = (e: Event) => callback(<number>e.target.result);
+      transaction.onerror = eCallback;
+      callback(transaction.objectStore("notes"));
+    } catch (er) {
+      eCallback(er);
     }
-    
-    request.onerror = logError;
   };
 
-  initObjectStore(prommise, 'readwrite');
+  init(prommise, eCallback);
+}
+
+function load(callback: Function, errorCallBack?: (e: (Error|Event)) => void) {
+  const eCallback = errorCallBack || logError;
+  var prommise: Function = (objectStore: IDBObjectStore) => {
+    try {
+      var index = objectStore.index("order");
+      var request = index.getAll();
+
+      // @ts-ignores
+      request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
+      request.onerror = eCallback;
+    } catch (er) {
+      eCallback(er);
+    }
+  };
+
+  initObjectStore(prommise, 'readonly', eCallback);
+}
+
+// function getSync(callback: Function) {
+//   var prommise: Function = (objectStore: IDBObjectStore) => {
+//     var index = objectStore.index("order");
+//     var request = index.getAll();
+
+//     // @ts-ignores
+//     request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
+//     request.onerror = logError;
+//   };
+
+//   initObjectStore(prommise, 'readonly');
+// }
+
+function add(item: IDBNote, callback?: Function, errorCallBack?: (e: (Error|Event)) => void) {
+  const eCallback = errorCallBack || logError;
+  var prommise: Function = (objectStore: IDBObjectStore) => {
+    try {
+      console.log('item', JSON.parse(JSON.stringify(item)));
+
+      item.id = item.id < 1? generateId() : item.id;
+      var request = objectStore.add(item);
+
+      if(callback) {
+        request.onsuccess = (e: Event) => callback(item.id);
+      }
+      
+      request.onerror = eCallback;
+    } catch (er) {
+      eCallback(er);
+    }
+  };
+
+  initObjectStore(prommise, 'readwrite', eCallback);
 }
 
 // TODO review frequency
-function update(item: IDBNote) {
+function update(item: IDBNote, onsuccess?: () => void, errorCallBack?: (e: (Error|Event)) => void) {
+  const eCallback = errorCallBack || logError;
   var prommise: Function = (objectStore: IDBObjectStore) => {
     var request = objectStore.put(item);
-
-    request.onerror = logError;
+    request.onerror = eCallback;
+    request.onsuccess = onsuccess
   };
 
-  initObjectStore(prommise, 'readwrite');
+  initObjectStore(prommise, 'readwrite', eCallback);
 }
 
-function remove(id: number) {
+function remove(id: number, errorCallBack?: (e: (Error|Event)) => void) {
+  const eCallback = errorCallBack || logError;
   var prommise: Function = (objectStore: IDBObjectStore) => {
     var request = objectStore.delete(id);
 
     request.onerror = logError;
   };
 
-  initObjectStore(prommise, 'readwrite');
+  initObjectStore(prommise, 'readwrite', eCallback);
 }
 
 function enqueue(item: IDBNote, command: string) {
@@ -127,7 +157,7 @@ function enqueue(item: IDBNote, command: string) {
   });
 };
 
-function dequeue(errorCallback?: Function) {
+function dequeue(errorCallBack?: (e: (Error|Event)) => void) {
   var prommise: Function = (objectStore: IDBObjectStore) => {
     queueList.forEach((command: IDBCommand) => {      
       var request = objectStore.put(command.item);
@@ -138,10 +168,10 @@ function dequeue(errorCallback?: Function) {
     queueList.splice(0);
   };
 
-  initObjectStore(prommise, 'readwrite');
+  initObjectStore(prommise, 'readwrite', errorCallBack);
 }
 
-function exists(callback?: Function) {
+function exists(callback?: Function, errorCallBack?: (e: (Error|Event)) => void) {
   indexedDB.databases().then((result) => {
     for(let i = 0; i < result.length; i++) {
       const db = result[0];
@@ -152,7 +182,7 @@ function exists(callback?: Function) {
     }
 
     callback(false);
-  });
+  }).catch(errorCallBack);
 }
 
 export default {
@@ -164,6 +194,6 @@ export default {
   // setField: () => {}, //setField,
   dequeue: dequeue,
   remove: remove,
-  getSync: getSync,
+  // getSync: getSync,
   exists: exists,
 };

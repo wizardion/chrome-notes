@@ -1,33 +1,8 @@
-import * as sync from './modules/sync/sync';
+/* import * as sync from './modules/db/sync_copy';
 import {migrate} from './modules/storage/migrate';
-import idb from './modules/db/idb';
-import { IDBNote } from './modules/db/interfaces';
-// import {Encrypter} from './modules/encryption/encrypter'
+import {generateKey} from './modules/db/encrypter_copy';
 
-
-const colors = {
-  RED: '\x1b[31m%s\x1b[0m',
-  GREEN: '\x1b[32m%s\x1b[0m',
-  BLUE: '\x1b[34m%s\x1b[0m',
-};
-
-function TEraseData() {
-  chrome.storage.local.clear().finally(() => {
-    chrome.storage.sync.clear().finally(async() => {
-      idb.load((data: IDBNote[]) => {
-        for (let i = 0; i < data.length; i++) {
-          const element = data[i];
-
-          element.locked = false;
-          element.inCloud = false;
-          idb.update(element); 
-        }
-        
-        chrome.tabs.create({url: chrome.runtime.getURL('options.html')});
-      });
-    });
-  });
-}
+var _time_: number;
 
 interface IWindow {
   top: number;
@@ -36,23 +11,21 @@ interface IWindow {
   height: number;
 }
 
-var _time_: number;
+chrome.runtime.onInstalled.addListener(function() {
+  console.log('app was installed');
+  chrome.storage.local.clear().finally(() => {
+    chrome.storage.sync.clear().finally(async() => {
+      chrome.tabs.create({url: chrome.runtime.getURL('options.html')});
+    });
+  });
+  // -----------------------------------------------------------------------------------------
+  chrome.alarms.clearAll((alarm) => {});
 
-chrome.runtime.onInstalled.addListener(() => {
-  TEraseData();
-  chrome.alarms.clearAll();
   chrome.alarms.create('alert', {periodInMinutes: 1});
-  chrome.alarms.create('sync', {periodInMinutes: 0.25});
-  // chrome.alarms.create('sync', {periodInMinutes: 0.45});
-  // chrome.alarms.create('sync', {periodInMinutes: 1.45});
-  // chrome.alarms.create('sync', {periodInMinutes: 15});
-  chrome.storage.local.remove('syncProcessing');
+  // chrome.alarms.create('sync', {periodInMinutes: 0.35}); // 5 minutes.
+  chrome.alarms.create('sync', {periodInMinutes: 15});
 
-  chrome.storage.local.get(['mode', 'migrate', 'oldNotes', 'syncEnabled', 'internalKey', 'shareKey', 'appId'], function(result) {
-    if (!result.appId) {
-      sync.initApp();
-    }
-
+  chrome.storage.local.get(['mode', 'migrate', 'oldNotes', 'syncEnabled', 'internalKey', 'shareKey'], function(result) {
     if (result.migrate && result.oldNotes) {
       migrate(result.oldNotes);
       return chrome.storage.local.clear();
@@ -66,8 +39,11 @@ chrome.runtime.onInstalled.addListener(() => {
 
     setPopup(Number(result.mode));
     chrome.storage.onChanged.addListener(eventOnStorageChanged);
-    startSync();
   });
+});
+
+chrome.runtime.onUpdateAvailable.addListener(() => {
+  console.warn('update is available');
 });
 
 chrome.alarms.onAlarm.addListener((alarm:chrome.alarms.Alarm) => {
@@ -118,18 +94,62 @@ function eventOnStorageChanged(changes: {[key: string]: chrome.storage.StorageCh
       }
 
       if (key === 'internalKey' && oldValue && newValue && oldValue !== newValue) {
-        let promise: Promise<void> = sync.wait();
+        let busy = sync.isBusy();
 
-        promise.finally(() => {
-          sync.resync(oldValue, newValue);
+        console.log('internalKey', {
+          'oldValue': oldValue,
+          'newValue': newValue,
         });
+
+        if (busy) {
+          busy.finally(() => sync.syncBack(oldValue, newValue));
+        } else {
+          sync.syncBack(oldValue, newValue);
+        }
       }
     }
   }
 
   if (namespace === 'sync') {
-    sync.onStorageChanged(changes, namespace);
+    chrome.storage.local.get(['syncEnabled', 'internalKey', 'shareKey', 'lastSynced']).then((result) => {
+      if (result.syncEnabled && result.internalKey) {
+        let busy = sync.isBusy();
+
+        if (busy) {
+          busy.finally(() => sync.onChanged(changes, namespace));
+        } else {
+          sync.onChanged(changes, namespace);
+        }
+      }
+    });
   }
+}
+
+function findTab(tabId: number, findback: Function, noneback?: Function) {
+  chrome.tabs.query({}, function (tabs) {
+    for(let i = 0; i < tabs.length; i++) {
+      if (tabs[i].id === tabId) {
+        return findback(tabs[i]);
+      }
+    }
+
+    if (noneback) {
+      noneback();
+    }
+  });
+}
+
+function startSync(): Promise<void> {
+  var busy;
+  console.log('1. start Sync...');
+
+  if (!sync.isBusy()) {
+    busy = sync.start();
+  } else {
+    console.log('... busy');
+  }
+
+  return busy;
 }
 
 function setPopup(mode: number) {
@@ -138,20 +158,6 @@ function setPopup(mode: number) {
   } else {
     chrome.action.setPopup({popup: 'popup.html'}, ()=>{});
   }
-}
-
-function findTab(tabId: number, found: Function, defaults?: Function) {
-  chrome.tabs.query({}, function (tabs) {
-    for(let i = 0; i < tabs.length; i++) {
-      if (tabs[i].id === tabId) {
-        return found(tabs[i]);
-      }
-    }
-
-    if (defaults) {
-      defaults();
-    }
-  });
 }
 
 function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: number) {
@@ -207,23 +213,4 @@ function openMigration() {
     }
   });
 }
-
-function startSync(): Promise<void> {
-  console.log(colors.GREEN, '=>=>=> start Sync...');
-
-  sync.isBusy().then((busy: boolean) => {
-
-    if (!busy) {
-      sync.start().finally(() => {
-        chrome.storage.sync.getBytesInUse().then((bytes: number) => {
-          console.log('bytes: ', bytes, chrome.storage.sync.QUOTA_BYTES);
-          console.log(colors.GREEN, '=>=>=> Sync is completed!');
-        });
-      });
-    } else {
-      console.log(colors.GREEN, '... busy');
-    }
-  });
-
-  return Promise.resolve();
-}
+ */

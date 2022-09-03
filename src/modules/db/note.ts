@@ -37,55 +37,80 @@ export class DbNote implements IDBNote {
 
   public save() {
     if (this.id && this.id > 0) {
-      idb.update(this);
+      idb.update(this.toDBNote());
     } else {
-      idb.add(this, this.noteAdded.bind(this));
+      idb.add(this.toDBNote(), this.noteAdded.bind(this));
     }
   }
 
   public remove() {
     if (this.id && this.id > 0) {
-      idb.remove(this.id);
+      let item: IDBNote = this.toDBNote();
+
+      if (this.sync) {  
+        item.deleted = true;
+
+        idb.update(item);
+      } else {
+        idb.remove(item.id);
+      }
     }
   }
   
   public setOrder() {
     if (this.id && this.id > 0) {
-      idb.enqueue(this, 'update');
+      idb.enqueue(this.toDBNote(), 'update');
     }
   }
 
   public setPreview() {
     if (this.id && this.id > 0) {
-      idb.update(this);
+      idb.update(this.toDBNote());
     }
   }
 
   public setSync() {
     if (this.id && this.id > 0) {
-      idb.update(this);
+      idb.update(this.toDBNote());
     }
   }
 
   public saveHtml() {
     if (this.id && this.id > 0) {
-      idb.update(this);
+      idb.update(this.toDBNote());
     }
   }
 
   public saveCursor() {
     if (this.id && this.id > 0) {
-      idb.update(this);
+      idb.update(this.toDBNote());
     }
   }
 
   public savePreviewState() {
     if (this.id && this.id > 0) {
-      idb.update(this);
+      idb.update(this.toDBNote());
     }
   }
 
   private noteAdded(id: number){
     this.id = id;
+  }
+
+  private toDBNote(): IDBNote {
+    return {
+      id: this.id,
+      title: this.title,
+      description: this.description,
+      order: this.order,
+      sync: this.sync,
+      preview: this.preview,
+      cState: this.cState,
+      pState: this.pState,
+      html: this.html,
+      updated: this.updated,
+      created: this.created,
+      deleted: false
+    };
   }
 }

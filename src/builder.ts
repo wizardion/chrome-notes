@@ -3,7 +3,7 @@ import {Editor} from './modules/notes/editor';
 import {Mixed} from './modules/notes/mixed';
 import {Base} from './modules/notes/base';
 import {Simple} from './modules/notes/simple';
-import {Comact} from './modules/notes/compact';
+import {Compact} from './modules/notes/compact';
 import {FullScreen} from './modules/notes/full-screen';
 
 
@@ -44,7 +44,7 @@ export function buildEditor(mode: number): Base {
   }
 
   if (mode === 2) {
-    return new Comact(listView, noteView, newView);
+    return new Compact(listView, noteView, newView);
   }
 
   if (mode === 3 || mode === 4) {

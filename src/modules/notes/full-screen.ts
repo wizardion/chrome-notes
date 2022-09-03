@@ -30,7 +30,9 @@ export class FullScreen extends Mixed {
 
     if (chrome && chrome.tabs) {
       chrome.tabs.getCurrent((tab: chrome.tabs.Tab) => {
-        this.saveTabInfo(tab.id, tab.windowId);
+        if (tab) {
+          this.saveTabInfo(tab.id, tab.windowId);
+        }
       });
     }
   }

@@ -61,7 +61,7 @@ export class Base {
 
     if (chrome && chrome.runtime) {
       chrome.runtime.sendMessage('get-sync-notes', (response) => {
-        if (response.working) {
+        if (response && response.working) {
           let time: number = 30000 - (new Date().getTime() - response.time);
           let indicator:HTMLElement = <HTMLElement>document.getElementById('sync-indicator');
           
@@ -91,14 +91,12 @@ export class Base {
     this.noteView.back.addEventListener('mousedown', this.prevent.bind(this));
     this.noteView.delete.addEventListener('mousedown', this.prevent.bind(this));
     this.noteView.preview.parentElement.addEventListener('mousedown', this.prevent.bind(this));
-    this.noteView.sync.parentElement.addEventListener('mousedown', this.prevent.bind(this));
     this.newView.create.addEventListener('mousedown', this.prevent.bind(this));
     this.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
 
     this.listView.addButton.addEventListener('click', this.selectNew.bind(this, '', null));
     this.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.noteView.preview.addEventListener('click', this.previewClick.bind(this));
-    this.noteView.sync.addEventListener('click', this.syncClick.bind(this));
     this.newView.create.addEventListener('click', this.placeNote.bind(this));
     this.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
     this.noteView.html.addEventListener('scroll', this.previewStateChanged.bind(this));
@@ -109,30 +107,43 @@ export class Base {
     this.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
     this.noteView.editor.on('save', this.saveHandler.bind(this));
     this.noteView.editor.on('cancel', this.cancelHandler.bind(this));
+    this.noteView.sync.parentElement.setAttribute('title', 'Enable synchronization in settings...');
 
     ScrollListener.listen(this.listView.items, 550);
     ScrollListener.listen(this.noteView.editor.scroll, 550);
     ScrollListener.listen(this.noteView.html, 550);
 
-    this.cacheList();
+    this.cacheList(notes);
   }
 
   private render(items: DbNote[]) {
+    var index: number = -1;
     var fragment = <DocumentFragment>document.createDocumentFragment();
 
     for (var i = 0; i < items.length; i++) {
       const item = items[i];
       const note = this.notes[i];
+      
+      index++;
 
       if (!note) {
-        const newNote = new Note(item, i);
+        const newNote = new Note(item, index);
 
         this.notes.push(newNote);
         fragment.appendChild(newNote.element);
+        
+        newNote.onclick = this.selectNote.bind(this, newNote, true, true);
+        newNote.sortButton.onmousedown = Sorting.start.bind(Sorting, newNote);
+      } else if (item.id !== note.id) {
+        const newNote = new Note(item, index);
+
+        this.notes.splice(i, 0, newNote);
+        this.listView.items.insertBefore(newNote.element, note.element);
+
         newNote.onclick = this.selectNote.bind(this, newNote, true, true);
         newNote.sortButton.onmousedown = Sorting.start.bind(Sorting, newNote);
       } else {
-        note.set(item);
+        note.set(item, index);
       }
     }
 
@@ -228,7 +239,7 @@ export class Base {
     }
   }
 
-  // TODO review evernts
+  // TODO review events
   protected previewClick() {
     this.selected.preview = this.noteView.preview.checked;
 
@@ -337,6 +348,13 @@ export class Base {
     }
   }
 
+  public unlock() {
+    this.noteView.sync.parentElement.addEventListener('mousedown', this.prevent.bind(this));
+    this.noteView.sync.addEventListener('click', this.syncClick.bind(this));
+    this.noteView.sync.removeAttribute('disabled');
+    this.noteView.sync.parentElement.setAttribute('title', 'sync note');
+  }
+
   public showList() {
 
   }
@@ -377,15 +395,18 @@ export class Base {
   }
 
   // TODO review usage
-  protected cacheList() {
-    var notes: (string|number)[] = [];
+  protected cacheList(db: DbNote[] = null) {
+    var notes: (DbNote|Note)[] = db || this.notes;
+    var cache: (string|number)[] = [];
 
-    for (let i = 0; i < Math.min(21, this.notes.length); i++) {
-      const note = this.notes[i];
+    for (let i = 0; i < Math.min(21, notes.length); i++) {
+      const note = notes[i];
 
-      notes = notes.concat([note.title, note.updated]);
+      if (note) {
+        cache = cache.concat([note.id, note.title, note.updated]);
+      }
     }
 
-    storage.set('list', JSON.stringify(notes).replace(/^\[|\]$/gi, ''), true);
+    chrome.storage.local.set({cachedList: JSON.stringify(cache).replace(/^\[|\]$/gi, '')});
   }
 }

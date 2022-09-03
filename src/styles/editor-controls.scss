@@ -130,6 +130,12 @@
   fill:#07a698;
 }
 
+.checkbox input:disabled ~ .checkmark {
+  color: #dfe2e5;
+  fill:#dfe2e5;
+  cursor: default;
+}
+
 .checkbox input:checked ~ .checkmark .active {
   display: block;
 }

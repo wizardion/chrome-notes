@@ -101,7 +101,7 @@ module.exports = {
     new CleanWebpackPlugin(process.__version__? {
       cleanAfterEveryBuildPatterns: ['**/*']
     } : {
-      cleanStaleWebpackAssets: false,
+      // cleanStaleWebpackAssets: false,
     }),
     new CopyWebpackPlugin({
       patterns: [

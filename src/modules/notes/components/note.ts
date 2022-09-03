@@ -56,9 +56,8 @@ export class Note {
     DbNote.saveQueue();
   }
 
-  public set(note: (DbNote|ISTNote)) {
+  public set(note: (DbNote|ISTNote), index: number = null) {
     this.note.id = note.id;
-    this.note.title = note.title;
     this.note.description = note.description;
     this.note.order = note.order;
     this.note.sync = note.sync;
@@ -66,8 +65,33 @@ export class Note {
     this.note.cState = note.cState;
     this.note.pState = note.pState;
     this.note.html = note.html;
-    this.note.updated = note.updated;
     this.note.created = note.created;
+
+    if (index) {
+      this.setIndex(index);
+    }
+
+    if (this.note.title !== note.title) {
+      this.note.title = note.title;
+      this.controls.title.innerText = this.note.title;
+    }
+
+    if (this.note.updated !== note.updated) {
+      this.note.updated = note.updated;
+      this.controls.date.innerText = this.getDateString(this.note.updated);
+    }
+  }
+
+  public setIndex(value: number) {
+    if (this.indexId !== value) {
+      this.indexId = value;
+      this.note.order = value + 1;
+      this.controls.bullet.innerText = `${(this.note.order)}`;
+    }
+  }
+
+  public get id(): number {
+    return this.note.id;
   }
 
   public set index(value: number) {
@@ -162,6 +186,7 @@ export class Note {
 
   public set sync(value: boolean) {
     this.note.sync = value? 1 : 0;
+    this.updated = this.getTime();
     this.note.setSync();
   }
 
@@ -197,6 +222,7 @@ export class Note {
     this.element.removeEventListener('mousedown', this.prevent);
     this.element.removeEventListener('click', this.event);
     this.element.remove();
+    this.note.updated = this.getTime();
     this.note.remove();
   }
 
@@ -221,7 +247,7 @@ export class Note {
 
   private createNew(index: number): DbNote {
     return new DbNote({
-      id: 0, 
+      id: -1, 
       title: '', 
       description: '', 
       order: index + 1, 

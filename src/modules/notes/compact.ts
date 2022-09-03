@@ -2,7 +2,7 @@ import {IListView, INewNoteView, INoteView} from './components/interfaces';
 import { Mixed } from './mixed';
 
 
-export class Comact extends Mixed {
+export class Compact extends Mixed {
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     super(listView, noteView, newView);
 
