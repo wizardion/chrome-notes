@@ -148,6 +148,7 @@ div .left {
 
 div .right {
   // float: left;
+  position: relative;
   display: inline-block;
   width: calc(100% - 130px);
   padding: 10px 10px 10px 0px;
@@ -259,6 +260,7 @@ label:hover, input:hover {
 
 .red{
   background-color: #e33636 !important;
+  fill: #e33636;
 }
 
 .green{
@@ -267,6 +269,18 @@ label:hover, input:hover {
 
 .yellow{
   background-color: chocolate !important;
+}
+
+.sync-indicator {
+  // width: 4px; 
+  // height: 4px; 
+  // border-radius: 2px; 
+  // background-color: red;
+  cursor: default; 
+  // position: absolute;
+  z-index: 1; 
+  // left: 76px;
+  // top: 0px;
 }
 
 // ----------------------------------

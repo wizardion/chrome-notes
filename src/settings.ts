@@ -11,6 +11,22 @@ var popupMode:string = storage.get('popupMode');
 var __lock__: boolean = true;
 var __internalKey__: string;
 
+var rootLogs: any = null;
+async function log(...args: any[]) {
+  let local = rootLogs || await chrome.storage.local.get(['logs']);
+
+  if (!rootLogs) {
+    rootLogs = local;
+  }
+
+  if (!local.logs) {
+    local.logs = [];
+  }
+
+  local.logs.push(args);
+  await chrome.storage.local.set({logs: local.logs});
+}
+
 
 (() => {
   if(popupMode) {
@@ -38,14 +54,19 @@ var __internalKey__: string;
   controls.blocks.maxEach.innerText = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 192).toString();
   controls.blocks.maxBytes.innerText = bytesToSize(chrome.storage.sync.QUOTA_BYTES - 0).toString();
 
-  chrome.storage.local.get(['syncEnabled', 'internalKey', 'restSyncedItems'], function(local) {
+  chrome.storage.local.get(['syncEnabled', 'internalKey', 'restSyncedItems', 'syncProcessing'], function(local) {
     controls.checkboxes.sync.checked = (local.syncEnabled === true);
     syncChanged.call(controls.checkboxes.sync);
     fillProgress(local.restSyncedItems || 0);
 
+    if (local.syncProcessing) {
+      controls.blocks.syncIndicator.classList.remove('hidden');
+      controls.blocks.lockTitle.textContent = 'Sync is processing...';
+    }
+
     chrome.storage.sync.get('secretKey', async (sync) => {
       if (!sync.secretKey || (local.internalKey && await new Encryptor(local.internalKey).verify(sync.secretKey))) {
-        controls.inputs.password.value = local.internalKey || '';
+        controls.inputs.password.value = local.internalKey || 'Wizard1919841+';
         unlockControls(local.internalKey);
       } else {
         lockControls(sync.secretKey);
@@ -55,6 +76,7 @@ var __internalKey__: string;
 
   // TODO removes temp variable passed to this page.
   storage.remove('popupMode');
+  chrome.storage.onChanged.addListener(eventOnStorageChanged);
 })();
 
 
@@ -113,6 +135,32 @@ function viewChanged() {
   }
 
   storage.set('mode', this.value, true);
+}
+
+async function eventOnStorageChanged(changes: {[key: string]: chrome.storage.StorageChange}, namespace: chrome.storage.AreaName) {
+  if (namespace === 'local') {
+    for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
+      if (key === 'syncProcessing' && oldValue !== newValue) {
+        if (newValue) {
+          controls.blocks.syncIndicator.classList.remove('hidden');
+          controls.blocks.lockTitle.textContent = 'Sync is processing...';
+        } else {
+          controls.blocks.syncIndicator.classList.add('hidden');
+          controls.blocks.lockTitle.textContent = '';
+
+          chrome.storage.local.get(['restSyncedItems', 'syncLocked', ], function(local) {
+            fillProgress(local.restSyncedItems || 0);
+
+            if (local.syncLocked) {
+              chrome.storage.sync.get('secretKey', async (sync) => {
+                lockControls(sync.secretKey);
+              });
+            }
+          });
+        }
+      }
+    }
+  }
 }
 
 function syncChanged() {
@@ -262,14 +310,25 @@ function lockData() {
 }
 
 function eraseData() {
-  if (confirm('Are you sure to delete all data? All sync and lock notes will be lost.')) {
-    // //TODO remove locked data as well.
-    // controls.buttons.erase.setAttribute('disabled', 'disabled');
+  chrome.storage.local.get(['logs'], (local) => {
+    let logs: any[] = local.logs || [];
+    console.clear();
 
-    // chrome.storage.local.clear().finally(() => {
-    //   chrome.storage.sync.clear().finally(async() => {
-    //     controls.buttons.erase.removeAttribute('disabled');
-    //   });
-    // });
-  }
+    for (let i = 0; i < logs.length; i++) {
+      const log = logs[i];
+      
+      console.log.apply(console, log);
+    }
+  });
+
+  // if (confirm('Are you sure to delete all data? All sync and lock notes will be lost.')) {
+  //   // //TODO remove locked data as well.
+  //   // controls.buttons.erase.setAttribute('disabled', 'disabled');
+
+  //   // chrome.storage.local.clear().finally(() => {
+  //   //   chrome.storage.sync.clear().finally(async() => {
+  //   //     controls.buttons.erase.removeAttribute('disabled');
+  //   //   });
+  //   // });
+  // }
 }

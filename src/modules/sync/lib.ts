@@ -3,6 +3,22 @@ import {ISyncNote, ISyncPair, ISyncEvent, IPromiseDecorator} from './interfaces'
 import {IDBNote} from '../db/interfaces';
 import { Encryptor } from '../encryption/encryptor';
 
+var rootLogs: any = null;
+async function log(...args: any[]) {
+  let local = await chrome.storage.local.get(['logs']);
+
+  if (!rootLogs) {
+    rootLogs = local;
+  }
+
+  if (!local.logs) {
+    local.logs = [];
+  }
+
+  local.logs.push(args);
+  await chrome.storage.local.set({logs: local.logs});
+}
+
 const colors = {
   RED: '\x1b[31m%s\x1b[0m',
   GREEN: '\x1b[32m%s\x1b[0m',
@@ -11,7 +27,7 @@ const colors = {
 
 var __promise: Promise<void> = null;
 var __maxItems: number = 0;
-const __delay: number = 2500;
+const __delay: number = 2100;
 
 
 export function logger(e: Error) {
@@ -35,7 +51,8 @@ export function startProcess(decorator: IPromiseDecorator): Promise<void> {
     throw Error('The process is still running');
   }
 
-  chrome.storage.local.set({syncProcessing: true});
+  log('\t::the process is starting!');
+  chrome.storage.local.set({syncProcessing: new Date().getTime()});
   __promise = new Promise<void>(decorator);
 
   __promise.catch(logger);
@@ -43,7 +60,8 @@ export function startProcess(decorator: IPromiseDecorator): Promise<void> {
     __promise = null;
     // _cryptor_ = null;
     __maxItems = 0;
-    chrome.storage.local.remove('syncProcessing');
+    chrome.storage.local.set({syncProcessing: null});
+    log('\t::the process is completed!');
   });
 
   return __promise;
@@ -101,7 +119,7 @@ export function unzip(data: {[key: string]: any}): ISyncNote[] {
     notes.push(<ISyncNote>buff[parseInt(key)]);
   });
 
-  console.log(colors.GREEN, 'unzip', {'data': data}, notes, 'max_items', __maxItems);
+  log(colors.GREEN, 'unzip', {'data': data}, notes, 'max_items', __maxItems);
   return notes;
 }
 

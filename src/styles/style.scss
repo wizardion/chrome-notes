@@ -73,18 +73,6 @@ input, button {
   fill:#e3363685;
 }
 
-.sync-indicator {
-  display: none; 
-  width: 4px; 
-  height: 4px; 
-  border-radius: 2px; 
-  background-color: red; 
-  position: absolute; 
-  z-index: 1; 
-  left: 8px;
-  top: 6px;
-}
-
 
 @import 'list-view';
 @import 'details-view';

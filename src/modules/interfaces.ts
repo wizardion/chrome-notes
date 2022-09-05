@@ -29,6 +29,8 @@ interface HTMLCollectionBlock {
   maxEach: HTMLSpanElement;
   maxBytes: HTMLSpanElement;
   locked: HTMLElement;
+  lockTitle: HTMLElement;
+  syncIndicator: HTMLElement;
   unlocked: HTMLElement;
   progressBar: HTMLElement;
 }
@@ -70,6 +72,8 @@ export class SettingsControls {
       maxBytes: <HTMLInputElement>document.getElementById('maxBytes'),
       
       locked: <HTMLElement>document.getElementById('locked-icon'),
+      lockTitle: <HTMLElement>document.getElementById('locked-title-indicator'),
+      syncIndicator: <HTMLElement>document.getElementById('sync-indicator'),
       unlocked: <HTMLElement>document.getElementById('unlocked-icon'),
     };
   }

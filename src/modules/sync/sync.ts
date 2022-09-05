@@ -5,6 +5,22 @@ import {Encryptor} from '../encryption/encryptor';
 import * as lib from './lib';
 
 
+var rootLogs: any = null;
+async function log(...args: any[]) {
+  let local = await chrome.storage.local.get(['logs']);
+
+  if (!rootLogs) {
+    rootLogs = local;
+  }
+
+  if (!local.logs) {
+    local.logs = [];
+  }
+
+  local.logs.push(args);
+  await chrome.storage.local.set({logs: local.logs});
+}
+
 var __cryptor: Encryptor = null;
 const colors = {
   RED: '\x1b[31m%s\x1b[0m',
@@ -17,6 +33,9 @@ export function initApp(): number {
   var appId: number = new Date().getTime();
 
   chrome.storage.local.set({appId: appId});
+  chrome.storage.local.remove('syncProcessing');
+  lib.updateCaches();
+
   return appId;
 }
 
@@ -33,12 +52,12 @@ export function wait(): Promise<void> {
     var busy: boolean = await isBusy();
 
     while(busy) {
-      busy = await isBusy()
+      await lib.delay(1000);
+      busy = await isBusy();
     }
 
     resolve();
   });
-  // return lib.default.promise() || Promise.resolve();
 }
 
 export function start(internalKey?: string): Promise<void> {
@@ -79,10 +98,10 @@ export function start(internalKey?: string): Promise<void> {
 }
 
 export async function resync(oldKey: string, newKey: string) {
-  console.log(colors.RED, '=>=>=> start ReSync...');
+  await log(colors.RED, '=>=>=> start ReSync...');
 
   await start(oldKey);
-  console.log(colors.RED, '=>=>=> synced old ReSyncing ...');
+  await log(colors.RED, '=>=>=> synced old ReSyncing ...');
 
   return lib.startProcess(async (resolve, reject) => {
     let data = await chrome.storage.sync.get(['secretKey', 'applicationId']);
@@ -96,7 +115,7 @@ export async function resync(oldKey: string, newKey: string) {
   
       await sync(map, true);
       resolve();
-      console.log(colors.RED, '=>=>=> ReSync is completed!');
+      await log(colors.RED, '=>=>=> ReSync is completed!');
     }
   });
 }
@@ -123,7 +142,7 @@ async function sync(map: {[key: number]: ISyncPair}, resync?: boolean): Promise<
   var deleted: number[] = [];
   var desync: number[] = [];
   var changes: boolean = false;
-  console.log(colors.BLUE, 'sync.pair...', map);
+  await log(colors.BLUE, 'sync.pair...', map);
 
   for (let i = 0, keys = Object.keys(map); i < keys.length; i++) {
     const item = map[parseInt(keys[i])];
@@ -183,7 +202,7 @@ async function sync(map: {[key: number]: ISyncPair}, resync?: boolean): Promise<
 
     // if (item.db && !item.cloud && item.db.inCloud) {
     //   // lib.remove(item.db);
-    //   console.log('delete local', item.db);
+    //   log('delete local', item.db);
     //   changes = true;
     //   continue;
     // }
@@ -196,7 +215,7 @@ async function sync(map: {[key: number]: ISyncPair}, resync?: boolean): Promise<
       desync: desync.length? desync : null,
       secretKey: await __cryptor.secretKey(),
     });
-    console.log(colors.RED, 'sync.changes', {
+    await log(colors.RED, 'sync.changes', {
       deleted: deleted.length? deleted : null,
       desync: desync.length? desync : null,
       secretKey: await __cryptor.secretKey()});
@@ -230,10 +249,10 @@ function saveToDB(item: ISyncPair): Promise<void> {
       note.preview = item.db.preview;
   
       idb.update(note, resolve, reject);
-      console.log('\t\t', 'setDBItems.update', note);
+      await log('\t\t', 'setDBItems.update', note);
     } else {
       idb.add(note, resolve, reject);
-      console.log('\t\t', 'setDBItems.add', note);
+      await log('\t\t', 'setDBItems.add', note);
     }
   });
 }
@@ -256,7 +275,7 @@ async function saveToCloud(item: IDBNote) {
     // await chrome.storage.sync.set({[key]: chunks[key]});
     
     data[key] = chunks[key];
-    console.log(colors.RED, 'saveToCloud.chunk', {[key]: chunks[key]}, 'remains', lib.default.rest());
+    await log(colors.RED, 'saveToCloud.chunk', {[key]: chunks[key]}, 'remains', lib.default.rest());
   }
 
   await lib.delay();
@@ -271,7 +290,7 @@ async function removeFromCloud(item: IDBNote, chunks: number) {
     var result = await chrome.storage.sync.get([`item_${item.id}_${i}`]);
     await chrome.storage.sync.remove(`item_${item.id}_${i}`);
 
-    console.log(colors.RED, 'deleteCloud.chunk', result, 'remains', lib.default.rest());
+    await log(colors.RED, 'deleteCloud.chunk', result, 'remains', lib.default.rest());
   }
 
   lib.addItems(chunks);
@@ -286,16 +305,16 @@ async function desyncFromCloud(item: IDBNote, chunks: number) {
 
   await lib.delay();
   await chrome.storage.sync.set({[`item_${item.id}_0`]: {rmsync: true, id: item.id}});
-  console.log(colors.RED, 'rmSyncCloud.rmsync.chunk', {rmsync: true, id: item.id}, 'remains', lib.default.rest());
+  await log(colors.RED, 'rmSyncCloud.rmsync.chunk', {rmsync: true, id: item.id}, 'remains', lib.default.rest());
 
   // lib.markDesync(item);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 async function processChanges(changes: {[key: string]: chrome.storage.StorageChange}, area: chrome.storage.AreaName) {
-  console.log('----------------------------------------------------------------------------------------------------');
-  console.log('changes', changes);
-  console.log('----------------------------------------------------------------------------------------------------');
+  await log('----------------------------------------------------------------------------------------------------');
+  await log('changes', changes);
+  await log('----------------------------------------------------------------------------------------------------');
 
 
   const tester: RegExp = /^item\_[\d]+$/;
@@ -316,7 +335,7 @@ async function processChanges(changes: {[key: string]: chrome.storage.StorageCha
       const item = map[parseInt(keys[i])];
       
       if (item.cloud && (!item.db || item.db.updated < item.cloud.u)) {
-        console.log('save to DB', item);
+        await log('save to DB', item);
         await saveToDB(item);
         continue;
       }
@@ -324,7 +343,7 @@ async function processChanges(changes: {[key: string]: chrome.storage.StorageCha
   }
 
   if(changes.deleted && changes.deleted.newValue || changes.desync && changes.desync.newValue) {
-    console.log('\t\t\t', 'onChanged {deleted:', changes.deleted, 'desync:', changes.desync, '}');
+    await log('\t\t\t', 'onChanged {deleted:', changes.deleted, 'desync:', changes.desync, '}');
     await updateDBItems(<number[]>changes.deleted, <number[]>changes.desync, 'onChanged');
   }
 

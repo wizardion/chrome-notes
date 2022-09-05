@@ -58,20 +58,6 @@ export class Base {
     //     this.build(notes);
     //   }, 1000);
     // });
-
-    if (chrome && chrome.runtime) {
-      chrome.runtime.sendMessage('get-sync-notes', (response) => {
-        if (response && response.working) {
-          let time: number = 30000 - (new Date().getTime() - response.time);
-          let indicator:HTMLElement = <HTMLElement>document.getElementById('sync-indicator');
-          
-          indicator.style.display = 'inherit';
-          setTimeout(() => {
-            indicator.style.display = 'none';
-          }, time);
-        }
-      });
-    }
   }
 
   protected build(notes: DbNote[]) {

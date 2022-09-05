@@ -4,7 +4,7 @@ import idb from './modules/db/idb';
 import { IDBNote } from './modules/db/interfaces';
 // import {Encrypter} from './modules/encryption/encrypter'
 
-
+const __periodInMinutes: number = 1;
 const colors = {
   RED: '\x1b[31m%s\x1b[0m',
   GREEN: '\x1b[32m%s\x1b[0m',
@@ -29,6 +29,22 @@ function TEraseData() {
   });
 }
 
+var rootLogs: any = null;
+async function log(...args: any[]) {
+  let local = await chrome.storage.local.get(['logs']);
+
+  if (!rootLogs) {
+    rootLogs = local;
+  }
+
+  if (!local.logs) {
+    local.logs = [];
+  }
+
+  local.logs.push(args);
+  await chrome.storage.local.set({logs: local.logs});
+}
+
 interface IWindow {
   top: number;
   left: number;
@@ -42,11 +58,8 @@ chrome.runtime.onInstalled.addListener(() => {
   TEraseData();
   chrome.alarms.clearAll();
   chrome.alarms.create('alert', {periodInMinutes: 1});
-  chrome.alarms.create('sync', {periodInMinutes: 0.25});
-  // chrome.alarms.create('sync', {periodInMinutes: 0.45});
-  // chrome.alarms.create('sync', {periodInMinutes: 1.45});
-  // chrome.alarms.create('sync', {periodInMinutes: 15});
-  chrome.storage.local.remove('syncProcessing');
+  chrome.alarms.create('sync', {periodInMinutes: __periodInMinutes});
+  chrome.storage.local.set({logs: [[colors.GREEN, '\t\t=> app installed!']]});
 
   chrome.storage.local.get(['mode', 'migrate', 'oldNotes', 'syncEnabled', 'internalKey', 'shareKey', 'appId'], function(result) {
     if (!result.appId) {
@@ -70,10 +83,20 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.alarms.onAlarm.addListener((alarm:chrome.alarms.Alarm) => {
+chrome.alarms.onAlarm.addListener(async (alarm:chrome.alarms.Alarm) => {
   _time_ = new Date().getTime();
 
   if (alarm.name === 'sync') {
+    let local = await chrome.storage.local.get(['syncProcessing']);
+
+    if (local.syncProcessing) {
+      let minutes: number = Math.round((((new Date().getTime() - local.syncProcessing) / 1000) / 60) * 100) / 100;
+
+      if (minutes >= (__periodInMinutes * 2)) {
+        await chrome.storage.local.remove('syncProcessing');
+      }
+    }
+
     return startSync();
   }
 
@@ -104,18 +127,45 @@ chrome.action.onClicked.addListener(() => {
 });
 
 chrome.runtime.onMessage.addListener((message: string, sender: any, sendResponse: (response?: any) => void) => {
-  if (message === 'get-sync-notes') {
-    sendResponse({working: sync.isBusy(), time: _time_});
+  if (message === 'get-sync-status') {
+    sendResponse({status2: sync.wait()});
   }
 });
+
+chrome.runtime.onConnect.addListener(() => {
+  log(colors.RED, 'onConnect');
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  log(colors.RED, 'onStartup');
+});
+
+chrome.runtime.onSuspend.addListener(() => {
+  log(colors.RED, 'onSuspend');
+});
+
+chrome.runtime.onSuspendCanceled.addListener(() => {
+  log(colors.RED, 'onSuspendCanceled');
+});
+
+chrome.runtime.onSuspend.addListener(() => {
+  log("Unloading.");
+  // chrome.browserAction.setBadgeText({text: ""});
+});
+
 
 function eventOnStorageChanged(changes: {[key: string]: chrome.storage.StorageChange}, namespace: chrome.storage.AreaName) {
   if (namespace === 'local') {
     for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
       if (key === 'mode' && oldValue !== newValue) {
-        console.log('storage.onChanged.mode:', oldValue, newValue);
+        log('storage.onChanged.mode:', oldValue, newValue);
         setPopup(Number(newValue));
       }
+
+      // if (1) {
+      //   log('\t:::key', key);
+      //   // 
+      // }
 
       if (key === 'internalKey' && oldValue && newValue && oldValue !== newValue) {
         let promise: Promise<void> = sync.wait();
@@ -209,19 +259,19 @@ function openMigration() {
 }
 
 function startSync(): Promise<void> {
-  console.log(colors.GREEN, '=>=>=> start Sync...');
+  log(colors.GREEN, '=>=>=> start Sync... lastError: ', chrome.runtime.lastError, chrome.runtime.id);
 
   sync.isBusy().then((busy: boolean) => {
 
     if (!busy) {
       sync.start().finally(() => {
         chrome.storage.sync.getBytesInUse().then((bytes: number) => {
-          console.log('bytes: ', bytes, chrome.storage.sync.QUOTA_BYTES);
-          console.log(colors.GREEN, '=>=>=> Sync is completed!');
+          log('bytes: ', bytes, chrome.storage.sync.QUOTA_BYTES);
+          log(colors.GREEN, '=>=>=> Sync is completed!');
         });
       });
     } else {
-      console.log(colors.GREEN, '... busy');
+      log(colors.GREEN, '... busy');
     }
   });
 
