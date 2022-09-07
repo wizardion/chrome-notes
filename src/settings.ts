@@ -3,6 +3,8 @@ import storage from './modules/storage/storage';
 import {Encryptor} from './modules/encryption/encryptor';
 import {SettingsControls} from './modules/interfaces';
 import * as lib from './modules/sync/lib';
+import * as logger from './modules/logger/logger';
+import { ILog } from './modules/logger/interfaces';
 // import {migrate} from './modules/storage/migrate';
 
 const controls: SettingsControls = new SettingsControls();
@@ -10,22 +12,6 @@ const controls: SettingsControls = new SettingsControls();
 // var popupMode:string = storage.get('popupMode');
 var __lock__: boolean = true;
 var __internalKey__: string;
-
-var rootLogs: any = null;
-async function log(...args: any[]) {
-  let local = rootLogs || await chrome.storage.local.get(['logs']);
-
-  if (!rootLogs) {
-    rootLogs = local;
-  }
-
-  if (!local.logs) {
-    local.logs = [];
-  }
-
-  local.logs.push(args);
-  await chrome.storage.local.set({logs: local.logs});
-}
 
 
 (() => {
@@ -309,14 +295,13 @@ function lockData() {
 }
 
 function eraseData() {
-  chrome.storage.local.get(['logs'], (local) => {
-    let logs: any[] = local.logs || [];
+  logger.getAll().then((logs: ILog[]) => {
     console.clear();
 
     for (let i = 0; i < logs.length; i++) {
       const log = logs[i];
       
-      console.log.apply(console, log);
+      console.log.apply(console, JSON.parse(log.data));
     }
   });
 

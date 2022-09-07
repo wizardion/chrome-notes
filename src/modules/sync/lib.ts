@@ -2,22 +2,8 @@ import idb from '../db/idb';
 import {ISyncNote, ISyncPair, ISyncEvent, IPromiseDecorator} from './interfaces';
 import {IDBNote} from '../db/interfaces';
 import { Encryptor } from '../encryption/encryptor';
+import * as logger from '../logger/logger';
 
-var rootLogs: any = null;
-async function log(...args: any[]) {
-  let local = await chrome.storage.local.get(['logs']);
-
-  if (!rootLogs) {
-    rootLogs = local;
-  }
-
-  if (!local.logs) {
-    local.logs = [];
-  }
-
-  local.logs.push(args);
-  await chrome.storage.local.set({logs: local.logs});
-}
 
 const colors = {
   RED: '\x1b[31m%s\x1b[0m',
@@ -30,7 +16,7 @@ var __maxItems: number = 0;
 const __delay: number = 2100;
 
 
-export function logger(e: Error) {
+export function errorLogger(e: Error) {
   console.error(colors.RED, 'Sync ERROR', e);
 }
 
@@ -51,17 +37,17 @@ export function startProcess(decorator: IPromiseDecorator): Promise<void> {
     throw Error('The process is still running');
   }
 
-  log('\t::the process is starting!');
+  logger.put('\t::the process is starting!');
   chrome.storage.local.set({syncProcessing: new Date().getTime()});
   __promise = new Promise<void>(decorator);
 
-  __promise.catch(logger);
+  __promise.catch(errorLogger);
   __promise.finally(() => {
     __promise = null;
     // _cryptor_ = null;
     __maxItems = 0;
     chrome.storage.local.set({syncProcessing: null});
-    log('\t::the process is completed!');
+    logger.put('\t::the process is completed!');
   });
 
   return __promise;
@@ -77,16 +63,16 @@ export function getDBNotes(): Promise<IDBNote[]> {
 
 export function markSynced(item: IDBNote) {
   item.inCloud = true;
-  idb.update(item, null, logger);
+  idb.update(item, null, errorLogger);
 }
 
 export function markDesync(item: IDBNote) {
   item.inCloud = false;
-  idb.update(item, null, logger);
+  idb.update(item, null, errorLogger);
 }
 
 export function remove(item: IDBNote) {
-  idb.remove(item.id, logger);
+  idb.remove(item.id, errorLogger);
 }
 
 export function unzip(data: {[key: string]: any}): ISyncNote[] {
@@ -119,7 +105,7 @@ export function unzip(data: {[key: string]: any}): ISyncNote[] {
     notes.push(<ISyncNote>buff[parseInt(key)]);
   });
 
-  log(colors.GREEN, 'unzip', {'data': data}, notes, 'max_items', __maxItems);
+  logger.put(colors.GREEN, 'unzip', {'data': data}, notes, 'max_items', __maxItems);
   return notes;
 }
 
@@ -185,7 +171,7 @@ export async function lockData(map: {[key: number]: ISyncPair}) {
 
     if (item.db && item.cloud) {
       item.db.locked = true;
-      idb.update(item.db, null, logger);
+      idb.update(item.db, null, errorLogger);
     } else if (item.db) {
       cached.push(item.db);
     }
@@ -204,7 +190,7 @@ export async function unlockData(map: {[key: number]: ISyncPair}) {
 
     if (item.db && item.db.locked) {
       item.db.locked = false;
-      idb.update(item.db, null, logger);
+      idb.update(item.db, null, errorLogger);
     }
 
     if (item.db) {

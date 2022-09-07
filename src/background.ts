@@ -2,6 +2,7 @@ import * as sync from './modules/sync/sync';
 import {migrate} from './modules/storage/migrate';
 import idb from './modules/db/idb';
 import { IDBNote } from './modules/db/interfaces';
+import * as logger from './modules/logger/logger';
 
 
 const __periodInMinutes: number = 20;
@@ -29,22 +30,6 @@ function TEraseData() {
   });
 }
 
-var rootLogs: any = null;
-async function log(...args: any[]) {
-  let local = await chrome.storage.local.get(['logs']);
-
-  if (!rootLogs) {
-    rootLogs = local;
-  }
-
-  if (!local.logs) {
-    local.logs = [];
-  }
-
-  local.logs.push(args);
-  await chrome.storage.local.set({logs: local.logs});
-}
-
 interface IWindow {
   top: number;
   left: number;
@@ -59,7 +44,11 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.clearAll();
   chrome.alarms.create('alert', {periodInMinutes: 1});
   chrome.alarms.create('sync', {periodInMinutes: __periodInMinutes});
-  chrome.storage.local.set({logs: [[colors.GREEN, '\t\t=> app installed!']]});
+  chrome.storage.local.remove('logs');
+
+  logger.clear().then(() => {
+    logger.put(colors.GREEN, '\t\t=> app installed!');
+  });
 
   chrome.storage.local.get(['mode', 'migrate', 'oldNotes', 'syncEnabled', 'internalKey', 'shareKey', 'appId'], function(result) {
     if (!result.appId) {
@@ -133,23 +122,23 @@ chrome.runtime.onMessage.addListener((message: string, sender: any, sendResponse
 });
 
 chrome.runtime.onConnect.addListener(() => {
-  log(colors.RED, 'onConnect');
+  logger.put(colors.RED, 'onConnect');
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  log(colors.RED, 'onStartup');
+  logger.put(colors.RED, 'onStartup');
 });
 
 chrome.runtime.onSuspend.addListener(() => {
-  log(colors.RED, 'onSuspend');
+  logger.put(colors.RED, 'onSuspend');
 });
 
 chrome.runtime.onSuspendCanceled.addListener(() => {
-  log(colors.RED, 'onSuspendCanceled');
+  logger.put(colors.RED, 'onSuspendCanceled');
 });
 
 chrome.runtime.onSuspend.addListener(() => {
-  log("Unloading.");
+  logger.put("Unloading.");
   // chrome.browserAction.setBadgeText({text: ""});
 });
 
@@ -158,12 +147,12 @@ function eventOnStorageChanged(changes: {[key: string]: chrome.storage.StorageCh
   if (namespace === 'local') {
     for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
       if (key === 'mode' && oldValue !== newValue) {
-        log('storage.onChanged.mode:', oldValue, newValue);
+        logger.put('storage.onChanged.mode:', oldValue, newValue);
         setPopup(Number(newValue));
       }
 
       // if (1) {
-      //   log('\t:::key', key);
+      //   logger.put('\t:::key', key);
       //   // 
       // }
 
@@ -259,19 +248,19 @@ function openMigration() {
 }
 
 function startSync(): Promise<void> {
-  log(colors.GREEN, '=>=>=> start Sync... lastError: ', chrome.runtime.lastError);
+  logger.put(colors.GREEN, '=>=>=> start Sync... lastError: ', chrome.runtime.lastError);
 
   sync.isBusy().then((busy: boolean) => {
 
     if (!busy) {
       sync.start().finally(() => {
         chrome.storage.sync.getBytesInUse().then((bytes: number) => {
-          log('bytes: ', bytes, chrome.storage.sync.QUOTA_BYTES);
-          log(colors.GREEN, '=>=>=> Sync is completed!');
+          logger.put('bytes: ', bytes, chrome.storage.sync.QUOTA_BYTES);
+          logger.put(colors.GREEN, '=>=>=> Sync is completed!');
         });
       });
     } else {
-      log(colors.GREEN, '... busy');
+      logger.put(colors.GREEN, '... busy');
     }
   });
 

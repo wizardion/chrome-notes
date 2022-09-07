@@ -3,23 +3,8 @@ import {ISyncNote, ISyncPair} from './interfaces';
 import {IDBNote} from '../db/interfaces';
 import {Encryptor} from '../encryption/encryptor';
 import * as lib from './lib';
+import * as logger from '../logger/logger';
 
-
-var rootLogs: any = null;
-async function log(...args: any[]) {
-  let local = await chrome.storage.local.get(['logs']);
-
-  if (!rootLogs) {
-    rootLogs = local;
-  }
-
-  if (!local.logs) {
-    local.logs = [];
-  }
-
-  local.logs.push(args);
-  await chrome.storage.local.set({logs: local.logs});
-}
 
 var __cryptor: Encryptor = null;
 const colors = {
@@ -98,10 +83,10 @@ export function start(internalKey?: string): Promise<void> {
 }
 
 export async function resync(oldKey: string, newKey: string) {
-  await log(colors.RED, '=>=>=> start ReSync...');
+  await logger.put(colors.RED, '=>=>=> start ReSync...');
 
   await start(oldKey);
-  await log(colors.RED, '=>=>=> synced old ReSyncing ...');
+  await logger.put(colors.RED, '=>=>=> synced old ReSyncing ...');
 
   return lib.startProcess(async (resolve, reject) => {
     let data = await chrome.storage.sync.get(['secretKey', 'applicationId']);
@@ -115,7 +100,7 @@ export async function resync(oldKey: string, newKey: string) {
   
       await sync(map, true);
       resolve();
-      await log(colors.RED, '=>=>=> ReSync is completed!');
+      await logger.put(colors.RED, '=>=>=> ReSync is completed!');
     }
   });
 }
@@ -142,7 +127,7 @@ async function sync(map: {[key: number]: ISyncPair}, resync?: boolean): Promise<
   var deleted: number[] = [];
   var desync: number[] = [];
   var changes: boolean = false;
-  await log(colors.BLUE, 'sync.pair...', map);
+  await logger.put(colors.BLUE, 'sync.pair...', map);
 
   for (let i = 0, keys = Object.keys(map); i < keys.length; i++) {
     const item = map[parseInt(keys[i])];
@@ -202,7 +187,7 @@ async function sync(map: {[key: number]: ISyncPair}, resync?: boolean): Promise<
 
     // if (item.db && !item.cloud && item.db.inCloud) {
     //   // lib.remove(item.db);
-    //   log('delete local', item.db);
+    //   logger.put('delete local', item.db);
     //   changes = true;
     //   continue;
     // }
@@ -215,7 +200,7 @@ async function sync(map: {[key: number]: ISyncPair}, resync?: boolean): Promise<
       desync: desync.length? desync : null,
       secretKey: await __cryptor.secretKey(),
     });
-    await log(colors.RED, 'sync.changes', {
+    await logger.put(colors.RED, 'sync.changes', {
       deleted: deleted.length? deleted : null,
       desync: desync.length? desync : null,
       secretKey: await __cryptor.secretKey()});
@@ -249,10 +234,10 @@ function saveToDB(item: ISyncPair): Promise<void> {
       note.preview = item.db.preview;
   
       idb.update(note, resolve, reject);
-      await log('\t\t', 'setDBItems.update', note);
+      await logger.put('\t\t', 'setDBItems.update', note);
     } else {
       idb.add(note, resolve, reject);
-      await log('\t\t', 'setDBItems.add', note);
+      await logger.put('\t\t', 'setDBItems.add', note);
     }
   });
 }
@@ -264,7 +249,7 @@ async function saveToCloud(item: IDBNote) {
   lib.subtractItems(keys.length);
 
   if (lib.default.rest() <= 0) {
-    return lib.logger(new Error('Max notes quota exceeded!'));
+    return lib.errorLogger(new Error('Max notes quota exceeded!'));
   }
 
   var data: {[key: string]: ISyncNote} = {};
@@ -275,7 +260,7 @@ async function saveToCloud(item: IDBNote) {
     // await chrome.storage.sync.set({[key]: chunks[key]});
     
     data[key] = chunks[key];
-    await log(colors.RED, 'saveToCloud.chunk', {[key]: chunks[key]}, 'remains', lib.default.rest());
+    await logger.put(colors.RED, 'saveToCloud.chunk', {[key]: chunks[key]}, 'remains', lib.default.rest());
   }
 
   await lib.delay();
@@ -290,7 +275,7 @@ async function removeFromCloud(item: IDBNote, chunks: number) {
     var result = await chrome.storage.sync.get([`item_${item.id}_${i}`]);
     await chrome.storage.sync.remove(`item_${item.id}_${i}`);
 
-    await log(colors.RED, 'deleteCloud.chunk', result, 'remains', lib.default.rest());
+    await logger.put(colors.RED, 'deleteCloud.chunk', result, 'remains', lib.default.rest());
   }
 
   lib.addItems(chunks);
@@ -305,16 +290,16 @@ async function desyncFromCloud(item: IDBNote, chunks: number) {
 
   await lib.delay();
   await chrome.storage.sync.set({[`item_${item.id}_0`]: {rmsync: true, id: item.id}});
-  await log(colors.RED, 'rmSyncCloud.rmsync.chunk', {rmsync: true, id: item.id}, 'remains', lib.default.rest());
+  await logger.put(colors.RED, 'rmSyncCloud.rmsync.chunk', {rmsync: true, id: item.id}, 'remains', lib.default.rest());
 
   // lib.markDesync(item);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 async function processChanges(changes: {[key: string]: chrome.storage.StorageChange}, area: chrome.storage.AreaName) {
-  await log('----------------------------------------------------------------------------------------------------');
-  await log('changes', changes);
-  await log('----------------------------------------------------------------------------------------------------');
+  await logger.put('----------------------------------------------------------------------------------------------------');
+  await logger.put('changes', changes);
+  await logger.put('----------------------------------------------------------------------------------------------------');
 
 
   const tester: RegExp = /^item\_[\d]+$/;
@@ -335,7 +320,7 @@ async function processChanges(changes: {[key: string]: chrome.storage.StorageCha
       const item = map[parseInt(keys[i])];
       
       if (item.cloud && (!item.db || item.db.updated < item.cloud.u)) {
-        await log('save to DB', item);
+        await logger.put('save to DB', item);
         await saveToDB(item);
         continue;
       }
@@ -343,7 +328,7 @@ async function processChanges(changes: {[key: string]: chrome.storage.StorageCha
   }
 
   if(changes.deleted && changes.deleted.newValue || changes.desync && changes.desync.newValue) {
-    await log('\t\t\t', 'onChanged {deleted:', changes.deleted, 'desync:', changes.desync, '}');
+    await logger.put('\t\t\t', 'onChanged {deleted:', changes.deleted, 'desync:', changes.desync, '}');
     await updateDBItems(<number[]>changes.deleted, <number[]>changes.desync, 'onChanged');
   }
 
@@ -364,7 +349,7 @@ async function updateDBItems(deleted: number[], desync: number[], action: string
     const note = deleteItems[i];
 
     console.warn('\t\t\t\t', `1.0 ${action}.updateDBItems.delete`, JSON.parse(JSON.stringify(note)));
-    idb.remove(note.id, lib.logger);
+    idb.remove(note.id, lib.errorLogger);
   }
 
   for (let i = 0; i < desyncItems.length; i++) {
@@ -373,7 +358,7 @@ async function updateDBItems(deleted: number[], desync: number[], action: string
     if (note.sync) {
       note.sync = 0;
       console.warn('\t\t\t\t', `2.0 ${action}.updateDBItems.rmsync`, JSON.parse(JSON.stringify(note)));
-      idb.update(note, null, lib.logger);
+      idb.update(note, null, lib.errorLogger);
     }
   }
 }
