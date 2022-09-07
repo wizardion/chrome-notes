@@ -6,8 +6,8 @@ import * as lib from './modules/sync/lib';
 // import {migrate} from './modules/storage/migrate';
 
 const controls: SettingsControls = new SettingsControls();
-var mode:string = storage.get('mode', true) || '0';
-var popupMode:string = storage.get('popupMode');
+// var mode:string = storage.get('mode', true) || '0';
+// var popupMode:string = storage.get('popupMode');
 var __lock__: boolean = true;
 var __internalKey__: string;
 
@@ -29,20 +29,6 @@ async function log(...args: any[]) {
 
 
 (() => {
-  if(popupMode) {
-    controls.buttons.back.style.display = '';
-  }
-  
-  for (let i = 0; i < controls.blocks.views.length; i++) {
-    const view: HTMLInputElement = <HTMLInputElement>controls.blocks.views[i];
-
-    if (view.value === mode) {
-      view.checked = true;
-    }
-    
-    view.onchange = viewChanged;
-  }
-
   controls.buttons.generate.disabled = true;
   controls.inputs.password.disabled = true;
   controls.buttons.erase.onclick = (e) => {e.preventDefault(); eraseData();};
@@ -54,7 +40,9 @@ async function log(...args: any[]) {
   controls.blocks.maxEach.innerText = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 192).toString();
   controls.blocks.maxBytes.innerText = bytesToSize(chrome.storage.sync.QUOTA_BYTES - 0).toString();
 
-  chrome.storage.local.get(['syncEnabled', 'internalKey', 'restSyncedItems', 'syncProcessing'], function(local) {
+  chrome.storage.local.get(['syncEnabled', 'internalKey', 'restSyncedItems', 'syncProcessing', 'mode'], function(local) {
+    let appMode = local.mode || 0;
+
     controls.checkboxes.sync.checked = (local.syncEnabled === true);
     syncChanged.call(controls.checkboxes.sync);
     fillProgress(local.restSyncedItems || 0);
@@ -62,6 +50,20 @@ async function log(...args: any[]) {
     if (local.syncProcessing) {
       controls.blocks.syncIndicator.classList.remove('hidden');
       controls.blocks.lockTitle.textContent = 'Sync is processing...';
+    }
+
+    // if(popupMode) {
+    //   controls.buttons.back.style.display = '';
+    // }
+    
+    for (let i = 0; i < controls.blocks.views.length; i++) {
+      const view: HTMLInputElement = <HTMLInputElement>controls.blocks.views[i];
+  
+      if (parseInt(view.value) === appMode) {
+        view.checked = true;
+      }
+      
+      view.onchange = viewChanged;
     }
 
     chrome.storage.sync.get('secretKey', async (sync) => {
@@ -75,7 +77,7 @@ async function log(...args: any[]) {
   });
 
   // TODO removes temp variable passed to this page.
-  storage.remove('popupMode');
+  // storage.remove('popupMode');
   chrome.storage.onChanged.addListener(eventOnStorageChanged);
 })();
 
@@ -118,23 +120,20 @@ function getBackButtonVisibility(md: number, value: number): string {
 }
 
 function viewChanged() {
-  if (controls.buttons.back) {
-    controls.buttons.back.style.display = getBackButtonVisibility(Number(mode), Number(this.value));
-  }
+  const appMode = parseInt(this.value);
+  // if (controls.buttons.back) {
+  //   controls.buttons.back.style.display = getBackButtonVisibility(Number(mode), Number(this.value));
+  // }
 
   if (chrome && chrome.action && chrome.storage) {
-    if (this.value === '3' || this.value === '4') {
+    if (appMode === 3 || appMode === 4) {
       chrome.action.setPopup({popup: ''});
     } else {
       chrome.action.setPopup({popup: 'popup.html'});
     }
 
-    if (chrome && chrome.storage) {
-      chrome.storage.local.set({mode: this.value});
-    }
+    chrome.storage.local.set({mode: appMode});
   }
-
-  storage.set('mode', this.value, true);
 }
 
 async function eventOnStorageChanged(changes: {[key: string]: chrome.storage.StorageChange}, namespace: chrome.storage.AreaName) {

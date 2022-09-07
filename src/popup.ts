@@ -1,20 +1,20 @@
 import { tracker } from './modules/notes/components/tracker';
-tracker.track('init', 'start');
+tracker.track('init', 'Start');
 
 import {ISTNote} from './modules/notes/components/interfaces';
 import {Base} from './modules/notes/base';
 import storage from './modules/storage/storage';
-import {buildEditor, getSelected} from './screen-builder';
+import {buildEditor, getSelected} from './popup-builder';
 import './styles/style.scss';
 
 
 tracker.track('init', 'import');
-chrome.storage.local.get(['syncEnabled', 'internalKey', 'syncLocked', 'cachedList'], function(local) {
+chrome.storage.local.get(['syncEnabled', 'internalKey', 'syncLocked', 'cachedList', 'mode'], function(local) {
   tracker.track('init', `local.get: ${local.cachedList}`.substring(0, 75) + ' ...');
 
   var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
-  var editor: Base = buildEditor();
-  
+  var editor: Base = buildEditor(local.mode);
+
   notes.classList.remove('hidden');
   if (local.cachedList) {
     tracker.track('init', `cache`);
@@ -36,7 +36,7 @@ chrome.storage.local.get(['syncEnabled', 'internalKey', 'syncLocked', 'cachedLis
   editor.init();
   notes.classList.remove('transparent');
 
-  tracker.track('init', 'Done');
+  tracker.track('init', 'End');
   tracker.print();
 });
 

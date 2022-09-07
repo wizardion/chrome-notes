@@ -13,6 +13,7 @@ const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev
 
 module.exports = {
   entry: {
+    popup: path.resolve(__root__, 'src/popup.ts'),
     index: path.resolve(__root__, 'src/index.ts'),
     background: path.resolve(__root__, 'src/background.ts'),
     settings: path.resolve(__root__, 'src/settings.ts'),
@@ -113,7 +114,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       title: 'My Notes',
-      filename: 'popup.html',
+      filename: 'index.html',
       template: './src/popup.html',
       scriptLoading: 'blocking',
       // inject: 'head',
@@ -122,6 +123,27 @@ module.exports = {
       chunks: [
         'vendors',
         'index'
+      ],
+      attributes: {
+        'async': function (tag, compilation, index, a, b) {
+          if (tag.tagName === 'script' && tag.attributes.src.match(/^index/gi)) {
+            return true;
+          }
+          return false;
+        }
+      },
+    }),
+    new HtmlWebpackPlugin({
+      title: 'My Notes',
+      filename: 'popup.html',
+      template: './src/popup.html',
+      scriptLoading: 'blocking',
+      // inject: 'head',
+      inject: "body",
+      // minify: true,
+      chunks: [
+        'vendors',
+        'popup'
       ],
       attributes: {
         'async': function (tag, compilation, index, a, b) {

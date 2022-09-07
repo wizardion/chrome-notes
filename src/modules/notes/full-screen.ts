@@ -41,7 +41,7 @@ export class FullScreen extends Mixed {
     super.build(notes);
 
     window.addEventListener('resize', this.screenResize.bind(this));
-    this.mode = Number(storage.get('mode', true) || '0');
+    // this.mode = Number(storage.get('mode', true) || '0');
   }
 
   protected timer() {

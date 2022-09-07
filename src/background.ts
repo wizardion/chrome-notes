@@ -2,9 +2,9 @@ import * as sync from './modules/sync/sync';
 import {migrate} from './modules/storage/migrate';
 import idb from './modules/db/idb';
 import { IDBNote } from './modules/db/interfaces';
-// import {Encrypter} from './modules/encryption/encrypter'
 
-const __periodInMinutes: number = 1;
+
+const __periodInMinutes: number = 20;
 const colors = {
   RED: '\x1b[31m%s\x1b[0m',
   GREEN: '\x1b[32m%s\x1b[0m',
@@ -214,20 +214,20 @@ function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: nu
   }
 
   if (mode === 3) {
-    return chrome.tabs.create({url: chrome.runtime.getURL('popup.html')});
+    return chrome.tabs.create({url: chrome.runtime.getURL('index.html')});
   }
 
   if (mode === 4) {
     if (window) {
       chrome.windows.create({
-        focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup',
+        focused: true, url: chrome.runtime.getURL('index.html'), type: 'popup',
         left: window.left,
         top: window.top,
         width: window.width,
         height: window.height,
       });
     } else {
-      chrome.windows.create({focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup'});
+      chrome.windows.create({focused: true, url: chrome.runtime.getURL('index.html'), type: 'popup'});
     }
   }
 }
@@ -259,7 +259,7 @@ function openMigration() {
 }
 
 function startSync(): Promise<void> {
-  log(colors.GREEN, '=>=>=> start Sync... lastError: ', chrome.runtime.lastError, chrome.runtime.id);
+  log(colors.GREEN, '=>=>=> start Sync... lastError: ', chrome.runtime.lastError);
 
   sync.isBusy().then((busy: boolean) => {
 
