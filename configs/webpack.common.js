@@ -45,21 +45,22 @@ module.exports = {
       },
       {
         test: /\.(sc|c)ss$/i,
-        use: [{
-          loader: MiniCssExtractPlugin.loader,
-          options: {
-            // publicPath: ''
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // publicPath: ''
+            }
+          }, 
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: false,
+              implementation: require("dart-sass"),
+            }
           }
-        }, 
-        'css-loader',
-        {
-          loader: 'sass-loader',
-          options: {
-            sourceMap: false,
-            implementation: require("dart-sass"),
-          }
-        }
-      ],
+        ],
       },
       {
         test: /\.(png|jp(e*)g|gif|ico)$/i,
@@ -116,10 +117,18 @@ module.exports = {
       title: 'My Notes',
       filename: 'index.html',
       template: './src/popup.html',
-      scriptLoading: 'blocking',
+      scriptLoading: 'defer',
       // inject: 'head',
-      inject: "body",
-      // minify: true,
+      inject: "head",
+      minify: {
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        removeComments: true,
+        removeRedundantAttributes: false,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      },
       chunks: [
         'vendors',
         'index'
@@ -137,10 +146,21 @@ module.exports = {
       title: 'My Notes',
       filename: 'popup.html',
       template: './src/popup.html',
-      scriptLoading: 'blocking',
+      // scriptLoading: 'blocking',
+      scriptLoading: 'defer',
       // inject: 'head',
-      inject: "body",
-      // minify: true,
+      inject: "head",
+      // inject: "body",
+      // minify: false,
+      minify: {
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        removeComments: true,
+        removeRedundantAttributes: false,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      },
       chunks: [
         'vendors',
         'popup'
@@ -159,8 +179,17 @@ module.exports = {
       title: 'My Options',
       filename: 'options.html',
       template: './src/options.html',
-      scriptLoading: 'blocking',
-      inject: "body",
+      scriptLoading: 'defer',
+      inject: "head",
+      minify: {
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        removeComments: true,
+        removeRedundantAttributes: false,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      },
       chunks: [
         'settings'
       ],
@@ -171,6 +200,15 @@ module.exports = {
       template: './src/migration.html',
       scriptLoading: 'blocking',
       inject: "body",
+      minify: {
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        removeComments: true,
+        removeRedundantAttributes: false,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      },
       chunks: [
         'migration'
       ],

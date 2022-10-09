@@ -1,7 +1,7 @@
 import {IListView, INewNoteView, INoteView, ISTNote} from './modules/notes/components/interfaces';
 import {Editor} from './modules/notes/editor';
 import {Base} from './modules/notes/base';
-import {FullScreen} from './modules/notes/full-screen';
+import {Screen} from './modules/notes/screen';
 
 
 export function buildEditor(): Base {
@@ -36,18 +36,5 @@ export function buildEditor(): Base {
     create: <HTMLButtonElement>document.getElementById('create-note'),
   }
 
-  return new FullScreen(listView, noteView, newView);
-}
-
-export function getSelected(selected: string): ISTNote {
-  if (selected) {
-    let note: ISTNote = <ISTNote>JSON.parse(`{${selected}}`);
-
-    note.title = note.title || '';
-    note.description = note.description || '';
-
-    return note;
-  }
-
-  return null;
+  return new Screen(listView, noteView, newView);
 }

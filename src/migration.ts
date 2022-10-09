@@ -87,12 +87,12 @@ function startMigration() {
   }, 1000);
 }
 
-function startMigrate() {
+async function startMigrate() {
   var whatsnew = document.getElementById('whats-new');
   var finished = document.getElementById('finished');
   var progress = document.getElementById('progress');
 
-  migrate(oldNotes);
+  await migrate(oldNotes);
   
   setTimeout(() => {
     progress.classList.add('hidden');

@@ -1,5 +1,10 @@
+interface HTMLCollectionFieldset {
+  synchronization: HTMLFieldSetElement;
+}
+
 interface HTMLCollectionCheckbox {
   sync: HTMLInputElement;
+  dev: HTMLInputElement;
 }
 
 interface HTMLCollectionInput {
@@ -12,7 +17,8 @@ interface HTMLCollectionButton {
   save: HTMLInputElement;
   cancel: HTMLInputElement;
   erase: HTMLLinkElement;
-  // lock: HTMLLinkElement;
+  printLogs: HTMLLinkElement;
+  clearLogs: HTMLLinkElement;
 }
 
 interface HTMLCollectionBlock {
@@ -22,28 +28,49 @@ interface HTMLCollectionBlock {
 
   unlockMessage: HTMLSpanElement;
   passwordValidator: HTMLElement;
-  // keyValidator: HTMLElement,
-  saveMessage: HTMLElement;
 
   maxItems: HTMLSpanElement;
   maxEach: HTMLSpanElement;
   maxBytes: HTMLSpanElement;
   locked: HTMLElement;
   lockTitle: HTMLElement;
-  syncIndicator: HTMLElement;
+  lockIndicator: HTMLElement;
   unlocked: HTMLElement;
-  progressBar: HTMLElement;
+  progressThumb: HTMLElement;
+  syncedTime: HTMLElement;
+  devInfo: HTMLElement;
 }
+
+interface IConfig {
+  blocked: boolean,
+  lock: boolean,
+  processing: boolean
+  internalKey: string
+  periodInMinutes: number
+};
+
+export const config: IConfig = {
+  blocked: false,
+  lock: true,
+  processing: false,
+  internalKey: null,
+  periodInMinutes: 1 //20
+};
 
 export class SettingsControls {
   public checkboxes: HTMLCollectionCheckbox;
   public inputs: HTMLCollectionInput;
   public buttons: HTMLCollectionButton;
   public blocks: HTMLCollectionBlock;
+  public groups: HTMLCollectionFieldset;
   
   constructor () {
+    this.groups = {
+      synchronization: <HTMLFieldSetElement>document.getElementById('sync-group'),
+    };
     this.checkboxes = {
-      sync: <HTMLInputElement>document.getElementById('sync')
+      sync: <HTMLInputElement>document.getElementById('sync'),
+      dev: <HTMLInputElement>document.getElementById('dev-mode')
     };
     this.inputs = {
       password: <HTMLInputElement>document.getElementById('id-key')
@@ -54,18 +81,18 @@ export class SettingsControls {
       save: <HTMLInputElement>document.getElementById('save-changes'),
       cancel: <HTMLInputElement>document.getElementById('cancel-save'),
       erase: <HTMLLinkElement>document.getElementById('erase-data'),
-      // lock: <HTMLLinkElement>document.getElementById('lock-data'),
+      printLogs: <HTMLLinkElement>document.getElementById('print-logs'),
+      clearLogs: <HTMLLinkElement>document.getElementById('clear-logs'),
     };
     this.blocks = {
       views: <NodeList>document.querySelectorAll('input[name="views"]'),
       info: <HTMLElement>document.getElementById('info'),
       keyInfo: <HTMLElement>document.getElementById('key-info'),
+      devInfo: <HTMLElement>document.getElementById('dev-info'),
 
       unlockMessage: <HTMLElement>document.getElementById('unlock-message'),
       passwordValidator: <HTMLElement>document.getElementById('validator-password'),
-      progressBar: <HTMLElement>document.getElementById('progress-thumb'),
-      // keyValidator: <HTMLElement>document.getElementById('validator-key'),
-      saveMessage: <HTMLElement>document.getElementById('save-changes-block'),
+      progressThumb: <HTMLElement>document.getElementById('progress-thumb'),
       
       maxItems: <HTMLInputElement>document.getElementById('maxItems'),
       maxEach: <HTMLInputElement>document.getElementById('maxEach'),
@@ -73,8 +100,9 @@ export class SettingsControls {
       
       locked: <HTMLElement>document.getElementById('locked-icon'),
       lockTitle: <HTMLElement>document.getElementById('locked-title-indicator'),
-      syncIndicator: <HTMLElement>document.getElementById('sync-indicator'),
+      lockIndicator: <HTMLElement>document.getElementById('lock-indicator'),
       unlocked: <HTMLElement>document.getElementById('unlocked-icon'),
+      syncedTime: <HTMLElement>document.getElementById('synced-time'),
     };
   }
 }

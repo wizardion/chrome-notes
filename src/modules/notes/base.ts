@@ -7,8 +7,10 @@ import {Sorting} from './components/sorting';
 import {ScrollListener} from './components/scrolling';
 import {NodeHelper} from './components/node-helper';
 import storage from '../storage/storage';
+import {Logger} from '../logger/logger';
 
 
+const logger: Logger = new Logger('base.ts', 'red');
 export class Base {
   protected notes: Note[];
   protected selected?: Note;
@@ -18,6 +20,7 @@ export class Base {
   protected newView: INewNoteView;
   private cacheIndex?: number;
   protected new?: boolean;
+  protected locked: boolean;
 
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     this.notes = [];
@@ -26,6 +29,7 @@ export class Base {
     this.listView = listView;
     this.noteView = noteView;
     this.newView = newView;
+    this.locked = true;
   }
 
   public initFromCache(list?: string) {
@@ -38,7 +42,6 @@ export class Base {
     }
   }
 
-  // public selectFromCache(index: number, description: string, bind?: boolean, selection?: string, html?: string, pState?: string) {
   public selectFromCache(note: ISTNote) {
     if (note.index !== null && this.notes.length > 0 && note.index < this.notes.length) {
       var selected = this.notes[note.index];
@@ -48,19 +51,22 @@ export class Base {
     }
 
     this.cacheIndex = note.index;
-    this.showNote(note.title + '\n' + note.description, true, note.cState, note.html, note.pState);
+    this.showNote();
+    this.bind((note.title || '') + '\n' + (note.description || ''), note.cState, note.html, note.pState);
   }
 
   public init() {
-    loadAll(this.build.bind(this));
-    // loadAll((notes: DbNote[]) => {
-    //   setTimeout(() => {
-    //     this.build(notes);
-    //   }, 1000);
-    // });
+    loadAll().then(this.build.bind(this));
   }
 
-  protected build(notes: DbNote[]) {
+  /**
+   * Builds and binds all events from db notes. This method calls asynchronously.
+   * @memberof Base
+   * @name build
+   * @param {DbNote[]} notes
+   * @returns {void}
+   */
+  protected build(notes: DbNote[]): void {
     if (notes.length > 0) {
       this.listView.items.appendChild(this.render(notes));
 
@@ -70,22 +76,29 @@ export class Base {
 
       if (!this.selected && this.cacheIndex >= 0 && this.notes.length) {
         this.selectNote(this.notes[this.cacheIndex]);
+      } else if (this.selected) {
+        let selected: Note = this.selected;
+        let value = selected.title + '\n' + selected.description;
+
+        if (this.noteView.editor.value !== value) {
+          this.bind(value, selected.cursor, selected.html, selected.previewState, selected.toString());
+        }
       }
     }
 
-    this.listView.addButton.addEventListener('mousedown', this.prevent.bind(this));
-    this.noteView.back.addEventListener('mousedown', this.prevent.bind(this));
-    this.noteView.delete.addEventListener('mousedown', this.prevent.bind(this));
-    this.noteView.preview.parentElement.addEventListener('mousedown', this.prevent.bind(this));
-    this.newView.create.addEventListener('mousedown', this.prevent.bind(this));
-    this.newView.cancel.addEventListener('mousedown', this.prevent.bind(this));
+    this.listView.addButton.addEventListener('mousedown', this.preventClick.bind(this));
+    this.noteView.back.addEventListener('mousedown', this.preventClick.bind(this));
+    this.noteView.delete.addEventListener('mousedown', this.preventClick.bind(this));
+    this.noteView.preview.parentElement.addEventListener('mousedown', this.preventClick.bind(this));
+    this.newView.create.addEventListener('mousedown', this.preventClick.bind(this));
+    this.newView.cancel.addEventListener('mousedown', this.preventClick.bind(this));
 
     this.listView.addButton.addEventListener('click', this.selectNew.bind(this, '', null));
     this.noteView.delete.addEventListener('click', this.remove.bind(this));
-    this.noteView.preview.addEventListener('click', this.previewClick.bind(this));
-    this.newView.create.addEventListener('click', this.placeNote.bind(this));
+    this.noteView.preview.addEventListener('click', this.togglePreview.bind(this));
+    this.newView.create.addEventListener('click', this.addNote.bind(this));
     this.newView.cancel.addEventListener('click', this.cancelCreation.bind(this));
-    this.noteView.html.addEventListener('scroll', this.previewStateChanged.bind(this));
+    // this.noteView.html.addEventListener('scroll', this.previewStateChanged.bind(this));
 
     document.addEventListener('selectionchange', this.previewStateChanged.bind(this));
 
@@ -93,15 +106,256 @@ export class Base {
     this.noteView.editor.on('cursorActivity', this.cursorMoved.bind(this));
     this.noteView.editor.on('save', this.saveHandler.bind(this));
     this.noteView.editor.on('cancel', this.cancelHandler.bind(this));
-    this.noteView.sync.parentElement.setAttribute('title', 'Enable synchronization in settings...');
 
     ScrollListener.listen(this.listView.items, 550);
     ScrollListener.listen(this.noteView.editor.scroll, 550);
     ScrollListener.listen(this.noteView.html, 550);
+    Note.addEventListener(this.onNewNoteCreated.bind(this));
+
+    if (this.locked) {
+      this.noteView.sync.parentElement.setAttribute('title', 'Enable synchronization in settings...');
+    }
 
     this.cacheList(notes);
   }
 
+  //#region Event-Listeners
+  private async preventClick(e: MouseEvent) {
+    e.preventDefault();
+  }
+
+  protected async descriptionChanged() {
+    if (this.selected || this.selected === undefined) {
+      clearInterval(this.intervals.document);
+
+      this.intervals.document = setTimeout(async () => {
+        var [title, description] = this.noteView.editor.getData();
+
+        if (this.validate(title)) {
+          if (this.selected) {
+            this.save(title, description);
+            await storage.cached.set('selected', this.selected.toString());
+          } else {
+            await storage.cached.set('description', title + '\n' + description);
+          }
+        }
+      }, 175);
+    }
+  }
+
+  protected async previewStateChanged() {
+    if (this.selected && this.selected.preview) {
+      clearInterval(this.intervals.scroll);
+
+      this.intervals.scroll = setTimeout(async () => {
+        let scrollTop = this.noteView.html.scrollTop;
+        let selection = NodeHelper.getSelection(this.noteView.html);
+
+        if (this.selected) {
+          this.selected.previewState = `${scrollTop}|${selection}`;
+          await storage.cached.set('selected', this.selected.toString());
+        }
+      }, 600);
+    }
+  }
+
+  protected async cursorMoved() {
+    if (this.selected || this.selected === undefined) {
+      clearInterval(this.intervals.cursor);
+
+      this.intervals.cursor = setTimeout(async () => {
+        if (this.selected) {
+          this.selected.selection = this.noteView.editor.getSelection();
+          this.selected.cursor = this.noteView.editor.getCursor();
+          await storage.cached.set('selected', this.selected.toString());
+        } else {
+          await storage.cached.set('selection', this.noteView.editor.getSelection());
+        }
+      }, 600);
+    }
+  }
+
+  protected async saveHandler() {
+    if (this.new) {
+      this.addNote();
+    } else if (this.selected) {
+      var [title, description] = this.noteView.editor.getData();
+
+      if (this.validate(title, true)) {
+        this.save(title, description);
+        await storage.cached.set('selected', this.selected.toString());
+      }
+    }
+  }
+
+  protected async cancelHandler() {
+    if (this.new) {
+      this.cancelCreation();
+    }
+  }
+
+  protected onNewNoteCreated(id: number) {
+    this.cacheList();
+  }
+  //#endregion
+
+  //#region Public-Members
+  public async selectNew(description: string, selection?: string) {
+    this.noteView.editor.value = description;
+    this.noteView.editor.setSelection(selection);
+
+    this.new = true;
+    this.selected = undefined;
+    await storage.cached.set('new', 'true');
+  }
+
+  public unlock() {
+    this.locked = false;
+    this.noteView.sync.parentElement.addEventListener('mousedown', this.preventClick.bind(this));
+    this.noteView.sync.addEventListener('click', this.toggleSync.bind(this));
+    this.noteView.sync.removeAttribute('disabled');
+    this.noteView.sync.parentElement.setAttribute('title', 'sync note');
+  }
+
+  public showList() {
+
+  }
+
+  public showNote() {
+    
+  }
+  //#endregion
+
+  //#region Protected-Members
+  protected async remove() {
+    if (this.selected) {
+      this.selected.remove();
+
+      for (let i = this.selected.index + 1; i < this.notes.length; i++) {
+        this.notes[i].index = i - 1;
+      }
+
+      this.notes.splice(this.selected.index, 1);
+      delete this.selected;
+
+      Note.saveQueue();
+      this.cacheList();
+    }
+  }
+
+  // TODO review events
+  protected async togglePreview() {
+    this.selected.preview = this.noteView.preview.checked;
+
+    if (this.noteView.preview.checked) {
+      var scrollTop = this.noteView.editor.scrollTop;
+
+      this.showPreview(this.noteView.editor.render());
+      this.noteView.html.scrollTop = scrollTop;
+
+      this.selected.html = this.noteView.html.innerHTML;
+    } else {
+      var scrollTop = this.noteView.html.scrollTop;
+
+      this.hidePreview();
+      this.noteView.editor.focus();
+      this.noteView.editor.scrollTop = scrollTop;
+
+      this.selected.html = null;
+      this.selected.previewState = null;
+    }
+
+    await storage.cached.set('selected', this.selected.toString());
+  }
+
+  protected showPreview(value: string) {
+    this.noteView.editor.hide();
+    this.noteView.html.innerHTML = value;
+    this.noteView.html.style.display = 'inherit';
+  }
+
+  protected hidePreview() {
+    this.noteView.editor.show();
+    this.noteView.html.style.display = 'none';
+  }
+
+  protected setPreviewSelection(previewState?: string) {
+    if (previewState && previewState.length > 1) {
+      let [scrollTop, selection] = previewState.split('|');
+
+      this.noteView.html.scrollTop = Number(scrollTop) || 0;
+      NodeHelper.setSelection(selection, this.noteView.html);
+    } else {
+      this.noteView.html.scrollTop = 0;
+    }
+  }
+
+  protected validate(title: string, animate: boolean = false): boolean {
+    return !Validator.required(title, animate && this.noteView.editor.wrapper);
+  }
+
+  // TODO review usage
+  protected async cacheList(db: DbNote[] = null) {
+    var notes: (DbNote|Note)[] = db || this.notes;
+    var cache: (string|number)[] = [];
+
+    for (let i = 0; i < Math.min(21, notes.length); i++) {
+      const note = notes[i];
+
+      if (note) {
+        cache = cache.concat([note.id, note.title, note.updated]);
+      }
+    }
+
+    await storage.cached.set('list', JSON.stringify(cache).replace(/^\[|\]$/gi, ''));
+  }
+
+  protected selectNote(note: Note, bind?: boolean, save?: boolean) {
+    if (!Sorting.busy) {
+      let value = note.title + '\n' + note.description;
+      logger.info(`selectNote, bind[${bind}]`, note.description);
+
+      this.showNote();
+      this.bind(value, note.cursor, note.html, note.previewState, save && note.toString());
+
+      this.selected = note;
+      this.noteView.preview.checked = note.preview;
+      this.noteView.sync.checked = this.selected.sync;
+    }
+  }
+
+  protected async bind(description: string, selection?: string, html?: string, pState?: string, selected?: string) {
+    this.noteView.editor.value = description;
+    this.noteView.editor.setSelection(selection);
+
+    if (html) {
+      this.showPreview(html);
+      this.setPreviewSelection(pState);
+    }
+
+    if (selected) {
+      await storage.cached.set('selected', selected);
+    }
+  }
+
+  protected async toggleSync() {
+    if (!this.new) {
+      this.selected.sync = this.noteView.sync.checked;
+      await storage.cached.set('selected', this.selected.toString());
+    }
+  }
+
+  protected save(title: string, description: string) {
+    if (this.selected && (this.selected.title !== title || this.selected.description !== description)) {
+      this.selected.title = title;
+      this.selected.description = description;
+      this.selected.save();
+      this.cacheList();
+    }
+  }
+  //#endregion
+
+  //#region Private-Members
   private render(items: DbNote[]) {
     var index: number = -1;
     var fragment = <DocumentFragment>document.createDocumentFragment();
@@ -135,17 +389,18 @@ export class Base {
 
     return fragment;
   }
+  //#endregion
 
-  public selectNew(description: string, selection?: string) {
-    this.noteView.editor.value = description;
-    this.noteView.editor.setSelection(selection);
+  protected async addNote() {
+    var note: Note = await this.createNote();
 
-    storage.set('new', 'true');
-    this.selected = undefined;
-    this.new = true;
+    if (note) {
+      this.new = false;
+      this.selectNote(note, false, true);
+    }
   }
-
-  protected createNote(): Note {
+  
+  protected async createNote(): Promise<Note> {
     var [title, description] = this.noteView.editor.getData();
 
     if (this.validate(title, true)) {
@@ -156,6 +411,7 @@ export class Base {
       note.title = title;
       note.description = description;
       note.cursor = this.noteView.editor.getSelection();
+      note.sync = this.noteView.sync.checked;
       note.save();
 
       this.notes.push(note);
@@ -169,230 +425,15 @@ export class Base {
       this.newView.cancel.style.display = 'None';
       this.newView.create.style.display = 'None';
       
-      storage.remove('new');
-      storage.remove('description');
-      storage.remove('selection');
+      await storage.cached.remove('new');
+      await storage.cached.remove('description');
+      await storage.cached.remove('selection');
       
       return note;
     }
   }
 
-  protected placeNote() {
-    var note: Note = this.createNote();
-
-    if (note) {
-      this.new = false;
-
-      this.selectNote(note, false, true);
-      this.cacheList();
-    }
-  }
-
   protected cancelCreation() {
     this.new = false;
-  }
-
-  protected selectNote(note: Note, bind?: boolean, save?: boolean) {
-    if (!Sorting.busy) {
-      let value = note.title + '\n' + note.description;
-
-      // TODO do we need this here?
-      this.showNote(value, bind, note.cursor, note.html, note.previewState);
-
-      this.selected = note;
-      this.noteView.preview.checked = note.preview;
-      this.noteView.sync.checked = this.selected.sync;
-
-      if (save) {
-        storage.set('selected', note.toString());
-      }
-    }
-  }
-
-  protected remove() {
-    if (this.selected) {
-      this.selected.remove();
-
-      for (let i = this.selected.index + 1; i < this.notes.length; i++) {
-        this.notes[i].index = i - 1;
-      }
-
-      this.notes.splice(this.selected.index, 1);
-      delete this.selected;
-
-      Note.saveQueue();
-      this.cacheList();
-    }
-  }
-
-  // TODO review events
-  protected previewClick() {
-    this.selected.preview = this.noteView.preview.checked;
-
-    if (this.noteView.preview.checked) {
-      var scrollTop = this.noteView.editor.scrollTop;
-
-      this.showPreview(this.noteView.editor.render());
-      this.noteView.html.scrollTop = scrollTop;
-
-      this.selected.html = this.noteView.html.innerHTML;
-    } else {
-      var scrollTop = this.noteView.html.scrollTop;
-
-      this.hidePreview();
-      this.noteView.editor.focus();
-      this.noteView.editor.scrollTop = scrollTop;
-
-      this.selected.html = null;
-      this.selected.previewState = null;
-    }
-
-    storage.set('selected', this.selected.toString());
-  }
-
-  protected syncClick() {
-    this.selected.sync = this.noteView.sync.checked;
-    storage.set('selected', this.selected.toString());
-  }
-
-  protected descriptionChanged() {
-    if (this.selected || this.selected === undefined) {
-      clearInterval(this.intervals.document);
-
-      this.intervals.document = setTimeout(() => {
-        var [title, description] = this.noteView.editor.getData();
-
-        if (this.validate(title)) {
-          if (this.selected) {
-            this.save(title, description);
-            storage.set('selected', this.selected.toString());
-          } else {
-            storage.set('description', title + '\n' + description);
-          }
-        }
-      }, 175);
-    }
-  }
-
-  protected previewStateChanged() {
-    if (this.selected && this.selected.preview) {
-      clearInterval(this.intervals.scroll);
-
-      this.intervals.scroll = setTimeout(() => {
-        let scrollTop = this.noteView.html.scrollTop;
-        let selection = NodeHelper.getSelection(this.noteView.html);
-
-        if (this.selected) {
-          this.selected.previewState = `${scrollTop}|${selection}`;
-          storage.set('selected', this.selected.toString());
-        }
-      }, 600);
-    }
-  }
-
-  protected cursorMoved() {
-    if (this.selected || this.selected === undefined) {
-      clearInterval(this.intervals.cursor);
-
-      this.intervals.cursor = setTimeout(() => {
-        if (this.selected) {
-          this.selected.selection = this.noteView.editor.getSelection();
-          storage.set('selected', this.selected.toString());
-          this.selected.cursor = this.noteView.editor.getCursor();
-        } else {
-          storage.set('selection', this.noteView.editor.getSelection());
-        }
-      }, 600);
-    }
-  }
-
-  protected saveHandler() {
-    if (this.new) {
-      this.placeNote();
-    } else if (this.selected) {
-      var [title, description] = this.noteView.editor.getData();
-
-      if (this.validate(title, true)) {
-        this.save(title, description);
-        storage.set('selected', this.selected.toString());
-      }
-    }
-  }
-
-  protected cancelHandler() {
-    if (this.new) {
-      this.cancelCreation();
-    }
-  }
-
-  protected save(title: string, description: string) {
-    if (this.selected && (this.selected.title !== title || this.selected.description !== description)) {
-      this.selected.title = title;
-      this.selected.description = description;
-      this.selected.save();
-      this.cacheList();
-    }
-  }
-
-  public unlock() {
-    this.noteView.sync.parentElement.addEventListener('mousedown', this.prevent.bind(this));
-    this.noteView.sync.addEventListener('click', this.syncClick.bind(this));
-    this.noteView.sync.removeAttribute('disabled');
-    this.noteView.sync.parentElement.setAttribute('title', 'sync note');
-  }
-
-  public showList() {
-
-  }
-
-  //TODO review params
-  public showNote(description: string, bind?: boolean, selection?: string, html?: string, pState?: string) {
-    
-  }
-
-  protected showPreview(value: string) {
-    this.noteView.editor.hide();
-    this.noteView.html.innerHTML = value;
-    this.noteView.html.style.display = 'inherit';
-  }
-
-  protected hidePreview() {
-    this.noteView.editor.show();
-    this.noteView.html.style.display = 'none';
-  }
-
-  protected setPreviewSelection(previewState?: string) {
-    if (previewState && previewState.length > 1) {
-      let [scrollTop, selection] = previewState.split('|');
-
-      this.noteView.html.scrollTop = Number(scrollTop) || 0;
-      NodeHelper.setSelection(selection, this.noteView.html);
-    } else {
-      this.noteView.html.scrollTop = 0;
-    }
-  }
-
-  protected validate(title: string, animate: boolean = false): boolean {
-    return !Validator.required(title, animate && this.noteView.editor.wrapper);
-  }
-
-  private prevent(e: MouseEvent) {
-    e.preventDefault();
-  }
-
-  // TODO review usage
-  protected cacheList(db: DbNote[] = null) {
-    var notes: (DbNote|Note)[] = db || this.notes;
-    var cache: (string|number)[] = [];
-
-    for (let i = 0; i < Math.min(21, notes.length); i++) {
-      const note = notes[i];
-
-      if (note) {
-        cache = cache.concat([note.id, note.title, note.updated]);
-      }
-    }
-
-    chrome.storage.local.set({cachedList: JSON.stringify(cache).replace(/^\[|\]$/gi, '')});
   }
 }

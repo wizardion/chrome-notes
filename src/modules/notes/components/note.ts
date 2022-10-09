@@ -1,5 +1,6 @@
 import {INoteControls, ISTNote} from './interfaces';
 import {DbNote} from '../../db/note';
+import { toIDBNoteString } from '../../../builder';
 
 
 export class Note {
@@ -56,6 +57,10 @@ export class Note {
     DbNote.saveQueue();
   }
 
+  public static addEventListener(event: (id: number) => void) {
+    DbNote.addEventListener(event);
+  }
+
   public set(note: (DbNote|ISTNote), index: number = null) {
     this.note.id = note.id;
     this.note.description = note.description;
@@ -99,6 +104,7 @@ export class Note {
       this.indexId = value;
       this.note.order = value + 1;
       this.controls.bullet.innerText = `${(this.note.order)}`;
+      this.note.updated = this.getTime();
       this.note.setOrder();
     }
   }
@@ -185,7 +191,7 @@ export class Note {
   }
 
   public set sync(value: boolean) {
-    this.note.sync = value? 1 : 0;
+    this.note.sync = value? true : false;
     this.updated = this.getTime();
     this.note.setSync();
   }
@@ -227,22 +233,7 @@ export class Note {
   }
 
   public toString(): string {
-    var note: ISTNote = {
-      index: this.index,
-      id: this.note.id || undefined,
-      title: this.note.title || undefined,
-      description: this.note.description || undefined,
-      sync: this.note.sync || undefined,
-      preview: this.note.preview || undefined,
-      cState: this.selectionState || undefined,
-      pState: this.note.pState || undefined,
-      html: this.note.html || undefined,
-      updated: this.note.updated || undefined,
-      order: undefined,
-      created: undefined
-    };
-
-    return JSON.stringify(note).replace(/^\{|\}$/gi, '');
+    return toIDBNoteString(this.note, this.index);
   }
 
   private createNew(index: number): DbNote {

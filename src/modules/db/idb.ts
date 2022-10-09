@@ -1,27 +1,23 @@
 import {IDBNote,IDBCommand} from './interfaces';
+import {Logger} from '../logger/logger';
 
-var database: IDBDatabase;
-var queueList: IDBCommand[] = [];
+const logger: Logger = new Logger('db.ts');
+var __database: IDBDatabase;
+var __queueList: IDBCommand[] = [];
 
-function logError(e: (Error|Event)) {
-  // @ts-ignoree
-  console.error('Database error: ', e.message || e.target.error || e.target.result || e.target);
+
+function logError(e: (Error|Event|any)) {
+  logger.error('DB ERROR', e.stack || e.message || e.cause || e, e.target);
 }
 
 function generateId(): number {
   return new Date().getTime();
 }
 
-function upgradeNeeded(event: Event) {
-  // @ts-ignore
-  var db:IDBDatabase = event.target.result;
-  // @ts-ignore
-  var request:IDBOpenDBRequest = event.target;
+function upgradeNeeded(db:IDBDatabase, request:IDBOpenDBRequest) {
   var objectStore:IDBObjectStore = null;
 
   if (!db.objectStoreNames.contains('notes')) {
-    //TODO use different type of ID
-    // objectStore = db.createObjectStore("notes", {autoIncrement : true, keyPath: "id",});
     objectStore = db.createObjectStore("notes", {autoIncrement : false, keyPath: "id",});
   } else {
     objectStore = request.transaction.objectStore('notes');
@@ -30,170 +26,182 @@ function upgradeNeeded(event: Event) {
   if (!objectStore.indexNames.contains('order')) {
     objectStore.createIndex("order", "order", {unique: false});
   }
-
-  // if (!objectStore.indexNames.contains('sync')) {
-  //   objectStore.createIndex("sync", "sync", {unique: false});
-  // }
 }
 
-function init(callback: Function, errorCallBack?: (e: (Error|Event)) => void) {
-  if (!database) {
-    var request = indexedDB.open('MyNotes', 1);
-    var eCallback = errorCallBack || logError;
-
-    request.onerror = eCallback;
-    request.onupgradeneeded = upgradeNeeded;
-
-    return request.onsuccess = (e: Event) => {
+function initDB(): Promise<IDBDatabase> {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    if (!__database) {
       try {
-        // @ts-ignore
-        database = e.target.result;
-        callback();
-      } catch (er) {
-        eCallback(er);
+        var request = indexedDB.open('MyNotes', 1);
+
+        request.onerror = reject;
+        request.onupgradeneeded = (e) => upgradeNeeded(
+            <IDBDatabase>(e.target as IDBOpenDBRequest).result, 
+            <IDBOpenDBRequest>e.target
+          );
+
+        return request.onsuccess = (e: Event) => {
+          try {
+            __database = (e.target as IDBRequest).result;
+            resolve(__database);
+          } catch (er) {
+            reject(er);
+          }
+        };
+      } catch (error) {
+        reject(error);
       }
-    };
-  }
-
-  callback();
-}
-
-function initObjectStore(callback: Function, mode: IDBTransactionMode, errorCallBack?: (e: (Error|Event)) => void) {
-  const eCallback = errorCallBack || logError;
-  var prommise: Function = () => {
-    try {
-      var transaction:IDBTransaction = database.transaction('notes', mode);
-
-      transaction.onerror = eCallback;
-      callback(transaction.objectStore("notes"));
-    } catch (er) {
-      eCallback(er);
     }
-  };
-
-  init(prommise, eCallback);
+  
+    resolve(__database);
+  });
 }
 
-function load(callback: Function, errorCallBack?: (e: (Error|Event)) => void) {
-  const eCallback = errorCallBack || logError;
-  var prommise: Function = (objectStore: IDBObjectStore) => {
+function initObjectStore(mode: IDBTransactionMode): Promise<IDBObjectStore> {
+  return new Promise<IDBObjectStore>(async (resolve, reject) => {
     try {
-      var index = objectStore.index("order");
-      var request = index.getAll();
+      var db = await initDB();
+      var transaction:IDBTransaction = db.transaction('notes', mode);
+
+      transaction.onerror = reject;
+      resolve(transaction.objectStore('notes'));
+    } catch (er) {
+      reject(er);
+    }
+  });
+}
+
+export function load(): Promise<IDBNote[]> {
+  return new Promise<IDBNote[]>(async (resolve, reject) => {
+    try {
+      var store: IDBObjectStore = await initObjectStore('readonly');
+      var index: IDBIndex = store.index('order');
+      var request: IDBRequest = index.getAll();
+  
+      request.onsuccess = (e: Event) => resolve(<IDBNote[]>(e.target as IDBRequest).result);
+      request.onerror = (e: Event) => {
+        logError(e); 
+        reject(e);
+      };
+    } catch (error) {
+      logError(error); 
+      reject(error);
+    }
+  });
+}
+
+export function get(id: number): Promise<IDBNote[]> {
+  return new Promise<IDBNote[]>(async (resolve, reject) => {
+    try {
+      var store: IDBObjectStore = await initObjectStore('readonly');
+      var index: IDBIndex = store.index('order');
+      var request: IDBRequest = index.get(id);
+  
+      request.onsuccess = (e: Event) => resolve(<IDBNote[]>(e.target as IDBRequest).result);
+      request.onerror = (e: Event) => {
+        logError(e); 
+        reject(e);
+      };
+    } catch (error) {
+      logError(error); 
+      reject(error);
+    }
+  });
+}
+
+export function add(item: IDBNote): Promise<number> {
+  return new Promise<number>(async (resolve, reject) => {
+    try {
+      var store:IDBObjectStore = await initObjectStore('readwrite');
+      var request: IDBRequest = store.add({...item, id: (!item.id || item.id < 1)? generateId() : item.id});
 
       // @ts-ignores
-      request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
-      request.onerror = eCallback;
-    } catch (er) {
-      eCallback(er);
+      request.onsuccess = (e: Event) => resolve(<number>e.target.result);
+      request.onerror = (e: Event) => {
+        logError(e); 
+        reject(e);
+      };
+    } catch (error) {
+      logError(error); 
+      reject(error);
     }
-  };
-
-  initObjectStore(prommise, 'readonly', eCallback);
+  });
 }
 
-// function getSync(callback: Function) {
-//   var prommise: Function = (objectStore: IDBObjectStore) => {
-//     var index = objectStore.index("order");
-//     var request = index.getAll();
-
-//     // @ts-ignores
-//     request.onsuccess = (e: Event) => {callback(<IDBNote[]>e.target.result);};
-//     request.onerror = logError;
-//   };
-
-//   initObjectStore(prommise, 'readonly');
-// }
-
-function add(item: IDBNote, callback?: Function, errorCallBack?: (e: (Error|Event)) => void) {
-  const eCallback = errorCallBack || logError;
-  var prommise: Function = (objectStore: IDBObjectStore) => {
+export function update(item: IDBNote, objectStore?: IDBObjectStore): Promise<void> {
+  return new Promise<void>(async (resolve, reject) => {
     try {
-      console.log('item', JSON.parse(JSON.stringify(item)));
+      var store:IDBObjectStore = objectStore || await initObjectStore('readwrite');
+      var request: IDBRequest = store.put(item);
 
-      item.id = item.id < 1? generateId() : item.id;
-      var request = objectStore.add(item);
-
-      if(callback) {
-        request.onsuccess = (e: Event) => callback(item.id);
-      }
-      
-      request.onerror = eCallback;
-    } catch (er) {
-      eCallback(er);
+      // @ts-ignores
+      request.onsuccess = (e: Event) => resolve();
+      request.onerror = (e: Event) => {
+        logError(e); 
+        reject(e);
+      };
+    } catch (error) {
+      logError(error); 
+      reject(error);
     }
-  };
-
-  initObjectStore(prommise, 'readwrite', eCallback);
+  });
 }
 
-// TODO review frequency
-function update(item: IDBNote, onsuccess?: () => void, errorCallBack?: (e: (Error|Event)) => void) {
-  const eCallback = errorCallBack || logError;
-  var prommise: Function = (objectStore: IDBObjectStore) => {
-    var request = objectStore.put(item);
-    request.onerror = eCallback;
-    request.onsuccess = onsuccess
-  };
+export function remove(item: (IDBNote|number)): Promise<void> {
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      var store:IDBObjectStore = await initObjectStore('readwrite');
+      var request: IDBRequest = store.delete(typeof(item) === 'number'? item : item.id);
 
-  initObjectStore(prommise, 'readwrite', eCallback);
+      // @ts-ignores
+      request.onsuccess = (e: Event) => resolve();
+      request.onerror = (e: Event) => {
+        logError(e); 
+        reject(e);
+      };
+    } catch (error) {
+      logError(error); 
+      reject(error);
+    }
+  });
 }
 
-function remove(id: number, errorCallBack?: (e: (Error|Event)) => void) {
-  const eCallback = errorCallBack || logError;
-  var prommise: Function = (objectStore: IDBObjectStore) => {
-    var request = objectStore.delete(id);
-
-    request.onerror = logError;
-  };
-
-  initObjectStore(prommise, 'readwrite', eCallback);
-}
-
-function enqueue(item: IDBNote, command: string) {
-  queueList.push({
+export function enqueue(item: IDBNote, command: string) {
+  __queueList.push({
     item: item,
     name: command
   });
 };
 
-function dequeue(errorCallBack?: (e: (Error|Event)) => void) {
-  var prommise: Function = (objectStore: IDBObjectStore) => {
-    queueList.forEach((command: IDBCommand) => {      
-      var request = objectStore.put(command.item);
+export function dequeue(): Promise<void> {
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      var store:IDBObjectStore = await initObjectStore('readwrite');
 
-      request.onerror = logError;
-    });
-
-    queueList.splice(0);
-  };
-
-  initObjectStore(prommise, 'readwrite', errorCallBack);
-}
-
-function exists(callback?: Function, errorCallBack?: (e: (Error|Event)) => void) {
-  indexedDB.databases().then((result) => {
-    for(let i = 0; i < result.length; i++) {
-      const db = result[0];
-
-      if (db.name === 'MyNotes') {
-        return callback(true);
+      while(__queueList.length) {
+        const command: IDBCommand = __queueList.shift();
+        
+        await update(command.item, store);
       }
-    }
 
-    callback(false);
-  }).catch(errorCallBack);
+      resolve();
+    } catch (error) {
+      logError(error); 
+      reject(error);
+    }
+  });
 }
 
-export default {
-  init: init,
-  load: load,
-  add: add,
-  update: update,
-  enqueue: enqueue,
-  // setField: () => {}, //setField,
-  dequeue: dequeue,
-  remove: remove,
-  // getSync: getSync,
-  exists: exists,
-};
+// function exists(callback?: Function, errorCallBack?: (e: (Error|Event)) => void) {
+//   indexedDB.databases().then((result) => {
+//     for(let i = 0; i < result.length; i++) {
+//       const db = result[0];
+
+//       if (db.name === 'MyNotes') {
+//         return callback(true);
+//       }
+//     }
+
+//     callback(false);
+//   }).catch(errorCallBack);
+// }

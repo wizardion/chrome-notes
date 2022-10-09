@@ -7,7 +7,7 @@
   <body>
     <a id="back" href="./popup.html" class="link back" style="display: none;">{{> ./images/back.xml}} Back</a>
 
-    <h4 class="title">Your notes' settings</h4>
+    <h4 class="title">Notes' settings</h4>
 
     <div class="row">
       <div class="left">View style:</div>
@@ -17,81 +17,113 @@
           <li><label><input type="radio" name="views" value="1"> Mixed</label></li>
           <li><label><input type="radio" name="views" value="2"> Compact</label></li>
           <li><label><input type="radio" name="views" value="3"> Browser Tab</label></li>
-          <li><label><input type="radio" name="views" value="4"> Window</label></li>
+          <!-- <li><label><input type="radio" name="views" value="4"> Window</label></li> -->
         </ul>
       </div>
     </div>
 
     <div class="row">
+      <fieldset id="sync-group">
+        <div>
+          <div class="left">Enable sync:</div>
+          <div class="right">
+            <label><input type="checkbox" name="sync" id="sync">Enable synchronization</label>
+            <span class="note">(browser <a href="https://support.google.com/chrome/answer/185277?hl=en&co=GENIE.Platform%3DDesktop" target="_blank">sync on</a> required).</span>
+            <div id="info" class="info hidden">
+              <span>
+                By enabling synchronization you need to enter your private password which will be used as your personal encryption key.<br>
+                This is necessary to keep your notes encrypted and secure. 
+                Please remember that key and keep it secure.<br/>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div id="key-info" class="hidden">
+          <div class="left">Your Key:</div>
+          <div class="right">
+              <div class="row-wrap">
+                <input type="button" id="generate" value="Generate">
+                <svg id="lock-indicator" class="locker" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" class="lock">
+                  <title id="locked-title-indicator">I'm a circle</title>
+                  <path id="locked-icon" fill-rule="evenodd" d="M4 4v2h-.25A1.75 1.75 0 002 7.75v5.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-5.5A1.75 1.75 0 0012.25 6H12V4a4 4 0 10-8 0zm6.5 2V4a2.5 2.5 0 00-5 0v2h5zM12 7.5h.25a.25.25 0 01.25.25v5.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-5.5a.25.25 0 01.25-.25H12z"></path>
+                  <path id="unlocked-icon" fill-rule="evenodd" d="M5.5 4a2.5 2.5 0 014.607-1.346.75.75 0 101.264-.808A4 4 0 004 4v2h-.501A1.5 1.5 0 002 7.5v6A1.5 1.5 0 003.5 15h9a1.5 1.5 0 001.5-1.5v-6A1.5 1.5 0 0012.5 6h-7V4zm-.75 3.5H3.5v6h9v-6H4.75z"></path>
+                </svg>
+                <input type="text" pattern="(?=.*[0-9])(?=.*[!#$%&'()*+,-./:;<=>?@\[\]^_`{|}~])(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9!#$%&'()*+,-./:;<=>?@\[\]^_`{|}~]{12,})" placeholder="Enter your password" spellcheck="false" class="key" name="id-key" id="id-key" value="">
+                <input type="button" class="submit small-space" id="save-changes" value="Save" disabled="disabled">
+                <input id="cancel-save" class="small-space" type="button" id="save-changes" value="Cancel" disabled="disabled">
+              </div>
+
+              <div id="validator-password" class="error"></div>
+              <div class="info" style="text-align: center;">
+                <span id="unlock-message" class="warning hidden">Data is locked. Please enter your password to unlock the data.</span>
+                <span>
+                  Should contain Letters, Mixed case, Punctuation, Numbers, Min length 12.
+                </span>
+              </div>
+              <!-- <div class="margin-top"><label><input type="checkbox" name="key-share" id="share-key">Share across all your devices.</span></label></div> -->
+              <!-- <div style="text-align: right;">
+                <div class="info" style="text-align: right;">
+                  <input type="button" class="submit" id="save-changes" value="Save" disabled="disabled">
+                  <input id="cancel-save" type="button" id="save-changes" value="Cancel" disabled="disabled">
+                </div>
+              </div> -->
+
+            </div>
+
+            <div class="left">Erase:</div>
+            <div class="right">
+              <div class="info no-margin-top">
+                <!-- <span>In cases where you are not able to unlock your data or just want to clear that up and start from scratch...<br>you can <a id="erase-data" href="#">erase all sync data</a>.</span><br> -->
+                <span>
+                  In cases where you are not able to unlock your data or just want to clear that up and start from scratch...
+                  <br>you can <a id="erase-data" href="#">erase all sync data and local settings.</a>.
+                </span>
+                <br>
+              </div>
+            </div>
+            
+            <!-- <div class="left">Lock:</div>
+            <div class="right">
+              <div class="info no-margin-top">
+                <span>In order to lock the sync data on this device press <a id="lock-data" href="#">lock sync data</a>.</span><br>
+              </div>
+            </div> -->
+            
+            <div class="left">Quotas:</div>
+            <div class="right">
+              <div class="info no-margin-top">
+                <div>
+                  <span>Storage:&nbsp;</span>
+                  <!-- <span class="progress-bar"><span id="progress-thumb" class="progress-thumb"></span></span> -->
+
+
+                  <div id="progress" class="progress-bar">
+                    <div id="progress-thumb" class="progress-thumb"></div>
+                  </div>
+
+                  <span>The last time sync was on: <span id="synced-time">...</span></span>
+                  <div>&nbsp;</div>
+                </div>
+                <span>The maximum length of each note is <span id="maxEach"></span>. If this size is exceeded, the note will be split into two elements, which will reduce the maximum amount of items.</span><br>
+                <span>The maximum amount of items that can be synchronized is: <span id="maxItems"></span></span><br>
+                <span>The total disk space of all notes that can be synchronized is: <span id="maxBytes"></span></span><br>
+              </div>
+            </div>
+        </div>
+
+      </fieldset>
+    </div>
+
+    <div class="row">
       <div>
-        <div class="left">Enable sync:</div>
+        <div class="left">Development:</div>
         <div class="right">
-          <label><input type="checkbox" name="sync" id="sync">Enable synchronization</label>
-          <span class="note">(browser <a href="https://support.google.com/chrome/answer/185277?hl=en&co=GENIE.Platform%3DDesktop" target="_blank">sync on</a> required).</span>
-          <div id="info" class="info hidden">
-            <span>
-              By enabling synchronization you need to enter your private password which will be used as your personal encryption key.<br>
-              This is necessary to keep your notes encrypted and secure. 
-              Please remember that key and keep it secure.<br/>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div id="key-info" class="hidden">
-        <div class="left">Your Key:</div>
-        <div class="right">
-          
-          <input type="button" id="generate" value="Generate">
-          <!-- <div id="sync-indicator" title="sync is processing" class="sync-indicator hidden2">&nbsp;</div> -->
-          <svg id="lock-indicator" class="locker" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" class="lock">
-            <title id="locked-title-indicator">I'm a circle</title>
-            <circle id="sync-indicator" cx="8" cy="10.5" r="2" class="sync-indicator red hidden" title="sync is processing"/>
-            <path id="locked-icon" fill-rule="evenodd" d="M4 4v2h-.25A1.75 1.75 0 002 7.75v5.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-5.5A1.75 1.75 0 0012.25 6H12V4a4 4 0 10-8 0zm6.5 2V4a2.5 2.5 0 00-5 0v2h5zM12 7.5h.25a.25.25 0 01.25.25v5.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-5.5a.25.25 0 01.25-.25H12z"></path>
-            <path id="unlocked-icon" fill-rule="evenodd" d="M5.5 4a2.5 2.5 0 014.607-1.346.75.75 0 101.264-.808A4 4 0 004 4v2h-.501A1.5 1.5 0 002 7.5v6A1.5 1.5 0 003.5 15h9a1.5 1.5 0 001.5-1.5v-6A1.5 1.5 0 0012.5 6h-7V4zm-.75 3.5H3.5v6h9v-6H4.75z"></path>
-          </svg>
-          <input type="text" pattern="(?=.*[0-9])(?=.*[!#$%&'()*+,-./:;<=>?@\[\]^_`{|}~])(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9!#$%&'()*+,-./:;<=>?@\[\]^_`{|}~]{12,})" placeholder="Enter your password" spellcheck="false" class="key" name="id-key" id="id-key" value="">
-          <div id="validator-password" class="error" style="margin-left: 80px;"></div>
-          <div class="info" style="text-align: center;">
-            <span id="unlock-message" class="warning hidden" style="margin-left: 80px;">Data is locked. Please enter your password to unlock the data.</span>
-            <span style="margin-left: 80px;">
-              Should contain Letters, Mixed case, Punctuation, Numbers, Min length 12.
-            </span>
-          </div>
-          <!-- <div class="margin-top"><label><input type="checkbox" name="key-share" id="share-key">Share across all your devices.</span></label></div> -->
-          <div id="save-changes-block" style="text-align: right;" class="hidden">
-            <div class="info" style="text-align: right;">
-              <input type="button" class="submit" id="save-changes" value="Save">
-              <input id="cancel-save" type="button" class="submit1 hidden" id="save-changes" value="Cancel">
-            </div>
-          </div>
-        </div>
-
-        <div class="left">Erase:</div>
-        <div class="right">
-          <div class="info no-margin-top">
-            <span>In cases where you are not able to unlock your data or just want to clear that up and start from scratch...<br>you can <a id="erase-data" href="#">erase all sync data</a>.</span><br>
-          </div>
-        </div>
-        
-        <!-- <div class="left">Lock:</div>
-        <div class="right">
-          <div class="info no-margin-top">
-            <span>In order to lock the sync data on this device press <a id="lock-data" href="#">lock sync data</a>.</span><br>
-          </div>
-        </div> -->
-        
-        <div class="left">Quotas:</div>
-        <div class="right">
-          <div class="info no-margin-top">
-            <div>
-              <span>Storage:&nbsp;</span>
-              <span class="progress-bar"><span id="progress-thumb" class="progress-thumb"></span></span>
-              <div>&nbsp;</div>
-            </div>
-            <span>The maximum length of each note is <span id="maxEach"></span>. If this size is exceeded, the note will be split into two elements, which will reduce the maximum amount of items.</span><br>
-            <span>The maximum amount of items that can be synchronized is: <span id="maxItems"></span></span><br>
-            <span>The total disk space of all notes that can be synchronized is: <span id="maxBytes"></span></span><br>
+          <label><input type="checkbox" name="sync" id="dev-mode">Enable development mode</label>
+          <!-- <span class="note">(browser <a href="https://support.google.com/chrome/answer/185277?hl=en&co=GENIE.Platform%3DDesktop" target="_blank">sync on</a> required).</span> -->
+          <div id="dev-info" class="info hidden">
+            <span>In order you need to send the logs for the developer you will need to <a id="print-logs" href="#">print the logs</a><br>and copy all details into a ticket.</span>
+            <span> To clear logs history press <a id="clear-logs" href="#">clear the logs.</a></span><br>
           </div>
         </div>
       </div>

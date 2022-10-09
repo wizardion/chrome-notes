@@ -41,17 +41,20 @@ export class FullScreen extends Mixed {
     super.build(notes);
 
     window.addEventListener('resize', this.screenResize.bind(this));
-    // this.mode = Number(storage.get('mode', true) || '0');
+    // storage.cached.get('mode').then((mode) => {
+    //   console.log('mode', mode);
+    //   this.mode = Number(mode);
+    // });
   }
 
   protected timer() {
-    this.saveScreenPossition();
+    this.saveScreenPosition();
   }
 
   protected screenResize() {
     if (this.noteView.editor) {
       this.noteView.editor.refresh();
-      this.saveScreenPossition();
+      this.saveScreenPosition();
     }
   }
 
@@ -64,7 +67,9 @@ export class FullScreen extends Mixed {
     }});
   }
 
-  protected saveScreenPossition() {
+  protected saveScreenPosition() {
+    console.log('this.mode',this.mode);
+
     if (this.mode === 4 && chrome && chrome.storage) {
       chrome.storage.local.set({window: {
         top: window.screenTop,

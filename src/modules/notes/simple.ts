@@ -1,4 +1,3 @@
-import {NodeHelper} from './components/node-helper';
 import {Base} from './base';
 import {IListView, INewNoteView, INoteView} from './components/interfaces';
 import {Validator} from './components/validation';
@@ -25,7 +24,7 @@ export class Simple extends Base {
     }
   }
 
-  public selectNew(description: string, selection?: string) {
+  public async selectNew(description: string, selection?: string) {
     this.listView.node.style.display = 'None';
     this.newView.node.style.display = 'inherit';
 
@@ -34,10 +33,12 @@ export class Simple extends Base {
 
     this.noteView.back.style.display = 'none';
     this.noteView.delete.style.display = 'none';
-    this.noteView.sync.parentElement.style.display = 'none';
+    // this.noteView.sync.parentElement.style.display = 'none';
     this.noteView.preview.parentElement.style.display = 'none';
 
     // this.noteView.preview.checked = false;
+    this.noteView.sync.parentElement.classList.add('short');
+    this.noteView.sync.checked = false;
     super.selectNew(description, selection);
   }
 
@@ -49,17 +50,17 @@ export class Simple extends Base {
     this.showList();
   }
 
-  protected remove() {
+  protected async remove() {
     super.remove();
     this.showList();
   }
 
-  public showList() {
+  public async showList() {
     this.listView.node.style.display = 'inherit';
     this.noteView.node.style.display = 'None';
 
     this.hidePreview();
-    storage.clear();
+    storage.cached.clear();
 
     if (this.selected) {
       this.selected.element.scrollIntoView({block: 'center'});
@@ -69,22 +70,14 @@ export class Simple extends Base {
     this.selected = null;
   }
 
-  public showNote(description: string, bind?: boolean, selection?: string, html?: string, pState?: string) {
+  public showNote() {
     this.listView.node.style.display = 'None';
     this.noteView.node.style.display = 'inherit';
     this.noteView.back.style.display = 'inherit';
     this.noteView.delete.style.display = 'inherit';
-    this.noteView.sync.parentElement.style.display = 'inherit';
+    // this.noteView.sync.parentElement.style.display = 'inherit';
     this.noteView.preview.parentElement.style.display = 'inherit';
 
-    if (bind) {
-      this.noteView.editor.value = description;
-      this.noteView.editor.setSelection(selection);
-
-      if (html) {
-        this.showPreview(html);
-        this.setPreviewSelection(pState);
-      }
-    }
+    this.noteView.sync.parentElement.classList.remove('short');
   }
 }

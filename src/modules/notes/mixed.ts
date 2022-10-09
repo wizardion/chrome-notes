@@ -25,7 +25,7 @@ export class Mixed extends Base {
     super.selectFromCache(note);
 
     if (this.selected && !this.new) {
-      this.selected.element.scrollIntoView({block: 'nearest'});
+      this.scrollIntoElement(this.listView.items, this.selected.element);
     }
   }
 
@@ -37,13 +37,11 @@ export class Mixed extends Base {
     }
 
     if (this.selected && !this.new) {
-      setTimeout(() => {
-        this.selected.element.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-      }, 100);
+      this.scrollIntoElement(this.listView.items, this.selected.element);
     }
   }
 
-  public selectNew(description: string, selection?: string) {
+  public async selectNew(description: string, selection?: string) {
     this.newView.cancel.style.display = 'inherit';
     this.newView.create.style.display = 'inherit';
     this.noteView.delete.style.display = 'none';
@@ -65,7 +63,7 @@ export class Mixed extends Base {
     this.newView.create.style.display = 'None';
     this.listView.addButton.style.visibility = '';
 
-    storage.clear();
+    storage.cached.clear();
     this.new = false;
 
     if (this.notes.length) {
@@ -82,8 +80,8 @@ export class Mixed extends Base {
     }
   }
 
-  protected placeNote() {
-    var note: Note = this.createNote();
+  protected async addNote() {
+    var note: Note = await this.createNote();
 
     if (note) {
       this.listView.addButton.style.visibility = '';
@@ -97,10 +95,10 @@ export class Mixed extends Base {
     }
   }
 
-  protected remove() {
+  protected async remove() {
     var index = this.selected.index;
 
-    storage.clear();
+    storage.cached.clear();
     super.remove();
     this.hidePreview();
 
@@ -125,23 +123,13 @@ export class Mixed extends Base {
     this.select(note, bind, save);
   }
 
-  public showNote(description: string, bind?: boolean, selection?: string, html?: string, pState?: string) {
+  public showNote() {
     this.noteView.delete.style.display = 'inherit';
     this.noteView.sync.parentElement.style.display = 'inherit';
     this.noteView.preview.parentElement.style.display = 'inherit';
 
     if (!this.noteView.editor.displayed) {
       this.noteView.editor.show();
-    }
-
-    if (bind) {
-      this.noteView.editor.value = description;
-      this.noteView.editor.setSelection(selection);
-
-      if (html) {
-        this.showPreview(html);
-        this.setPreviewSelection(pState);
-      }
     }
   }
 
@@ -156,10 +144,18 @@ export class Mixed extends Base {
       this.selected.element.classList.remove('selected');
       // this.save(title, description);
       this.hidePreview();
-      storage.clear();
+      storage.cached.clear();
     }
 
     super.selectNote(note, bind, save);
     this.selected.element.classList.add('selected');
+  }
+
+  private scrollIntoElement(container: HTMLElement, element: HTMLElement) {
+    let max = container.scrollHeight - container.offsetHeight;
+
+    if ((element.offsetTop + element.offsetHeight) > container.offsetHeight) {
+      container.scrollTop = Math.min(Math.max(element.offsetTop - element.offsetHeight, 0), max);
+    }
   }
 }

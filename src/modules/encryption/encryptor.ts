@@ -16,6 +16,16 @@ export class Encryptor {
   }
 
   //#region  private 
+  private toBase(buffer: Uint8Array): string {
+    // return base.encode(buffer);
+    return btoa(String.fromCharCode.apply(null, buffer));
+  }
+
+  private fromBase(message: string): Uint8Array {
+    // return base.decode(message);
+    return Uint8Array.from(atob(message), (c) => c.charCodeAt(null));
+  }
+
   private getSecrets(password: string, code: number = null, position:  number = null): Uint8Array[] {
     let buffer: Uint8Array = this.encoder.encode(password);
     let secret: Uint8Array = new Uint8Array(buffer.length + 1);
@@ -48,7 +58,7 @@ export class Encryptor {
   }
 
   protected decode(value: string): Uint8Array[] {
-    const buff: Uint8Array = Uint8Array.from(atob(value), (c) => c.charCodeAt(null));
+    const buff: Uint8Array = this.fromBase(value);
     let method: number = buff[2];
     var salt, iv, data;
 
@@ -107,7 +117,7 @@ export class Encryptor {
       ld.push(<number>element)
     }
     
-    return btoa(String.fromCharCode.apply(null, buff));
+    return this.toBase(buff);
   }
   //#endregion
   

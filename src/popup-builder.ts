@@ -48,16 +48,3 @@ export function buildEditor(mode: number): Base {
 
   return new Simple(listView, noteView, newView);
 }
-
-export function getSelected(selected: string): ISTNote {
-  if (selected) {
-    let note: ISTNote = <ISTNote>JSON.parse(`{${selected}}`);
-
-    note.title = note.title || '';
-    note.description = note.description || '';
-
-    return note;
-  }
-
-  return null;
-}

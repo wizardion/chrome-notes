@@ -1,12 +1,12 @@
-import idb from '../db/idb';
+import * as idb from '../db/idb';
 import {IDBNote} from '../db/interfaces';
 
 
-export function migrate(data: string): boolean {
+export async function migrate(data: string): Promise<boolean> {
   var notes = fromString(data);
   
   for(var i = 0; i < notes.length; i++){
-      idb.add(notes[i]);
+      await idb.add(notes[i]);
   }
 
   return !!notes;

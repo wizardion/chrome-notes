@@ -1,20 +1,21 @@
 import {IDBNote} from './interfaces'
-import idb from './idb';
+import * as idb from './idb';
 
+var onNoteAdded: (id: number) => void;
 
 export class DbNote implements IDBNote {
   public id: number;
   public title: string;
   public description: string;
   public order: number;
-  public sync: number;
+  public sync: boolean;
   public preview: boolean;
   public cState: string;
   public pState: string;
   public html: string;
   public updated: number;
   public created: number;
-
+  
   constructor(item: IDBNote) {
     this.id = item.id;
     this.title = item.title;
@@ -28,7 +29,7 @@ export class DbNote implements IDBNote {
     this.pState = item.pState   || null;
     this.html = item.html       || null;
     
-    this.sync = (item.sync === undefined || item.sync === null)? 0 : item.sync;
+    this.sync = (item.sync === undefined || item.sync === null)? false : item.sync;
   }
 
   public static saveQueue() {
@@ -39,7 +40,7 @@ export class DbNote implements IDBNote {
     if (this.id && this.id > 0) {
       idb.update(this.toDBNote());
     } else {
-      idb.add(this.toDBNote(), this.noteAdded.bind(this));
+      idb.add(this.toDBNote()).then(this.noteAdded.bind(this));
     }
   }
 
@@ -93,8 +94,16 @@ export class DbNote implements IDBNote {
     }
   }
 
-  private noteAdded(id: number){
+  private async noteAdded(id: number){
     this.id = id;
+
+    if (onNoteAdded)  {
+      onNoteAdded(id);
+    }
+  }
+
+  public static addEventListener(event: (id: number) => void) {
+    onNoteAdded = event;
   }
 
   private toDBNote(): IDBNote {

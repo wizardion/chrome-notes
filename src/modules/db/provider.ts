@@ -1,4 +1,4 @@
-import idb from './idb';
+import * as idb from './idb';
 import {DbNote} from './note';
 import {IDBNote} from './interfaces'
 
@@ -26,20 +26,19 @@ export function loadFromCache(list?: string): DbNote[] {
   return notes;
 }
 
-export function loadAll(callback: Function) {
+export async function loadAll() {
   var notes: DbNote[] = [];
+  var result: IDBNote[] = await idb.load();
 
-  idb.load((result: IDBNote[]) => {
-    for(var i = 0; i < result.length; i++) {
-      const item = result[i];
+  for(var i = 0; i < result.length; i++) {
+    const item = result[i];
 
-      if (!item.deleted && !item.locked) {
-        notes.push(new DbNote(item));
-      }
+    if (!item.deleted && !item.locked) {
+      notes.push(new DbNote(item));
     }
-    
-    callback(notes);
-  });
+  }
+  
+  return notes;
 }
 
 export function toJSONString(notes: string[]): string {

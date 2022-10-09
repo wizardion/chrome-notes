@@ -1,33 +1,18 @@
 import * as sync from './modules/sync/sync';
 import {migrate} from './modules/storage/migrate';
-import idb from './modules/db/idb';
-import { IDBNote } from './modules/db/interfaces';
-import * as logger from './modules/logger/logger';
+import {Logger} from './modules/logger/logger';
+import storage from './modules/storage/storage';
 
 
-const __periodInMinutes: number = 20;
-const colors = {
-  RED: '\x1b[31m%s\x1b[0m',
-  GREEN: '\x1b[32m%s\x1b[0m',
-  BLUE: '\x1b[34m%s\x1b[0m',
-};
+type StorageChange = chrome.storage.StorageChange;
+type AreaName = chrome.storage.AreaName;
+const logger: Logger = new Logger('background.ts', 'green');
+const __periodInMinutes: number = 2; //20;
 
-function TEraseData() {
-  chrome.storage.local.clear().finally(() => {
-    chrome.storage.sync.clear().finally(async() => {
-      idb.load((data: IDBNote[]) => {
-        for (let i = 0; i < data.length; i++) {
-          const element = data[i];
 
-          element.locked = false;
-          element.inCloud = false;
-          idb.update(element); 
-        }
-        
-        chrome.tabs.create({url: chrome.runtime.getURL('options.html')});
-      });
-    });
-  });
+async function TEraseData() {
+  chrome.tabs.create({url: chrome.runtime.getURL('options.html')});
+  storage.cached.clear();
 }
 
 interface IWindow {
@@ -37,44 +22,42 @@ interface IWindow {
   height: number;
 }
 
-var _time_: number;
-
 chrome.runtime.onInstalled.addListener(() => {
-  TEraseData();
-  chrome.alarms.clearAll();
+  // chrome.alarms.clearAll();
+  chrome.alarms.clear('alert');
   chrome.alarms.create('alert', {periodInMinutes: 1});
-  chrome.alarms.create('sync', {periodInMinutes: __periodInMinutes});
+
   chrome.storage.local.remove('logs');
 
   logger.clear().then(() => {
-    logger.put(colors.GREEN, '\t\t=> app installed!');
+    logger.info('\t\t=> app installed!');
   });
 
-  chrome.storage.local.get(['mode', 'migrate', 'oldNotes', 'syncEnabled', 'internalKey', 'shareKey', 'appId'], function(result) {
-    if (!result.appId) {
-      sync.initApp();
+  chrome.storage.local.get(['migrate', 'oldNotes', 'syncEnabled', 'internalKey', 'shareKey', 'applicationId'], 
+                            async function(result) {
+    if (!result.applicationId) {
+      sync.initApplication();
     }
 
     if (result.migrate && result.oldNotes) {
-      migrate(result.oldNotes);
+      await migrate(result.oldNotes);
       return chrome.storage.local.clear();
     }
     
     if (result.migrate) {
       chrome.action.setPopup({popup: ''}, ()=>{});
-      chrome.storage.local.set({mode: 4});
+      await storage.cached.set('mode', 5, true);
       return chrome.tabs.create({url: chrome.runtime.getURL('migration.html')});
     }
 
-    setPopup(Number(result.mode));
-    chrome.storage.onChanged.addListener(eventOnStorageChanged);
+    TEraseData();
+    await chrome.storage.local.remove('syncProcessing');
+    setPopup((await storage.cached.get('mode')).mode.value || 0);
     startSync();
   });
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm:chrome.alarms.Alarm) => {
-  _time_ = new Date().getTime();
-
   if (alarm.name === 'sync') {
     let local = await chrome.storage.local.get(['syncProcessing']);
 
@@ -83,92 +66,51 @@ chrome.alarms.onAlarm.addListener(async (alarm:chrome.alarms.Alarm) => {
 
       if (minutes >= (__periodInMinutes * 2)) {
         await chrome.storage.local.remove('syncProcessing');
+        await logger.warn('looks like last sync was terminated', minutes);
       }
     }
 
-    return startSync();
+    await startSync();
   }
 
-  chrome.storage.local.get(['mode'], function(result) {
-    setPopup(Number(result.mode));
-  });
-});
-
-chrome.action.onClicked.addListener(() => {
-  chrome.storage.local.get(['mode', 'window', 'migrate', 'tabInfo'], function(result) {
-    let mode: number = Number(result.mode);
-    let window: IWindow = result.window;
-
-    if (result.migrate) {
-      return openMigration();
-    }
-
-    if (result.tabInfo) {
-      findTab(result.tabInfo.id, (tab: chrome.tabs.Tab) => {
-        openPopup(mode, window, tab.id, tab.windowId);
-      }, () => {
-        openPopup(mode, window);
-      });
-    } else {
-      openPopup(mode, window);
-    }
-  });
-});
-
-chrome.runtime.onMessage.addListener((message: string, sender: any, sendResponse: (response?: any) => void) => {
-  if (message === 'get-sync-status') {
-    sendResponse({status2: sync.wait()});
+  if (alarm.name === 'alert') {
+    let cache = await storage.cached.get('mode');
+    setPopup(Number(cache.mode.value || 0));
   }
 });
 
-chrome.runtime.onConnect.addListener(() => {
-  logger.put(colors.RED, 'onConnect');
-});
+chrome.action.onClicked.addListener(async () => {
+  var local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo']);
+  let mode: number = (await storage.cached.get('mode')).mode.value || 0;
+  let window: IWindow = local.window;
 
-chrome.runtime.onStartup.addListener(() => {
-  logger.put(colors.RED, 'onStartup');
-});
-
-chrome.runtime.onSuspend.addListener(() => {
-  logger.put(colors.RED, 'onSuspend');
-});
-
-chrome.runtime.onSuspendCanceled.addListener(() => {
-  logger.put(colors.RED, 'onSuspendCanceled');
-});
-
-chrome.runtime.onSuspend.addListener(() => {
-  logger.put("Unloading.");
-  // chrome.browserAction.setBadgeText({text: ""});
-});
-
-
-function eventOnStorageChanged(changes: {[key: string]: chrome.storage.StorageChange}, namespace: chrome.storage.AreaName) {
-  if (namespace === 'local') {
-    for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
-      if (key === 'mode' && oldValue !== newValue) {
-        logger.put('storage.onChanged.mode:', oldValue, newValue);
-        setPopup(Number(newValue));
-      }
-
-      // if (1) {
-      //   logger.put('\t:::key', key);
-      //   // 
-      // }
-
-      if (key === 'internalKey' && oldValue && newValue && oldValue !== newValue) {
-        let promise: Promise<void> = sync.wait();
-
-        promise.finally(() => {
-          sync.resync(oldValue, newValue);
-        });
-      }
-    }
+  if (local.migrate) {
+    return openMigration();
   }
 
-  if (namespace === 'sync') {
-    sync.onStorageChanged(changes, namespace);
+  if (local.tabInfo) {
+    var tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
+
+    openPopup(mode, window, tab && tab.id, tab && tab.windowId);
+  } else {
+    openPopup(mode, window);
   }
+});
+
+chrome.storage.onChanged.addListener((changes: {[key: string]: StorageChange}, namespace: AreaName) => {
+  if (namespace === 'sync' && changes.message && changes.message.newValue) {
+    sync.onMessage(changes.message.newValue).catch(logError);
+  }
+});
+
+async function logError(e: Error) {
+  // console.log('background:e', e);
+  // console.trace('background:e', e.stack);
+  // console.log('background:e', {'v': e.stack.toString()});
+  // console.log('-------------------------------------------------------------');
+  // @ts-ignoree
+  await logger.error('Background ERROR', e.stack || e.message || e.cause || e, e.target);
+  // await logger.error('Background ERROR', e.stack);
 }
 
 function setPopup(mode: number) {
@@ -179,18 +121,16 @@ function setPopup(mode: number) {
   }
 }
 
-function findTab(tabId: number, found: Function, defaults?: Function) {
-  chrome.tabs.query({}, function (tabs) {
-    for(let i = 0; i < tabs.length; i++) {
-      if (tabs[i].id === tabId) {
-        return found(tabs[i]);
-      }
-    }
+async function findTab(tabId: number): Promise<chrome.tabs.Tab> {
+  var tabs = await chrome.tabs.query({});
 
-    if (defaults) {
-      defaults();
+  for(let i = 0; i < tabs.length; i++) {
+    if (tabs[i].id === tabId) {
+      return tabs[i];
     }
-  });
+  }
+
+  return null;
 }
 
 function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: number) {
@@ -247,22 +187,20 @@ function openMigration() {
   });
 }
 
-function startSync(): Promise<void> {
-  logger.put(colors.GREEN, '=>=>=> start Sync... lastError: ', chrome.runtime.lastError);
-
-  sync.isBusy().then((busy: boolean) => {
+async function startSync() {
+  try {
+    await logger.addLine();
+    await logger.info('=>=>=> start Sync... lastError: ', chrome.runtime.lastError);
+    var busy: boolean = await sync.isBusy();
 
     if (!busy) {
-      sync.start().finally(() => {
-        chrome.storage.sync.getBytesInUse().then((bytes: number) => {
-          logger.put('bytes: ', bytes, chrome.storage.sync.QUOTA_BYTES);
-          logger.put(colors.GREEN, '=>=>=> Sync is completed!');
-        });
-      });
+      await sync.start();
+      await logger.info('=>=>=> Sync is completed, bytes: ', 
+                        await chrome.storage.sync.getBytesInUse(), chrome.storage.sync.QUOTA_BYTES, '!');
     } else {
-      logger.put(colors.GREEN, '... busy');
+      await logger.info('... busy');
     }
-  });
-
-  return Promise.resolve();
+  } catch (error) {
+    await logError(error);
+  }
 }
