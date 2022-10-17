@@ -1,20 +1,33 @@
+import {IStorageValue} from "./interfaces";
+
 
 class CachedStorage {
   // private static storage: Storage = (typeof(localStorage) !== 'undefined') && localStorage;
   private static storage: Storage = null;
 
-  public static async set(key: string, value: (string|number|object), permanent: boolean = false) {
+  public static async set(key: string, value: (string|number|object)) {
     if (!value && value !== 0) {
       return this.remove(key);
     }
 
     let cache = (await chrome.storage.local.get('cache') || {}).cache || {};
-    cache[key] = {value: value, permanent: permanent};
+    cache[key] = {value: value, permanent: false};
     await chrome.storage.local.set({cache: cache});
     this.storage && this.storage.setItem('cache', JSON.stringify(cache));
   }
 
-  public static async get(key?: string): Promise<{[key: string]: {value: any, permanent: boolean}}> {
+  public static async permanent(key: string, value: (string|number|object)) {
+    if (!value && value !== 0) {
+      return this.remove(key);
+    }
+
+    let cache = (await chrome.storage.local.get('cache') || {}).cache || {};
+    cache[key] = {value: value, permanent: true};
+    await chrome.storage.local.set({cache: cache});
+    this.storage && this.storage.setItem('cache', JSON.stringify(cache));
+  }
+
+  public static async get(key?: string): Promise<IStorageValue> {
     let cache = this.storage? JSON.parse(this.storage.getItem('cache') || '{}') : 
         (await chrome.storage.local.get('cache') || {}).cache || {};
 
@@ -25,26 +38,20 @@ class CachedStorage {
     return cache;
   }
 
-  public static async clear(permanent?: boolean) {
-    if (!permanent) {
-      let cache = (await chrome.storage.local.get('cache') || {}).cache || {};
-      var keys: string[] = Object.keys(cache);
-  
-      for(let i = 0; i < keys.length; i++) {
-        const key: string = keys[i];
-  
-        if (!cache[key].permanent) {
-          delete cache[key];
-        }
-      }
+  public static async clear() {
+    let cache = (await chrome.storage.local.get('cache') || {}).cache || {};
+    var keys: string[] = Object.keys(cache);
 
-      await chrome.storage.local.set({cache: cache});
-      this.storage && this.storage.setItem('cache', JSON.stringify(cache));
-      return;
+    for(let i = 0; i < keys.length; i++) {
+      const key: string = keys[i];
+
+      if (!cache[key].permanent) {
+        delete cache[key];
+      }
     }
 
-    await chrome.storage.local.remove('cache');
-    this.storage && this.storage.removeItem('cache');
+    await chrome.storage.local.set({cache: cache});
+    this.storage && this.storage.setItem('cache', JSON.stringify(cache));
   }
 
   public static async remove(key: string) {
@@ -57,8 +64,14 @@ class CachedStorage {
     await chrome.storage.local.set({cache: cache});
     this.storage && this.storage.setItem('cache', JSON.stringify(cache));
   }
+
+  public static async empty() {
+    await chrome.storage.local.remove('cache');
+    this.storage && this.storage.removeItem('cache');
+  }
 }
 
 export default {
-  cached: CachedStorage
+  cached: CachedStorage,
+  // local: LocalStorage
 };

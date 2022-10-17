@@ -8,10 +8,12 @@ import {fromIDBNoteString, toIDBNoteString} from '../../builder';
 
 
 const logger: Logger = new Logger('lib.ts');
+const __maxItems: number = (chrome.storage.sync.MAX_ITEMS - 12);
+const __delay: number = 2100;
+
 var __promise: Promise<void> = null;
 var __applicationId: number = null;
-var __maxItems: number = 0;
-const __delay: number = 2100;
+var __chunks: {[id: string]: {count: number}} = {};
 
 
 export function errorLogger(e: Error) {
@@ -43,7 +45,7 @@ export async function startProcess(decorator: IPromiseDecorator): Promise<void> 
     __promise = new Promise<void>(decorator);
     __promise.finally(async () => {
       __promise = null;
-      __maxItems = 0;
+      __chunks = {};
       await chrome.storage.local.set({syncProcessing: null});
     }).catch(errorLogger);
 
@@ -81,45 +83,61 @@ export function wait(): Promise<void> {
   });
 }
 
-export function subtractItems(value: number) {
-  __maxItems -= value;
+export function chunk(id: number, value?: number) {
+  if (value) {
+    let chunk = __chunks[id] || {count: 0};
+    
+    chunk.count = value;
+    __chunks[id] = chunk;
+  } else if (__chunks[id]) {
+    delete __chunks[id];
+  }
 }
 
-export function addItems(value: number) {
-  __maxItems += value;
+function chunks() {
+  let count: number = 0;
+
+  Object.keys(__chunks).forEach(key => count += __chunks[key].count);
+  return count;
 }
 
 export function unzip(data: {[key: string]: any}): ISyncNote[] {
   const tester: RegExp = /^item\_[\d]+_\d+$/;
   var buff: {[key: number]: ISyncNote} = {};
   var notes: ISyncNote[] = [];
-  __maxItems = (chrome.storage.sync.MAX_ITEMS - 12);
 
-  Object.keys(data).sort().forEach(key => {
-    if (tester.test(key)) {
-      const item: ISyncNote = <ISyncNote>{...data[key]};
-      const id: number = parseInt(key.split('_')[1]);
-      var tmp: ISyncNote = buff[id];
+  Object.keys(data)
+    .filter(n => tester.test(n))
+    .map(key => {
+      let [_, id, chunk] = key.split('_');
+      return {
+        'id': Number(id),
+        'chunk': Number(chunk),
+        'key': key
+      }
+    })
+    .sort((a, b) => ((a.id - b.id) - (b.chunk - a.chunk)))
+    .forEach(pair => {
+      const item: ISyncNote = <ISyncNote>{...data[pair.key]};
+      var tmp: ISyncNote = buff[pair.id];
 
       if (!tmp) {
         tmp = item;
-        tmp.i = id;
+        tmp.i = pair.id;
         tmp.chunks = 1;
-        buff[id] = tmp;
+        buff[pair.id] = tmp;
+        __chunks[pair.id] = {count: 1};
       } else {
-        tmp.d += item.d
+        tmp.d += item.d;
         tmp.chunks += 1;
+        __chunks[pair.id].count += 1;
       }
-
-      __maxItems -= 1;
-    }
-  });
+    });
 
   Object.keys(buff).forEach(key => {
     notes.push(<ISyncNote>buff[parseInt(key)]);
   });
 
-  // logger.info('unzip', {'data': data}, notes, 'max_items', __maxItems);
   return notes;
 }
 
@@ -218,6 +236,7 @@ export async function unlockData(map: {[key: number]: ISyncPair}) {
 export async function updateCaches() {
   logger.info('------------- updateCaches -------------');
   var cache = await storage.cached.get();
+  var local = await chrome.storage.local.get('restItems');
   var notes: IDBNote[] = (await idb.load() || []).filter(n => !n.locked);
 
   logger.info('updateCaches.notes', JSON.parse(JSON.stringify(notes)));
@@ -229,7 +248,7 @@ export async function updateCaches() {
     logger.info('updateCaches.selected', JSON.parse(JSON.stringify(selected)), 'index:', index);
 
     if (index >= 0) {
-      logger.info('updateCaches.toIDBNoteString', toIDBNoteString(notes[index], index));
+      // logger.info('updateCaches.toIDBNoteString', toIDBNoteString(notes[index], index));
 
       await storage.cached.set('selected', toIDBNoteString(notes[index], index));
     } else {
@@ -238,6 +257,11 @@ export async function updateCaches() {
   }
 
   await saveCachedList(notes);
+  logger.info('syncedItems.local', local);
+  // await storage.cached.permanent('maxBytes', chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 25);
+  await storage.cached.permanent('maxBytes', 25);
+  await storage.cached.permanent('maxItems', __maxItems);
+  await storage.cached.permanent('syncedItems', __maxItems - (local.restItems || __maxItems));
   logger.info('------------- updateCaches.end -------------');
 }
 
@@ -259,6 +283,7 @@ async function saveCachedList(notes: IDBNote[] = []) {
 export default {
   applicationId: async () => __applicationId || <number>(await chrome.storage.local.get(['applicationId']) || {}).applicationId,
   promise: () => __promise,
-  max: (chrome.storage.sync.MAX_ITEMS - 12),
-  rest: () => __maxItems,
+  max: __maxItems,
+  chunks: chunks,
+  rest: () => __maxItems - chunks(),
 };

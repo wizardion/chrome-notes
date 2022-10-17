@@ -157,7 +157,7 @@ async function sync(map: {[key: number]: ISyncPair}, force?: boolean) {
     await lib.delay();
     await chrome.storage.sync.set({secretKey: await __cryptor.secretKey()});
     await logger.info('send key', {secretKey: await __cryptor.secretKey()});
-    await chrome.storage.local.set({restSyncedItems: lib.default.rest(), lastSync: new Date().getTime()});
+    await chrome.storage.local.set({restItems: lib.default.rest(), lastSync: new Date().getTime()});
   }
   
   await logger.info('sync-end:   ....................................................................................');
@@ -292,7 +292,7 @@ async function saveToCloud(item: IDBNote) {
   const chunks:{[key: string]: ISyncNote} = await lib.zipNote(__cryptor, item);
   const keys = Object.keys(chunks);
 
-  lib.subtractItems(keys.length);
+  lib.chunk(item.id, keys.length);
 
   if (lib.default.rest() <= 0) {
     lib.errorLogger(new Error('Max notes quota exceeded!'));
@@ -317,7 +317,7 @@ async function removeFromCloud(item: IDBNote, chunks: number) {
     await chrome.storage.sync.remove(`item_${item.id}_${i}`);
   }
 
-  lib.addItems(chunks);
+  lib.chunk(item.id);
   return true;
 }
 

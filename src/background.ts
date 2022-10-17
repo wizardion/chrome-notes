@@ -7,7 +7,7 @@ import storage from './modules/storage/storage';
 type StorageChange = chrome.storage.StorageChange;
 type AreaName = chrome.storage.AreaName;
 const logger: Logger = new Logger('background.ts', 'green');
-const __periodInMinutes: number = 2; //20;
+const __periodInMinutes: number = 1; //20;
 
 
 async function TEraseData() {
@@ -23,7 +23,6 @@ interface IWindow {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  // chrome.alarms.clearAll();
   chrome.alarms.clear('alert');
   chrome.alarms.create('alert', {periodInMinutes: 1});
 
@@ -46,7 +45,7 @@ chrome.runtime.onInstalled.addListener(() => {
     
     if (result.migrate) {
       chrome.action.setPopup({popup: ''}, ()=>{});
-      await storage.cached.set('mode', 5, true);
+      await storage.cached.permanent('mode', 5);
       return chrome.tabs.create({url: chrome.runtime.getURL('migration.html')});
     }
 

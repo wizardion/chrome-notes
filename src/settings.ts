@@ -33,8 +33,7 @@ const controls: SettingsControls = new SettingsControls();
   controls.blocks.maxEach.innerText = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 192).toString();
   controls.blocks.maxBytes.innerText = bytesToSize(chrome.storage.sync.QUOTA_BYTES - 0).toString();
 
-  chrome.storage.local.get([
-    'syncEnabled', 'restSyncedItems', 'syncProcessing', 'lastSync', 'devMode', 'internalKey'], async (local) => {
+  chrome.storage.local.get(['syncEnabled', 'restItems', 'syncProcessing', 'lastSync', 'devMode', 'internalKey'], async (local) => {
     controls.checkboxes.sync.checked = (local.syncEnabled === true);
     controls.checkboxes.dev.checked = (local.devMode === true);
     controls.blocks.syncedTime.innerText = local.lastSync? new Date(local.lastSync).toLocaleString() : '...';
@@ -46,7 +45,7 @@ const controls: SettingsControls = new SettingsControls();
 
     toggleSync((local.syncEnabled === true));
     devModeChanged.call(controls.checkboxes.dev);
-    fillProgress(local.restSyncedItems || 0);
+    fillProgress(local.restItems || 0);
 
     if (local.syncProcessing) {
       controls.blocks.lockIndicator.classList.add('red');
@@ -91,11 +90,12 @@ async function eventOnStorageChanged(changes: {[key: string]: StorageChange}, na
           controls.blocks.lockIndicator.classList.add('red');
           controls.blocks.lockTitle.textContent = 'Sync is processing...';
         } else {
-          var local = await chrome.storage.local.get(['restSyncedItems', 'internalKey']);
+          var local = await chrome.storage.local.get(['restItems', 'internalKey']);
 
+          logger.info('eventOnStorageChanged', local);
           printLogs();
-          await checkKey();
-          fillProgress(local.restSyncedItems || 0);
+          fillProgress(local.restItems || 0);
+          await checkKey(local.internalKey);
 
           controls.blocks.lockIndicator.classList.remove('red');
           controls.blocks.lockTitle.textContent = '';
@@ -136,7 +136,7 @@ async function syncChanged() {
   }
 
   await chrome.storage.local.set({syncEnabled: this.checked});
-  await storage.cached.set('syncEnabled', this.checked, true);
+  await storage.cached.permanent('syncEnabled', this.checked);
   await wait();
 }
 
@@ -162,7 +162,7 @@ async function viewChanged() {
     chrome.action.setPopup({popup: 'popup.html'});
   }
 
-  await storage.cached.set('mode', mode, true);
+  await storage.cached.permanent('mode', mode);
 }
 
 function cancel() {
@@ -178,7 +178,7 @@ async function eraseData() {
 
     chrome.storage.local.clear().finally(() => {
       chrome.storage.sync.clear().finally(async() => {
-        storage.cached.clear(true);
+        storage.cached.empty();
         controls.buttons.erase.removeAttribute('disabled');
           var data: IDBNote[] = await idb.load();
           var applicationId: number = initApplication();
@@ -247,7 +247,7 @@ async function keyChanged() {
   }
 
   try {
-    if (!element.validity.patternMismatch && tester.test(value) && await Encryptor.check(value)) {
+    if (!element.validity.patternMismatch && tester.test(value) && await Encryptor.validate(value)) {
       controls.blocks.passwordValidator.innerText = '';
       controls.buttons.save.disabled = false;
 
@@ -362,7 +362,7 @@ async function save() {
 function lock() {
   lockControls();
   chrome.storage.local.set({internalKey: null});
-  storage.cached.set('internalKey', null, true);
+  storage.cached.permanent('internalKey', null);
   controls.inputs.password.value = '';
 }
 
@@ -403,7 +403,7 @@ async function checkKey(internalKey?: string) {
 }
 
 function fillProgress(count: number) {
-  const colors: {[key: number]: string} = {0: 'green', 65: 'yellow', 85: 'red'}
+  const colors: {[key: number]: string} = {0: 'green', 65: 'yellow', 85: 'red-fill'}
   const max_sync_items: number = lib.default.max;
   const percentage: number = count? Math.ceil(100 - (count / max_sync_items * 100)) : 0;
   const colorKeys = Object.keys(colors);
@@ -473,7 +473,7 @@ async function resyncData() {
     controls.buttons.cancel.disabled = true;
 
     
-    fillProgress(local && local.restSyncedItems || 0);
+    fillProgress(local && local.restItems || 0);
     controls.blocks.syncedTime.innerText = local && local.lastSync? new Date(local.lastSync).toLocaleString() : '...';
 
     config.processing = false;
@@ -487,13 +487,13 @@ async function resyncData() {
     await resync(config.internalKey, internalKey);
 
     await chrome.storage.local.set({internalKey: internalKey});
-    await storage.cached.set('internalKey', 'exists', true);
+    await storage.cached.permanent('internalKey', 'exists');
     logger.info('save-changes:', internalKey);
 
     // TODO unlock DB Data!
     await chrome.alarms.clear('sync');
     chrome.alarms.create('sync', {periodInMinutes: config.periodInMinutes});
-    local = await chrome.storage.local.get(['restSyncedItems', 'lastSync']);
+    local = await chrome.storage.local.get(['restItems', 'lastSync']);
   } catch (error) {
     logger.error('Error unlocking data', error);
     controls.blocks.passwordValidator.innerText = 'Error re-syncing data! Please see dev console for details.';
@@ -518,7 +518,7 @@ async function unlockData(internalKey: string) {
     controls.buttons.cancel.disabled = true;
 
     unlockControls();
-    fillProgress(local && local.restSyncedItems || 0);
+    fillProgress(local && local.restItems || 0);
     controls.blocks.syncedTime.innerText = local && local.lastSync? new Date(local.lastSync).toLocaleString() : '...';
 
     config.processing = false;
@@ -532,13 +532,13 @@ async function unlockData(internalKey: string) {
     await start(internalKey);
 
     await chrome.storage.local.set({internalKey: internalKey});
-    await storage.cached.set('internalKey', 'exists', true);
+    await storage.cached.permanent('internalKey', 'exists');
     logger.info('save-changes:', internalKey);
 
     // TODO unlock DB Data!
     await chrome.alarms.clear('sync');
     chrome.alarms.create('sync', {periodInMinutes: config.periodInMinutes});
-    local = await chrome.storage.local.get(['restSyncedItems', 'lastSync']);
+    local = await chrome.storage.local.get(['restItems', 'lastSync']);
   } catch (error) {
     logger.error('Error unlocking data', error);
     controls.blocks.passwordValidator.innerText = 'Error unlocking data! Please see dev console for details.';

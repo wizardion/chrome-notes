@@ -1,4 +1,8 @@
+import { Logger } from '../logger/logger';
+// import * as base from './base255'
+
 const _secretKey_: string = 'te~st-Sy#nc%K*ey';
+const logger: Logger = new Logger('encryptor.ts', 'red');
 
 export class Encryptor {
   private password: string;
@@ -17,12 +21,19 @@ export class Encryptor {
 
   //#region  private 
   private toBase(buffer: Uint8Array): string {
-    // return base.encode(buffer);
+    // var a = base.encode(buffer);
+
+    // logger.info('toBase.a', a);
+    // logger.info('toBase.b', btoa(String.fromCharCode.apply(null, buffer)));
+    // return a;
     return btoa(String.fromCharCode.apply(null, buffer));
   }
 
   private fromBase(message: string): Uint8Array {
-    // return base.decode(message);
+    // var a = base.decode(message);
+    // logger.info('fromBase', a);
+
+    // return a;
     return Uint8Array.from(atob(message), (c) => c.charCodeAt(null));
   }
 
@@ -171,7 +182,7 @@ export class Encryptor {
     return ex.k;
   }
 
-  public static check(password: string): Promise<boolean> {
+  public static validate(password: string): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         const salt = crypto.getRandomValues(new Uint8Array(16));
