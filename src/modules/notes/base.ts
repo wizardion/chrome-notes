@@ -21,6 +21,8 @@ export class Base {
   private cacheIndex?: number;
   protected new?: boolean;
   protected locked: boolean;
+  private _maxSyncItems: number;
+  private _syncedItems: number;
 
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     this.notes = [];
@@ -30,6 +32,8 @@ export class Base {
     this.noteView = noteView;
     this.newView = newView;
     this.locked = true;
+    this._maxSyncItems = 0;
+    this._syncedItems = 0;
   }
 
   public initFromCache(list?: string) {
@@ -190,7 +194,7 @@ export class Base {
 
   protected async cancelHandler() {
     if (this.new) {
-      this.cancelCreation();
+      await this.cancelCreation();
     }
   }
 
@@ -200,20 +204,62 @@ export class Base {
   //#endregion
 
   //#region Public-Members
-  public async selectNew(description: string, selection?: string) {
+  public get maxLength(): number {
+    return this.noteView.editor.maxLength;
+  }
+
+  public set maxLength(value: number) {
+    this.noteView.editor.maxLength = value;
+  }
+
+  public get maxSyncItems(): number {
+    return this._maxSyncItems;
+  }
+
+  public set maxSyncItems(value: number) {
+    this._maxSyncItems = value;
+  }
+
+  public get syncedItems(): number {
+    return this._syncedItems;
+  }
+
+  public set syncedItems(value: number) {
+    this._syncedItems = value;
+
+    console.log('syncedItems = ', value);
+    this.setSyncAvailability();
+  }
+  
+  private setSyncAvailability() {
+    console.log('this.syncedItems', this.syncedItems, this.maxSyncItems);
+
+    if (this.maxSyncItems > 0 && this.syncedItems >= (this.maxSyncItems) && !this.noteView.sync.checked) {
+      this.noteView.sync.disabled = true;
+      this.noteView.sync.parentElement.setAttribute('title', 'No more space is available to sync.');
+    } else {
+      this.noteView.sync.disabled = false;
+      this.noteView.sync.parentElement.setAttribute('title', 'sync note');
+    }
+  }
+
+  public async selectNew(description: string, selection?: string, sync?: boolean) {
     this.noteView.editor.value = description;
     this.noteView.editor.setSelection(selection);
+    this.noteView.sync.checked = (sync === true);
 
     this.new = true;
     this.selected = undefined;
+
+    this.setSyncAvailability();
     await storage.cached.set('new', 'true');
   }
 
   public unlock() {
     this.locked = false;
+    this.noteView.sync.disabled = false;
     this.noteView.sync.parentElement.addEventListener('mousedown', this.preventClick.bind(this));
     this.noteView.sync.addEventListener('click', this.toggleSync.bind(this));
-    this.noteView.sync.removeAttribute('disabled');
     this.noteView.sync.parentElement.setAttribute('title', 'sync note');
   }
 
@@ -321,6 +367,7 @@ export class Base {
       this.selected = note;
       this.noteView.preview.checked = note.preview;
       this.noteView.sync.checked = this.selected.sync;
+      this.setSyncAvailability();
     }
   }
 
@@ -339,9 +386,17 @@ export class Base {
   }
 
   protected async toggleSync() {
+    var checked: boolean = this.noteView.sync.checked;
+
     if (!this.new) {
-      this.selected.sync = this.noteView.sync.checked;
+      this.selected.sync = checked;
+      this.syncedItems += checked? 1 : -1;
+      // this.syncedItems = this.notes.filter(n => n.sync).length;
+
+      await storage.cached.set('syncedItems', this.syncedItems);
       await storage.cached.set('selected', this.selected.toString());
+    } else {
+      await storage.cached.set('sync', checked);
     }
   }
 
@@ -397,6 +452,7 @@ export class Base {
     if (note) {
       this.new = false;
       this.selectNote(note, false, true);
+      // await storage.cached.remove('sync');
     }
   }
   
@@ -428,12 +484,13 @@ export class Base {
       await storage.cached.remove('new');
       await storage.cached.remove('description');
       await storage.cached.remove('selection');
+      await storage.cached.remove('sync');
       
       return note;
     }
   }
 
-  protected cancelCreation() {
+  protected async cancelCreation() {
     this.new = false;
   }
 }

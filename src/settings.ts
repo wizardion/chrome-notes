@@ -45,7 +45,7 @@ const controls: SettingsControls = new SettingsControls();
 
     toggleSync((local.syncEnabled === true));
     devModeChanged.call(controls.checkboxes.dev);
-    fillProgress(local.restItems || 0);
+    fillProgress(await chrome.storage.sync.getBytesInUse() || 0);
 
     if (local.syncProcessing) {
       controls.blocks.lockIndicator.classList.add('red');
@@ -69,6 +69,11 @@ const controls: SettingsControls = new SettingsControls();
 
   // TODO removes temp variable passed to this page.
   chrome.storage.onChanged.addListener(eventOnStorageChanged);
+
+  console.log('chrome.AccountStatus', chrome.identity.AccountStatus);
+  chrome.identity.getProfileUserInfo(null, (info) => {
+    console.log('info', info);
+  });
 })();
 
 function event(fn: () => void, e: Event) {
@@ -90,11 +95,11 @@ async function eventOnStorageChanged(changes: {[key: string]: StorageChange}, na
           controls.blocks.lockIndicator.classList.add('red');
           controls.blocks.lockTitle.textContent = 'Sync is processing...';
         } else {
-          var local = await chrome.storage.local.get(['restItems', 'internalKey']);
+          var local = await chrome.storage.local.get(['internalKey']);
 
           logger.info('eventOnStorageChanged', local);
           printLogs();
-          fillProgress(local.restItems || 0);
+          fillProgress(await chrome.storage.sync.getBytesInUse() || 0);
           await checkKey(local.internalKey);
 
           controls.blocks.lockIndicator.classList.remove('red');
@@ -404,8 +409,8 @@ async function checkKey(internalKey?: string) {
 
 function fillProgress(count: number) {
   const colors: {[key: number]: string} = {0: 'green', 65: 'yellow', 85: 'red-fill'}
-  const max_sync_items: number = lib.default.max;
-  const percentage: number = count? Math.ceil(100 - (count / max_sync_items * 100)) : 0;
+  const max_sync_items: number = config.quotaBytes;
+  const percentage: number = count? Math.ceil((count / max_sync_items * 100)) : 0;
   const colorKeys = Object.keys(colors);
 
   for (let i = colorKeys.length - 1; i >= 0; i--) {
@@ -457,6 +462,7 @@ function getBackButtonVisibility(md: number, value: number): string {
 // }
 
 async function resyncData() {
+  var bytesInUse: number;
   var local: any;
   var internalKey = controls.inputs.password.value;
 
@@ -473,7 +479,7 @@ async function resyncData() {
     controls.buttons.cancel.disabled = true;
 
     
-    fillProgress(local && local.restItems || 0);
+    fillProgress(bytesInUse);
     controls.blocks.syncedTime.innerText = local && local.lastSync? new Date(local.lastSync).toLocaleString() : '...';
 
     config.processing = false;
@@ -494,6 +500,7 @@ async function resyncData() {
     await chrome.alarms.clear('sync');
     chrome.alarms.create('sync', {periodInMinutes: config.periodInMinutes});
     local = await chrome.storage.local.get(['restItems', 'lastSync']);
+    bytesInUse = await chrome.storage.sync.getBytesInUse() || 0;
   } catch (error) {
     logger.error('Error unlocking data', error);
     controls.blocks.passwordValidator.innerText = 'Error re-syncing data! Please see dev console for details.';
@@ -503,6 +510,7 @@ async function resyncData() {
 }
 
 async function unlockData(internalKey: string) {
+  var bytesInUse: number;
   var local: any;
 
   controls.groups.synchronization.setAttribute('disabled', 'disabled');
@@ -518,7 +526,7 @@ async function unlockData(internalKey: string) {
     controls.buttons.cancel.disabled = true;
 
     unlockControls();
-    fillProgress(local && local.restItems || 0);
+    fillProgress(bytesInUse || 0);
     controls.blocks.syncedTime.innerText = local && local.lastSync? new Date(local.lastSync).toLocaleString() : '...';
 
     config.processing = false;
@@ -539,6 +547,7 @@ async function unlockData(internalKey: string) {
     await chrome.alarms.clear('sync');
     chrome.alarms.create('sync', {periodInMinutes: config.periodInMinutes});
     local = await chrome.storage.local.get(['restItems', 'lastSync']);
+    bytesInUse = await chrome.storage.sync.getBytesInUse() || 0;
   } catch (error) {
     logger.error('Error unlocking data', error);
     controls.blocks.passwordValidator.innerText = 'Error unlocking data! Please see dev console for details.';

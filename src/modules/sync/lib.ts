@@ -9,7 +9,8 @@ import {fromIDBNoteString, toIDBNoteString} from '../../builder';
 
 const logger: Logger = new Logger('lib.ts');
 const __maxItems: number = (chrome.storage.sync.MAX_ITEMS - 12);
-const __delay: number = 2100;
+// const __delay: number = 2100;
+const __delay: number = 1100;
 
 var __promise: Promise<void> = null;
 var __applicationId: number = null;
@@ -142,7 +143,8 @@ export function unzip(data: {[key: string]: any}): ISyncNote[] {
 }
 
 export async function zipNote(cryptor: Encryptor, item: IDBNote) {
-  const bytes_per_item = 100; //chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 25;
+  const bytes_per_item = chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 25;
+  // const bytes_per_item = 100;
   var title = await cryptor.encrypt(item.title);
   var description = await cryptor.encrypt(item.description);
   var data: string[] = (title + '|' + description).match(new RegExp(`.{1,${bytes_per_item}}`, 'g'));
@@ -208,9 +210,9 @@ export async function lockData(map: {[key: number]: ISyncPair}) {
     }
   }
 
-  saveCachedList(cached);
-  chrome.storage.local.set({syncLocked: true});
-  chrome.storage.local.remove('internalKey');
+  await chrome.storage.local.set({syncLocked: true});
+  await chrome.storage.local.remove('internalKey');
+  await updateCaches();
 }
 
 export async function unlockData(map: {[key: number]: ISyncPair}) {
@@ -229,27 +231,25 @@ export async function unlockData(map: {[key: number]: ISyncPair}) {
     }
   }
 
-  saveCachedList(cached);
-  chrome.storage.local.remove('syncLocked');
+  await chrome.storage.local.remove('syncLocked');
+  await updateCaches();
 }
 
 export async function updateCaches() {
-  logger.info('------------- updateCaches -------------');
+  // logger.info('------------- updateCaches -------------');
   var cache = await storage.cached.get();
   var local = await chrome.storage.local.get('restItems');
   var notes: IDBNote[] = (await idb.load() || []).filter(n => !n.locked);
 
-  logger.info('updateCaches.notes', JSON.parse(JSON.stringify(notes)));
+  // logger.info('updateCaches.notes', JSON.parse(JSON.stringify(notes)));
 
   if (cache.selected && cache.selected.value) {
     let selected = fromIDBNoteString(cache.selected.value);
     let index: number = notes.findIndex(n => n.id === selected.id);
 
-    logger.info('updateCaches.selected', JSON.parse(JSON.stringify(selected)), 'index:', index);
+    // logger.info('updateCaches.selected', JSON.parse(JSON.stringify(selected)), 'index:', index);
 
     if (index >= 0) {
-      // logger.info('updateCaches.toIDBNoteString', toIDBNoteString(notes[index], index));
-
       await storage.cached.set('selected', toIDBNoteString(notes[index], index));
     } else {
       await storage.cached.remove('selected');
@@ -257,12 +257,8 @@ export async function updateCaches() {
   }
 
   await saveCachedList(notes);
-  logger.info('syncedItems.local', local);
-  // await storage.cached.permanent('maxBytes', chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 25);
-  await storage.cached.permanent('maxBytes', 25);
-  await storage.cached.permanent('maxItems', __maxItems);
   await storage.cached.permanent('syncedItems', __maxItems - (local.restItems || __maxItems));
-  logger.info('------------- updateCaches.end -------------');
+  // logger.info('------------- updateCaches.end -------------');
 }
 
 async function saveCachedList(notes: IDBNote[] = []) {
@@ -276,7 +272,7 @@ async function saveCachedList(notes: IDBNote[] = []) {
     }
   }
 
-  logger.info('list', cache)
+  // logger.info('list', cache)
   await storage.cached.set('list', JSON.stringify(cache).replace(/^\[|\]$/gi, ''));
 }
 

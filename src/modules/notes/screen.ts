@@ -16,7 +16,6 @@ export class Screen extends Mixed {
     document.body.parentElement.classList.add('full-size');
 
     this.noteView.delete.style.display = 'none';
-    this.noteView.sync.parentElement.style.display = 'none';
     this.noteView.preview.parentElement.style.display = 'none';
 
     this.noteView.editor.hide();

@@ -24,7 +24,7 @@ export class Simple extends Base {
     }
   }
 
-  public async selectNew(description: string, selection?: string) {
+  public async selectNew(description: string, selection?: string, sync?: boolean) {
     this.listView.node.style.display = 'None';
     this.newView.node.style.display = 'inherit';
 
@@ -33,16 +33,13 @@ export class Simple extends Base {
 
     this.noteView.back.style.display = 'none';
     this.noteView.delete.style.display = 'none';
-    // this.noteView.sync.parentElement.style.display = 'none';
     this.noteView.preview.parentElement.style.display = 'none';
 
-    // this.noteView.preview.checked = false;
     this.noteView.sync.parentElement.classList.add('short');
-    this.noteView.sync.checked = false;
-    super.selectNew(description, selection);
+    super.selectNew(description, selection, sync);
   }
 
-  protected cancelCreation() {
+  protected async cancelCreation() {
     this.newView.cancel.style.display = 'None';
     this.newView.create.style.display = 'None';
     this.new = false;

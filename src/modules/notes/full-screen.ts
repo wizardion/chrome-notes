@@ -1,5 +1,5 @@
 import {DbNote} from '../db/note';
-import storage from '../storage/storage';
+// import storage from '../storage/storage';
 import {IListView, INewNoteView, INoteView} from './components/interfaces';
 import {Mixed} from './mixed';
 
@@ -17,7 +17,6 @@ export class FullScreen extends Mixed {
     document.body.parentElement.classList.add('full-size');
 
     this.noteView.delete.style.display = 'none';
-    this.noteView.sync.parentElement.style.display = 'none';
     this.noteView.preview.parentElement.style.display = 'none';
 
     this.noteView.editor.hide();
@@ -37,7 +36,7 @@ export class FullScreen extends Mixed {
     }
   }
 
-  protected build(notes: DbNote[]) {
+  protected build(notes: DbNote[]): void {
     super.build(notes);
 
     window.addEventListener('resize', this.screenResize.bind(this));

@@ -15,6 +15,7 @@ export class Editor {
   private codemirror: CodeMirror.EditorFromTextArea;
   private controls: NodeList;
   private doc: CodeMirror.Doc;
+  private maximum: number;
   public wrapper: HTMLTextAreaElement;
   public scroll: HTMLElement;
 
@@ -32,6 +33,7 @@ export class Editor {
   };
 
   constructor(textarea: HTMLTextAreaElement, controls?: NodeList) {
+    this.maximum = 0;
     this.controls = controls;
 
     CodeMirrorSpellChecker({
@@ -99,6 +101,7 @@ export class Editor {
     mapping['Esc'] = () => this.cancelHandler();
 
     this.codemirror.setOption("extraKeys", mapping);
+    this.codemirror.on('beforeChange', (cm, change) => this.beforeChange(cm, change));
   }
 
   public get displayed(): boolean {
@@ -123,6 +126,14 @@ export class Editor {
     this.codemirror.scrollTo(0, top);
   }
 
+  public get maxLength(): number {
+    return this.maximum;
+  }
+
+  public set maxLength(value: number) {
+    this.maximum = value;
+  }
+
   public on(event: string, callback: Function) {
     if (event === 'save') {
       // @ts-ignore
@@ -134,6 +145,37 @@ export class Editor {
     }
 
     this.codemirror.on(event, () => callback());
+  }
+
+  /**
+   * Prevents edit when maxLength is presented no more then maximum characters set.
+   * @memberof Editor
+   * @abstract Taken from https://github.com/codemirror/codemirror5/issues/821#issuecomment-36967065
+   * @name beforeChange
+   * @param {Editor} cm
+   * @param {EditorChangeCancellable} change
+   * @returns {boolean}
+   */
+  protected beforeChange(cm: CodeMirror.Editor, change: CodeMirror.EditorChangeCancellable): boolean {
+    const separator = cm.getDoc().lineSeparator();
+
+    if (this.maximum && change.update) {
+        var input = change.text.join(separator);
+        var delta = input.length - (cm.indexFromPos(change.to) - cm.indexFromPos(change.from));
+        
+        if (delta <= 0) {
+          return true;
+        }
+        
+        delta = cm.getValue().length + delta - this.maximum;
+
+        if (delta > 0) {
+          input = input.substring(0, input.length - delta);
+          change.update(change.from, change.to, input.split(separator));
+        }
+    }
+
+    return true;
   }
 
   public focus() {
@@ -304,9 +346,13 @@ export class Editor {
   }
 
   private cancelHandler() {
-    if (this.customEvents['cancel']) {
-      this.customEvents['cancel']();
+    var handler = this.customEvents['cancel'];
+
+    if (handler) {
+      handler();
     }
+
+    return CodeMirror.Pass;
   }
 
   // private saveHandler(instance?: CodeMirror.Editor, e?: KeyboardEvent) {

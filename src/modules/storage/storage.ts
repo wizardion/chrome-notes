@@ -5,7 +5,7 @@ class CachedStorage {
   // private static storage: Storage = (typeof(localStorage) !== 'undefined') && localStorage;
   private static storage: Storage = null;
 
-  public static async set(key: string, value: (string|number|object)) {
+  public static async set(key: string, value: (string|number|object|boolean)) {
     if (!value && value !== 0) {
       return this.remove(key);
     }

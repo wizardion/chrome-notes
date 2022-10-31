@@ -1,4 +1,4 @@
-import { tracker } from './modules/notes/components/tracker';
+import {tracker} from './modules/notes/components/tracker';
 tracker.track('init', 'Start');
 
 import {Base} from './modules/notes/base';
@@ -10,8 +10,6 @@ import { Logger } from './modules/logger/logger';
 
 
 tracker.track('init', 'import');
-
-
 storage.cached.get().then(async cache => {
   const logger: Logger = new Logger('popup.ts');
   logger.addLine();
@@ -27,23 +25,36 @@ storage.cached.get().then(async cache => {
   }
 
   if (cache.new && cache.new.value) {
-    editor.selectNew(cache.description && cache.description.value, cache.selection && cache.selection.value);
+    editor.selectNew(
+      cache.description && cache.description.value, 
+      cache.selection && cache.selection.value,
+      cache.sync && cache.sync.value
+    );
+    tracker.track('init', `selectNew`);
   } else if (cache.selected && cache.selected.value) {
     editor.selectFromCache(fromIDBNoteString(cache.selected.value));
+    tracker.track('init', `selectFromCache`);
   } else {
     editor.showList();
+    tracker.track('init', `showList`);
   }
 
   if (cache.syncEnabled && cache.internalKey 
     && cache.syncEnabled.value && !!cache.internalKey.value && !cache.syncLocked) {
     editor.unlock();
+    tracker.track('init', `unlock`);
   }
 
   editor.init();
+  tracker.track('init', `editor.init`);
   notes.classList.remove('transparent');
+  editor.maxLength = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 10);
+  // editor.maxSyncItems = (chrome.storage.sync.MAX_ITEMS - 12);
+  editor.maxSyncItems = 4;
+  editor.syncedItems = (cache.syncedItems && cache.syncedItems.value || 0);
 
   tracker.track('init', 'End');
   await logger.info(tracker.print());
 });
 
-tracker.track('init', 'chrome.storage');
+tracker.track('init', 'page.ends');

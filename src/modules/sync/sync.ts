@@ -25,7 +25,7 @@ export function wait(): Promise<void> {
 export function start(internalKey?: string): Promise<void> {
   return lib.startProcess(async (resolve, reject) => {
     try {
-      await logger.info('process started...');
+      // await logger.info('process started...');
       let local = await chrome.storage.local.get(['syncEnabled', 'internalKey', 'syncLocked']);
       let data = await chrome.storage.sync.get();
 
@@ -58,7 +58,7 @@ export function start(internalKey?: string): Promise<void> {
       }
 
       __cryptor = null;
-      await logger.info('process finished...');
+      // await logger.info('process finished...', {'d': (await chrome.storage.sync.get() || {})});
       resolve();
     } catch (er) {
       reject(er);
@@ -109,7 +109,7 @@ async function sync(map: {[key: number]: ISyncPair}, force?: boolean) {
   var changed: boolean = force;
 
   if (!force) {
-    await deriveMessages(map);
+    changed = await deriveMessages(map);
   }
 
   for (let i = 0, keys = Object.keys(map); i < keys.length; i++) {
@@ -121,7 +121,7 @@ async function sync(map: {[key: number]: ISyncPair}, force?: boolean) {
       continue;
     }
 
-    if (item.db && item.cloud && item.db.deleted) {
+    if (item.db && item.cloud && item.db.deleted && item.db.updated > item.cloud.u) {
       await idb.remove(item.db.id);
       changed = await removeFromCloud(item.db, item.cloud.chunks);
       deleted.push(item.db.id);
@@ -129,8 +129,8 @@ async function sync(map: {[key: number]: ISyncPair}, force?: boolean) {
       continue;
     }
 
-    if (item.db && item.cloud && !item.db.sync) {
-      changed = await removeFromCloud(item.db, item.cloud.chunks);      
+    if (item.db && item.cloud && !item.db.sync && item.db.updated > item.cloud.u) {
+      changed = await removeFromCloud(item.db, item.cloud.chunks);
       desync.push(item.db.id);
       await logger.info(i, ' - desync note: ', item.db.id, 'remains: ', lib.default.rest());
       continue;
@@ -143,6 +143,7 @@ async function sync(map: {[key: number]: ISyncPair}, force?: boolean) {
     }
 
     if (item.db && item.db.sync && (!item.cloud || item.db.updated > item.cloud.u || force)) {
+      changed = await removeFromCloud(item.db, item.cloud && item.cloud.chunks || 0);
       changed = await saveToCloud(item.db);
       await logger.info(i, ' - upload note to Cloud: ', item.db.id, 'remains: ', lib.default.rest());
     }
@@ -158,6 +159,7 @@ async function sync(map: {[key: number]: ISyncPair}, force?: boolean) {
     await chrome.storage.sync.set({secretKey: await __cryptor.secretKey()});
     await logger.info('send key', {secretKey: await __cryptor.secretKey()});
     await chrome.storage.local.set({restItems: lib.default.rest(), lastSync: new Date().getTime()});
+    await logger.info('restItems', {restItems: lib.default.rest(), lastSync: new Date().getTime()});
   }
   
   await logger.info('sync-end:   ....................................................................................');
@@ -219,7 +221,8 @@ async function sendMessage(data:{[key: string]: any}) {
   await logger.info('send message', message);
 }
 
-async function deriveMessages(map: {[key: number]: ISyncPair}) {
+async function deriveMessages(map: {[key: number]: ISyncPair}): Promise<boolean> {
+  var result: boolean = false;
   var messages = (await chrome.storage.local.get('messages') || {}).messages || [];
 
   if (messages.length) {
@@ -233,9 +236,9 @@ async function deriveMessages(map: {[key: number]: ISyncPair}) {
           if (map[id] && map[id].db) {
             map[id].db.sync = false;
             await idb.update(map[id].db);
-            logger.warn(`- desync DB note [message]`, map[id].db.id);
+            logger.warn(`- derive message: desync DB note [message]`, map[id].db.id);
           } else {
-            logger.warn('not found map[id].db: ', id);
+            logger.warn('derive message: not found map[id].db: ', id);
           }
         }
   
@@ -245,16 +248,20 @@ async function deriveMessages(map: {[key: number]: ISyncPair}) {
           if (map[id] && map[id].db) {
             await idb.remove(map[id].db.id);
             delete map[id].db;
-            logger.warn(`- remove DB note [message]`, map[id].db.id);
+            logger.warn(`- derive message: remove DB note [message]`, map[id].db.id);
           } else {
-            logger.warn('not found map[id].db: ', id);
+            logger.warn('derive message: not found map[id].db: ', id);
           }
         }
+
+        result = true;
       }
     }
     
     await chrome.storage.local.set({messages: []});
   }
+
+  return result;
 }
 
 function saveToDB(item: ISyncPair): Promise<boolean> {
@@ -312,13 +319,15 @@ async function saveToCloud(item: IDBNote) {
 }
 
 async function removeFromCloud(item: IDBNote, chunks: number) {
-  for (let i = 0; i < chunks; i++) {
-    await lib.delay();
-    await chrome.storage.sync.remove(`item_${item.id}_${i}`);
+  if (chunks > 0) {
+    for (let i = 0; i < chunks; i++) {
+      await lib.delay();
+      await chrome.storage.sync.remove(`item_${item.id}_${i}`);
+    }
+  
+    lib.chunk(item.id);
+    return true;
   }
-
-  lib.chunk(item.id);
-  return true;
 }
 
 // async function syncSettings(sync: {[key: string]: any}) {

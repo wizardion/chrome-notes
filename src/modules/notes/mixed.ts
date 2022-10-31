@@ -15,7 +15,6 @@ export class Mixed extends Base {
     this.noteView.node.classList.add('mixed');
 
     this.noteView.delete.style.display = 'none';
-    this.noteView.sync.parentElement.style.display = 'none';
     this.noteView.preview.parentElement.style.display = 'none';
 
     this.noteView.editor.hide();
@@ -29,11 +28,12 @@ export class Mixed extends Base {
     }
   }
 
-  protected build(notes: DbNote[]) {
+  protected build(notes: DbNote[]): void {
     super.build(notes);
 
     if (!this.selected && !this.new && notes.length) {
-      return this.selectNote(this.notes[0], true, true);
+      this.selectNote(this.notes[0], true, true);
+      return;
     }
 
     if (this.selected && !this.new) {
@@ -41,11 +41,10 @@ export class Mixed extends Base {
     }
   }
 
-  public async selectNew(description: string, selection?: string) {
+  public async selectNew(description: string, selection?: string, sync?: boolean) {
     this.newView.cancel.style.display = 'inherit';
     this.newView.create.style.display = 'inherit';
     this.noteView.delete.style.display = 'none';
-    this.noteView.sync.parentElement.style.display = 'none';
     this.noteView.preview.parentElement.style.display = 'none';
     this.listView.addButton.style.visibility = 'collapse';
 
@@ -55,22 +54,21 @@ export class Mixed extends Base {
     }
 
     this.hidePreview();
-    super.selectNew(description, selection);
+    super.selectNew(description, selection, sync);
   }
 
-  protected cancelCreation() {
+  protected async cancelCreation() {
     this.newView.cancel.style.display = 'None';
     this.newView.create.style.display = 'None';
     this.listView.addButton.style.visibility = '';
 
-    storage.cached.clear();
+    await storage.cached.clear();
     this.new = false;
 
     if (this.notes.length) {
       let reserved = this.reserved || this.notes[0];
 
       this.noteView.delete.style.display = 'inherit';
-      this.noteView.sync.parentElement.style.display = 'inherit';
       this.noteView.preview.parentElement.style.display = 'inherit';
 
       this.reserved = null;
@@ -107,7 +105,6 @@ export class Mixed extends Base {
     } else {
       this.noteView.editor.value = '';
       this.noteView.delete.style.display = 'none';
-      this.noteView.sync.parentElement.style.display = 'none';
       this.noteView.preview.parentElement.style.display = 'none';
 
       this.noteView.editor.hide();
@@ -125,7 +122,6 @@ export class Mixed extends Base {
 
   public showNote() {
     this.noteView.delete.style.display = 'inherit';
-    this.noteView.sync.parentElement.style.display = 'inherit';
     this.noteView.preview.parentElement.style.display = 'inherit';
 
     if (!this.noteView.editor.displayed) {

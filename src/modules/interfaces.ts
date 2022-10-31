@@ -44,9 +44,10 @@ interface HTMLCollectionBlock {
 interface IConfig {
   blocked: boolean,
   lock: boolean,
-  processing: boolean
-  internalKey: string
-  periodInMinutes: number
+  processing: boolean,
+  internalKey: string,
+  periodInMinutes: number,
+  quotaBytes: number
 };
 
 export const config: IConfig = {
@@ -54,7 +55,8 @@ export const config: IConfig = {
   lock: true,
   processing: false,
   internalKey: null,
-  periodInMinutes: 1 //20
+  periodInMinutes: 1, //20
+  quotaBytes: chrome.storage.sync.QUOTA_BYTES
 };
 
 export class SettingsControls {
