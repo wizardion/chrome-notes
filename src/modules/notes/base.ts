@@ -237,7 +237,7 @@ export class Base {
     if (this.maxSyncItems > 0 && this.syncedItems >= (this.maxSyncItems) && !this.noteView.sync.checked) {
       this.noteView.sync.disabled = true;
       this.noteView.sync.parentElement.setAttribute('title', 'No more space is available to sync.');
-    } else {
+    } else if (!this.locked) {
       this.noteView.sync.disabled = false;
       this.noteView.sync.parentElement.setAttribute('title', 'sync note');
     }
