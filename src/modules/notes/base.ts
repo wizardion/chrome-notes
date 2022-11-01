@@ -170,8 +170,8 @@ export class Base {
       this.intervals.cursor = setTimeout(async () => {
         if (this.selected) {
           this.selected.selection = this.noteView.editor.getSelection();
-          this.selected.cursor = this.noteView.editor.getCursor();
           await storage.cached.set('selected', this.selected.toString());
+          this.selected.cursor = this.noteView.editor.getCursor();
         } else {
           await storage.cached.set('selection', this.noteView.editor.getSelection());
         }
