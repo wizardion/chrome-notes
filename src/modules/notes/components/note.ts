@@ -233,7 +233,7 @@ export class Note {
   }
 
   public toString(): string {
-    return toIDBNoteString(this.note, this.index);
+    return toIDBNoteString({...this.note, cState: this.selectionState}, this.index);
   }
 
   private createNew(index: number): DbNote {

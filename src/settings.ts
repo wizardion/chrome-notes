@@ -70,10 +70,10 @@ const controls: SettingsControls = new SettingsControls();
   // TODO removes temp variable passed to this page.
   chrome.storage.onChanged.addListener(eventOnStorageChanged);
 
-  console.log('chrome.AccountStatus', chrome.identity.AccountStatus);
-  chrome.identity.getProfileUserInfo(null, (info) => {
-    console.log('info', info);
-  });
+  // console.log('chrome.AccountStatus', chrome.identity.AccountStatus);
+  // chrome.identity.getProfileUserInfo(null, (info) => {
+  //   console.log('info', info);
+  // });
 })();
 
 function event(fn: () => void, e: Event) {

@@ -15,7 +15,7 @@ export function fromIDBNoteString(value: string): ISTNote {
   return null;
 }
 
-export function toIDBNoteString(selected: IDBNote, index: number = 0): string {  
+export function toIDBNoteString(selected: IDBNote, index: number = 0): string {
   var note: ISTNote = {
     index: index,
     id: selected.id || undefined,
