@@ -249,10 +249,10 @@ export async function updateCaches() {
 
     // logger.info('updateCaches.selected', JSON.parse(JSON.stringify(selected)), 'index:', index);
 
-    if (index >= 0) {
-      await storage.cached.set('selected', toIDBNoteString(notes[index], index));
-    } else {
+    if (!(index >= 0)) {
       await storage.cached.remove('selected');
+    } else if ((!selected.updated || selected.updated < notes[index].updated)) {
+      await storage.cached.set('selected', toIDBNoteString(notes[index], index));
     }
   }
 
