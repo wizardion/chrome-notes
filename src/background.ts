@@ -7,12 +7,13 @@ import storage from './modules/storage/storage';
 type StorageChange = chrome.storage.StorageChange;
 type AreaName = chrome.storage.AreaName;
 const logger: Logger = new Logger('background.ts', 'green');
-const __periodInMinutes: number = 1; //20;
+const __periodInMinutes: number = 3; //20;
 
 
 async function TEraseData() {
   chrome.tabs.create({url: chrome.runtime.getURL('options.html')});
-  storage.cached.clear();
+  await storage.cached.clear();
+  logger.info('\t\t=> storage.cached: cleared!');
 }
 
 interface IWindow {
@@ -21,6 +22,11 @@ interface IWindow {
   width: number;
   height: number;
 }
+
+// chrome.runtime.onStartup.addListener(async () => {
+//   await storage.cached.init();
+//   logger.info('\t\t=> storage.cached: initiated!');
+// });
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.clear('alert');

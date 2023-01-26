@@ -7,10 +7,16 @@ import {fromIDBNoteString} from './builder';
 import {buildEditor} from './popup-builder';
 import './styles/style.scss';
 import { Logger } from './modules/logger/logger';
+// import quota from './modules/sync/quota';
 
 
 tracker.track('init', 'import');
+// chrome.storage.session.get('key').then((result) => {
+//   tracker.track('init', `storage.session.loaded: key:${result.key}`);
+// });
+
 storage.cached.get().then(async cache => {
+  // tracker.track('init', `storage.cached.loaded...`);
   const logger: Logger = new Logger('popup.ts');
   logger.addLine();
 
@@ -48,13 +54,13 @@ storage.cached.get().then(async cache => {
   editor.init();
   tracker.track('init', `editor.init`);
   notes.classList.remove('transparent');
-  editor.maxLength = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 10);
-  // editor.maxSyncItems = (chrome.storage.sync.MAX_ITEMS - 12);
-  editor.maxSyncItems = 4;
-  editor.syncedItems = (cache.syncedItems && cache.syncedItems.value || 0);
+  // editor.maxLength = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 10);
+  // editor.maxSyncItems = quota.MAX_ITEMS;
+  // // editor.maxSyncItems = 4;
+  // editor.syncedItems = (cache.syncedItems && cache.syncedItems.value || 0);
 
   tracker.track('init', 'End');
-  await logger.info(tracker.print());
+  // await logger.info(tracker.print());
 });
 
 tracker.track('init', 'page.ends');

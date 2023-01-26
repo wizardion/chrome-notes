@@ -55,7 +55,7 @@ export const config: IConfig = {
   lock: true,
   processing: false,
   internalKey: null,
-  periodInMinutes: 1, //20
+  periodInMinutes: 3, //20
   quotaBytes: chrome.storage.sync.QUOTA_BYTES
 };
 

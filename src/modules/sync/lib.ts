@@ -9,8 +9,8 @@ import {fromIDBNoteString, toIDBNoteString} from '../../builder';
 
 const logger: Logger = new Logger('lib.ts');
 const __maxItems: number = (chrome.storage.sync.MAX_ITEMS - 12);
-// const __delay: number = 2100;
-const __delay: number = 1100;
+const __delay: number = 2100;
+// const __delay: number = 1100;
 
 var __promise: Promise<void> = null;
 var __applicationId: number = null;
@@ -143,7 +143,7 @@ export function unzip(data: {[key: string]: any}): ISyncNote[] {
 }
 
 export async function zipNote(cryptor: Encryptor, item: IDBNote) {
-  const bytes_per_item = chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 25;
+  const bytes_per_item = chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 200;
   // const bytes_per_item = 100;
   var title = await cryptor.encrypt(item.title);
   var description = await cryptor.encrypt(item.description);
@@ -257,8 +257,12 @@ export async function updateCaches() {
   }
 
   await saveCachedList(notes);
-  await storage.cached.permanent('syncedItems', __maxItems - (local.restItems || __maxItems));
+  // await storage.cached.permanent('syncedItems', __maxItems - (local.restItems || __maxItems));
   // logger.info('------------- updateCaches.end -------------');
+
+  // chrome.storage.session.set({key: local.restItems}).then(() => {
+  //   console.log("Value is set to ");
+  // });
 }
 
 async function saveCachedList(notes: IDBNote[] = []) {

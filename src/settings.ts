@@ -7,7 +7,7 @@ import {ILog} from './modules/logger/interfaces';
 import {IDBNote} from './modules/db/interfaces';
 import * as idb from './modules/db/idb';
 import {wait, resync, initApplication, start} from './modules/sync/sync';
-import * as lib from './modules/sync/lib';
+// import * as lib from './modules/sync/lib';
 // import {migrate} from './modules/storage/migrate';
 
 type StorageChange = chrome.storage.StorageChange;
@@ -45,7 +45,7 @@ const controls: SettingsControls = new SettingsControls();
 
     toggleSync((local.syncEnabled === true));
     devModeChanged.call(controls.checkboxes.dev);
-    fillProgress(await chrome.storage.sync.getBytesInUse() || 0);
+    fillProgress();
 
     if (local.syncProcessing) {
       controls.blocks.lockIndicator.classList.add('red');
@@ -99,7 +99,7 @@ async function eventOnStorageChanged(changes: {[key: string]: StorageChange}, na
 
           logger.info('eventOnStorageChanged', local);
           printLogs();
-          fillProgress(await chrome.storage.sync.getBytesInUse() || 0);
+          fillProgress();
           await checkKey(local.internalKey);
 
           controls.blocks.lockIndicator.classList.remove('red');
@@ -177,40 +177,40 @@ function cancel() {
 }
 
 async function eraseData() {
-  if (confirm('Are you sure to delete all data?\nAll sync and locked notes will be lost...')) {
-    //TODO remove locked data as well.
-    controls.buttons.erase.setAttribute('disabled', 'disabled');
+  // if (confirm('Are you sure to delete all data?\nAll sync and locked notes will be lost...')) {
+  //   //TODO remove locked data as well.
+  //   controls.buttons.erase.setAttribute('disabled', 'disabled');
 
-    chrome.storage.local.clear().finally(() => {
-      chrome.storage.sync.clear().finally(async() => {
-        storage.cached.empty();
-        controls.buttons.erase.removeAttribute('disabled');
-          var data: IDBNote[] = await idb.load();
-          var applicationId: number = initApplication();
-          var deleted: number[] = [];
+  //   chrome.storage.local.clear().finally(() => {
+  //     chrome.storage.sync.clear().finally(async() => {
+  //       storage.cached.empty();
+  //       controls.buttons.erase.removeAttribute('disabled');
+  //         var data: IDBNote[] = await idb.load();
+  //         var applicationId: number = initApplication();
+  //         var deleted: number[] = [];
 
-          for (let i = 0; i < data.length; i++) {
-            const item = data[i];
+  //         for (let i = 0; i < data.length; i++) {
+  //           const item = data[i];
 
-            if (item.locked) {
-              item.sync = false;
-              item.locked = false;
-              item.inCloud = false;
+  //           if (item.locked) {
+  //             item.sync = false;
+  //             item.locked = false;
+  //             item.inCloud = false;
 
-              await idb.update(item);
-              deleted.push(item.id);
-              // await idb.remove(item.id);
-            }
-          }
+  //             await idb.update(item);
+  //             deleted.push(item.id);
+  //             // await idb.remove(item.id);
+  //           }
+  //         }
           
-          if (deleted.length) {
-            await chrome.storage.sync.set({message: {erased: deleted, secretKey: 'new', applicationId: applicationId}});
-          }
+  //         if (deleted.length) {
+  //           await chrome.storage.sync.set({message: {erased: deleted, secretKey: 'new', applicationId: applicationId}});
+  //         }
           
-          window.location.reload();
-      });
-    });
-  }
+  //         window.location.reload();
+  //     });
+  //   });
+  // }
 }
 
 async function clearLogs() {
@@ -222,7 +222,7 @@ async function printLogs() {
   var cache = await storage.cached.get();
   var local = await chrome.storage.local.get('devMode');
 
-  logger.info('cache', cache);
+  logger.info('printLogs.cache', cache);
 
   if (local.devMode) {
     Logger.load().then((logs: ILog[]) => {
@@ -407,24 +407,26 @@ async function checkKey(internalKey?: string) {
   }
 }
 
-function fillProgress(count: number) {
-  const colors: {[key: number]: string} = {0: 'green', 65: 'yellow', 85: 'red-fill'}
-  const max_sync_items: number = config.quotaBytes;
-  const percentage: number = count? Math.ceil((count / max_sync_items * 100)) : 0;
-  const colorKeys = Object.keys(colors);
+function fillProgress() {
+  chrome.storage.sync.getBytesInUse().then((count: number) => {
+    const colors: {[key: number]: string} = {0: 'green', 65: 'yellow', 85: 'red-fill'}
+    const max_sync_items: number = chrome.storage.sync.QUOTA_BYTES - 200;
+    const percentage: number = count? Math.ceil((count / max_sync_items * 100)) : 0;
+    const colorKeys = Object.keys(colors);
 
-  for (let i = colorKeys.length - 1; i >= 0; i--) {
-    const key = parseInt(colorKeys[i]);
-    const color = colors[key];
+    for (let i = colorKeys.length - 1; i >= 0; i--) {
+      const key = parseInt(colorKeys[i]);
+      const color = colors[key];
 
-    if (percentage >= key) {
-      controls.blocks.progressThumb.classList.add(color);
-      break;
+      if (percentage >= key) {
+        controls.blocks.progressThumb.classList.add(color);
+        break;
+      }
     }
-  }
 
-  controls.blocks.progressThumb.style.width = `${percentage}%`;
-  controls.blocks.progressThumb.parentElement.setAttribute('title', `your storage is full on ${percentage}%`);
+    controls.blocks.progressThumb.style.width = `${percentage}%`;
+    controls.blocks.progressThumb.parentElement.setAttribute('title', `your storage is full on ${percentage}%`);
+  });
 }
 
 function bytesToSize(bytes: number) {
@@ -462,7 +464,6 @@ function getBackButtonVisibility(md: number, value: number): string {
 // }
 
 async function resyncData() {
-  var bytesInUse: number;
   var local: any;
   var internalKey = controls.inputs.password.value;
 
@@ -479,7 +480,7 @@ async function resyncData() {
     controls.buttons.cancel.disabled = true;
 
     
-    fillProgress(bytesInUse);
+    fillProgress();
     controls.blocks.syncedTime.innerText = local && local.lastSync? new Date(local.lastSync).toLocaleString() : '...';
 
     config.processing = false;
@@ -500,7 +501,6 @@ async function resyncData() {
     await chrome.alarms.clear('sync');
     chrome.alarms.create('sync', {periodInMinutes: config.periodInMinutes});
     local = await chrome.storage.local.get(['restItems', 'lastSync']);
-    bytesInUse = await chrome.storage.sync.getBytesInUse() || 0;
   } catch (error) {
     logger.error('Error unlocking data', error);
     controls.blocks.passwordValidator.innerText = 'Error re-syncing data! Please see dev console for details.';
@@ -510,7 +510,6 @@ async function resyncData() {
 }
 
 async function unlockData(internalKey: string) {
-  var bytesInUse: number;
   var local: any;
 
   controls.groups.synchronization.setAttribute('disabled', 'disabled');
@@ -526,7 +525,7 @@ async function unlockData(internalKey: string) {
     controls.buttons.cancel.disabled = true;
 
     unlockControls();
-    fillProgress(bytesInUse || 0);
+    fillProgress();
     controls.blocks.syncedTime.innerText = local && local.lastSync? new Date(local.lastSync).toLocaleString() : '...';
 
     config.processing = false;
@@ -547,7 +546,6 @@ async function unlockData(internalKey: string) {
     await chrome.alarms.clear('sync');
     chrome.alarms.create('sync', {periodInMinutes: config.periodInMinutes});
     local = await chrome.storage.local.get(['restItems', 'lastSync']);
-    bytesInUse = await chrome.storage.sync.getBytesInUse() || 0;
   } catch (error) {
     logger.error('Error unlocking data', error);
     controls.blocks.passwordValidator.innerText = 'Error unlocking data! Please see dev console for details.';

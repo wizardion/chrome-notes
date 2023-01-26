@@ -310,11 +310,28 @@ async function saveToCloud(item: IDBNote) {
   for (let j = 0; j < keys.length; j++) {
     const key: string = keys[j];
     
-    data[key] = chunks[key];
+    // data[key] = chunks[key];
+
+    try {
+      await lib.delay();
+      await chrome.storage.sync.set({[key]: chunks[key]});
+      // return true;
+    } catch (error) {
+      logger.info(item.id, 'data-item', 'd.length:', chunks[key].d.length, 'max:', chrome.storage.sync.QUOTA_BYTES_PER_ITEM);
+      logger.info(item.id, 'json', JSON.stringify(chunks[key]), JSON.stringify(chunks[key]).length);
+      throw error;
+    }
   }
 
   await lib.delay();
-  await chrome.storage.sync.set(data);
+  
+  // try {
+  //   await chrome.storage.sync.set(data);
+  //   return true;
+  // } catch (error) {
+  //   logger.info(item.id, 'data-item', data);
+  //   throw error;
+  // }
   return true;
 }
 

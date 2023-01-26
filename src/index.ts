@@ -36,10 +36,10 @@ storage.cached.get().then(cache => {
 
   editor.init();
   notes.classList.remove('transparent');
-  editor.maxLength = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 10);
+  // editor.maxLength = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 10);
   // editor.maxSyncItems = (chrome.storage.sync.MAX_ITEMS - 12);
-  editor.maxSyncItems = 4;
-  editor.syncedItems = (cache.syncedItems && cache.syncedItems.value || 0);
+  // // editor.maxSyncItems = 4;
+  // editor.syncedItems = (cache.syncedItems && cache.syncedItems.value || 0);
 
   tracker.track('init', 'Done');
   tracker.print();
