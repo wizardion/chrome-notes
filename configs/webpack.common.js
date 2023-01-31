@@ -14,11 +14,11 @@ const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev
 
 module.exports = {
   entry: {
-    popup: path.resolve(__root__, 'src/popup/index.ts'),
-    index: path.resolve(__root__, 'src/index/index.ts'),
+    popup: path.resolve(__root__, 'src/pages/popup/index.ts'),
+    index: path.resolve(__root__, 'src/pages/index/index.ts'),
     background: path.resolve(__root__, 'src/worker/index.ts'),
-    settings: path.resolve(__root__, 'src/options/index.ts'),
-    migration: path.resolve(__root__, 'src/migration/index.ts'),
+    settings: path.resolve(__root__, 'src/pages/options/index.ts'),
+    migration: path.resolve(__root__, 'src/pages/migration/index.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -115,7 +115,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'My Notes',
       filename: 'index.html',
-      template: './src/index/index.html',
+      template: './src/pages/index/index.html',
       scriptLoading: 'defer',
       // inject: 'head',
       inject: "head",
@@ -144,7 +144,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'My Notes',
       filename: 'popup.html',
-      template: './src/popup/index.html',
+      template: './src/pages/popup/index.html',
       // scriptLoading: 'blocking',
       scriptLoading: 'defer',
       // inject: 'head',
@@ -177,7 +177,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'My Options',
       filename: 'options.html',
-      template: './src/options/index.html',
+      template: './src/pages/options/index.html',
       scriptLoading: 'defer',
       inject: "head",
       minify: {
@@ -196,7 +196,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Migration',
       filename: 'migration.html',
-      template: './src/migration/index.html',
+      template: './src/pages/migration/index.html',
       scriptLoading: 'blocking',
       inject: "body",
       minify: {
