@@ -1,5 +1,5 @@
-import { IDBNote } from './db/interfaces';
-import {ISTNote} from './notes/components/interfaces';
+import { IDBNote } from '../db/interfaces';
+import {ISTNote} from './components/interfaces';
 
 
 export function fromIDBNoteString(value: string): ISTNote {

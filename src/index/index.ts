@@ -3,7 +3,7 @@ tracker.track('init', 'start');
 
 import {Base} from 'modules/notes/base';
 import storage from 'modules/storage/storage';
-import {fromIDBNoteString} from 'modules/builder';
+import {fromIDBNoteString} from 'modules/notes/builder';
 import {buildEditor} from './components/builder';
 import 'styles/style.scss';
 

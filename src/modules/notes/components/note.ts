@@ -1,6 +1,6 @@
 import {INoteControls, ISTNote} from './interfaces';
 import {DbNote} from '../../db/note';
-import { toIDBNoteString } from '../../builder';
+import { toIDBNoteString } from '../builder';
 
 
 export class Note {
