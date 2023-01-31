@@ -1,12 +1,12 @@
-import {tracker} from './modules/notes/components/tracker';
+import {tracker} from 'modules/notes/components/tracker';
 tracker.track('init', 'Start');
 
-import {Base} from './modules/notes/base';
-import storage from './modules/storage/storage';
-import {fromIDBNoteString} from './builder';
-import {buildEditor} from './popup-builder';
-import './styles/style.scss';
-import { Logger } from './modules/logger/logger';
+import {Base} from 'modules/notes/base';
+import storage from 'modules/storage/storage';
+import {fromIDBNoteString} from 'modules/builder';
+import {buildEditor} from './components/builder';
+import 'styles/style.scss';
+import { Logger } from 'modules/logger/logger';
 // import quota from './modules/sync/quota';
 
 

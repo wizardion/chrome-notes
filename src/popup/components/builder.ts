@@ -1,10 +1,12 @@
-import {IListView, INewNoteView, INoteView, ISTNote} from './modules/notes/components/interfaces';
-import {Editor} from './modules/notes/editor';
-import {Base} from './modules/notes/base';
-import {Screen} from './modules/notes/screen';
+import {IListView, INewNoteView, INoteView, ISTNote} from 'modules/notes/components/interfaces';
+import {Editor} from 'modules/notes/editor';
+import {Mixed} from 'modules/notes/mixed';
+import {Base} from 'modules/notes/base';
+import {Simple} from 'modules/notes/simple';
+import {Compact} from 'modules/notes/compact';
 
 
-export function buildEditor(): Base {
+export function buildEditor(mode: number): Base {
   var listViewElement: HTMLElement = <HTMLElement>document.getElementById('list-view');
   var noteViewElement: HTMLElement = <HTMLElement>document.getElementById('details-view');
   var codemirror = new Editor(
@@ -36,5 +38,13 @@ export function buildEditor(): Base {
     create: <HTMLButtonElement>document.getElementById('create-note'),
   }
 
-  return new Screen(listView, noteView, newView);
+  if (mode === 1) {
+    return new Mixed(listView, noteView, newView);
+  }
+
+  if (mode === 2) {
+    return new Compact(listView, noteView, newView);
+  }
+
+  return new Simple(listView, noteView, newView);
 }

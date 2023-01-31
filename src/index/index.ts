@@ -1,11 +1,11 @@
-import { tracker } from './modules/notes/components/tracker';
+import { tracker } from 'modules/notes/components/tracker';
 tracker.track('init', 'start');
 
-import {Base} from './modules/notes/base';
-import storage from './modules/storage/storage';
-import {fromIDBNoteString} from './builder';
-import {buildEditor} from './screen-builder';
-import './styles/style.scss';
+import {Base} from 'modules/notes/base';
+import storage from 'modules/storage/storage';
+import {fromIDBNoteString} from 'modules/builder';
+import {buildEditor} from './components/builder';
+import 'styles/style.scss';
 
 
 tracker.track('init', 'import');

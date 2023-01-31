@@ -4,7 +4,7 @@ import {IDBNote} from '../db/interfaces';
 import {Encryptor} from '../encryption/encryptor';
 import {Logger} from '../logger/logger';
 import storage from '../storage/storage';
-import {fromIDBNoteString, toIDBNoteString} from '../../builder';
+import {fromIDBNoteString, toIDBNoteString} from '../builder';
 
 
 const logger: Logger = new Logger('lib.ts');

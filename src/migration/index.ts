@@ -1,5 +1,5 @@
-import './styles/migration.scss';
-import {migrate} from './modules/storage/migrate';
+import 'styles/migration.scss';
+import {migrate} from 'modules/storage/migrate';
 
 
 var oldNotes: string;

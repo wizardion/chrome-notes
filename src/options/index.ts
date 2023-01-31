@@ -1,12 +1,12 @@
-import './styles/settings.scss';
-import storage from './modules/storage/storage';
-import {Encryptor} from './modules/encryption/encryptor';
-import {config, SettingsControls} from './modules/interfaces';
-import {Logger} from './modules/logger/logger';
-import {ILog} from './modules/logger/interfaces';
-import {IDBNote} from './modules/db/interfaces';
-import * as idb from './modules/db/idb';
-import {wait, resync, initApplication, start} from './modules/sync/sync';
+import 'styles/settings.scss';
+import storage from 'modules/storage/storage';
+import {Encryptor} from 'modules/encryption/encryptor';
+import {config, SettingsControls} from './components/interfaces';
+import {Logger} from 'modules/logger/logger';
+import {ILog} from 'modules/logger/interfaces';
+import {IDBNote} from 'modules/db/interfaces';
+import * as idb from 'modules/db/idb';
+import {wait, resync, initApplication, start} from 'modules/sync/sync';
 // import * as lib from './modules/sync/lib';
 // import {migrate} from './modules/storage/migrate';
 

@@ -6,6 +6,7 @@ const htmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attribute
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const svgToMiniDataURI = require('mini-svg-data-uri');
 const __root__ = path.resolve(__dirname, '..');
@@ -13,11 +14,11 @@ const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev
 
 module.exports = {
   entry: {
-    popup: path.resolve(__root__, 'src/popup.ts'),
-    index: path.resolve(__root__, 'src/index.ts'),
-    background: path.resolve(__root__, 'src/background.ts'),
-    settings: path.resolve(__root__, 'src/settings.ts'),
-    migration: path.resolve(__root__, 'src/migration.ts'),
+    popup: path.resolve(__root__, 'src/popup/index.ts'),
+    index: path.resolve(__root__, 'src/index/index.ts'),
+    background: path.resolve(__root__, 'src/worker/index.ts'),
+    settings: path.resolve(__root__, 'src/options/index.ts'),
+    migration: path.resolve(__root__, 'src/migration/index.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -73,31 +74,29 @@ module.exports = {
         },
       },
       {
-        test: /\.svg$/i,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              generator: (content) => svgToMiniDataURI(content.toString()),
-            },
-          },
-        ],
-      },
-      {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
       {
-        test: /\.(hbs|html|xml)$/, 
-        loader: 'handlebars-loader', 
-        options: {
-          inlineRequires: "/images/"
+        test: /\.svg/,
+        type: 'asset/inline',
+        generator: {
+          dataUrl: content => svgToMiniDataURI(content.toString())
         }
-      }
+      },
+      {
+        test: /\.svg/,
+        type: 'asset/source',
+        resourceQuery: /inline/,
+        generator: {
+          dataUrl: content => svgToMiniDataURI(content.toString())
+        }
+      },
     ]
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    plugins: [new TsconfigPathsPlugin({/* options: see below */})]
   },
   plugins: [
     new CleanWebpackPlugin(process.__version__? {
@@ -116,7 +115,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'My Notes',
       filename: 'index.html',
-      template: './src/popup.html',
+      template: './src/index/index.html',
       scriptLoading: 'defer',
       // inject: 'head',
       inject: "head",
@@ -145,7 +144,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'My Notes',
       filename: 'popup.html',
-      template: './src/popup.html',
+      template: './src/popup/index.html',
       // scriptLoading: 'blocking',
       scriptLoading: 'defer',
       // inject: 'head',
@@ -178,7 +177,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'My Options',
       filename: 'options.html',
-      template: './src/options.html',
+      template: './src/options/index.html',
       scriptLoading: 'defer',
       inject: "head",
       minify: {
@@ -197,7 +196,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Migration',
       filename: 'migration.html',
-      template: './src/migration.html',
+      template: './src/migration/index.html',
       scriptLoading: 'blocking',
       inject: "body",
       minify: {
@@ -236,7 +235,7 @@ module.exports = {
         
         return JSON.stringify(manifest, null, 2);
       }
-    })
+    }),
   ],
   stats: {
     errorDetails: true,

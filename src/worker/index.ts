@@ -1,7 +1,7 @@
-import * as sync from './modules/sync/sync';
-import {migrate} from './modules/storage/migrate';
-import {Logger} from './modules/logger/logger';
-import storage from './modules/storage/storage';
+import * as sync from 'modules/sync/sync';
+import {migrate} from 'modules/storage/migrate';
+import {Logger} from 'modules/logger/logger';
+import storage from 'modules/storage/storage';
 
 
 type StorageChange = chrome.storage.StorageChange;

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <div id="notes" class="notes hidden transparent">
+      <div id="details-view" class="details-view">
+        <div id="details-controls" class="head">
+          <button id="to-list" class="link back"><%= require('/images/back.svg?inline') %> All Notes</button>
+          <button id="cancel-note" class="link back cancel"><%= require('/images/back2.svg?inline') %></button>
+          <button id="create-note" class="button save"><%= require('/images/save.svg?inline') %></button>
+          <button id="delete-note" class="button delete"><%= require('/images/delete.svg?inline') %></button>
+          <label class="checkbox sync" title="sync note">
+            <input id="sync-note" type="checkbox" disabled>
+            <span class="checkmark"><%= require('/images/sync.svg?inline') %></span>
+          </label>
+          <label class="checkbox edit" title="preview">
+            <input id="preview-note" type="checkbox">
+            <span class="checkmark"><%= require('/images/code.svg?inline') %></span>
+          </label>
+
+          <div id="editor-controls" class="editor-controls">
+            <fieldset><!--
+              --><div action="bold" keys="Ctrl-B,Cmd-B" title="Bold" class="button"><%= require('/images/bold.svg?inline') %></div><!--
+              --><div action="italic" keys="Ctrl-I,Cmd-I" title="Italic" class="button"><%= require('/images/italic.svg?inline') %></div><!--
+              --><div action="strikethrough" keys="Ctrl-Y,Cmd-Y" title="Strikethrough" class="button"><%= require('/images/strikethrough.svg?inline') %></div><!--
+              --><div action="link" keys="Ctrl-L,Cmd-L" title="Link" class="button"><%= require('/images/link.svg?inline') %></div><!--
+            --></fieldset><!--
+            --><fieldset><!--
+              --><div action="insertOrderedList" keys="Ctrl-O,Cmd-O" title="Ordered List" class="button"><%= require('/images/insertOrderedList.svg?inline') %></div><!--
+              --><div action="insertUnorderedList" keys="Ctrl-U,Cmd-U" title="Unordered List" class="button"><%= require('/images/insertUnorderedList.svg?inline') %></div><!--
+            --></fieldset><!--
+          --><fieldset><!--
+              --><div action="removeFormat" keys="Ctrl-G,Cmd-G" title="Remove Format" class="button"><%= require('/images/removeFormat.svg?inline') %></div><!--
+            --></fieldset><!--
+          --><fieldset><!--
+              --><div action="undo" title="Undo" class="button"><%= require('/images/undo.svg?inline') %></div><!--
+              --><div action="redo" title="Redo" class="button"><%= require('/images/redo.svg?inline') %></div><!--
+            --></fieldset>
+          </div>
+        </div>
+        
+        <div id="content" class="content">
+          <pre id="html-preview" class="content-preview hidden-scroll" tabindex="2"></pre>
+          <textarea id="description-note" class="description-note hidden-scroll"></textarea>
+        </div>
+      </div>
+
+      <div id="list-view" class="list-view disable-select">
+        <div id="list-controls" class="list-controls">
+          <!-- <a id="title" href="./options.html" class="notes-title" >My Notes</a> -->
+          <span class="notes-title">My Notes</span>
+
+          <button id="search-button" class="button search"><%= require('/images/search.svg?inline') %></button>
+          <input id="search-input" type="text" class="search-notes" placeholder="Enter keyword" maxlength="30">
+          <button id="add-note" class="button add"><%= require('/images/plus.svg?inline') %></button>
+        </div>
+        <div id="list-items" class="list-items hidden-scroll"></div>
+      </div>
+    </div>
+  </body>
+</html>

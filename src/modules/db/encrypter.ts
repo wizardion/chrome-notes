@@ -16,11 +16,11 @@ export class BaseEncrypter {
     return btoa(String.fromCharCode.apply(null, buff));
   }
   
-  protected fromBase64(b64: string): Uint8Array {
+  protected fromBase64(b64: string): ArrayBuffer {
     return Uint8Array.from(atob(b64), (c) => c.charCodeAt(null));
   }
   
-  protected toString(buff: Uint8Array): string {
+  protected toString(buff: ArrayBuffer): string {
     return new TextDecoder().decode(buff);
   }
 
