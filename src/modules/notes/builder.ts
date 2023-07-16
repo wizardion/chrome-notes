@@ -21,7 +21,6 @@ export function toIDBNoteString(selected: IDBNote, index: number = 0): string {
     id: selected.id || undefined,
     title: selected.title || undefined,
     description: selected.description || undefined,
-    sync: selected.sync || undefined,
     preview: selected.preview || undefined,
     cState: selected.cState || undefined,
     pState: selected.pState || undefined,

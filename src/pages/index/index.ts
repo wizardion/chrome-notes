@@ -18,13 +18,13 @@ storage.cached.get().then(cache => {
   notes.classList.remove('hidden');
   if (cache.list && cache.list.value) {
     tracker.track('init', `cache`);
-    editor.initFromCache(cache.list.value);
+    editor.initFromCache(<string>cache.list.value);
   }
 
   if (cache.new && cache.new.value) {
-    editor.selectNew(cache.description && cache.description.value, cache.selection && cache.selection.value);
+    editor.selectNew(<string>(cache.description && cache.description.value), <string>(cache.selection && cache.selection.value));
   } else if (cache.selected && cache.selected.value) {
-    editor.selectFromCache(fromIDBNoteString(cache.selected.value));
+    editor.selectFromCache(fromIDBNoteString(<string>cache.selected.value));
   } else {
     editor.showList();
   }

@@ -65,7 +65,6 @@ export class Note {
     this.note.id = note.id;
     this.note.description = note.description;
     this.note.order = note.order;
-    this.note.sync = note.sync;
     this.note.preview = note.preview;
     this.note.cState = note.cState;
     this.note.pState = note.pState;
@@ -186,16 +185,6 @@ export class Note {
     this.note.setPreview();
   }
 
-  public get sync(): boolean {
-    return !!this.note.sync;
-  }
-
-  public set sync(value: boolean) {
-    this.note.sync = value? true : false;
-    this.updated = this.getTime();
-    this.note.setSync();
-  }
-
   public get updated(): number {
     return this.note.updated;
   }
@@ -243,8 +232,7 @@ export class Note {
       description: '', 
       order: index + 1, 
       updated: this.getTime(), 
-      created: this.getTime(),
-      sync: null
+      created: this.getTime()
     });
   }
 

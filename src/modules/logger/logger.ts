@@ -1,6 +1,7 @@
 import {ILog,ILogType,ILogColor,ILogColors} from './interfaces';
 
 var __database: IDBDatabase;
+var __tracing: boolean;
 
 function logError(e: (Error|Event|any)) {
   console.error('DB ERROR', e.stack || e.message || e.cause || e, e.target);
@@ -55,19 +56,24 @@ function initObjectStore(mode: IDBTransactionMode): Promise<IDBObjectStore> {
   });
 }
 
-function put(type: ILogType, color: string, name: string, args: any[]): Promise<number> {
-  return new Promise<number>(async (resolve, reject) => {
+function put(type: ILogType, color: string, name: string, args: any[]): Promise<void> {
+  return new Promise<void>(async (resolve, reject) => {
     try {
-      var store:IDBObjectStore = await initObjectStore('readwrite');
-      var request: IDBRequest = store.add({
-        time: new Date().getTime(), 
-        type: type, 
-        color: color, 
-        name: name, 
-        data: (args && args[0] !== '' && args[0] !== null)? JSON.stringify(args) : null
-      });
+      const store: IDBObjectStore = await initObjectStore('readwrite');
+      const log: ILog = {
+        time: new Date().getTime(),
+        type: type,
+        color: color,
+        name: name,
+        data: (args && args[0] !== '' && args[0] !== null) ? JSON.stringify(args) : null
+      };
 
-      request.onsuccess = (e: Event) => resolve(<number>(e.target as IDBRequest).result);
+      if (__tracing) {
+        Logger.print(log);
+      }
+
+      const request: IDBRequest = store.add(log);
+      request.onsuccess = (e: Event) => resolve();
       request.onerror = (e: Event) => {
         logError(e); 
         reject(e);
@@ -88,27 +94,35 @@ export class Logger {
     this.color = ILogColor[color];
   }
 
-  public info(...args: any[]): Promise<number> {
+  public static get tracing(): boolean {
+    return __tracing;
+  }
+
+  public static set tracing(value: boolean) {
+    __tracing = value;
+  }
+
+  public info(...args: any[]): Promise<void> {
     return put(ILogType.Info, this.color, this.name, args);
   }
 
-  public static info(...args: any[]): Promise<number> {
+  public static info(...args: any[]): Promise<void> {
     return put(ILogType.Info, null, null, args);
   }
 
-  public warn(...args: any[]): Promise<number> {
+  public warn(...args: any[]): Promise<void> {
     return put(ILogType.Warning, this.color, this.name, args);
   }
 
-  public static warn(...args: any[]): Promise<number> {
+  public static warn(...args: any[]): Promise<void> {
     return put(ILogType.Warning, null, null, args);
   }
 
-  public error(...args: any[]): Promise<number> {
+  public error(...args: any[]): Promise<void> {
     return put(ILogType.Error, this.color, this.name, args);
   }
 
-  public static error(...args: any[]): Promise<number> {
+  public static error(...args: any[]): Promise<void> {
     return put(ILogType.Error, null, null, args);
   }
 
@@ -134,7 +148,7 @@ export class Logger {
     });
   }
 
-  public addLine(): Promise<number> {
+  public addLine(): Promise<void> {
     return put(ILogType.Info, null, this.name, null);
   }
 

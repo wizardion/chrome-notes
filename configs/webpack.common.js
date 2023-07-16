@@ -6,7 +6,6 @@ const htmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attribute
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const svgToMiniDataURI = require('mini-svg-data-uri');
 const __root__ = path.resolve(__dirname, '..');
@@ -14,11 +13,12 @@ const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev
 
 module.exports = {
   entry: {
-    popup: path.resolve(__root__, 'src/pages/popup/index.ts'),
+    
     index: path.resolve(__root__, 'src/pages/index/index.ts'),
-    background: path.resolve(__root__, 'src/worker/index.ts'),
-    settings: path.resolve(__root__, 'src/pages/options/index.ts'),
-    migration: path.resolve(__root__, 'src/pages/migration/index.ts'),
+    popup: path.resolve(__root__, 'src/pages/popup/popup.ts'),
+    background: path.resolve(__root__, 'src/worker/background.ts'),
+    settings: path.resolve(__root__, 'src/pages/options/options.ts'),
+    migration: path.resolve(__root__, 'src/pages/migration/migration.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -40,7 +40,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.ts?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
@@ -95,8 +95,12 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    plugins: [new TsconfigPathsPlugin({/* options: see below */})]
+    extensions: ['.tsx', '.ts', '.component.ts', '.js'],
+    alias: {
+      modules: path.resolve(__root__, 'src/modules'),
+      styles: path.resolve(__root__, 'src/styles'),
+      images: path.resolve(__root__, 'src/images'),
+    }
   },
   plugins: [
     new CleanWebpackPlugin(process.__version__? {
@@ -144,7 +148,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'My Notes',
       filename: 'popup.html',
-      template: './src/pages/popup/index.html',
+      template: './src/pages/popup/popup.html',
       // scriptLoading: 'blocking',
       scriptLoading: 'defer',
       // inject: 'head',
@@ -176,8 +180,9 @@ module.exports = {
     new htmlWebpackInjectAttributesPlugin(),
     new HtmlWebpackPlugin({
       title: 'My Options',
+      appName: 'Notes',
       filename: 'options.html',
-      template: './src/pages/options/index.html',
+      template: './src/pages/options/options.html',
       scriptLoading: 'defer',
       inject: "head",
       minify: {
@@ -196,7 +201,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Migration',
       filename: 'migration.html',
-      template: './src/pages/migration/index.html',
+      template: './src/pages/migration/migration.html',
       scriptLoading: 'blocking',
       inject: "body",
       minify: {

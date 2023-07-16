@@ -259,7 +259,6 @@ export class Base {
     this.locked = false;
     this.noteView.sync.disabled = false;
     this.noteView.sync.parentElement.addEventListener('mousedown', this.preventClick.bind(this));
-    this.noteView.sync.addEventListener('click', this.toggleSync.bind(this));
     this.noteView.sync.parentElement.setAttribute('title', 'sync note');
   }
 
@@ -366,7 +365,6 @@ export class Base {
 
       this.selected = note;
       this.noteView.preview.checked = note.preview;
-      this.noteView.sync.checked = this.selected.sync;
       this.setSyncAvailability();
     }
   }
@@ -382,21 +380,6 @@ export class Base {
 
     if (selected) {
       await storage.cached.set('selected', selected);
-    }
-  }
-
-  protected async toggleSync() {
-    var checked: boolean = this.noteView.sync.checked;
-
-    if (!this.new) {
-      this.selected.sync = checked;
-      this.syncedItems += checked? 1 : -1;
-      // this.syncedItems = this.notes.filter(n => n.sync).length;
-
-      await storage.cached.set('syncedItems', this.syncedItems);
-      await storage.cached.set('selected', this.selected.toString());
-    } else {
-      await storage.cached.set('sync', checked);
     }
   }
 
@@ -467,7 +450,6 @@ export class Base {
       note.title = title;
       note.description = description;
       note.cursor = this.noteView.editor.getSelection();
-      note.sync = this.noteView.sync.checked;
       note.save();
 
       this.notes.push(note);

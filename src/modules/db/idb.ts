@@ -6,7 +6,7 @@ var __database: IDBDatabase;
 var __queueList: IDBCommand[] = [];
 
 
-function logError(e: (Error|Event|any)) {
+function logError(e: (Error | Event | any)) {
   logger.error('DB ERROR', e.stack || e.message || e.cause || e, e.target);
 }
 
@@ -78,10 +78,10 @@ export function load(): Promise<IDBNote[]> {
       var index: IDBIndex = store.index('order');
       var request: IDBRequest = index.getAll();
   
-      request.onsuccess = (e: Event) => resolve(<IDBNote[]>(e.target as IDBRequest).result);
+      request.onsuccess = (e: Event) => resolve((<IDBNote[]>(e.target as IDBRequest).result).filter(i => !i.deleted));
       request.onerror = (e: Event) => {
-        logError(e); 
-        reject(e);
+        logError((<IDBRequest>e.target).error);
+        reject((<IDBRequest>e.target).error);
       };
     } catch (error) {
       logError(error); 
@@ -90,17 +90,35 @@ export function load(): Promise<IDBNote[]> {
   });
 }
 
-export function get(id: number): Promise<IDBNote[]> {
+export function dump(): Promise<IDBNote[]> {
   return new Promise<IDBNote[]>(async (resolve, reject) => {
     try {
       var store: IDBObjectStore = await initObjectStore('readonly');
       var index: IDBIndex = store.index('order');
-      var request: IDBRequest = index.get(id);
+      var request: IDBRequest = index.getAll();
   
       request.onsuccess = (e: Event) => resolve(<IDBNote[]>(e.target as IDBRequest).result);
       request.onerror = (e: Event) => {
-        logError(e); 
-        reject(e);
+        logError((<IDBRequest>e.target).error);
+        reject(e.target);
+      };
+    } catch (error) {
+      logError(error); 
+      reject(error);
+    }
+  });
+}
+
+export function get(id: number): Promise<IDBNote> {
+  return new Promise<IDBNote>(async (resolve, reject) => {
+    try {
+      var store: IDBObjectStore = await initObjectStore('readonly');
+      var request: IDBRequest = store.get(id);
+  
+      request.onsuccess = (e: Event) => resolve(<IDBNote>(<IDBRequest>e.target).result);
+      request.onerror = (e: Event) => {
+        logError((<IDBRequest>e.target).error); 
+        reject((<IDBRequest>e.target).error);
       };
     } catch (error) {
       logError(error); 
@@ -115,11 +133,10 @@ export function add(item: IDBNote): Promise<number> {
       var store:IDBObjectStore = await initObjectStore('readwrite');
       var request: IDBRequest = store.add({...item, id: (!item.id || item.id < 1)? generateId() : item.id});
 
-      // @ts-ignores
-      request.onsuccess = (e: Event) => resolve(<number>e.target.result);
+      request.onsuccess = (e: Event) => resolve(<number>(<IDBRequest>e.target).result);
       request.onerror = (e: Event) => {
-        logError(e); 
-        reject(e);
+        logError((<IDBRequest>e.target).error); 
+        reject((<IDBRequest>e.target).error);
       };
     } catch (error) {
       logError(error); 
@@ -134,11 +151,10 @@ export function update(item: IDBNote, objectStore?: IDBObjectStore): Promise<voi
       var store:IDBObjectStore = objectStore || await initObjectStore('readwrite');
       var request: IDBRequest = store.put(item);
 
-      // @ts-ignores
-      request.onsuccess = (e: Event) => resolve();
+      request.onsuccess = () => resolve();
       request.onerror = (e: Event) => {
-        logError(e); 
-        reject(e);
+        logError((<IDBRequest>e.target).error); 
+        reject((<IDBRequest>e.target).error);
       };
     } catch (error) {
       logError(error); 
@@ -153,11 +169,10 @@ export function remove(item: (IDBNote|number)): Promise<void> {
       var store:IDBObjectStore = await initObjectStore('readwrite');
       var request: IDBRequest = store.delete(typeof(item) === 'number'? item : item.id);
 
-      // @ts-ignores
-      request.onsuccess = (e: Event) => resolve();
+      request.onsuccess = () => resolve();
       request.onerror = (e: Event) => {
-        logError(e); 
-        reject(e);
+        logError((<IDBRequest>e.target).error);
+        reject((<IDBRequest>e.target).error);
       };
     } catch (error) {
       logError(error); 

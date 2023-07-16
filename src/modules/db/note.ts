@@ -8,7 +8,7 @@ export class DbNote implements IDBNote {
   public title: string;
   public description: string;
   public order: number;
-  public sync: boolean;
+  public synced: number;
   public preview: boolean;
   public cState: string;
   public pState: string;
@@ -28,8 +28,6 @@ export class DbNote implements IDBNote {
     this.cState = item.cState   || null;
     this.pState = item.pState   || null;
     this.html = item.html       || null;
-    
-    this.sync = (item.sync === undefined || item.sync === null)? false : item.sync;
   }
 
   public static saveQueue() {
@@ -48,13 +46,8 @@ export class DbNote implements IDBNote {
     if (this.id && this.id > 0) {
       let item: IDBNote = this.toDBNote();
 
-      if (this.sync) {  
-        item.deleted = true;
-
-        idb.update(item);
-      } else {
-        idb.remove(item.id);
-      }
+      item.deleted = true;
+      idb.update(item);
     }
   }
   
@@ -112,7 +105,6 @@ export class DbNote implements IDBNote {
       title: this.title,
       description: this.description,
       order: this.order,
-      sync: this.sync,
       preview: this.preview,
       cState: this.cState,
       pState: this.pState,

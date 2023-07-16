@@ -22,23 +22,23 @@ storage.cached.get().then(async cache => {
 
   tracker.track('init', `local.get: [${Object.keys(cache)}`.substring(0, 75) + '] ...');
   var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
-  var editor: Base = buildEditor(cache.mode && cache.mode.value || 0);
+  var editor: Base = buildEditor(<number>(cache.mode && cache.mode.value) || 0);
 
   notes.classList.remove('hidden');
   if (cache.list && cache.list.value) {
     tracker.track('init', `cache`);
-    editor.initFromCache(cache.list.value);
+    editor.initFromCache(<string>cache.list.value);
   }
 
   if (cache.new && cache.new.value) {
     editor.selectNew(
-      cache.description && cache.description.value, 
-      cache.selection && cache.selection.value,
-      cache.sync && cache.sync.value
+      <string>(cache.description && cache.description.value), 
+      <string>(cache.selection && cache.selection.value),
+      <boolean>(cache.sync && cache.sync.value)
     );
     tracker.track('init', `selectNew`);
   } else if (cache.selected && cache.selected.value) {
-    editor.selectFromCache(fromIDBNoteString(cache.selected.value));
+    editor.selectFromCache(fromIDBNoteString(<string>cache.selected.value));
     tracker.track('init', `selectFromCache`);
   } else {
     editor.showList();

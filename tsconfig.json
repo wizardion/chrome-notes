@@ -5,15 +5,15 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "module": "es6",
-    "target": "es5",
+    "target": "es6",
     "jsx": "react",
     "allowJs": true,
     "baseUrl": "src",
+    "moduleSuffixes": [".component", ""],
     "paths": {
-      "@notes/*": ["*/index"],
       "modules/*": ["modules/*"],
       "styles/*": ["styles/*"],
-      "images/*": ["images/*"],
+      "images/*": ["images/*"]
     }
   },
   "include": [

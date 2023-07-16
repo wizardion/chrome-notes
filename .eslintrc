@@ -1,0 +1,32 @@
+{
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "ignorePatterns": [
+    "**/*.html",
+    "**/node_modules"
+  ],
+  "rules": {
+    "no-bitwise": 2,
+    "camelcase": [2, {"properties": "never"}],
+    "curly": 2,
+    "eqeqeq": 2,
+    "wrap-iife": [2, "any"],
+    "indent": [2, 2, {"SwitchCase": 1}],
+    "no-use-before-define": [2, {"functions": false}],
+    "new-cap": 2,
+    "no-caller": 2,
+    "quotes": [2, "single"],
+    "semi": [2, "always"],
+    "no-undef": 2,
+    "no-unused-vars": 2,
+    "strict": [2, "function"]
+  },
+  "globals": {
+    "chrome": "readonly"
+  }
+}

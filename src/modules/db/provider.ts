@@ -18,8 +18,7 @@ export function loadFromCache(list?: string): DbNote[] {
       description: '', 
       order: i + 1, 
       updated: updated, 
-      created: null,
-      sync: null
+      created: null
     }));
   }
 

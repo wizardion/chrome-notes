@@ -1,44 +1,44 @@
-export default class Storage {
-  private static keys: {[key: string]: boolean} = {};
+// export default class Storage {
+//   private static keys: {[key: string]: boolean} = {};
 
-  public static set(key: string, value: (string|number|object), permament: boolean = false) {
-    if (!value && value !== 0) {
-      return this.remove(key);
-    }
+//   public static set(key: string, value: (string|number|object), permament: boolean = false) {
+//     if (!value && value !== 0) {
+//       return this.remove(key);
+//     }
 
-    if (permament && !this.keys[key]) {
-      this.keys[key] = true;
-    }
+//     if (permament && !this.keys[key]) {
+//       this.keys[key] = true;
+//     }
 
-    localStorage.setItem(key, value.toString());
-  }
+//     localStorage.setItem(key, value.toString());
+//   }
 
-  public static get(key: string, permament: boolean = false): string {
-    if (permament && !this.keys[key]) {
-      this.keys[key] = true;
-    }
+//   public static get(key: string, permament: boolean = false): string {
+//     if (permament && !this.keys[key]) {
+//       this.keys[key] = true;
+//     }
 
-    return localStorage.getItem(key);
-  }
+//     return localStorage.getItem(key);
+//   }
 
-  public static clear() {
-    var keys: string[] = Object.keys(localStorage);
+//   public static clear() {
+//     var keys: string[] = Object.keys(localStorage);
 
-    for(let i = 0; i < keys.length; i++) {
-      const key: string = keys[i];
+//     for(let i = 0; i < keys.length; i++) {
+//       const key: string = keys[i];
 
-      if (!this.keys[key]) {
-        localStorage.removeItem(key);
-      }
-    }
-  }
+//       if (!this.keys[key]) {
+//         localStorage.removeItem(key);
+//       }
+//     }
+//   }
 
-  public static erase() {
-    localStorage.clear();
-  }
+//   public static erase() {
+//     localStorage.clear();
+//   }
 
-  public static remove(key: string) {
-    localStorage.removeItem(key);
-    delete this.keys[key];
-  }
-}
+//   public static remove(key: string) {
+//     localStorage.removeItem(key);
+//     delete this.keys[key];
+//   }
+// }
