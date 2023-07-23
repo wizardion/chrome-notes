@@ -24,7 +24,7 @@ export class Simple extends Base {
     }
   }
 
-  public async selectNew(description: string, selection?: string, sync?: boolean) {
+  public async selectNew(description: string, selection?: string) {
     this.listView.node.style.display = 'None';
     this.newView.node.style.display = 'inherit';
 
@@ -35,8 +35,7 @@ export class Simple extends Base {
     this.noteView.delete.style.display = 'none';
     this.noteView.preview.parentElement.style.display = 'none';
 
-    this.noteView.sync.parentElement.classList.add('short');
-    super.selectNew(description, selection, sync);
+    super.selectNew(description, selection);
   }
 
   protected async cancelCreation() {
@@ -61,7 +60,7 @@ export class Simple extends Base {
 
     if (this.selected) {
       this.selected.element.scrollIntoView({block: 'center'});
-      Validator.animateSelected(this.selected.element);
+      Validator.animateSelected(this.selected.element, 2000);
     }
 
     this.selected = null;
@@ -72,9 +71,6 @@ export class Simple extends Base {
     this.noteView.node.style.display = 'inherit';
     this.noteView.back.style.display = 'inherit';
     this.noteView.delete.style.display = 'inherit';
-    // this.noteView.sync.parentElement.style.display = 'inherit';
     this.noteView.preview.parentElement.style.display = 'inherit';
-
-    this.noteView.sync.parentElement.classList.remove('short');
   }
 }

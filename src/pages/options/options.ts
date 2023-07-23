@@ -2,7 +2,7 @@ import 'styles/options.scss';
 
 import * as core from 'modules/core';
 import storage from 'modules/storage/storage';
-import { IStorageData, ISyncStorageValue } from 'modules/storage/interfaces';
+import { IStorageData, IStorageValue, ISyncStorageValue } from 'modules/storage/interfaces';
 import { ViewStyleElement } from './components/view-style/style';
 import { SyncInfoElement } from './components/sync-info/info';
 import { DevModeElement } from './components/dev-mode/dev';
@@ -13,10 +13,19 @@ import { ISyncInfo, IdentityInfo } from 'modules/sync/components/interfaces';
 
 type StorageChange = { [key: string]: chrome.storage.StorageChange };
 type AreaName = chrome.storage.AreaName;
+type SettingsArea = {
+  devMode: boolean;
+  mode: number;
+  sync: ISyncInfo;
+  identity: IdentityInfo;
+  promise: boolean;
+  message: string;
+};
 
 const controls: { syncInfo?: SyncInfoElement, devModeInfo?: DevModeElement, viewStyle?: ViewStyleElement } = {};
-const settings: { cached: IStorageData; sync: ISyncInfo; identity: IdentityInfo; promise: boolean; message: string } = {
-  cached: null,
+const settings: SettingsArea = {
+  mode: null,
+  devMode: null,
   sync: null,
   identity: null,
   promise: false,
@@ -34,7 +43,10 @@ customElements.define('dev-mode-info', DevModeElement);
   controls.devModeInfo = <DevModeElement>document.querySelector('dev-mode-info');
   controls.viewStyle = <ViewStyleElement>document.querySelector('view-style');
 
-  settings.cached = await storage.cached.get(['mode', 'devMode', 'syncInfo']);
+  // settings.cached = await storage.local.get(['mode', 'devMode']);
+  settings.devMode = <boolean>await storage.local.get('devMode');
+  settings.mode = <number>await storage.local.get('mode');
+  
   settings.identity = <IdentityInfo>await storage.local.get('identityInfo');
   settings.sync = await storage.sync.get();
   settings.message = <string>(await chrome.storage.session.get('errorMessage')).errorMessage;
@@ -59,8 +71,8 @@ customElements.define('dev-mode-info', DevModeElement);
     controls.syncInfo.message = settings.message;
   }
 
-  controls.devModeInfo.enabled = settings.cached.devMode.value === true;
-  controls.viewStyle.value = <number>settings.cached.mode.value;
+  controls.devModeInfo.enabled = settings.devMode === true;
+  controls.viewStyle.value = settings.mode;
 
   await chrome.storage.session.set({ optionPageId: (await chrome.tabs.getCurrent()).id });
 })();
@@ -74,6 +86,7 @@ async function viewChanged(element: ViewStyleElement) {
     chrome.action.setPopup({ popup: 'popup.html' });
   }
 
+  await storage.local.set('mode', mode);
   await storage.cached.permanent('mode', mode);
 }
 
@@ -120,7 +133,7 @@ async function syncInfoChanged(element: SyncInfoElement) {
 }
 
 async function devModeChanged(element: DevModeElement) {
-  await storage.cached.permanent('devMode', element.enabled);
+  await storage.local.set('devMode', element.enabled);
 }
 
 async function eventOnStorageChanged(changes: StorageChange, namespace: AreaName) {

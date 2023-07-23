@@ -4,7 +4,6 @@ import { IDBNote } from 'modules/db/interfaces';
 import { Encryptor } from 'modules/encryption/encryptor';
 import { Logger } from 'modules/logger/logger';
 import storage from 'modules/storage/storage';
-import { fromIDBNoteString, toIDBNoteString } from 'modules/notes/builder';
 
 
 const logger: Logger = new Logger('lib.ts');
@@ -89,5 +88,6 @@ export async function lock(reason: string) {
   if (!identityInfo.locked) {
     identityInfo.locked = true;
     await storage.local.sensitive('identityInfo', identityInfo);
+    await storage.cached.permanent('locked', true);
   }
 }

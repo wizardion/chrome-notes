@@ -24,8 +24,8 @@ export class FullScreen extends Mixed {
     setInterval(this.timer.bind(this), 1000);
   }
 
-  public init() {
-    super.init();
+  public async init() {
+    await super.init();
 
     if (chrome && chrome.tabs) {
       chrome.tabs.getCurrent((tab: chrome.tabs.Tab) => {
@@ -58,24 +58,28 @@ export class FullScreen extends Mixed {
   }
 
   protected saveTabInfo(tabId: number, windowId?: number) {
-    chrome.storage.local.set({tabInfo: {
-      id: tabId, 
-      windowId: windowId,
-      width: null,
-      height: null
-    }});
+    chrome.storage.local.set({
+      tabInfo: {
+        id: tabId,
+        windowId: windowId,
+        width: null,
+        height: null,
+      },
+    });
   }
 
   protected saveScreenPosition() {
-    console.log('this.mode',this.mode);
+    console.log('this.mode', this.mode);
 
     if (this.mode === 4 && chrome && chrome.storage) {
-      chrome.storage.local.set({window: {
-        top: window.screenTop,
-        left: window.screenLeft,
-        width: window.outerWidth,
-        height: window.outerHeight,
-      }});
+      chrome.storage.local.set({
+        window: {
+          top: window.screenTop,
+          left: window.screenLeft,
+          width: window.outerWidth,
+          height: window.outerHeight,
+        },
+      });
     }
   }
 }

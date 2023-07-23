@@ -25,7 +25,6 @@ export function buildEditor(): Base {
     back: <HTMLButtonElement>document.getElementById('to-list'),
     delete: <HTMLButtonElement>document.getElementById('delete-note'),
     preview: <HTMLInputElement>document.getElementById('preview-note'),
-    sync: <HTMLInputElement>document.getElementById('sync-note'),
     html: <HTMLElement>document.getElementById('html-preview'),
     editor: codemirror
   };

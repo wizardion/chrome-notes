@@ -113,6 +113,6 @@ export class DevModeElement extends BaseElement {
   }
 
   protected async printCache() {
-    console.log(await storage.global.get());
+    console.log((await storage.global.get()).local['cache']);
   }
 }

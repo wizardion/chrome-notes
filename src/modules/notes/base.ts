@@ -1,66 +1,97 @@
-import {IListView, INewNoteView, INoteView, Intervals, ISTNote} from './components/interfaces';
-import {DbNote} from '../db/note';
-import {loadFromCache,loadAll} from '../db/provider';
-import {Note} from './components/note';
-import {Validator} from './components/validation';
-import {Sorting} from './components/sorting';
-import {ScrollListener} from './components/scrolling';
-import {NodeHelper} from './components/node-helper';
+import { ICachedNote, IListView, INewNoteView, INoteView, Intervals, ISTNote } from './components/interfaces';
+import { DbNote } from '../db/note';
+import { loadAll, parseList } from '../db/provider';
+import { Note } from './components/note';
+import { Validator } from './components/validation';
+import { Sorting } from './components/sorting';
+import { ScrollListener } from './components/scrolling';
+import { NodeHelper } from './components/node-helper';
 import storage from '../storage/storage';
-import {Logger} from '../logger/logger';
-
+import { Logger } from '../logger/logger';
 
 const logger: Logger = new Logger('base.ts', 'red');
 export class Base {
   protected notes: Note[];
-  protected selected?: Note;
+  protected _selected?: Note;
   protected intervals: Intervals;
   protected listView: IListView;
   protected noteView: INoteView;
   protected newView: INewNoteView;
   private cacheIndex?: number;
   protected new?: boolean;
-  protected locked: boolean;
-  private _maxSyncItems: number;
-  private _syncedItems: number;
+  protected _locked: boolean;
 
   constructor(listView: IListView, noteView: INoteView, newView: INewNoteView) {
     this.notes = [];
     this.intervals = {};
-    this.selected = null;
+    this._selected = null;
     this.listView = listView;
     this.noteView = noteView;
     this.newView = newView;
-    this.locked = true;
-    this._maxSyncItems = 0;
-    this._syncedItems = 0;
+    this._locked = false;
   }
 
-  public initFromCache(list?: string) {
-    this.buildFromCache(loadFromCache(list));
-  }
+  // public selectFromCache(note: ISTNote) {
+  //   if (note.index !== null && this.notes.length > 0 && note.index < this.notes.length) {
+  //     var selected = this.notes[note.index];
 
-  protected buildFromCache(notes: DbNote[]) {
-    if (notes.length > 0) {
-      this.listView.items.appendChild(this.render(notes));
-    }
-  }
+  //     selected.set(note);
+  //     return this.selectNote(selected, true);
+  //   }
 
-  public selectFromCache(note: ISTNote) {
-    if (note.index !== null && this.notes.length > 0 && note.index < this.notes.length) {
-      var selected = this.notes[note.index];
+  //   this.cacheIndex = note.index;
+  //   this.showNote();
+  //   this.bind((note.title || '') + '\n' + (note.description || ''), note.cState, note.html, note.pState);
+  // }
 
-      selected.set(note);
-      return this.selectNote(selected, true);
+  public async init(list?: DbNote[]) {
+    if (list && list.length) {
+      this.listView.items.appendChild(this.render(list));
     }
 
-    this.cacheIndex = note.index;
-    this.showNote();
-    this.bind((note.title || '') + '\n' + (note.description || ''), note.cState, note.html, note.pState);
+    this.build(await loadAll());
   }
 
-  public init() {
-    loadAll().then(this.build.bind(this));
+  get selected(): Note {
+    return this._selected;
+  }
+
+  set selected(value: Note) {
+    this._selected = value;
+  }
+
+  private render(items: DbNote[]) {
+    var index: number = -1;
+    var fragment = <DocumentFragment>document.createDocumentFragment();
+
+    for (var i = 0; i < items.length; i++) {
+      const item = items[i];
+      const note = this.notes[i];
+
+      index++;
+
+      if (!note) {
+        const newNote = new Note(item, index);
+
+        this.notes.push(newNote);
+        fragment.appendChild(newNote.element);
+
+        newNote.onclick = this.selectNote.bind(this, newNote, true, true);
+        newNote.sortButton.onmousedown = Sorting.start.bind(Sorting, newNote);
+      } else if (item.id !== note.id) {
+        const newNote = new Note(item, index);
+
+        this.notes.splice(i, 0, newNote);
+        this.listView.items.insertBefore(newNote.element, note.element);
+
+        newNote.onclick = this.selectNote.bind(this, newNote, true, true);
+        newNote.sortButton.onmousedown = Sorting.start.bind(Sorting, newNote);
+      } else {
+        note.set(item, index);
+      }
+    }
+
+    return fragment;
   }
 
   /**
@@ -85,7 +116,7 @@ export class Base {
         let value = selected.title + '\n' + selected.description;
 
         if (this.noteView.editor.value !== value) {
-          this.bind(value, selected.cursor, selected.html, selected.previewState, selected.toString());
+          this.bind(value, selected.cursor, selected.html, selected.previewState, selected.cached);
         }
       }
     }
@@ -97,7 +128,7 @@ export class Base {
     this.newView.create.addEventListener('mousedown', this.preventClick.bind(this));
     this.newView.cancel.addEventListener('mousedown', this.preventClick.bind(this));
 
-    this.listView.addButton.addEventListener('click', this.selectNew.bind(this, '', null));
+    this.listView.addButton.addEventListener('click', () => this.selectNew());
     this.noteView.delete.addEventListener('click', this.remove.bind(this));
     this.noteView.preview.addEventListener('click', this.togglePreview.bind(this));
     this.newView.create.addEventListener('click', this.addNote.bind(this));
@@ -116,15 +147,11 @@ export class Base {
     ScrollListener.listen(this.noteView.html, 550);
     Note.addEventListener(this.onNewNoteCreated.bind(this));
 
-    if (this.locked) {
-      this.noteView.sync.parentElement.setAttribute('title', 'Enable synchronization in settings...');
-    }
-
     this.cacheList(notes);
   }
 
   //#region Event-Listeners
-  private async preventClick(e: MouseEvent) {
+  private preventClick(e: MouseEvent) {
     e.preventDefault();
   }
 
@@ -204,71 +231,25 @@ export class Base {
   //#endregion
 
   //#region Public-Members
-  public get maxLength(): number {
-    return this.noteView.editor.maxLength;
-  }
+  async selectNew(description: string = '', selection?: string) {
+    console.log('selectNew', [description, selection]);
 
-  public set maxLength(value: number) {
-    this.noteView.editor.maxLength = value;
-  }
-
-  public get maxSyncItems(): number {
-    return this._maxSyncItems;
-  }
-
-  public set maxSyncItems(value: number) {
-    this._maxSyncItems = value;
-  }
-
-  public get syncedItems(): number {
-    return this._syncedItems;
-  }
-
-  public set syncedItems(value: number) {
-    this._syncedItems = value;
-
-    console.log('syncedItems = ', value);
-    this.setSyncAvailability();
-  }
-  
-  private setSyncAvailability() {
-    console.log('this.syncedItems', this.syncedItems, this.maxSyncItems);
-
-    if (this.maxSyncItems > 0 && this.syncedItems >= (this.maxSyncItems) && !this.noteView.sync.checked) {
-      this.noteView.sync.disabled = true;
-      this.noteView.sync.parentElement.setAttribute('title', 'No more space is available to sync.');
-    } else if (!this.locked) {
-      this.noteView.sync.disabled = false;
-      this.noteView.sync.parentElement.setAttribute('title', 'sync note');
-    }
-  }
-
-  public async selectNew(description: string, selection?: string, sync?: boolean) {
     this.noteView.editor.value = description;
     this.noteView.editor.setSelection(selection);
-    this.noteView.sync.checked = (sync === true);
 
     this.new = true;
     this.selected = undefined;
 
-    this.setSyncAvailability();
     await storage.cached.set('new', 'true');
   }
 
-  public unlock() {
-    this.locked = false;
-    this.noteView.sync.disabled = false;
-    this.noteView.sync.parentElement.addEventListener('mousedown', this.preventClick.bind(this));
-    this.noteView.sync.parentElement.setAttribute('title', 'sync note');
+  public set lock(value: boolean) {
+    this._locked = true;
   }
 
-  public showList() {
+  public showList() {}
 
-  }
-
-  public showNote() {
-    
-  }
+  public showNote() {}
   //#endregion
 
   //#region Protected-Members
@@ -341,8 +322,8 @@ export class Base {
 
   // TODO review usage
   protected async cacheList(db: DbNote[] = null) {
-    var notes: (DbNote|Note)[] = db || this.notes;
-    var cache: (string|number)[] = [];
+    var notes: (DbNote | Note)[] = db || this.notes;
+    var cache: (string | number)[] = [];
 
     for (let i = 0; i < Math.min(21, notes.length); i++) {
       const note = notes[i];
@@ -352,24 +333,29 @@ export class Base {
       }
     }
 
-    await storage.cached.set('list', JSON.stringify(cache).replace(/^\[|\]$/gi, ''));
+    await storage.cached.set('list', cache);
   }
 
-  protected selectNote(note: Note, bind?: boolean, save?: boolean) {
+  public selectNote(item: Note | ICachedNote, bind?: boolean, save?: boolean) {
+    const value = item.title + '\n' + item.description;
+
+    if (item.new) {
+      const cached = <ICachedNote>item;
+      return this.selectNew(value, cached.selection);
+    }
+
     if (!Sorting.busy) {
-      let value = note.title + '\n' + note.description;
-      logger.info(`selectNote, bind[${bind}]`, note.description);
+      const note = <Note>item;
 
       this.showNote();
-      this.bind(value, note.cursor, note.html, note.previewState, save && note.toString());
+      this.bind(value, note.cursor, note.html, note.previewState, save && note.cached);
 
       this.selected = note;
       this.noteView.preview.checked = note.preview;
-      this.setSyncAvailability();
     }
   }
 
-  protected async bind(description: string, selection?: string, html?: string, pState?: string, selected?: string) {
+  protected async bind(description: string, selection?: string, html?: string, pState?: string, cached?: ICachedNote) {
     this.noteView.editor.value = description;
     this.noteView.editor.setSelection(selection);
 
@@ -378,8 +364,8 @@ export class Base {
       this.setPreviewSelection(pState);
     }
 
-    if (selected) {
-      await storage.cached.set('selected', selected);
+    if (cached) {
+      await storage.cached.set('selected', cached);
     }
   }
 
@@ -393,52 +379,15 @@ export class Base {
   }
   //#endregion
 
-  //#region Private-Members
-  private render(items: DbNote[]) {
-    var index: number = -1;
-    var fragment = <DocumentFragment>document.createDocumentFragment();
-
-    for (var i = 0; i < items.length; i++) {
-      const item = items[i];
-      const note = this.notes[i];
-      
-      index++;
-
-      if (!note) {
-        const newNote = new Note(item, index);
-
-        this.notes.push(newNote);
-        fragment.appendChild(newNote.element);
-        
-        newNote.onclick = this.selectNote.bind(this, newNote, true, true);
-        newNote.sortButton.onmousedown = Sorting.start.bind(Sorting, newNote);
-      } else if (item.id !== note.id) {
-        const newNote = new Note(item, index);
-
-        this.notes.splice(i, 0, newNote);
-        this.listView.items.insertBefore(newNote.element, note.element);
-
-        newNote.onclick = this.selectNote.bind(this, newNote, true, true);
-        newNote.sortButton.onmousedown = Sorting.start.bind(Sorting, newNote);
-      } else {
-        note.set(item, index);
-      }
-    }
-
-    return fragment;
-  }
-  //#endregion
-
   protected async addNote() {
     var note: Note = await this.createNote();
 
     if (note) {
       this.new = false;
       this.selectNote(note, false, true);
-      // await storage.cached.remove('sync');
     }
   }
-  
+
   protected async createNote(): Promise<Note> {
     var [title, description] = this.noteView.editor.getData();
 
@@ -446,7 +395,7 @@ export class Base {
       // TODO Review state savings, synch and preview.
       // TODO new note doesn't have id yet, state needs to be reviewed.
       let note: Note = new Note(null, this.notes.length);
-      
+
       note.title = title;
       note.description = description;
       note.cursor = this.noteView.editor.getSelection();
@@ -462,12 +411,11 @@ export class Base {
 
       this.newView.cancel.style.display = 'None';
       this.newView.create.style.display = 'None';
-      
+
       await storage.cached.remove('new');
       await storage.cached.remove('description');
       await storage.cached.remove('selection');
-      await storage.cached.remove('sync');
-      
+
       return note;
     }
   }

@@ -1,5 +1,6 @@
 import {Editor} from '../editor';
 import {IDBNote} from '../../db/interfaces'
+import { Note } from './note';
 
 
 interface IView {
@@ -21,7 +22,6 @@ export interface INoteView extends IView {
   editorControlls?: HTMLElement[];
   editor?: Editor;
   preview?: HTMLInputElement;
-  sync?: HTMLInputElement;
   html?: HTMLElement;
 }
 
@@ -46,6 +46,20 @@ export interface Intervals {
   scroll?: NodeJS.Timeout,
 }
 
+export interface IDecorator {
+  document?: NodeJS.Timeout;
+}
+
 export interface ISTNote extends IDBNote {
   index: number;
+}
+
+export interface ICachedNote {
+  new: boolean;
+  title: string;
+  description: string;
+  cursor?: string;
+  selection?: string;
+  previewState?: string;
+  preview?: boolean;
 }

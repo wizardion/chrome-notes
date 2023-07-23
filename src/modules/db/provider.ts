@@ -1,55 +1,57 @@
 import * as idb from './idb';
 import {DbNote} from './note';
 import {IDBNote} from './interfaces'
+import { Note } from 'modules/notes/components/note';
+import { ICachedNote } from 'modules/notes/components/interfaces';
 
 
-export function loadFromCache(list?: string): DbNote[] {
-  var items = list? JSON.parse(`[${list}]`) : [];
-  var notes: DbNote[] = [];
-
-  for (let i = 2; i < items.length; i += 3) {
-    const id = items[i - 2];
-    const title = items[i - 1];
-    const updated = items[i];
-    
-    notes.push(new DbNote({
-      id: id, 
-      title: title,
-      description: '', 
-      order: i + 1, 
-      updated: updated, 
-      created: null
-    }));
-  }
-
-  return notes;
-}
-
-export async function loadAll() {
+export async function loadAll(): Promise<DbNote[]> {
   var notes: DbNote[] = [];
   var result: IDBNote[] = await idb.load();
 
-  for(var i = 0; i < result.length; i++) {
+  for (var i = 0; i < result.length; i++) {
     const item = result[i];
 
     if (!item.deleted && !item.locked) {
       notes.push(new DbNote(item));
     }
   }
-  
+
   return notes;
 }
 
-export function toJSONString(notes: string[]): string {
-  // var list: (string|number)[] = [];
+export function parseList(list: (number | string)[]): DbNote[] {
+  var result: DbNote[] = [];
 
-  // for (let i = 0; i < Math.min(10, notes.length); i++) {
-  //   const note = notes[i];
+  for (var i = 0; i < list.length; i += 3) {
+    result.push(
+      new DbNote({
+        id: <number>list[i],
+        description: '',
+        order: i,
+        title: <string>list[i + 1],
+        updated: <number>list[i + 2],
+        created: 0,
+      })
+    );
+  }
 
-  //   list = list.concat([note.title, note.updated]);
-  // }
-
-  // return JSON.stringify(list).replace(/^\[|\]$/gi, '');
-
-  return '';
+  return result;
 }
+
+// export function toNote(value: ICachedNote): Note {
+//   // const splited = value.split('\n\n');
+//   // const title = splited.shift();
+//   // const description = splited.join('\n\n');
+
+//   // return new Note(
+//   //   new DbNote({
+//   //     id: -1,
+//   //     description: description,
+//   //     order: 0,
+//   //     title: title,
+//   //     updated: 0,
+//   //     created: 0,
+//   //   })
+//   // );
+// }

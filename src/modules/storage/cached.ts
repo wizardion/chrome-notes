@@ -70,7 +70,7 @@ export class CachedStorage {
 
   public static async init() {
     const value = (await chrome.storage.local.get(this.key)) || {};
-    return await chrome.storage.session.set({ [this.key]: value });
+    return await chrome.storage.session.set({ [this.key]: value[this.key] || {} });
   }
 
   public static async empty() {

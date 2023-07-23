@@ -14,30 +14,9 @@ type AreaName = chrome.storage.AreaName;
 const workerName: string = 'sync-worker';
 const logger: Logger = new Logger('background.ts', 'green');
 
+chrome.runtime.onInstalled.addListener(initApp);
 
-chrome.runtime.onInstalled.addListener(async () => {
-  await chrome.alarms.clearAll();
-  if (await AlarmWorker.validate()) {
-    await AlarmWorker.start();
-  }
-
-  await storage.cached.init();
-  //#region testing
-  await core.delay(100);
-  Logger.tracing = true;
-  // chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
-  //#endregion
-});
-
-chrome.runtime.onStartup.addListener(async () => {
-  logger.info('onStartup is fired');
-  await storage.cached.init();
-
-  await chrome.alarms.clearAll();
-  if (await AlarmWorker.validate()) {
-    await AlarmWorker.start();
-  }
-});
+chrome.runtime.onStartup.addListener(initApp);
 
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
   await logger.addLine();
@@ -61,8 +40,7 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
 });
 
 chrome.action.onClicked.addListener(async () => {
-  var local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo']);
-  let mode: number = <number>(await storage.cached.get(['mode'])).mode.value || 0;
+  var local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'mode']);
   let window: IWindow = local.window;
 
   // if (local.migrate) {
@@ -71,10 +49,9 @@ chrome.action.onClicked.addListener(async () => {
 
   if (local.tabInfo) {
     var tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
-
-    openPopup(mode, window, tab && tab.id, tab && tab.windowId);
+    openPopup(local.mode, window, tab && tab.id, tab && tab.windowId);
   } else {
-    openPopup(mode, window);
+    openPopup(local.mode, window);
   }
 });
 
@@ -97,6 +74,34 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
   }
 });
 
+async function initApp() {
+  logger.info('initApp is fired');
+  await storage.cached.init();
+
+  await chrome.alarms.clearAll();
+  if (await AlarmWorker.validate()) {
+    await AlarmWorker.start();
+  }
+
+  initPopup();
+
+  //#region testing
+  await core.delay(100);
+  Logger.tracing = true;
+  ensureOptionPage();
+  //#endregion
+}
+
+async function initPopup() {
+  var storage = await chrome.storage.local.get('mode');
+
+  if (storage.mode === 3 || storage.mode === 4) {
+    chrome.action.setPopup({ popup: '' }, () => {});
+  } else {
+    chrome.action.setPopup({ popup: 'popup.html' }, () => {});
+  }
+}
+
 async function eventOnSyncInfoChanged(info: ISyncInfo) {
   logger.info('eventOnSyncInfoChanged', { i: info });
   const identity: IdentityInfo = <IdentityInfo>await storage.local.get('identityInfo') || {
@@ -109,10 +114,12 @@ async function eventOnSyncInfoChanged(info: ISyncInfo) {
 
   if (identity.locked && info.enabled && info.token && !info.encrypted && identity.encrypted) {
     identity.locked = false;
+    await storage.cached.permanent('locked', false);
   }
 
   if (!identity.locked && info.enabled && info.token && info.encrypted && !identity.passphrase) {
     identity.locked = true;
+    await storage.cached.permanent('locked', true);
   }
 
   if (!info.encrypted) {
@@ -181,7 +188,7 @@ function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: nu
   }
 
   if (mode === 3) {
-    return chrome.tabs.create({ url: chrome.runtime.getURL('index.html') });
+    return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
   }
 
   if (mode === 4) {
@@ -196,7 +203,7 @@ function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: nu
         height: window.height,
       });
     } else {
-      chrome.windows.create({ focused: true, url: chrome.runtime.getURL('index.html'), type: 'popup' });
+      chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
     }
   }
 }
@@ -216,14 +223,6 @@ chrome.runtime.onConnect.addListener(() => {
 //#endregion
 
 //#region old.code
-// function setPopup(mode: number) {
-//   if (mode === 3 || mode === 4) {
-//     chrome.action.setPopup({popup: ''}, ()=>{});
-//   } else {
-//     chrome.action.setPopup({popup: 'popup.html'}, ()=>{});
-//   }
-// }
-
 // chrome.runtime.onInstalled.addListener(() => {
 
 //   chrome.storage.local.remove('logs');

@@ -21,7 +21,7 @@ export class Mixed extends Base {
   }
 
   public selectFromCache(note: ISTNote) {
-    super.selectFromCache(note);
+    // super.selectFromCache(note);
 
     if (this.selected && !this.new) {
       this.scrollIntoElement(this.listView.items, this.selected.element);
@@ -41,7 +41,7 @@ export class Mixed extends Base {
     }
   }
 
-  public async selectNew(description: string, selection?: string, sync?: boolean) {
+  public async selectNew(description: string, selection?: string) {
     this.newView.cancel.style.display = 'inherit';
     this.newView.create.style.display = 'inherit';
     this.noteView.delete.style.display = 'none';
@@ -54,7 +54,7 @@ export class Mixed extends Base {
     }
 
     this.hidePreview();
-    super.selectNew(description, selection, sync);
+    super.selectNew(description, selection);
   }
 
   protected async cancelCreation() {
@@ -111,7 +111,7 @@ export class Mixed extends Base {
     }
   }
 
-  protected selectNote(note: Note, bind?: boolean, save?: boolean) {
+  public selectNote(note: Note, bind?: boolean, save?: boolean) {
     if (this.new) {
       this.reserved = note;
       return this.cancelCreation();

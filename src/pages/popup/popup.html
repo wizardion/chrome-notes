@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="background-color: darkgrey;">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +13,6 @@
           <button id="cancel-note" class="link back cancel"><%= require('images/back.svg?inline') %></button>
           <button id="create-note" class="button save"><%= require('images/save.svg?inline') %></button>
           <button id="delete-note" class="button delete"><%= require('images/delete.svg?inline') %></button>
-          <label class="checkbox sync" title="sync note">
-            <input id="sync-note" type="checkbox" disabled>
-            <span class="checkmark"><%= require('images/sync.svg?inline') %></span>
-          </label>
           <label class="checkbox edit" title="preview">
             <input id="preview-note" type="checkbox">
             <span class="checkmark"><%= require('images/code.svg?inline') %></span>

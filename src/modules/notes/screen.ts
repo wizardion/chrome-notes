@@ -21,8 +21,8 @@ export class Screen extends Mixed {
     this.noteView.editor.hide();
   }
 
-  public init() {
-    super.init();
+  public async init() {
+    await super.init();
     this.setTabInfo();
   }
 
@@ -31,12 +31,14 @@ export class Screen extends Mixed {
 
     chrome.tabs.getCurrent(async (tab: chrome.tabs.Tab) => {
       if (tab) {
-        await chrome.storage.local.set({tabInfo: {
-          id: tab.id, 
-          windowId: tab.windowId,
-          width: null,
-          height: null
-        }});
+        await chrome.storage.local.set({
+          tabInfo: {
+            id: tab.id,
+            windowId: tab.windowId,
+            width: null,
+            height: null,
+          },
+        });
       }
     });
   }

@@ -1,6 +1,5 @@
-import {INoteControls, ISTNote} from './interfaces';
-import {DbNote} from '../../db/note';
-import { toIDBNoteString } from '../builder';
+import { ICachedNote, INoteControls, ISTNote } from './interfaces';
+import { DbNote } from '../../db/note';
 
 
 export class Note {
@@ -10,6 +9,7 @@ export class Note {
   private selectionState: string;
   private event?: EventListener;
   public element: HTMLElement;
+  public new?: boolean;
 
   constructor(note?: DbNote, index: number = 0) {
     this.note = note || this.createNew(index);
@@ -28,7 +28,7 @@ export class Note {
       sort: <HTMLInputElement>document.createElement('input'),
       toNote: <HTMLInputElement>document.createElement('input'),
     };
-    
+
     this.element.className = 'list-item';
     this.controls.date.className = 'date-time';
     this.controls.title.className = 'list-title';
@@ -41,7 +41,7 @@ export class Note {
     this.controls.toNote.className = 'button to-note';
 
     this.element.title = this.note.title;
-    this.controls.bullet.innerText = `${(this.indexId + 1)}`;
+    this.controls.bullet.innerText = `${this.indexId + 1}`;
     this.controls.title.innerText = this.note.title;
     this.controls.date.innerText = this.getDateString(this.note.updated);
 
@@ -61,7 +61,7 @@ export class Note {
     DbNote.addEventListener(event);
   }
 
-  public set(note: (DbNote|ISTNote), index: number = null) {
+  public set(note: DbNote | ISTNote, index: number = null) {
     this.note.id = note.id;
     this.note.description = note.description;
     this.note.order = note.order;
@@ -90,7 +90,7 @@ export class Note {
     if (this.indexId !== value) {
       this.indexId = value;
       this.note.order = value + 1;
-      this.controls.bullet.innerText = `${(this.note.order)}`;
+      this.controls.bullet.innerText = `${this.note.order}`;
     }
   }
 
@@ -102,7 +102,7 @@ export class Note {
     if (this.indexId !== value) {
       this.indexId = value;
       this.note.order = value + 1;
-      this.controls.bullet.innerText = `${(this.note.order)}`;
+      this.controls.bullet.innerText = `${this.note.order}`;
       this.note.updated = this.getTime();
       this.note.setOrder();
     }
@@ -194,6 +194,18 @@ export class Note {
     this.controls.date.innerText = this.getDateString(this.note.updated);
   }
 
+  public get cached(): ICachedNote {
+    return {
+      new: false,
+      title: this.title,
+      description: this.description,
+      cursor: this.cursor,
+      selection: this.selection,
+      previewState: this.previewState,
+      preview: this.preview
+    };
+  }
+
   public set onclick(event: EventListener) {
     if (this.event) {
       this.element.removeEventListener('mousedown', this.prevent);
@@ -221,18 +233,14 @@ export class Note {
     this.note.remove();
   }
 
-  public toString(): string {
-    return toIDBNoteString({...this.note, cState: this.selectionState || this.note.cState}, this.index);
-  }
-
   private createNew(index: number): DbNote {
     return new DbNote({
-      id: -1, 
-      title: '', 
-      description: '', 
-      order: index + 1, 
-      updated: this.getTime(), 
-      created: this.getTime()
+      id: -1,
+      title: '',
+      description: '',
+      order: index + 1,
+      updated: this.getTime(),
+      created: this.getTime(),
     });
   }
 
