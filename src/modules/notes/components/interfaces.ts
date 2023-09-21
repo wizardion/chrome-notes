@@ -1,5 +1,5 @@
-import {Editor} from '../editor';
-import {IDBNote} from '../../db/interfaces'
+import {Editor} from '../../notes2/components/editor/editor';
+import {IDBNote} from '../../db/interfaces';
 import { Note } from './note';
 
 

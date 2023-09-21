@@ -4,10 +4,11 @@
     "node": true
   },
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "script"
   },
   "ignorePatterns": [
     "**/*.html",
+    "**/*.json",
     "**/node_modules"
   ],
   "rules": {
@@ -24,8 +25,28 @@
     "semi": [2, "always"],
     "no-undef": 2,
     "no-unused-vars": 2,
-    "strict": [2, "function"]
+    "strict": ["error", "safe"]
   },
+  "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/warnings"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint"],
+      "parserOptions": {
+        "sourceType": "module"
+      },
+      "rules": {
+        "import/newline-after-import": ["error", { "count": 2 }],
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ],
   "globals": {
     "chrome": "readonly"
   }

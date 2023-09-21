@@ -4,13 +4,14 @@ import { buildEditor } from './components/builder';
 import { parseList } from 'modules/db/provider';
 import { DbNote } from 'modules/db/note';
 import 'styles/style.scss';
-import { ICachedNote } from 'modules/notes/components/interfaces';
+import { ICachedNote, IDecorator } from 'modules/notes/components/interfaces';
 
 
-var dbNotes: DbNote[] = null;
+console.log('IDecorator', 1 as IDecorator);
+let dbNotes: DbNote[] = null;
 storage.cached.get().then(async (cache) => {
-  var editor: Base = buildEditor(<number>cache.mode?.value || 0);
-  var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
+  const editor: Base = buildEditor(<number>cache.mode?.value || 0);
+  const notes: HTMLElement = <HTMLElement>document.getElementById('notes');
 
   notes.classList.remove('hidden');
 

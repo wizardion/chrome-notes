@@ -66,7 +66,7 @@ export class Mixed extends Base {
     this.new = false;
 
     if (this.notes.length) {
-      let reserved = this.reserved || this.notes[0];
+      const reserved = this.reserved || this.notes[0];
 
       this.noteView.delete.style.display = 'inherit';
       this.noteView.preview.parentElement.style.display = 'inherit';
@@ -79,7 +79,7 @@ export class Mixed extends Base {
   }
 
   protected async addNote() {
-    var note: Note = await this.createNote();
+    const note: Note = await this.createNote();
 
     if (note) {
       this.listView.addButton.style.visibility = '';
@@ -94,7 +94,7 @@ export class Mixed extends Base {
   }
 
   protected async remove() {
-    var index = this.selected.index;
+    const index = this.selected.index;
 
     storage.cached.clear();
     super.remove();
@@ -124,14 +124,14 @@ export class Mixed extends Base {
     this.noteView.delete.style.display = 'inherit';
     this.noteView.preview.parentElement.style.display = 'inherit';
 
-    if (!this.noteView.editor.displayed) {
+    if (this.noteView.editor.hidden) {
       this.noteView.editor.show();
     }
   }
 
   private select(note: Note, bind?: boolean, save?: boolean) {
     if (this.selected) {
-      var [title, description] = this.noteView.editor.getData();
+      const [title, description] = this.noteView.editor.getData();
 
       if (this.selected === note || !this.validate(title, true)) {
         return;
@@ -148,7 +148,7 @@ export class Mixed extends Base {
   }
 
   private scrollIntoElement(container: HTMLElement, element: HTMLElement) {
-    let max = container.scrollHeight - container.offsetHeight;
+    const max = container.scrollHeight - container.offsetHeight;
 
     if ((element.offsetTop + element.offsetHeight) > container.offsetHeight) {
       container.scrollTop = Math.min(Math.max(element.offsetTop - element.offsetHeight, 0), max);

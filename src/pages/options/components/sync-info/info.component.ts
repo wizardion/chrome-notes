@@ -3,7 +3,8 @@ import { BaseElement } from 'modules/core/base';
 import { TokenSecretDenied } from 'modules/sync/components/interfaces';
 import { ISyncInfoForm, IDecorator, IResponseDetails } from './interfaces';
 
-const template: DocumentFragment = BaseElement.template(require('html-loader!./template.html').default);
+
+const template: DocumentFragment = BaseElement.template(require('./template.html').default);
 
 
 export class SyncInfoElement extends BaseElement {
@@ -15,7 +16,6 @@ export class SyncInfoElement extends BaseElement {
   private _locked: boolean;
   private _response: IResponseDetails;
 
-  protected template: HTMLElement;
   protected form: ISyncInfoForm;
   protected event: Event;
 
@@ -154,10 +154,6 @@ export class SyncInfoElement extends BaseElement {
     );
   }
 
-  protected render() {
-    this.appendChild(this.template);
-  }
-
   protected async eventListeners() {
     this.event = new Event('sync-info:change');
 
@@ -244,7 +240,7 @@ export class SyncInfoElement extends BaseElement {
     return async () => {
       await Cloud.wait();
       return Cloud.sync();
-    }
+    };
   }
 
   protected encryptDecorator(passphrase: string): IDecorator {

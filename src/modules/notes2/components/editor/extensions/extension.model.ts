@@ -1,0 +1,1 @@
+export type Extension = {extension: Extension} | readonly Extension[];

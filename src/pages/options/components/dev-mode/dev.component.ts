@@ -3,10 +3,11 @@ import storage from 'modules/storage/storage';
 import { Logger } from 'modules/logger/logger';
 import { ILogType } from 'modules/logger/interfaces';
 
-const template: DocumentFragment = BaseElement.template(require('html-loader!./template.html').default);
+
+const template: DocumentFragment = BaseElement.template(require('./template.html').default);
+
 
 export class DevModeElement extends BaseElement {
-  protected template: HTMLElement;
   protected fieldset: HTMLFieldSetElement;
   protected mode: HTMLInputElement;
   protected print: HTMLLinkElement;
@@ -42,10 +43,6 @@ export class DevModeElement extends BaseElement {
     this.info.hidden = !value;
   }
 
-  protected render() {
-    this.appendChild(this.template);
-  }
-
   protected async eventListeners() {
     this.event = new Event('mode:change');
     this.mode.onchange = () => this.modeChanged();
@@ -71,7 +68,7 @@ export class DevModeElement extends BaseElement {
   }
 
   protected async printLogs() {
-    var cache = await storage.cached.get();
+    const cache = await storage.cached.get();
 
     Logger.load().then((logs) => {
       console.clear();

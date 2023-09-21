@@ -1,10 +1,10 @@
 import {BaseElement} from 'modules/core/base.component';
 
-const template:DocumentFragment = BaseElement.template(require('html-loader!./template.html').default);
+
+const template:DocumentFragment = BaseElement.template(require('./template.html').default);
 
 
 export class ViewStyleElement extends BaseElement {
-  protected template: HTMLElement;
   protected fieldset: HTMLFieldSetElement;
   protected views: NodeList;
   protected index: number;
@@ -16,7 +16,7 @@ export class ViewStyleElement extends BaseElement {
     super();
     this.template = <HTMLElement>template.cloneNode(true);
     this.fieldset = this.template.querySelector('fieldset');
-    this.views = <NodeList>this.template.querySelectorAll('input[name="views"]')
+    this.views = <NodeList>this.template.querySelectorAll('input[name="views"]');
   }
 
   get value():number {
@@ -32,10 +32,6 @@ export class ViewStyleElement extends BaseElement {
         this.index = index;
       }
     }
-  }
-
-  protected render() {
-    this.appendChild(this.template);
   }
 
   protected async eventListeners() {

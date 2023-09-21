@@ -1,6 +1,6 @@
-import { ICachedNote, IListView, INewNoteView, INoteView, Intervals, ISTNote } from './components/interfaces';
+import { ICachedNote, IListView, INewNoteView, INoteView, Intervals } from './components/interfaces';
 import { DbNote } from '../db/note';
-import { loadAll, parseList } from '../db/provider';
+import { loadAll } from '../db/provider';
 import { Note } from './components/note';
 import { Validator } from './components/validation';
 import { Sorting } from './components/sorting';
@@ -8,6 +8,7 @@ import { ScrollListener } from './components/scrolling';
 import { NodeHelper } from './components/node-helper';
 import storage from '../storage/storage';
 import { Logger } from '../logger/logger';
+
 
 const logger: Logger = new Logger('base.ts', 'red');
 export class Base {
@@ -61,10 +62,10 @@ export class Base {
   }
 
   private render(items: DbNote[]) {
-    var index: number = -1;
-    var fragment = <DocumentFragment>document.createDocumentFragment();
+    let index = -1;
+    const fragment = <DocumentFragment>document.createDocumentFragment();
 
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const note = this.notes[i];
 
@@ -112,8 +113,8 @@ export class Base {
       if (!this.selected && this.cacheIndex >= 0 && this.notes.length) {
         this.selectNote(this.notes[this.cacheIndex]);
       } else if (this.selected) {
-        let selected: Note = this.selected;
-        let value = selected.title + '\n' + selected.description;
+        const selected: Note = this.selected;
+        const value = selected.title + '\n' + selected.description;
 
         if (this.noteView.editor.value !== value) {
           this.bind(value, selected.cursor, selected.html, selected.previewState, selected.cached);
@@ -160,7 +161,7 @@ export class Base {
       clearInterval(this.intervals.document);
 
       this.intervals.document = setTimeout(async () => {
-        var [title, description] = this.noteView.editor.getData();
+        const [title, description] = this.noteView.editor.getData();
 
         if (this.validate(title)) {
           if (this.selected) {
@@ -179,8 +180,8 @@ export class Base {
       clearInterval(this.intervals.scroll);
 
       this.intervals.scroll = setTimeout(async () => {
-        let scrollTop = this.noteView.html.scrollTop;
-        let selection = NodeHelper.getSelection(this.noteView.html);
+        const scrollTop = this.noteView.html.scrollTop;
+        const selection = NodeHelper.getSelection(this.noteView.html);
 
         if (this.selected) {
           this.selected.previewState = `${scrollTop}|${selection}`;
@@ -210,7 +211,7 @@ export class Base {
     if (this.new) {
       this.addNote();
     } else if (this.selected) {
-      var [title, description] = this.noteView.editor.getData();
+      const [title, description] = this.noteView.editor.getData();
 
       if (this.validate(title, true)) {
         this.save(title, description);
@@ -231,7 +232,7 @@ export class Base {
   //#endregion
 
   //#region Public-Members
-  async selectNew(description: string = '', selection?: string) {
+  async selectNew(description = '', selection?: string) {
     console.log('selectNew', [description, selection]);
 
     this.noteView.editor.value = description;
@@ -247,9 +248,13 @@ export class Base {
     this._locked = true;
   }
 
-  public showList() {}
+  public showList() {
+    throw Error('Not Implemented');
+  }
 
-  public showNote() {}
+  public showNote() {
+    throw Error('Not Implemented');
+  }
   //#endregion
 
   //#region Protected-Members
@@ -274,14 +279,14 @@ export class Base {
     this.selected.preview = this.noteView.preview.checked;
 
     if (this.noteView.preview.checked) {
-      var scrollTop = this.noteView.editor.scrollTop;
+      const scrollTop = this.noteView.editor.scrollTop;
 
       this.showPreview(this.noteView.editor.render());
       this.noteView.html.scrollTop = scrollTop;
 
       this.selected.html = this.noteView.html.innerHTML;
     } else {
-      var scrollTop = this.noteView.html.scrollTop;
+      const scrollTop = this.noteView.html.scrollTop;
 
       this.hidePreview();
       this.noteView.editor.focus();
@@ -307,7 +312,7 @@ export class Base {
 
   protected setPreviewSelection(previewState?: string) {
     if (previewState && previewState.length > 1) {
-      let [scrollTop, selection] = previewState.split('|');
+      const [scrollTop, selection] = previewState.split('|');
 
       this.noteView.html.scrollTop = Number(scrollTop) || 0;
       NodeHelper.setSelection(selection, this.noteView.html);
@@ -316,14 +321,14 @@ export class Base {
     }
   }
 
-  protected validate(title: string, animate: boolean = false): boolean {
+  protected validate(title: string, animate = false): boolean {
     return !Validator.required(title, animate && this.noteView.editor.wrapper);
   }
 
   // TODO review usage
   protected async cacheList(db: DbNote[] = null) {
-    var notes: (DbNote | Note)[] = db || this.notes;
-    var cache: (string | number)[] = [];
+    const notes: (DbNote | Note)[] = db || this.notes;
+    let cache: (string | number)[] = [];
 
     for (let i = 0; i < Math.min(21, notes.length); i++) {
       const note = notes[i];
@@ -380,7 +385,7 @@ export class Base {
   //#endregion
 
   protected async addNote() {
-    var note: Note = await this.createNote();
+    const note: Note = await this.createNote();
 
     if (note) {
       this.new = false;
@@ -389,12 +394,12 @@ export class Base {
   }
 
   protected async createNote(): Promise<Note> {
-    var [title, description] = this.noteView.editor.getData();
+    const [title, description] = this.noteView.editor.getData();
 
     if (this.validate(title, true)) {
       // TODO Review state savings, synch and preview.
       // TODO new note doesn't have id yet, state needs to be reviewed.
-      let note: Note = new Note(null, this.notes.length);
+      const note: Note = new Note(null, this.notes.length);
 
       note.title = title;
       note.description = description;

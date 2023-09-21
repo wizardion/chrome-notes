@@ -1,10 +1,10 @@
 import {BaseElement} from 'modules/core/base.component';
 
-const template:DocumentFragment = BaseElement.template(require('html-loader!./template.html').default);
+
+const template:DocumentFragment = BaseElement.template(require('./template.html').default);
 
 
 export class ProgressElement extends BaseElement {
-  protected template: HTMLElement;
   protected progress: HTMLDivElement;
   protected thumb: HTMLDivElement;
 
@@ -22,7 +22,7 @@ export class ProgressElement extends BaseElement {
 
   public finish(delay?: number): Promise<void> {
     return new Promise<void>(async (resolve) => {
-      var animationEvent = async () => {
+      const animationEvent = async () => {
         this.animationIteration();
         this.thumb.removeEventListener('animationiteration', animationEvent);
         delay && await this.delay(delay);
@@ -48,10 +48,6 @@ export class ProgressElement extends BaseElement {
 
   protected delay(milliseconds: number): Promise<void> {
     return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
-  }
-
-  protected render() {
-    this.appendChild(this.template);
   }
 
   protected async eventListeners() {

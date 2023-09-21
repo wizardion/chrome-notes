@@ -1,0 +1,15 @@
+<div id="list-view" class="list-view disable-select">
+  <div id="list-controls" class="list-controls">
+    <!-- <a id="title" href="./options.html" class="notes-title" >My Notes</a> -->
+    <span class="notes-title">My Notes</span>
+
+    <button id="search-button" class="button search">
+      <%= require('images/search.svg?inline') %>
+    </button>
+    <input id="search-input" type="text" class="search-notes" placeholder="Enter keyword" maxlength="30">
+    <button id="add-note" class="button add">
+      <%= require('images/plus.svg?inline') %>
+    </button>
+  </div>
+  <div id="list-items" class="list-items hidden-scroll"></div>
+</div>

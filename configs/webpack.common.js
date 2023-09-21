@@ -2,11 +2,11 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const htmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
+const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
 const __root__ = path.resolve(__dirname, '..');
 const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
@@ -40,6 +40,14 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /template\.html$/,
+        loader: 'html-loader',
+        options: {
+          minimize: true,
+        },
+        exclude: /node_modules/,
+      },
+      {
         test: /\.ts?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
@@ -58,7 +66,7 @@ module.exports = {
             loader: 'sass-loader',
             options: {
               sourceMap: false,
-              implementation: require("dart-sass"),
+              implementation: require('dart-sass'),
             }
           }
         ],
@@ -122,7 +130,7 @@ module.exports = {
       template: './src/pages/index/index.html',
       scriptLoading: 'defer',
       // inject: 'head',
-      inject: "head",
+      inject: 'head',
       minify: {
         collapseWhitespace: true,
         keepClosingSlash: true,
@@ -137,7 +145,7 @@ module.exports = {
         'index'
       ],
       attributes: {
-        'async': function (tag, compilation, index, a, b) {
+        'async': function (tag) {
           if (tag.tagName === 'script' && tag.attributes.src.match(/^index/gi)) {
             return true;
           }
@@ -152,7 +160,7 @@ module.exports = {
       // scriptLoading: 'blocking',
       scriptLoading: 'defer',
       // inject: 'head',
-      inject: "head",
+      inject: 'head',
       // inject: "body",
       // minify: false,
       minify: {
@@ -169,7 +177,7 @@ module.exports = {
         'popup'
       ],
       attributes: {
-        'async': function (tag, compilation, index, a, b) {
+        'async': function (tag) {
           if (tag.tagName === 'script' && tag.attributes.src.match(/^index/gi)) {
             return true;
           }
@@ -177,14 +185,14 @@ module.exports = {
         }
       },
     }),
-    new htmlWebpackInjectAttributesPlugin(),
+    new HtmlWebpackInjectAttributesPlugin(),
     new HtmlWebpackPlugin({
       title: 'My Options',
       appName: 'Notes',
       filename: 'options.html',
       template: './src/pages/options/options.html',
       scriptLoading: 'defer',
-      inject: "head",
+      inject: 'head',
       minify: {
         collapseWhitespace: true,
         keepClosingSlash: true,
@@ -203,7 +211,7 @@ module.exports = {
       filename: 'migration.html',
       template: './src/pages/migration/migration.html',
       scriptLoading: 'blocking',
-      inject: "body",
+      inject: 'body',
       minify: {
         collapseWhitespace: true,
         keepClosingSlash: true,
@@ -223,7 +231,7 @@ module.exports = {
     //   // test: {}
     // }),
     new StatsWriterPlugin({
-      filename: "manifest.json",
+      filename: 'manifest.json',
       transform({ assetsByChunkName }) {
         let manifest = require(path.resolve(__root__, 'src/manifest.json'));
 
@@ -233,7 +241,7 @@ module.exports = {
         if (!manifest.version) {
           delete manifest.key;
 
-          manifest.version = "0"
+          manifest.version = '0';
           manifest.name = 'My-Notes-Testers (Dev)';
           manifest.action.default_title = 'My-Notes-Testers (Dev)';
         }
