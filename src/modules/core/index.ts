@@ -1,5 +1,6 @@
-import { Encryptor } from "modules/encryption/encryptor";
-import { IAppConfig } from "./interfaces";
+import { Encryptor } from 'modules/encryption/encryptor';
+import { IAppConfig } from './interfaces';
+
 
 const configs: IAppConfig = {
   delay: 500

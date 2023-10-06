@@ -16,6 +16,7 @@
     "@codemirror/search": "^6.5.2",
     "markdown-it": "^13.0.1",
     "markdown-it-task-lists": "^2.1.1",
+    "@hedgedoc/markdown-it-task-lists": "^2.0.1",
     "@lezer/highlight": "^1.1.6",
     "@lezer/markdown": "^1.1.0"
   },

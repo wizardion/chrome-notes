@@ -18,8 +18,8 @@ export async function unzip(item: ISyncItemInfo, cryptor?: Encryptor): Promise<I
     title: title,
     description: description,
     order: item.o,
-    preview: false,
-    cState: item.s,
+    preview: null,
+    cState: item.s.split(',').map(v => Number(v)),
     pState: null,
     html: null,
     updated: item.u,
@@ -39,7 +39,7 @@ export async function zip(item: IDBNote, cryptor?: Encryptor): Promise<ISyncItem
     t: title,
     d: description,
     o: item.order,
-    s: item.cState,
+    s: item.cState.join(','),
     u: item.updated,
     c: item.created
   };
@@ -49,7 +49,7 @@ export async function zip(item: IDBNote, cryptor?: Encryptor): Promise<ISyncItem
 
 function map(items: IDBNote[], cloud: ISyncItemInfo[]): ISyncPair[] {
   const map: { [id: number]: ISyncPair } = {};
-  const pairs: ISyncPair[] = []
+  const pairs: ISyncPair[] = [];
 
   for (let i = 0; i < cloud.length; i++) {
     const pair: ISyncPair = { db: null, cloud: cloud[i] };
@@ -66,7 +66,7 @@ function map(items: IDBNote[], cloud: ISyncItemInfo[]): ISyncPair[] {
     }
 
     if (!map[item.id]) {
-      let pair: ISyncPair = { db: item, cloud: null };
+      const pair: ISyncPair = { db: item, cloud: null };
 
       map[item.id] = pair;
       pairs.push(pair);

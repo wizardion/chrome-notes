@@ -1,36 +1,47 @@
-import { Base } from 'modules/notes/base';
 import storage from 'modules/storage/storage';
-import { buildEditor } from './components/builder';
-import { parseList } from 'modules/db/provider';
-import { DbNote } from 'modules/db/note';
+import { IDataDaft, IPopupData } from './components/popup.models';
+import { PopupNotesElement } from 'modules/notes/popup/popup-notes.component';
+import { ListViewElement } from 'modules/notes/list-view/list-view.component';
+import { ListItemElement } from 'modules/notes/list-item/list-item.component';
+import { DetailsViewElement } from 'modules/notes/details-view/details-view.component';
+import { IDBNote } from 'modules/db/interfaces';
 import 'styles/style.scss';
-import { ICachedNote, IDecorator } from 'modules/notes/components/interfaces';
 
 
-console.log('IDecorator', 1 as IDecorator);
-let dbNotes: DbNote[] = null;
 storage.cached.get().then(async (cache) => {
-  const editor: Base = buildEditor(<number>cache.mode?.value || 0);
-  const notes: HTMLElement = <HTMLElement>document.getElementById('notes');
+  const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
+  const configs: IPopupData = {
+    items: <IDBNote[]>cache.list?.value,
+    index: <number>cache.selected?.value,
+    draft: <IDataDaft>cache.draft?.value
+  };
 
-  notes.classList.remove('hidden');
+  // console.log('list', cache.list?.value);
 
-  if (cache.new?.value) {
-    editor.selectNew(<string>cache.description?.value, <string>cache.selection?.value);
-  } else if (cache.selected?.value) {
-    editor.selectNote(<ICachedNote>cache.selected.value);
-  } else {
-    editor.showList();
+  if (configs.items) {
+    notes.init(configs.items);
+
+    if (configs.index !== null) {
+      const item = configs.items.find(i => i.id === configs.index);
+
+      // console.log('item', item);
+
+      if (item) {
+        notes.hidden = false;
+        return notes.select(item, false);
+      }
+    }
   }
 
-  if (cache.list?.value) {
-    dbNotes = parseList(<(number | string)[]>cache.list.value);
+  if (configs.draft) {
+    notes.hidden = false;
+    return notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
   }
 
-  if (cache.locked) {
-    editor.lock = true;
-  }
-
-  editor.init(dbNotes);
-  notes.classList.remove('transparent');
+  notes.hidden = false;
 });
+
+customElements.define(ListViewElement.selector, ListViewElement);
+customElements.define(ListItemElement.selector, ListItemElement);
+customElements.define(DetailsViewElement.selector, DetailsViewElement);
+customElements.define(PopupNotesElement.selector, PopupNotesElement);

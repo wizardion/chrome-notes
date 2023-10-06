@@ -6,49 +6,50 @@ import { Logger } from 'modules/logger/logger';
 import storage from 'modules/storage/storage';
 import { ISyncStorageValue } from 'modules/storage/interfaces';
 import { IdentityInfo, ISyncInfo } from 'modules/sync/components/interfaces';
-import { IWindow } from './interfaces';
-import { AlarmWorker } from './components/alarm-worker';
+import { workers, DataWorker, SyncWorker, IWindow, StorageChange, AreaName } from './components';
 
-type StorageChange = { [key: string]: chrome.storage.StorageChange };
-type AreaName = chrome.storage.AreaName;
-const workerName: string = 'sync-worker';
+
 const logger: Logger = new Logger('background.ts', 'green');
 
-chrome.runtime.onInstalled.addListener(initApp);
+chrome.runtime.onInstalled.addListener(async () => await initApp('onInstalled'));
 
-chrome.runtime.onStartup.addListener(initApp);
+chrome.runtime.onStartup.addListener(async () => await initApp('onStartup'));
 
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
-  await logger.addLine();
-  await logger.info(`${workerName} started`);
+  const workers = [DataWorker, SyncWorker];
+  
+  for (let i = 0; i < workers.length; i++) {
+    const worker = workers[i];
+    
+    if (alarm.name === worker.worker) {
+      await logger.addLine();
+      await logger.info(`${worker.worker} started`);
 
-  if (alarm.name === workerName && !(await Cloud.busy())) {
-    try {
-      await chrome.storage.session.remove('errorMessage');
-      await Cloud.sync();
-    } catch (error) {
-      await ensureOptionPage();
-      await chrome.storage.session.set({ errorMessage: error.message });
-      await logger.error('An error occurred during the sync process.\n', error.message);
-      await AlarmWorker.stop();
+      try {
+        await chrome.storage.session.remove('errorMessage');
+        await worker.process();
+      } catch (error) {
+        await ensureOptionPage();
+        await chrome.storage.session.set({ errorMessage: error.message });
+        await logger.error('An error occurred during the process.\n', error.message);
+        await worker.stop();
+      } finally {
+        await logger.info(`${worker.worker} finished`);
+      }
     }
-  } else if (await Cloud.busy()) {
-    await logger.info(`${workerName} is busy`);
   }
-
-  await logger.info(`${workerName} finished`);
 });
 
 chrome.action.onClicked.addListener(async () => {
-  var local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'mode']);
-  let window: IWindow = local.window;
+  const local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'mode']);
+  const window: IWindow = local.window;
 
   // if (local.migrate) {
   //   return openMigration();
   // }
 
   if (local.tabInfo) {
-    var tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
+    const tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
     openPopup(local.mode, window, tab && tab.id, tab && tab.windowId);
   } else {
     openPopup(local.mode, window);
@@ -74,16 +75,16 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
   }
 });
 
-async function initApp() {
-  logger.info('initApp is fired');
-  await storage.cached.init();
+async function initApp(handler: string) {
+  await logger.info('initApp is fired: ', [handler]);
 
   await chrome.alarms.clearAll();
-  if (await AlarmWorker.validate()) {
-    await AlarmWorker.start();
+  if (await SyncWorker.validate()) {
+    await SyncWorker.start();
   }
 
-  initPopup();
+  DataWorker.start();
+  await initPopup();
 
   //#region testing
   await core.delay(100);
@@ -93,12 +94,12 @@ async function initApp() {
 }
 
 async function initPopup() {
-  var storage = await chrome.storage.local.get('mode');
+  const storage = await chrome.storage.local.get('mode');
 
   if (storage.mode === 3 || storage.mode === 4) {
-    chrome.action.setPopup({ popup: '' }, () => {});
+    chrome.action.setPopup({ popup: '' });
   } else {
-    chrome.action.setPopup({ popup: 'popup.html' }, () => {});
+    chrome.action.setPopup({ popup: 'popup.html' });
   }
 }
 
@@ -137,23 +138,23 @@ async function eventOnIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Identi
   logger.info('eventOnIdentityInfoChanged', { i: newInfo });
 
   if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
-    await AlarmWorker.stop();
+    await SyncWorker.stop();
     return await removeCachedAuthToken(oldInfo.token);
   }
 
-  if (newInfo && newInfo.token && (await AlarmWorker.validate(newInfo))) {
-    return await AlarmWorker.start();
+  if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
+    return await SyncWorker.start();
   }
 
   if (newInfo && newInfo.locked) {
     await ensureOptionPage();
   }
 
-  return await AlarmWorker.stop();
+  return await SyncWorker.stop();
 }
 
 async function findTab(tabId: number): Promise<chrome.tabs.Tab> {
-  var tabs = await chrome.tabs.query({});
+  const tabs = await chrome.tabs.query({});
 
   for (let i = 0; i < tabs.length; i++) {
     if (tabs[i].id === tabId) {
@@ -209,16 +210,16 @@ function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: nu
 }
 
 //#region testing
-chrome.runtime.onSuspend.addListener(() => {
-  logger.info('onSuspend called');
+chrome.runtime.onSuspend.addListener(async () => {
+  await logger.info('onSuspend called');
 });
 
-chrome.runtime.onSuspendCanceled.addListener(() => {
-  logger.info('onSuspend is canceled');
+chrome.runtime.onSuspendCanceled.addListener(async () => {
+  await logger.info('onSuspend is canceled');
 });
 
-chrome.runtime.onConnect.addListener(() => {
-  logger.info('onConnect is fired');
+chrome.runtime.onConnect.addListener(async () => {
+  await logger.info('onConnect is fired');
 });
 //#endregion
 

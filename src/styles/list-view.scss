@@ -1,6 +1,8 @@
 .list-view {
-  display: none;
-  background: white;
+  // display: none;
+  // background: white;
+  // background: rgb(251 251 253);
+  background: rgb(248 250 252);
 }
 
 .list-view .list-controls {
@@ -9,6 +11,7 @@
   height: 25px;
   text-align:center;
   border-bottom: 1px groove transparent;
+  // border-bottom: 1px dotted #07a69835;
 }
 
 .list-view .list-controls span,
@@ -62,13 +65,38 @@
   outline: none;
 }
 
-.list-view .list-items {
+.list-view .list-content {
+  border-radius: 4px;
+  // border: 1px solid rebeccapurple;
+  box-sizing: border-box;
+  margin: 0px 5px 0px 5px;
+  overflow: hidden;
+}
+
+.list-view .list-scroll {
   width: 100%;
   height: 244px;
   position: relative;
   overflow-y: scroll;
   overflow-x: hidden;
+  z-index: 100;
 }
+
+.list-view .list-items {
+  border-radius: 4px;
+  // border: 1px solid rebeccapurple;
+  background: white;
+  margin-bottom: 5px;
+
+  // background: white;
+  // // background: #07a698;
+  // // overflow: hidden;
+  // margin: 0px 0px 5px 5px;
+  // border-radius: 4px;
+  // position: relative; 
+}
+
+.list-view .list-items .list list-item
 
 .list-view .list-items .no-items {
   display: none;

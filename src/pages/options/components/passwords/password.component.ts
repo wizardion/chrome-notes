@@ -2,8 +2,9 @@ import {BaseElement} from 'modules/core/base.component';
 import {Encryptor} from 'modules/encryption/encryptor';
 
 
-const template:DocumentFragment = BaseElement.template(require('./template.html').default);
-
+const template: DocumentFragment = BaseElement.component({
+  templateUrl: './template.html'
+});
 
 export class PasswordElement extends BaseElement {
   static observedAttributes = ['disabled', 'required'];

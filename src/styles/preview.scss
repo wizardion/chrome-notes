@@ -1,6 +1,6 @@
 .content-preview {
   outline: none;
-  margin: 0;
+  margin: 0px;
   resize: none;
   border: none;
   background: transparent;
@@ -8,53 +8,61 @@
   white-space: normal;
   word-break: break-word;
   font-weight: 400;
-  display: inline-block;
   width: 100%;
   min-height: 203px;
   box-sizing: border-box;
-  line-height: 18px;
-  padding: 7px;
-  padding-right: 3px;
-  padding-bottom: 0px;
-  padding-top: 0px;
+  padding: 5px 3px 0 18px;
   overflow-x: hidden;
   overflow-y: scroll;
-  height: 241px !important;
-  display: none;
-  font-size: 13px;
-  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+  height: 244px !important;
+  font-size: 14px;
+  // font-family: monospace;
+  // font-family: 'Roboto Mono', monospace, sans-serif !important;
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+  line-height: 1.4;
+
+  position: absolute;
+  left: 0px;
+  width: 100%;
+  background: white;
+  z-index: 100;
 }
 
-.content-preview .title {
-  text-align: center;
-  color: #06736a !important;
-  font-weight: bold !important;
-  font-style: normal !important;
-  font-size: 16px !important;
-  line-height: 21px;
-  margin-left: -1px !important;
-  padding: 9px 5px 10px 5px;
-}
+// .content-preview .title {
+//   text-align: center;
+//   color: #06736a !important;
+//   font-weight: bold !important;
+//   font-style: normal !important;
+
+//   font-size: x-large;
+//   line-height: 1.4;
+// }
 
 .content-preview .title + p {
   margin-top: 0px;
 }
-
-// .content-preview > p {
-//   // white-space: pre-wrap;
-//   // margin-top: 20px;
-//   // margin-bottom: 20px;
-// }
 
 .content-preview > * {
   margin-top: 0px;
   margin-bottom: 0px;
 }
 
-.content-preview ul, ul,
+.content-preview ul {
+  list-style: none;
+  margin: 0 0;
+  padding-left: 2em;
+  text-indent: -2em;
+  white-space: normal;
+}
+
+.content-preview ul li:before {
+  content: "-";
+  padding-right: 5px;
+}
+
 .content-preview ol {
-  margin: -1px;
-  padding-left: 30px;
+  margin: 0 0;
+  padding-left: 2em;
   white-space: normal;
 }
 
@@ -68,9 +76,20 @@
   padding-bottom: 1px;
 }
 
-.content-preview ul.contains-task-list {
-  list-style-type: none;
-  padding-left: 15px;
+// .content-preview ul.contains-task-list {
+//   list-style-type: none;
+//   padding-left: 15px;
+// }
+
+.content-preview ul li.task-list-item:before {
+  content: "-";
+  display: none;
+}
+
+.content-preview  li.task-list-item input {
+  margin: -2px 8px 0px 0px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .content-preview blockquote {
@@ -99,8 +118,12 @@
 }
 
 .content-preview ::selection {
+  background: #d7d4f0;
+}
+
+.content-preview ::selection {
   // background: #07a6983d;
-  background: #d9e9e9;
+  background: #d7d4f0;
 }
 
 .content-preview table {
@@ -135,23 +158,20 @@
   background-color: #f6f8fa;
 }
 
-.content-preview p code {
+.content-preview p {
+  margin: 0px 0 0px 0;
+}
+
+.content-preview :not(pre) > code {
   background: ghostwhite;
-  background-color: #f0f4f6;
+  background-color: #f6f8fa;
 
-  border: 1px solid transparent;
-  // border: 1px solid lightgray;
-
+  border: 1px solid lightgray;
   border-radius: 2px;
   padding: 1px 4px 1px 4px;
   margin: 0;
-  // color: #06736a;
-
-  // border: 1px solid lightgray;
-  border-radius: 4px;
 
   font-size: 13px;
-  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
   color: #06736a;
 }
 
@@ -170,11 +190,6 @@
   word-break: break-word;
 }
 
-.content-preview pre code {
-  font-size: 13px;
-  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
-}
-
 .content-preview > h1 + *,
 .content-preview > h2 + *,
 .content-preview > h3 + *,
@@ -191,11 +206,41 @@
 .content-preview h5,
 .content-preview h6 {
   padding-bottom: .2em;
-  border-bottom: 1px solid #eaecef;
   margin: 0;
-  font-size: 100%;
-  margin-top: 20px;
-  font-weight: 600;
+}
+
+.content-preview h1 {
+  display: block;
+  display: block;
+  color: #06736a;
+  font-size: x-large;
+  text-align: center;
+  font-weight: bold;
+  padding: 0px;
+}
+
+.content-preview h2 {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.content-preview h3 {
+  font-size: large;
+  font-weight: bold;
+}
+
+.content-preview h4 {
+  font-size: 14px;
+  font-weight: bold;
+  color: gray;
+}
+
+.content-preview h5, 
+.content-preview h6 {
+  font-size: 14px;
+  color: gray;
+  font-style: italic;
+  font-weight: normal;
 }
 
 // .content-preview > p + ul,

@@ -1,13 +1,17 @@
-import { IStorageData } from "./interfaces";
+import { IDBNote } from 'modules/db/interfaces';
+import { IStorageData } from './interfaces';
+import { Logger } from 'modules/logger/logger';
 
+
+const logger: Logger = new Logger('cached.ts', 'green');
 
 export class CachedStorage {
   public static cache: IStorageData;
-  protected static key: string = 'cache';
+  protected static key = 'cache';
 
   public static async set(key: string, value: string | number | object | boolean) {
     if (!value && value !== 0 && value !== false) {
-      return this.remove(key);
+      return this.remove([key]);
     }
 
     this.cache = await this.load(this.key);
@@ -17,7 +21,7 @@ export class CachedStorage {
 
   public static async permanent(key: string, value: string | number | boolean | object) {
     if (!value && value !== 0 && value !== false) {
-      return this.remove(key);
+      return this.remove([key]);
     }
 
     this.cache = await this.load(this.key);
@@ -29,7 +33,7 @@ export class CachedStorage {
     this.cache = await this.load(this.key);
 
     if (keys) {
-      let result: IStorageData = {};
+      const result: IStorageData = {};
 
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
@@ -45,7 +49,7 @@ export class CachedStorage {
 
   public static async clear() {
     this.cache = await this.load(this.key);
-    var keys: string[] = Object.keys(this.cache);
+    const keys: string[] = Object.keys(this.cache);
 
     for (let i = 0; i < keys.length; i++) {
       const key: string = keys[i];
@@ -58,33 +62,37 @@ export class CachedStorage {
     await this.save(this.key, this.cache);
   }
 
-  public static async remove(key: string) {
+  public static async remove(keys: string[]) {
     this.cache = await this.load(this.key);
 
-    if (this.cache[key]) {
-      delete this.cache[key];
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+
+      if (this.cache[key]) {
+        delete this.cache[key];
+      }
     }
 
     await this.save(this.key, this.cache);
   }
 
-  public static async init() {
-    const value = (await chrome.storage.local.get(this.key)) || {};
-    return await chrome.storage.session.set({ [this.key]: value[this.key] || {} });
+  public static async init(list: IDBNote[]) {
+    logger.info('set.list', list);
+
+    return this.set('list', list);
   }
 
   public static async empty() {
-    await chrome.storage.session.remove(this.key);
     await chrome.storage.local.remove(this.key);
   }
 
   protected static async save(key: string, value: IStorageData): Promise<void> {
-    chrome.storage.local.set({ [key]: value });
-    await chrome.storage.session.set({ [key]: value });
+    await chrome.storage.local.set({ [key]: value });
   }
 
   protected static async load(key: string): Promise<IStorageData> {
-    const value = (await chrome.storage.session.get(key)) || {};
+    const value = (await chrome.storage.local.get(key)) || {};
+    
     return value[key] || {};
   }
 }

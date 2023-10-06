@@ -1,9 +1,10 @@
-import {IDBNote,IDBCommand} from './interfaces';
+import {IDBNote,IDBCommand, IDBCommandType} from './interfaces';
 import {Logger} from '../logger/logger';
 
+
 const logger: Logger = new Logger('db.ts');
-var __database: IDBDatabase;
-var __queueList: IDBCommand[] = [];
+let __database: IDBDatabase;
+const __queueList: IDBCommand[] = [];
 
 
 function logError(e: (Error | Event | any)) {
@@ -15,16 +16,16 @@ function generateId(): number {
 }
 
 function upgradeNeeded(db:IDBDatabase, request:IDBOpenDBRequest) {
-  var objectStore:IDBObjectStore = null;
+  let objectStore:IDBObjectStore = null;
 
   if (!db.objectStoreNames.contains('notes')) {
-    objectStore = db.createObjectStore("notes", {autoIncrement : false, keyPath: "id",});
+    objectStore = db.createObjectStore('notes', {autoIncrement : false, keyPath: 'id',});
   } else {
     objectStore = request.transaction.objectStore('notes');
   }
 
   if (!objectStore.indexNames.contains('order')) {
-    objectStore.createIndex("order", "order", {unique: false});
+    objectStore.createIndex('order', 'order', {unique: false});
   }
 }
 
@@ -32,13 +33,13 @@ function initDB(): Promise<IDBDatabase> {
   return new Promise<IDBDatabase>((resolve, reject) => {
     if (!__database) {
       try {
-        var request = indexedDB.open('MyNotes', 1);
+        const request = indexedDB.open('MyNotes', 1);
 
         request.onerror = reject;
         request.onupgradeneeded = (e) => upgradeNeeded(
             <IDBDatabase>(e.target as IDBOpenDBRequest).result, 
             <IDBOpenDBRequest>e.target
-          );
+        );
 
         return request.onsuccess = (e: Event) => {
           try {
@@ -58,165 +59,155 @@ function initDB(): Promise<IDBDatabase> {
 }
 
 function initObjectStore(mode: IDBTransactionMode): Promise<IDBObjectStore> {
-  return new Promise<IDBObjectStore>(async (resolve, reject) => {
-    try {
-      var db = await initDB();
-      var transaction:IDBTransaction = db.transaction('notes', mode);
-
-      transaction.onerror = reject;
+  return new Promise<IDBObjectStore>((resolve, reject) => {
+    initDB().then((db) => {
+      const transaction:IDBTransaction = db.transaction('notes', mode);
+      
+      transaction.onerror = (er) => reject(er);
       resolve(transaction.objectStore('notes'));
-    } catch (er) {
-      reject(er);
-    }
+    }).catch(er => reject(er));
   });
 }
 
 export function load(): Promise<IDBNote[]> {
-  return new Promise<IDBNote[]>(async (resolve, reject) => {
-    try {
-      var store: IDBObjectStore = await initObjectStore('readonly');
-      var index: IDBIndex = store.index('order');
-      var request: IDBRequest = index.getAll();
-  
-      request.onsuccess = (e: Event) => resolve((<IDBNote[]>(e.target as IDBRequest).result).filter(i => !i.deleted));
-      request.onerror = (e: Event) => {
-        logError((<IDBRequest>e.target).error);
-        reject((<IDBRequest>e.target).error);
-      };
-    } catch (error) {
-      logError(error); 
-      reject(error);
-    }
+  return new Promise<IDBNote[]>((resolve, reject) => {
+    initObjectStore('readonly')
+      .then((store: IDBObjectStore) => {
+        const index: IDBIndex = store.index('order');
+        const request: IDBRequest = index.getAll();
+
+        request.onsuccess = (e: Event) => resolve((<IDBNote[]>(e.target as IDBRequest).result).filter(i => !i.deleted));
+        request.onerror = (e: Event) => {
+          logError((<IDBRequest>e.target).error);
+          reject((<IDBRequest>e.target).error);
+        };
+      })
+      .catch((er) => {
+        logError(er); 
+        reject(er);
+      });
   });
 }
 
 export function dump(): Promise<IDBNote[]> {
-  return new Promise<IDBNote[]>(async (resolve, reject) => {
-    try {
-      var store: IDBObjectStore = await initObjectStore('readonly');
-      var index: IDBIndex = store.index('order');
-      var request: IDBRequest = index.getAll();
-  
-      request.onsuccess = (e: Event) => resolve(<IDBNote[]>(e.target as IDBRequest).result);
-      request.onerror = (e: Event) => {
-        logError((<IDBRequest>e.target).error);
-        reject(e.target);
-      };
-    } catch (error) {
-      logError(error); 
-      reject(error);
-    }
+  return new Promise<IDBNote[]>((resolve, reject) => {
+    initObjectStore('readonly')
+      .then((store: IDBObjectStore) => {
+        const index: IDBIndex = store.index('order');
+        const request: IDBRequest = index.getAll();
+    
+        request.onsuccess = (e: Event) => resolve(<IDBNote[]>(e.target as IDBRequest).result);
+        request.onerror = (e: Event) => {
+          logError((<IDBRequest>e.target).error);
+          reject(e.target);
+        };
+      })
+      .catch((er) => {
+        logError(er); 
+        reject(er);
+      });
   });
 }
 
 export function get(id: number): Promise<IDBNote> {
-  return new Promise<IDBNote>(async (resolve, reject) => {
-    try {
-      var store: IDBObjectStore = await initObjectStore('readonly');
-      var request: IDBRequest = store.get(id);
+  return new Promise<IDBNote>((resolve, reject) => {
+    initObjectStore('readonly')
+      .then((store: IDBObjectStore) => {
+        const request: IDBRequest = store.get(id);
   
-      request.onsuccess = (e: Event) => resolve(<IDBNote>(<IDBRequest>e.target).result);
-      request.onerror = (e: Event) => {
-        logError((<IDBRequest>e.target).error); 
-        reject((<IDBRequest>e.target).error);
-      };
-    } catch (error) {
-      logError(error); 
-      reject(error);
-    }
+        request.onsuccess = (e: Event) => resolve(<IDBNote>(<IDBRequest>e.target).result);
+        request.onerror = (e: Event) => {
+          logError((<IDBRequest>e.target).error); 
+          reject((<IDBRequest>e.target).error);
+        };
+      })
+      .catch((er) => {
+        logError(er); 
+        reject(er);
+      });
   });
 }
 
 export function add(item: IDBNote): Promise<number> {
-  return new Promise<number>(async (resolve, reject) => {
-    try {
-      var store:IDBObjectStore = await initObjectStore('readwrite');
-      var request: IDBRequest = store.add({...item, id: (!item.id || item.id < 1)? generateId() : item.id});
+  return new Promise<number>((resolve, reject) => {
+    initObjectStore('readwrite')
+      .then((store: IDBObjectStore) => {
+        const request: IDBRequest = store.add({...item, id: (!item.id || item.id < 1)? generateId() : item.id});
 
-      request.onsuccess = (e: Event) => resolve(<number>(<IDBRequest>e.target).result);
-      request.onerror = (e: Event) => {
-        logError((<IDBRequest>e.target).error); 
-        reject((<IDBRequest>e.target).error);
-      };
-    } catch (error) {
-      logError(error); 
-      reject(error);
-    }
+        request.onsuccess = (e: Event) => resolve(<number>(<IDBRequest>e.target).result);
+        request.onerror = (e: Event) => {
+          logError((<IDBRequest>e.target).error); 
+          reject((<IDBRequest>e.target).error);
+        };
+      })
+      .catch((er) => {
+        logError(er); 
+        reject(er);
+      });
   });
 }
 
 export function update(item: IDBNote, objectStore?: IDBObjectStore): Promise<void> {
-  return new Promise<void>(async (resolve, reject) => {
-    try {
-      var store:IDBObjectStore = objectStore || await initObjectStore('readwrite');
-      var request: IDBRequest = store.put(item);
+  return new Promise<void>((resolve, reject) => {
+    (objectStore? Promise.resolve(objectStore) : initObjectStore('readwrite'))
+      .then((store: IDBObjectStore) => {
+        const request: IDBRequest = store.put(item);
 
-      request.onsuccess = () => resolve();
-      request.onerror = (e: Event) => {
-        logError((<IDBRequest>e.target).error); 
-        reject((<IDBRequest>e.target).error);
-      };
-    } catch (error) {
-      logError(error); 
-      reject(error);
-    }
+        request.onsuccess = () => resolve();
+        request.onerror = (e: Event) => {
+          logError((<IDBRequest>e.target).error); 
+          reject((<IDBRequest>e.target).error);
+        };
+      })
+      .catch((er) => {
+        logError(er); 
+        reject(er);
+      });
   });
 }
 
-export function remove(item: (IDBNote|number)): Promise<void> {
-  return new Promise<void>(async (resolve, reject) => {
-    try {
-      var store:IDBObjectStore = await initObjectStore('readwrite');
-      var request: IDBRequest = store.delete(typeof(item) === 'number'? item : item.id);
+export function remove(item: (IDBNote|number), objectStore?: IDBObjectStore): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    (objectStore? Promise.resolve(objectStore) : initObjectStore('readwrite'))
+      .then((store: IDBObjectStore) => {
+        const request: IDBRequest = store.delete(typeof(item) === 'number'? item : item.id);
 
-      request.onsuccess = () => resolve();
-      request.onerror = (e: Event) => {
-        logError((<IDBRequest>e.target).error);
-        reject((<IDBRequest>e.target).error);
-      };
-    } catch (error) {
-      logError(error); 
-      reject(error);
-    }
+        request.onsuccess = () => resolve();
+        request.onerror = (e: Event) => {
+          logError((<IDBRequest>e.target).error);
+          reject((<IDBRequest>e.target).error);
+        };
+      })
+      .catch((er) => {
+        logError(er); 
+        reject(er);
+      });
   });
 }
 
-export function enqueue(item: IDBNote, command: string) {
+export function enqueue(item: IDBNote, command: IDBCommandType) {
   __queueList.push({
     item: item,
-    name: command
-  });
-};
-
-export function dequeue(): Promise<void> {
-  return new Promise<void>(async (resolve, reject) => {
-    try {
-      var store:IDBObjectStore = await initObjectStore('readwrite');
-
-      while(__queueList.length) {
-        const command: IDBCommand = __queueList.shift();
-        
-        await update(command.item, store);
-      }
-
-      resolve();
-    } catch (error) {
-      logError(error); 
-      reject(error);
-    }
+    type: command
   });
 }
 
-// function exists(callback?: Function, errorCallBack?: (e: (Error|Event)) => void) {
-//   indexedDB.databases().then((result) => {
-//     for(let i = 0; i < result.length; i++) {
-//       const db = result[0];
+export async function dequeue(): Promise<void> {
+  try {
+    const store = await initObjectStore('readwrite');
 
-//       if (db.name === 'MyNotes') {
-//         return callback(true);
-//       }
-//     }
+    while(__queueList.length) {
+      const {item, type} = __queueList.shift();
 
-//     callback(false);
-//   }).catch(errorCallBack);
-// }
+      if (type === 'update') {
+        await update(item, store);
+      }
+      
+      if (type === 'remove') {
+        await remove(item, store);
+      }
+    }
+  } catch (error) {
+    logError(error); 
+  }
+}

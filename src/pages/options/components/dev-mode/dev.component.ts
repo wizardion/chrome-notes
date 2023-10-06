@@ -4,8 +4,9 @@ import { Logger } from 'modules/logger/logger';
 import { ILogType } from 'modules/logger/interfaces';
 
 
-const template: DocumentFragment = BaseElement.template(require('./template.html').default);
-
+const template: DocumentFragment = BaseElement.component({
+  templateUrl: './template.html'
+});
 
 export class DevModeElement extends BaseElement {
   protected fieldset: HTMLFieldSetElement;

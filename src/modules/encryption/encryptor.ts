@@ -1,4 +1,4 @@
-const _secretKey_: string = 'te~st-Sy#nc%K*ey-B-9frItU-mlw=8@9+';
+const _secretKey_ = 'te~st-Sy#nc%K*ey-B-9frItU-mlw=8@9+';
 
 export class Encryptor {
   private password: string;
@@ -25,27 +25,18 @@ export class Encryptor {
 
   //#region  private
   private toBase(buffer: Uint8Array): string {
-    // var a = base.encode(buffer);
-
-    // logger.info('toBase.a', a);
-    // logger.info('toBase.b', btoa(String.fromCharCode.apply(null, buffer)));
-    // return a;
     return btoa(String.fromCharCode.apply(null, buffer));
   }
 
   private fromBase(message: string): Uint8Array {
-    // var a = base.decode(message);
-    // logger.info('fromBase', a);
-
-    // return a;
     return Uint8Array.from(atob(message), (c) => c.charCodeAt(null));
   }
 
   private getSecrets(password: string, code: number = null, position: number = null): Uint8Array[] {
-    let buffer: Uint8Array = this.encoder.encode(password);
-    let secret: Uint8Array = new Uint8Array(buffer.length + 1);
-    let byte: number = code !== null ? code : crypto.getRandomValues(new Uint8Array(1))[0];
-    let index: number = position !== null ? position : Math.floor(Math.random() * secret.length);
+    const buffer: Uint8Array = this.encoder.encode(password);
+    const secret: Uint8Array = new Uint8Array(buffer.length + 1);
+    const byte: number = code !== null ? code : crypto.getRandomValues(new Uint8Array(1))[0];
+    const index: number = position !== null ? position : Math.floor(Math.random() * secret.length);
 
     for (let i = 0, j = 0; i < secret.length; i++) {
       secret[i] = i !== index ? buffer[j++] : byte;
@@ -75,8 +66,8 @@ export class Encryptor {
 
   protected decode(value: string): Uint8Array[] {
     const buff: Uint8Array = this.fromBase(value);
-    let method: number = buff[2];
-    var salt, iv, data;
+    const method: number = buff[2];
+    let salt, iv, data;
 
     if (method === 1) {
       salt = buff.slice(3, 19);
@@ -91,7 +82,7 @@ export class Encryptor {
     }
 
     if (method === 3) {
-      let dataLength = buff.length - (16 + 12 + 3);
+      const dataLength = buff.length - (16 + 12 + 3);
 
       iv = buff.slice(3, 15);
       data = buff.slice(15, 15 + dataLength);
@@ -102,8 +93,8 @@ export class Encryptor {
   }
 
   private encode(data: Uint8Array, salt: Uint8Array, iv: Uint8Array, secrets: Uint8Array): string {
-    let method = Math.floor(Math.random() * 3) + 1;
-    let buff = new Uint8Array(salt.byteLength + iv.byteLength + data.byteLength + 3);
+    const method = Math.floor(Math.random() * 3) + 1;
+    const buff = new Uint8Array(salt.byteLength + iv.byteLength + data.byteLength + 3);
 
     buff.set(secrets, 0);
     buff.set([method], 2);
@@ -126,7 +117,7 @@ export class Encryptor {
       buff.set(salt, 3 + data.byteLength + iv.byteLength);
     }
 
-    var ld = [];
+    const ld = [];
 
     for (let i = 0; i < data.length; i++) {
       const element = data[i];
@@ -141,7 +132,7 @@ export class Encryptor {
     if (this.password && this.password.length) {
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const iv = crypto.getRandomValues(new Uint8Array(12));
-      let [secret, keys]: Uint8Array[] = this.getSecrets(this.password);
+      const [secret, keys]: Uint8Array[] = this.getSecrets(this.password);
 
       const encrypted = await crypto.subtle.encrypt(
         {
@@ -164,7 +155,7 @@ export class Encryptor {
     if (this.password && this.password.length) {
       try {
         const [data, salt, iv, buff]: Uint8Array[] = this.decode(value);
-        let [secret, _]: Uint8Array[] = this.getSecrets(this.password, buff[0], buff[1]);
+        const [secret, _]: Uint8Array[] = this.getSecrets(this.password, buff[0], buff[1]);
 
         const decryptedContent = await crypto.subtle.decrypt(
           {
@@ -187,9 +178,9 @@ export class Encryptor {
   }
 
   public static async generateKey(): Promise<string> {
-    let key = await crypto.subtle.generateKey({ name: 'AES-CTR', length: 256 }, true, ['encrypt', 'decrypt']);
+    const key = await crypto.subtle.generateKey({ name: 'AES-CTR', length: 256 }, true, ['encrypt', 'decrypt']);
 
-    var ex: JsonWebKey = await crypto.subtle.exportKey('jwk', key);
+    const ex: JsonWebKey = await crypto.subtle.exportKey('jwk', key);
     return ex.k;
   }
 
@@ -198,11 +189,11 @@ export class Encryptor {
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const cryptor = new Encryptor(password);
 
-      let [secret, _]: Uint8Array[] = cryptor.getSecrets(password);
-      let key = await cryptor.deriveKey(await cryptor.getSecretKey(secret), salt, ['encrypt']);
+      const [secret, _]: Uint8Array[] = cryptor.getSecrets(password);
+      const key = await cryptor.deriveKey(await cryptor.getSecretKey(secret), salt, ['encrypt']);
 
       if (key) {
-        let tmp = new Encryptor(password);
+        const tmp = new Encryptor(password);
         return await tmp.verify(await tmp.generateSecret());
       }
 

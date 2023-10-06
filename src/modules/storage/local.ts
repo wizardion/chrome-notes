@@ -1,10 +1,10 @@
-import { IStorageValue, IStorageData } from "./interfaces";
+import { IStorageValue, IStorageData } from './interfaces';
 import {encrypt, decrypt} from 'modules/core';
 
 
 export class LocalStorage {
   public static async get(key: string, defaults: any = null): Promise<object | number | boolean> {
-    var data = await chrome.storage.local.get(key);
+    const data = await chrome.storage.local.get(key);
 
     if (data[key] && data[key].sensitive && data[key].value) {
       return this.decrypt(data[key]);

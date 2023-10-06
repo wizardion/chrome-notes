@@ -4,46 +4,42 @@
 }
 
 .editor-controls .button {
-  width: 28px;
-  height: 17px;
-  margin: 3px 1px 0 0;
+  width: 30px;
+  height: 19px;
+  margin: 3px 0px 0 0;
 
-  // background: #07a69804;
-  // background: #c4c4c4;
-  // border: 1px solid #07a69809;
-}
-
-.editor-controls .button.disabled,
-.editor-controls .button.disabled:hover,
-.editor-controls .button.disabled:active {
-  
-  cursor: inherit;
-  color: #d7e9e9;
-  fill:#d7e9e9;
-  // color: #07a69875;
-  // fill:#07a69875;
-
-  // background: #07a69804;
-  // border-color: #07a69809;
-  
-  opacity: 1;
+  // background: #07a69809;
+  // background-color: rgb(252 253 255);
+  background-color: rgb(251 254 255);
+  // background: #07a69809;
+  border: 1px solid #d7e9e965;
+  // border: 1px solid rgb(248 248 250);
 }
 
 .editor-controls .button:hover {
-  // background: #07a6980e;
-  // color: #07a698;
-  // fill:#07a698;
+  // background: #07a69819;
+  background-color: #07a69805;
+  border-color: #d7e9e995;
+
   color: #e33636;
   fill:#e33636;
 }
 
 .editor-controls .button:active {
-  // background: #07a6982b;
-  // border: 1px solid #b7f1ed1a;
-  // color: #07a698;
-  // fill:#07a698;
-  color: #e3363685;
-  fill:#e3363685;
+  background: #07a69819;
+  border-color: #d7e9e9;
+
+  color: #e33636a5;
+  fill:#e33636a5;
+}
+
+.editor-controls .button[disabled] {
+  cursor: inherit;
+  color: #d7e9e9;
+  fill:#d7e9e9;
+  background: #07a69803;
+  border-color: #d7e9e944;
+  pointer-events: none;
 }
 
 .editor-controls fieldset {
@@ -61,6 +57,18 @@
 .editor-controls fieldset div:first-child {
   border-top-left-radius: 4px; 
   border-bottom-left-radius: 4px; 
+}
+
+.editor-controls fieldset input:nth-child(2),
+.editor-controls fieldset button:nth-child(2),
+.editor-controls fieldset div:nth-child(2),
+.editor-controls fieldset input:nth-child(3),
+.editor-controls fieldset button:nth-child(3),
+.editor-controls fieldset div:nth-child(3),
+.editor-controls fieldset input:nth-child(4),
+.editor-controls fieldset button:nth-child(4),
+.editor-controls fieldset div:nth-child(4) {
+  border-left: none;
 }
 
 .editor-controls fieldset input:last-child,

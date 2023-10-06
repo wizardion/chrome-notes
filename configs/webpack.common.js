@@ -8,12 +8,13 @@ const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
+const processHtmlLoader = require('./html-preprocessor');
 const __root__ = path.resolve(__dirname, '..');
 const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
 
+
 module.exports = {
   entry: {
-    
     index: path.resolve(__root__, 'src/pages/index/index.ts'),
     popup: path.resolve(__root__, 'src/pages/popup/popup.ts'),
     background: path.resolve(__root__, 'src/worker/background.ts'),
@@ -40,16 +41,41 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /template\.html$/,
+        test: /\.html$/,
         loader: 'html-loader',
         options: {
-          minimize: true,
+          minimize: {
+            // collapseInlineTagWhitespace: true,
+            // conservativeCollapse: true,
+            collapseWhitespace: true,
+            keepClosingSlash: true,
+            minifyCSS: true,
+            minifyJS: true,
+            removeComments: true,
+            removeRedundantAttributes: true,
+            removeScriptTypeAttributes: true,
+            removeStyleLinkTypeAttributes: true
+          },
+          preprocessor: processHtmlLoader
         },
         exclude: /node_modules/,
       },
       {
         test: /\.ts?$/,
-        use: 'ts-loader',
+        include: [
+          path.join(__root__, 'src'),
+        ],
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              experimentalFileCaching: true
+            }
+          },
+          {
+            loader: path.resolve('configs/template-loader')
+          }
+        ],
         exclude: /node_modules/,
       },
       {
@@ -103,7 +129,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.component.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.component.ts', '.js', '.svg'],
     alias: {
       modules: path.resolve(__root__, 'src/modules'),
       styles: path.resolve(__root__, 'src/styles'),

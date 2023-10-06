@@ -1,3 +1,9 @@
+
+export interface IPReviewState {
+  scrollTop: number;
+  selection: string;
+}
+
 export interface IDBNote {
   id: number;
   title: string;
@@ -5,16 +11,18 @@ export interface IDBNote {
   order: number;
   synced?: number;
   preview?: boolean;
-  cState?: string;
-  pState?: string;
-  html?: string;
+  cState?: number[] | null;
+  pState?: IPReviewState | null;
+  html?: boolean;
   updated: number;
   created: number;
   deleted?: boolean;
   locked?: boolean;
 }
 
+export type IDBCommandType = 'update' | 'add' | 'remove';
+
 export interface IDBCommand {
   item: IDBNote,
-  name: string
+  type: IDBCommandType
 }

@@ -1,15 +1,31 @@
 .cm-editor {
   height: 244px !important;
   font-size: 14px !important;
-  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+  // font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+  // font-family: 'PT Mono', 'Roboto Mono', 'Menlo', monospace, sans-serif !important;
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+  // border-top: 1px solid transparent;
+  position: relative !important;
+  cursor: text;
+}
+
+.cm-scroller {
+  // font-family: 'PT Mono', 'Roboto Mono', 'Menlo', monospace, sans-serif !important;
+  // font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+}
+
+.cm-editor[hidden] {
+  display: none !important;
 }
 
 .cm-gutters {
   background-color: transparent !important;
   border-right: 1px solid transparent !important;
+  // border-right: 1px solid #06736a;
   font-size: 10px !important;
-  font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
-  width: 16px;
+  // font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
+  width: 12px;
 }
 
 .cm-gutterElement {
@@ -48,17 +64,7 @@
   background-color: #07a6981f !important;
 }
 
-.cm-heading-1 {
-  display: block;
-  display: block;
-  color: #06736a;
-  font-size: x-large;
-  text-align: center;
-  font-weight: bold;
-}
-
 .cm-heading-1.cm-meta {
-  // display: none;
   opacity: 0.5;
   font-size: medium;
   float: left;
@@ -70,22 +76,33 @@
 .cm-heading-4.cm-meta,
 .cm-heading-5.cm-meta,
 .cm-heading-6.cm-meta,
+.cm-heading-6.cm-meta,
 .cm-bold.cm-meta,
 .cm-italic.cm-meta {
-  opacity: 0.5;
-  font-size: medium;
+  font-size: smaller;
+}
+
+.cm-heading-1 {
+  display: block;
+  display: block;
+  color: #06736a;
+  font-size: x-large;
+  text-align: center;
+  font-weight: bold;
 }
 
 .cm-heading-2 {
-  font-size: large;
+  font-size: larger;
   font-weight: bold;
 }
 
 .cm-heading-3 {
+  font-size: large;
   font-weight: bold;
 }
 
 .cm-heading-4 {
+  font-weight: bold;
   color: gray;
 }
 
@@ -100,6 +117,10 @@
 
 .cm-italic {
   font-style: italic;
+}
+
+.cm-strikethrough {
+  text-decoration: line-through;
 }
 
 .cm-link {
@@ -124,10 +145,20 @@
   opacity: 0.5;
 }
 
-.cm-line :first-child.cm-list.cm-meta {
-  opacity: 1;
-  font-size: medium;
-}
+// .cm-heading-2.cm-meta, 
+// .cm-heading-3.cm-meta, 
+// .cm-heading-4.cm-meta, 
+// .cm-heading-5.cm-meta, 
+// .cm-heading-6.cm-meta, 
+// .cm-bold.cm-meta, 
+// .cm-italic.cm-meta {
+//   font-size: 14px;
+// }
+
+// .cm-line :first-child.cm-list.cm-meta {
+//   opacity: 1;
+//   font-size: medium;
+// }
 
 // .cm-selectionBackground {
 //   background-color: #d9e9e9 !important; 

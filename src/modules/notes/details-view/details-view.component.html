@@ -1,0 +1,35 @@
+<div name="details-view" class="details-view">
+  <div name="details-controls" class="head">
+    <button name="back" class="link back"><include src="./images/back.svg"></include>&nbsp;All Notes</button>
+    <button name="cancel" class="link back cancel" hidden><include src="./images/back.svg"></include>&nbsp;Cancel</button>
+    <button name="create" class="button save" hidden><include src="./images/save.svg"></include></button>
+    <button name="delete" class="button delete"><include src="./images/delete.svg"></include></button>
+    <label class="checkbox edit" title="preview">
+      <input name="preview" type="checkbox">
+      <span class="checkmark"><include src="./images/code.svg"></include></span>
+    </label>
+    <div name="editor-controls" class="editor-controls">
+      <fieldset><!--
+        --><button action="bold" title="Bold" class="button"><include src="./images/bold.svg"></include></button><!--
+        --><button action="italic" title="Italic" class="button"><include src="./images/italic.svg"></include></button><!--
+        --><button action="strikethrough" title="Strikethrough" class="button"><include src="./images/strikethrough.svg"></include></button><!--
+        --><button action="link" title="Link" class="button"><include src="./images/link.svg"></include></button><!--
+      --></fieldset>
+      <fieldset><!--
+        --><button action="orderedList" title="Ordered List" class="button"><include src="./images/insertOrderedList.svg"></include></button><!--
+        --><button action="unorderedList" title="Unordered List" class="button"><include src="./images/insertUnorderedList.svg"></include></button><!--
+      --></fieldset>
+      <fieldset><!--
+        --><button action="removeFormat" title="Remove Format" class="button"><include src="./images/removeFormat.svg"></include></button><!--
+      --></fieldset>
+      <fieldset><!--
+        --><button action="undo" title="Undo" class="button"><include src="./images/undo.svg"></include></button><!--
+        --><button action="redo" title="Redo" class="button"><include src="./images/redo.svg"></include></button><!--
+      --></fieldset>
+    </div>
+  </div>
+  <div name="content" class="content">
+    <pre name="previewer" class="content-preview" tabindex="2" hidden></pre>
+    <textarea name="description" class="description-note hidden-scroll"></textarea>
+  </div>
+</div>

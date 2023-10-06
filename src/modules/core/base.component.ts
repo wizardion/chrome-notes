@@ -49,13 +49,20 @@ export class BaseElement extends HTMLElement {
   // protected attributeChanged() {}
   // disconnectedCallback() {}
 
-  static template(html: string): DocumentFragment {
-    const template = document.createElement('template');
-    template.innerHTML = html;
+  // static template(html: string): DocumentFragment {
+  //   const template = document.createElement('template');
+  //   template.innerHTML = html;
 
-    // console.log('---------------------------------------------------------------------------------------------------');
-    // console.log(html.trim());
-    // console.log('---------------------------------------------------------------------------------------------------');
+  //   return template.content;
+  // }
+
+  static component(config: {templateUrl: string}): DocumentFragment {
+    const template = document.createElement('template');
+    // template.innerHTML = require(config.templateUrl).default;
+    template.innerHTML = config.templateUrl;
+    // import(config.templateUrl).then(widget => {
+    //   console.log('widget');
+    // });
 
     return template.content;
   }

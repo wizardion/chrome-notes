@@ -4,8 +4,9 @@ import { TokenSecretDenied } from 'modules/sync/components/interfaces';
 import { ISyncInfoForm, IDecorator, IResponseDetails } from './interfaces';
 
 
-const template: DocumentFragment = BaseElement.template(require('./template.html').default);
-
+const template: DocumentFragment = BaseElement.component({
+  templateUrl: './template.html'
+});
 
 export class SyncInfoElement extends BaseElement {
   private _token: string;

@@ -1,8 +1,9 @@
 import {BaseElement} from 'modules/core/base.component';
 
 
-const template:DocumentFragment = BaseElement.template(require('./template.html').default);
-
+const template: DocumentFragment = BaseElement.component({
+  templateUrl: './template.html'
+});
 
 export class ProgressElement extends BaseElement {
   protected progress: HTMLDivElement;
@@ -21,7 +22,7 @@ export class ProgressElement extends BaseElement {
   }
 
   public finish(delay?: number): Promise<void> {
-    return new Promise<void>(async (resolve) => {
+    return new Promise<void>((resolve) => {
       const animationEvent = async () => {
         this.animationIteration();
         this.thumb.removeEventListener('animationiteration', animationEvent);

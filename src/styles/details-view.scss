@@ -1,6 +1,7 @@
 .details-view {
-  display: none;
-  background: #07a69801;
+  // background: #07a69801;
+  // background: rgb(252 252 254);
+  background: rgb(248 250 252);
 }
 
 .details-view .head
@@ -11,7 +12,7 @@
   color: #07a698;
   position: relative;
   line-height: 23px;
-  // border-bottom: 1px dotted #07a69826;
+  // border-bottom: 1px dotted #07a69835;
   border-bottom: 1px dotted transparent;
 }
 
@@ -19,14 +20,12 @@
   display: none;
 }
 
-.content
-{
+.content {
   height: 228px;
 
   overflow-y: hidden;
   overflow-x: hidden;
   outline: none;
-  border: none;
   padding: 2px;
   resize: none;
   border: none;
@@ -36,6 +35,14 @@
 
   padding: 0px;
   height: 244px;
+  position: relative !important;
+
+  background: white;
+  border-radius: 6px;
+  margin: 0 0px 0 0px;
+  // border: 1px dashed #d7e9e965;
+  // border: 1px dashed transparent;
+  box-sizing: border-box;
 }
 
 .back {
@@ -65,7 +72,6 @@
 }
 
 .details-view .button.save {
-  display: none;
   width: 25px;
   float: right;
   cursor: pointer;
@@ -79,37 +85,7 @@
 }
 
 .details-view .cancel {
-  display: none;
   left: 4px;
-}
-
-.required {
-  animation: borderchange 1.5s;
-}
-
-.animate {
-  // background: linear-gradient(to right, #07a69812, #07a69801, #07a69800);
-  background: linear-gradient(to right, #07a69815, #07a69800 45%);
-  background-size: 200% 100%;
-  animation: colorchange 1.520s;
-}
-
-@keyframes borderchange
-{
-  0% { border-top: 1px solid #e3363699; }
-  100% { border-top: 1px solid transparent; }
-}
-
-@keyframes colorchange
-{
-  0% {
-    color: #06736a;
-		background-position: 0% 0%;
-	}
-	100% {
-    color: inherit;
-		background-position: 100% 0%;
-	}
 }
 
 @import 'editor-controls';
