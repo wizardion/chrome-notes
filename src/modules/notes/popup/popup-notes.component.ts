@@ -30,7 +30,7 @@ export class PopupNotesElement extends BaseElement {
 
   protected render() {
     super.render();
-    
+
     this.listView.hidden = false;
   }
 
@@ -48,11 +48,11 @@ export class PopupNotesElement extends BaseElement {
 
   init(items: IDBNote[]) {
     this.items = items;
-    
+
     for (let i = 0; i < this.items.length; i++) {
       const note = this.items[i];
       const item = document.createElement('list-item') as ListItemElement;
-      
+
       item.index = i + 1;
       item.title = note.title;
       item.date = new Date(note.updated);
@@ -71,10 +71,10 @@ export class PopupNotesElement extends BaseElement {
     this.selected = item;
 
     this.detailsView.focus();
-    this.detailsView.setData({title: item.title, description: item.description, selection: item.cState});
-    
+    this.detailsView.setData({ title: item.title, description: item.description, selection: item.cState });
+
     this.detailsView.preview = this.selected.preview;
-    
+
     if (this.selected.pState) {
       this.detailsView.setPreviewState(this.selected.pState);
     }
@@ -88,10 +88,10 @@ export class PopupNotesElement extends BaseElement {
     this.listView.hidden = false;
     this.detailsView.hidden = true;
     this.detailsView.draft = false;
-    
+
     this.selected?.item.animateItem();
     this.selected = null;
-    
+
     DbProvider.cache.remove(['draft', 'selected']);
   }
 
@@ -102,7 +102,7 @@ export class PopupNotesElement extends BaseElement {
     this.detailsView.preview = null;
     this.selected = null;
 
-    this.detailsView.setData({title: title || '', description: description || '', selection: selection});
+    this.detailsView.setData({ title: title || '', description: description || '', selection: selection });
   }
 
   togglePreview() {
@@ -149,8 +149,9 @@ export class PopupNotesElement extends BaseElement {
     this.listView.items.splice(index, 1);
 
     const draft = Object.assign({}, this.selected);
+
     delete draft.item;
-    
+
     item.remove();
     await DbProvider.remove(draft, this.items);
     this.goBack();
@@ -159,6 +160,7 @@ export class PopupNotesElement extends BaseElement {
   async save() {
     if (this.selected) {
       const draft = Object.assign({}, this.selected);
+
       delete draft.item;
 
       this.selected.id = await DbProvider.save(draft);
@@ -175,11 +177,12 @@ export class PopupNotesElement extends BaseElement {
 
     for (let i = Math.min(first, second); i <= Math.max(first, second); i++) {
       const item = this.items[i];
-      
+
       item.order = i;
       item.item.index = i + 1;
 
       const draft = Object.assign({}, item);
+
       delete draft.item;
 
       queue.push(draft);
@@ -198,7 +201,7 @@ export class PopupNotesElement extends BaseElement {
   }
 
   onChanged() {
-    const {title, description, selection} = this.detailsView.data;
+    const { title, description, selection } = this.detailsView.data;
 
     if (this.selected) {
       const time = new Date().getTime();
@@ -214,7 +217,7 @@ export class PopupNotesElement extends BaseElement {
       this.save();
     } else {
       console.log('onChanged.draft ...');
-      DbProvider.cache.set('draft', {title, description, selection});
+      DbProvider.cache.set('draft', { title, description, selection });
     }
   }
 }

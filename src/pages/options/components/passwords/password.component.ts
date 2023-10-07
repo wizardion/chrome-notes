@@ -1,5 +1,5 @@
-import {BaseElement} from 'modules/core/base.component';
-import {Encryptor} from 'modules/encryption/encryptor';
+import { BaseElement } from 'modules/core/base.component';
+import { Encryptor } from 'modules/encryption/encryptor';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -7,9 +7,9 @@ const template: DocumentFragment = BaseElement.component({
 });
 
 export class PasswordElement extends BaseElement {
+  static readonly selector = 'user-password';
   static observedAttributes = ['disabled', 'required'];
 
-  private _locked: boolean;
   protected generate: HTMLInputElement;
   protected lockedMessage: HTMLElement;
   protected input: HTMLInputElement;
@@ -21,6 +21,8 @@ export class PasswordElement extends BaseElement {
   protected initial: string;
   protected event: Event;
   protected dirtinessEvent: Event;
+
+  private _locked: boolean;
 
   constructor() {
     super();
@@ -35,6 +37,80 @@ export class PasswordElement extends BaseElement {
     this.validator = this.template.querySelector('div[name="validator-password"]');
     this.fieldset = this.template.querySelector('fieldset');
     this.initial = '';
+  }
+
+  protected async eventListeners() {
+    this.event = new Event('password:change');
+    this.dirtinessEvent = new Event('password:dirtiness');
+
+    this.generate.onmousedown = (e) => e.preventDefault();
+    this.save.onmousedown = (e) => e.preventDefault();
+    this.cancel.onmousedown = (e) => e.preventDefault();
+
+    this.generate.onclick = () => this.generatePassword();
+    this.cancel.onclick = () => this.reset();
+    this.save.onclick = () => this.saveChanges();
+
+    this.input.oninput = () => this.inputChanged();
+    this.input.onfocus = () => this.setInputType(true);
+    this.input.onblur = () => this.setInputType(false);
+  }
+
+  protected setInputType(focused = false) {
+    this.input.type = (!focused && this.input.value.length && !this.dirty && this.checkValidity()) ?
+      'password' :
+      'text';
+  }
+
+  protected attributeChanged(name: string, oldValue: string, newValue: string) {
+    if (name === 'disabled') {
+      if (this.disabled) {
+        this.fieldset.setAttribute('disabled', 'disabled');
+      } else {
+        this.fieldset.removeAttribute('disabled');
+      }
+    }
+
+    if (name === 'required') {
+      this.required = newValue !== null;
+    }
+  }
+
+  protected async generatePassword() {
+    const key: string = await Encryptor.generateKey();
+    const index = Math.floor(Math.random() * key.length - 1);
+
+    this.input.value = [key.slice(0, index), '-', key.slice(index)].join('');
+    this.validator.innerText = '';
+    this.save.disabled = false;
+    this.cancel.disabled = false;
+
+    this.input.focus();
+    this.dispatchEvent(this.dirtinessEvent);
+  }
+
+  protected inputChanged() {
+    this.cancel.disabled = !this.dirty;
+    this.save.disabled = !this.input.validity.valid || !this.dirty;
+    this.validator.innerText = this.input.validationMessage;
+
+    this.dispatchEvent(this.dirtinessEvent);
+  }
+
+  protected async saveChanges() {
+    if (this.checkValidity() && await Encryptor.validate(this.input.value)) {
+      this.initial = this.input.value;
+
+      this.save.disabled = true;
+      this.cancel.disabled = true;
+
+      this.input.blur();
+      this.setInputType();
+      this.dispatchEvent(this.event);
+    } else {
+      this.input.setCustomValidity('Your password entered is not valid for encrypting.');
+      this.validator.innerText = this.input.validationMessage;
+    }
   }
 
   get value(): string {
@@ -85,9 +161,12 @@ export class PasswordElement extends BaseElement {
 
   checkValidity(): boolean {
     const valid = this.disabled || (!this.required && !this.dirty) || this.input.checkValidity();
-    // const valid: boolean = (!this.required || this.disabled) && (!this.input.value.length || this.input.checkValidity()) ||
-    //                         this.required && (!!this.input.value.length && this.input.checkValidity());
+
+    // const valid: boolean = (!this.required || this.disabled) &&
+    //   (!this.input.value.length || this.input.checkValidity()) ||
+    //   this.required && (!!this.input.value.length && this.input.checkValidity());
     this.validator.innerText = !valid ? this.input.validationMessage : '';
+
     return valid;
   }
 
@@ -109,78 +188,6 @@ export class PasswordElement extends BaseElement {
 
     if (dirty) {
       this.dispatchEvent(this.dirtinessEvent);
-    }
-  }
-
-  protected async eventListeners() {
-    this.event = new Event('password:change');
-    this.dirtinessEvent = new Event('password:dirtiness');
-    
-    this.generate.onmousedown = (e) => e.preventDefault();
-    this.save.onmousedown = (e) => e.preventDefault();
-    this.cancel.onmousedown = (e) => e.preventDefault();
-    
-    this.generate.onclick = () => this.generatePassword();
-    this.cancel.onclick = () => this.reset();
-    this.save.onclick = () => this.saveChanges();
-
-    this.input.oninput = () => this.inputChanged();
-    this.input.onfocus = () => this.setInputType(true);
-    this.input.onblur = () => this.setInputType(false);
-  }
-
-  protected setInputType(focused = false) {
-    this.input.type = (!focused && this.input.value.length && !this.dirty && this.checkValidity())? 'password' : 'text';
-  }
-
-  protected attributeChanged(name: string, oldValue: string, newValue: string) {
-    if (name === 'disabled') {
-      if (this.disabled) {
-        this.fieldset.setAttribute('disabled', 'disabled');
-      } else {
-        this.fieldset.removeAttribute('disabled');
-      }
-    }
-
-    if (name === 'required') {
-      this.required = newValue !== null;
-    }
-  }
-
-  protected async generatePassword() {
-    const key: string = await Encryptor.generateKey();
-    const index = Math.floor(Math.random() * key.length - 1);
-
-    this.input.value = [key.slice(0, index), '-', key.slice(index)].join('');
-    this.validator.innerText = '';
-    this.save.disabled = false;
-    this.cancel.disabled = false;
-
-    this.input.focus();
-    this.dispatchEvent(this.dirtinessEvent);
-  }
-
-  protected inputChanged() {
-    this.cancel.disabled = !this.dirty;
-    this.save.disabled = !this.input.validity.valid || !this.dirty;
-    this.validator.innerText = this.input.validationMessage;
-
-    this.dispatchEvent(this.dirtinessEvent);
-  }
-
-  protected async saveChanges() {
-    if (await this.checkValidity() && await Encryptor.validate(this.input.value)) {
-      this.initial = this.input.value;
-
-      this.save.disabled = true;
-      this.cancel.disabled = true;
-
-      this.input.blur();
-      this.setInputType();
-      this.dispatchEvent(this.event);
-    } else {
-      this.input.setCustomValidity('Your password entered is not valid for encrypting.');
-      this.validator.innerText = this.input.validationMessage;
     }
   }
 }

@@ -1,7 +1,8 @@
-/* 
+/*
   https://web.dev/custom-elements-v1/
 */
-export class BaseElement extends HTMLElement {
+export abstract class BaseElement extends HTMLElement {
+  static readonly selector: string;
   static observedAttributes = ['disabled'];
 
   protected template?: HTMLElement;
@@ -10,6 +11,27 @@ export class BaseElement extends HTMLElement {
   constructor() {
     super();
     this.rendered = false;
+  }
+
+  protected eventListeners?(): void;
+  protected attributeChanged?(name: string, oldValue: string, newValue: string): void;
+
+  protected connectedCallback() {
+    if (!this.rendered) {
+      this.render();
+      this.eventListeners?.();
+      this.rendered = true;
+    }
+  }
+
+  protected attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    this.attributeChanged?.(name, oldValue, newValue);
+  }
+
+  protected render() {
+    if (this.template) {
+      this.appendChild(this.template);
+    }
   }
 
   get disabled(): boolean {
@@ -24,45 +46,10 @@ export class BaseElement extends HTMLElement {
     }
   }
 
-  protected connectedCallback() {
-    if (!this.rendered) {
-      this.render();
-      this.eventListeners();
-      this.rendered = true;
-    }
-  }
-
-  protected attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    this.attributeChanged(name, oldValue, newValue);
-  }
-
-  protected render() {
-    if (this.template) {
-      this.appendChild(this.template);
-    }
-  }
-
-  protected async eventListeners() {}
-
-  protected attributeChanged(name: string, oldValue: string, newValue: string) {}
-
-  // protected attributeChanged() {}
-  // disconnectedCallback() {}
-
-  // static template(html: string): DocumentFragment {
-  //   const template = document.createElement('template');
-  //   template.innerHTML = html;
-
-  //   return template.content;
-  // }
-
   static component(config: {templateUrl: string}): DocumentFragment {
     const template = document.createElement('template');
-    // template.innerHTML = require(config.templateUrl).default;
+
     template.innerHTML = config.templateUrl;
-    // import(config.templateUrl).then(widget => {
-    //   console.log('widget');
-    // });
 
     return template.content;
   }

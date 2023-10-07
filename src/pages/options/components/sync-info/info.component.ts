@@ -9,6 +9,11 @@ const template: DocumentFragment = BaseElement.component({
 });
 
 export class SyncInfoElement extends BaseElement {
+  static readonly selector = 'sync-info';
+
+  protected form: ISyncInfoForm;
+  protected event: Event;
+
   private _token: string;
   private _enabled: boolean;
   private _promise: boolean;
@@ -16,9 +21,6 @@ export class SyncInfoElement extends BaseElement {
   private _passphrase: string;
   private _locked: boolean;
   private _response: IResponseDetails;
-
-  protected form: ISyncInfoForm;
-  protected event: Event;
 
   constructor() {
     super();
@@ -29,7 +31,6 @@ export class SyncInfoElement extends BaseElement {
       error: this.template.querySelector('div[name="error"]'),
       passphrase: this.template.querySelector('user-password[name="encryption-key"]'),
       progressBar: this.template.querySelector('progress-bar'),
-
       checkboxes: {
         sync: this.template.querySelector('input[name="sync-enabled"]'),
         encrypt: this.template.querySelector('input[name="encryption-enabled"]'),
@@ -53,10 +54,172 @@ export class SyncInfoElement extends BaseElement {
     this.form.checkboxes.encrypt.disabled = true;
     this.form.sections.encryption.disabled = true;
 
-    // this.form.sections.submit.disabled = true;
     this.form.buttons.submit.disabled = true;
     this._response = { message: null, locked: false, error: false };
     this.promise = false;
+  }
+
+  protected async eventListeners() {
+    this.event = new Event('sync-info:change');
+
+    this.form.checkboxes.encrypt.parentElement.onmousedown = (e) => e.preventDefault();
+
+    this.form.buttons.submit.onclick = () => this.submit(this.syncDecorator());
+    this.form.buttons.authorize.onclick = () => this.authorize();
+    this.form.checkboxes.sync.onchange = () => this.enabledChanged();
+    this.form.buttons.deauthorize.onclick = () => this.deauthorize();
+    this.form.checkboxes.encrypt.onchange = () => this.encryptedChanged();
+
+    this.form.passphrase.addEventListener('password:change', () => this.passphraseChanged());
+    // this.form.passphrase.addEventListener('password:dirtiness', () => this.passwordDirtinessChanged());
+  }
+
+  protected attributeChanged() {
+    const disabled: boolean = this.disabled;
+
+    this.form.info.disabled = disabled;
+  }
+
+  protected enabledChanged() {
+    this.enabled = this.form.checkboxes.sync.checked;
+
+    this.dispatchEvent(this.event);
+  }
+
+  protected async encryptedChanged() {
+    const encrypted: boolean = this.form.checkboxes.encrypt.checked;
+
+    if (!encrypted && !this._locked && this._token && this._passphrase) {
+      this.form.checkboxes.encrypt.checked = true;
+
+      if (!(await this.submit(this.encryptDecorator('')))) {
+        return;
+      }
+
+      this.passphrase = null;
+    }
+
+    this.encrypted = encrypted;
+
+    if (encrypted && !this._passphrase) {
+      this.form.passphrase.checkValidity();
+
+      return this.form.passphrase.focus();
+    } else if (!encrypted) {
+      this.form.passphrase.reset();
+    }
+
+    this.dispatchEvent(this.event);
+  }
+
+  protected async passphraseChanged() {
+    const passphrase = this.form.passphrase.value;
+
+    if (!this.locked && this._enabled && this._encrypted) {
+      if (await this.submit(this.encryptDecorator(passphrase))) {
+        this.passphrase = passphrase;
+        this.dispatchEvent(this.event);
+      }
+
+      return;
+    }
+
+    if (this.locked) {
+      if (!(await this.submit(this.verifyIdentity(passphrase)))) {
+        if (!this._response.error || this._response.locked) {
+          this.locked = true;
+          this.form.passphrase.focus();
+          this.message = this._response.message || 'Invalid encryption passphrase.';
+
+          return this.dispatchEvent(this.event);
+        }
+
+        return;
+      }
+
+      this.passphrase = passphrase;
+      this.locked = false;
+      this.dispatchEvent(this.event);
+      await this.submit(this.syncDecorator());
+    }
+  }
+
+  protected syncDecorator(): IDecorator {
+    return async () => {
+      await Cloud.wait();
+
+      return Cloud.sync();
+    };
+  }
+
+  protected encryptDecorator(passphrase: string): IDecorator {
+    return async () => {
+      await Cloud.wait();
+
+      return Cloud.encrypt(this._passphrase || '', passphrase);
+    };
+  }
+
+  protected verifyIdentity(passphrase: string): IDecorator {
+    return async () => {
+      await Cloud.wait();
+
+      return Cloud.verifyIdentity({
+        id: null,
+        enabled: this._enabled,
+        token: this._token,
+        passphrase: passphrase,
+        encrypted: this._encrypted,
+        locked: this._locked,
+      });
+    };
+  }
+
+  protected async authorize() {
+    this.promise = true;
+
+    try {
+      if (this.checkValidity()) {
+        this.token = await Cloud.authorize();
+
+        if (!(await this.submit(this.verifyIdentity(this._passphrase)))) {
+          if (!this._response.error || this._response.locked) {
+            this.locked = true;
+            this.form.passphrase.focus();
+            this.message = this._response.message || 'Invalid encryption passphrase.';
+
+            return this.dispatchEvent(this.event);
+          }
+
+          this.token = null;
+
+          return;
+        }
+
+        this.dispatchEvent(this.event);
+        await this.submit(this.syncDecorator());
+      } else {
+        this.message = 'Form is not valid.';
+      }
+    } catch (error) {
+      this.message = error;
+    } finally {
+      this.promise = false;
+    }
+  }
+
+  protected async deauthorize() {
+    this.promise = true;
+
+    try {
+      await Cloud.deauthorize(this.token);
+      this.token = null;
+      this.dispatchEvent(this.event);
+    } catch (error) {
+      this.message = error;
+    } finally {
+      this.promise = false;
+    }
   }
 
   public get promise(): boolean {
@@ -130,7 +293,16 @@ export class SyncInfoElement extends BaseElement {
     this.form.error.innerText = value || '';
   }
 
-  protected validateControls() {
+  public checkValidity(): boolean {
+    return !!(
+      !this._enabled ||
+      !this._token ||
+      !this._encrypted ||
+      (this._passphrase && this.form.passphrase.checkValidity())
+    );
+  }
+
+  private validateControls() {
     this._encrypted = this._locked || this._encrypted;
     this.form.checkboxes.encrypt.checked = this._locked || this.form.checkboxes.encrypt.checked;
 
@@ -144,170 +316,6 @@ export class SyncInfoElement extends BaseElement {
 
     this.form.passphrase.locked = this._locked;
     this.form.buttons.submit.disabled = this._locked || !this._token || (this._encrypted && !this._passphrase);
-  }
-
-  public checkValidity(): boolean {
-    return !!(
-      !this._enabled ||
-      !this._token ||
-      !this._encrypted ||
-      (this._passphrase && this.form.passphrase.checkValidity())
-    );
-  }
-
-  protected async eventListeners() {
-    this.event = new Event('sync-info:change');
-
-    this.form.checkboxes.encrypt.parentElement.onmousedown = (e) => e.preventDefault();
-
-    this.form.buttons.submit.onclick = () => this.submit(this.syncDecorator());
-    this.form.buttons.authorize.onclick = () => this.authorize();
-    this.form.checkboxes.sync.onchange = () => this.enabledChanged();
-    this.form.buttons.deauthorize.onclick = () => this.deauthorize();
-    this.form.checkboxes.encrypt.onchange = () => this.encryptedChanged();
-
-    this.form.passphrase.addEventListener('password:change', () => this.passphraseChanged());
-    // this.form.passphrase.addEventListener('password:dirtiness', () => this.passwordDirtinessChanged());
-  }
-
-  protected attributeChanged(name: string, oldValue: string, newValue: string) {
-    const disabled: boolean = this.disabled;
-
-    this.form.info.disabled = disabled;
-  }
-
-  protected enabledChanged() {
-    this.enabled = this.form.checkboxes.sync.checked;
-
-    this.dispatchEvent(this.event);
-  }
-
-  protected async encryptedChanged() {
-    const encrypted: boolean = this.form.checkboxes.encrypt.checked;
-
-    if (!encrypted && !this._locked && this._token && this._passphrase) {
-      this.form.checkboxes.encrypt.checked = true;
-
-      if (!(await this.submit(this.encryptDecorator('')))) {
-        return;
-      }
-
-      this.passphrase = null;
-    }
-
-    this.encrypted = encrypted;
-
-    if (encrypted && !this._passphrase) {
-      this.form.passphrase.checkValidity();
-      return this.form.passphrase.focus();
-    } else if (!encrypted) {
-      this.form.passphrase.reset();
-    }
-
-    this.dispatchEvent(this.event);
-  }
-
-  protected async passphraseChanged() {
-    const passphrase = this.form.passphrase.value;
-
-    if (!this.locked && this._enabled && this._encrypted) {
-      if (await this.submit(this.encryptDecorator(passphrase))) {
-        this.passphrase = passphrase;
-        this.dispatchEvent(this.event);
-      }
-      return;
-    }
-
-    if (this.locked) {
-      if (!(await this.submit(this.verifyIdentity(passphrase)))) {
-        if (!this._response.error || this._response.locked) {
-          this.locked = true;
-          this.form.passphrase.focus();
-          this.message = this._response.message || 'Invalid encryption passphrase.';
-          return this.dispatchEvent(this.event);
-        }
-
-        return;
-      }
-
-      this.passphrase = passphrase;
-      this.locked = false;
-      this.dispatchEvent(this.event);
-      await this.submit(this.syncDecorator());
-    }
-  }
-
-  protected syncDecorator(): IDecorator {
-    return async () => {
-      await Cloud.wait();
-      return Cloud.sync();
-    };
-  }
-
-  protected encryptDecorator(passphrase: string): IDecorator {
-    return async () => {
-      await Cloud.wait();
-      return Cloud.encrypt(this._passphrase || '', passphrase);
-    };
-  }
-
-  protected verifyIdentity(passphrase: string): IDecorator {
-    return async () => {
-      await Cloud.wait();
-      return Cloud.verifyIdentity({
-        id: null,
-        enabled: this._enabled,
-        token: this._token,
-        passphrase: passphrase,
-        encrypted: this._encrypted,
-        locked: this._locked,
-      });
-    };
-  }
-
-  protected async authorize() {
-    this.promise = true;
-
-    try {
-      if (this.checkValidity()) {
-        this.token = await Cloud.authorize();
-
-        if (!(await this.submit(this.verifyIdentity(this._passphrase)))) {
-          if (!this._response.error || this._response.locked) {
-            this.locked = true;
-            this.form.passphrase.focus();
-            this.message = this._response.message || 'Invalid encryption passphrase.';
-            return this.dispatchEvent(this.event);
-          }
-
-          this.token = null;
-          return;
-        }
-
-        this.dispatchEvent(this.event);
-        await this.submit(this.syncDecorator());
-      } else {
-        this.message = 'Form is not valid.';
-      }
-    } catch (error) {
-      this.message = error;
-    } finally {
-      this.promise = false;
-    }
-  }
-
-  protected async deauthorize() {
-    this.promise = true;
-
-    try {
-      await Cloud.deauthorize(this.token);
-      this.token = null;
-      this.dispatchEvent(this.event);
-    } catch (error) {
-      this.message = error;
-    } finally {
-      this.promise = false;
-    }
   }
 
   private async submit(decorator: IDecorator): Promise<boolean> {

@@ -28,6 +28,7 @@ storage.cached.get().then(async (cache) => {
 
       if (item) {
         notes.hidden = false;
+
         return notes.select(item, false);
       }
     }
@@ -35,6 +36,7 @@ storage.cached.get().then(async (cache) => {
 
   if (configs.draft) {
     notes.hidden = false;
+
     return notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
   }
 

@@ -1,6 +1,9 @@
 import { Encryptor } from 'modules/encryption/encryptor';
-import { IAppConfig } from './interfaces';
+import { IAppConfig } from './code.models';
 
+
+export { BaseElement } from './base.component';
+export { FormElement } from './form.component';
 
 const configs: IAppConfig = {
   delay: 500
@@ -9,7 +12,8 @@ const configs: IAppConfig = {
 const encryptor = new Encryptor(chrome.runtime.id.toString(), true);
 
 export async function applicationId(): Promise<number> {
-  configs.applicationId = configs.applicationId || <number>(await chrome.storage.local.get('applicationId')).applicationId;
+  configs.applicationId = configs.applicationId ||
+    <number>(await chrome.storage.local.get('applicationId')).applicationId;
 
   if (!configs.applicationId) {
     configs.applicationId = new Date().getTime();

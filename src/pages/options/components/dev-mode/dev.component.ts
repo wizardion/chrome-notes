@@ -1,7 +1,6 @@
 import { BaseElement } from 'modules/core/base.component';
 import storage from 'modules/storage/storage';
 import { Logger } from 'modules/logger/logger';
-import { ILogType } from 'modules/logger/interfaces';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -9,6 +8,9 @@ const template: DocumentFragment = BaseElement.component({
 });
 
 export class DevModeElement extends BaseElement {
+  static readonly selector = 'dev-mode-info';
+  static observedAttributes = ['disabled', 'default-index'];
+
   protected fieldset: HTMLFieldSetElement;
   protected mode: HTMLInputElement;
   protected print: HTMLLinkElement;
@@ -19,7 +21,6 @@ export class DevModeElement extends BaseElement {
   protected info: HTMLElement;
   protected event: Event;
 
-  static observedAttributes = ['disabled', 'default-index'];
 
   constructor() {
     super();
@@ -35,21 +36,16 @@ export class DevModeElement extends BaseElement {
     this.info.hidden = true;
   }
 
-  get enabled(): boolean {
-    return this.mode.checked;
-  }
-
-  set enabled(value: boolean) {
-    this.mode.checked = value;
-    this.info.hidden = !value;
-  }
-
   protected async eventListeners() {
     this.event = new Event('mode:change');
     this.mode.onchange = () => this.modeChanged();
+
     this.print.onclick = (e) => { e.preventDefault(); this.printLogs(); };
+
     this.clean.onclick = (e) => { e.preventDefault(); this.clearLogs(); };
+
     this.cacheEmpty.onclick = (e) => { e.preventDefault(); this.clearCache(); };
+
     this.cachePrint.onclick = (e) => { e.preventDefault(); this.printCache(); };
   }
 
@@ -76,6 +72,7 @@ export class DevModeElement extends BaseElement {
 
       for (let i = 0; i < logs.length; i++) {
         const log = logs[i];
+
         // if (['base.ts', 'popup.ts', 'db.note.ts'].indexOf(log.name) >= 0) {
         Logger.print(log);
       }
@@ -112,5 +109,14 @@ export class DevModeElement extends BaseElement {
 
   protected async printCache() {
     console.log((await storage.global.get()).local['cache']);
+  }
+
+  get enabled(): boolean {
+    return this.mode.checked;
+  }
+
+  set enabled(value: boolean) {
+    this.mode.checked = value;
+    this.info.hidden = !value;
   }
 }

@@ -15,6 +15,22 @@ html, body {
   font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
 }
 
+.row-flex {
+  display: flex;
+}
+
+// .row-flex > div {
+//   // margin: 0px 10px 0px 0px;
+//   // flex: 0 0 10em;
+//   // width: 35%;
+// }
+
+.row-flex-group {
+  font-style: italic;
+  color: #045c55;
+  flex: 0 0 10em;
+}
+
 fieldset {
   border: none;
   padding: 0;
@@ -219,6 +235,19 @@ input[type='button']:active {
   background-color: #e336362a !important;
 }
 
+select {
+  border-color: #06736a;
+  border-radius: 4px;
+  color: #045c55;
+  padding: 0px 5px 0px 15px;
+  // margin-left: 5px;
+  background: #f1f3f4;
+}
+
+select:focus {
+  outline: none;
+}
+
 // .dangerous.warning {
 //   color: chocolate !important;
 //   fill: chocolate !important;
@@ -346,6 +375,11 @@ label:hover, input:hover {
 .info span {
   font-style: italic;
   font-size: small;
+  color: #045c55;
+}
+
+span.info {
+  font-style: italic;
   color: #045c55;
 }
 

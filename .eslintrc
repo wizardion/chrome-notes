@@ -7,26 +7,9 @@
     "sourceType": "script"
   },
   "ignorePatterns": [
-    "**/*.html",
     "**/*.json",
     "**/node_modules"
   ],
-  "rules": {
-    "no-bitwise": 2,
-    "camelcase": [2, {"properties": "never"}],
-    "curly": 2,
-    "eqeqeq": 2,
-    "wrap-iife": [2, "any"],
-    "indent": [2, 2, {"SwitchCase": 1}],
-    "no-use-before-define": [2, {"functions": false}],
-    "new-cap": 2,
-    "no-caller": 2,
-    "quotes": [2, "single"],
-    "semi": [2, "always"],
-    "no-undef": 2,
-    "no-unused-vars": 2,
-    "strict": ["error", "safe"]
-  },
   "overrides": [
     {
       "files": ["src/**/*.ts"],
@@ -41,9 +24,107 @@
       "parserOptions": {
         "sourceType": "module"
       },
+      "globals": {
+        "document": "readonly",
+        "customElements": "readonly",
+        "DocumentFragment": "readonly",
+        "HTMLElement": "readonly",
+        "MouseEvent": "readonly",
+        "HTMLFieldSetElement": "readonly",
+        "NodeList": "readonly",
+        "HTMLInputElement": "readonly",
+        "HTMLLinkElement": "readonly",
+        "HTMLDivElement": "readonly",
+        "HTMLSelectElement": "readonly",
+        "SVGElement": "readonly",
+        "window": "readonly"
+      },
       "rules": {
+        "no-bitwise": "error",
+        "camelcase": ["error", { "properties": "never" }],
+        "curly": "error",
+        "eqeqeq": "error",
+        "wrap-iife": ["error", "any"],
+        "indent": ["error", 2, { "SwitchCase": 1 }],
+        "@typescript-eslint/no-use-before-define": "error",
+        "no-caller": "error",
+        "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+        "semi": ["error", "always"],
+        "no-undef": "error",
+        "strict": ["error", "safe"],
+        "no-duplicate-imports": "error",
+        "eol-last": "error",
+        "no-trailing-spaces": "error",
+        "object-curly-newline": ["error"],
+        "max-len": ["error", { "code": 120 }],
+        "space-before-blocks": "error",
+        "keyword-spacing": "error",
+        "arrow-spacing": "error",
+        "no-multiple-empty-lines": "error",
+        "object-curly-spacing": ["error", "always"],
+        "@typescript-eslint/no-explicit-any": "off", // temporary solution
+        "@typescript-eslint/no-unused-vars": "error",
+        "lines-between-class-members":["error", "always", { "exceptAfterSingleLine": true }],
         "import/newline-after-import": ["error", { "count": 2 }],
-        "@typescript-eslint/no-var-requires": "off"
+        "import/no-duplicates": "off",
+        "space-infix-ops": "error",
+        "comma-spacing": "error",
+        "key-spacing": "error",
+        "padded-blocks": ["error", "never"],
+        "padding-line-between-statements": [
+          "error",
+          { "blankLine": "always", "prev": "*", "next": "return" },
+          { "blankLine": "always", "prev": "*", "next": "block-like" },
+          { "blankLine": "always", "prev": ["block-like", "const", "let", "var"], "next": "*"},
+          { "blankLine": "any",    "prev": ["const", "let", "var"], "next": ["const", "let", "var"]}
+        ],
+        "new-cap": [
+          "error", {
+            "capIsNewExceptions": [
+              "Attribute",
+              "Component",
+              "ContentChild",
+              "ContentChildren",
+              "Directive",
+              "Host",
+              "HostBinding",
+              "HostListener",
+              "Inject",
+              "Injectable",
+              "Input",
+              "NgModule",
+              "Optional",
+              "Output",
+              "Pipe",
+              "Self",
+              "SkipSelf",
+              "ViewChild",
+              "ViewChildren"
+            ]
+          }
+        ],
+        "@typescript-eslint/member-ordering": [
+          "error",
+          {
+            "classes": [
+              "static-field",
+              "decorated-field",
+              "public-field",
+              "public-readonly-field",
+              "protected-field",
+              "protected-readonly-field",
+              "private-field",
+              "private-readonly-field",
+              "constructor",
+              "decorated-method",
+              "protected-instance-method",
+              ["public-instance-method", "get", "set"],
+              "public-method",
+              "protected-method",
+              "private-method"
+            ]
+          }
+        ]
       }
     }
   ],

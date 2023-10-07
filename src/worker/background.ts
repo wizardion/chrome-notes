@@ -1,38 +1,45 @@
 import * as core from 'modules/core';
-import { Cloud } from 'modules/sync/cloud';
-import { removeCachedAuthToken } from 'modules/sync/components/drive';
+import storage from 'modules/storage/storage';
 // import {migrate} from 'modules/storage/migrate';
 import { Logger } from 'modules/logger/logger';
-import storage from 'modules/storage/storage';
 import { ISyncStorageValue } from 'modules/storage/interfaces';
-import { IdentityInfo, ISyncInfo } from 'modules/sync/components/interfaces';
-import { workers, DataWorker, SyncWorker, IWindow, StorageChange, AreaName } from './components';
+import { IdentityInfo } from 'modules/sync/components/interfaces';
+import {
+  DataWorker, SyncWorker, IWindow, StorageChange, AreaName, initApp, eventOnSyncInfoChanged,
+  eventOnIdentityInfoChanged, findTab, openPopup, ensureOptionPage
+} from './components';
+import { ISettingsArea } from 'pages/options/components/options.model';
 
 
 const logger: Logger = new Logger('background.ts', 'green');
 
-chrome.runtime.onInstalled.addListener(async () => await initApp('onInstalled'));
+chrome.runtime.onInstalled.addListener(async () => initApp('onInstalled'));
 
-chrome.runtime.onStartup.addListener(async () => await initApp('onStartup'));
+chrome.runtime.onStartup.addListener(async () => initApp('onStartup'));
 
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
   const workers = [DataWorker, SyncWorker];
-  
+
   for (let i = 0; i < workers.length; i++) {
     const worker = workers[i];
-    
+
     if (alarm.name === worker.worker) {
+      const settings = <ISettingsArea> await storage.local.get('settings');
+
       await logger.addLine();
       await logger.info(`${worker.worker} started`);
+      settings.error = null;
 
       try {
-        await chrome.storage.session.remove('errorMessage');
         await worker.process();
+        await storage.local.set('settings', settings);
       } catch (error) {
-        await ensureOptionPage();
-        await chrome.storage.session.set({ errorMessage: error.message });
+        settings.error = { message: error.message };
+
+        await storage.local.set('settings', settings);
         await logger.error('An error occurred during the process.\n', error.message);
         await worker.stop();
+        await ensureOptionPage();
       } finally {
         await logger.info(`${worker.worker} finished`);
       }
@@ -50,6 +57,7 @@ chrome.action.onClicked.addListener(async () => {
 
   if (local.tabInfo) {
     const tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
+
     openPopup(local.mode, window, tab && tab.id, tab && tab.windowId);
   } else {
     openPopup(local.mode, window);
@@ -63,151 +71,19 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
 
     if ((data && data.id !== id) || !data) {
       console.log('storage.syncInfo.onChanged.data', { v: data });
+
       return await eventOnSyncInfoChanged(await storage.sync.decrypt(data));
     }
   }
 
   if (namespace === 'local' && changes.identityInfo) {
-    const newInfo: IdentityInfo = <IdentityInfo>await storage.local.decrypt(changes.identityInfo.newValue);
-    const oldInfo: IdentityInfo = <IdentityInfo>await storage.local.decrypt(changes.identityInfo.oldValue);
+    const newInfo: IdentityInfo = <IdentityInfo> await storage.local.decrypt(changes.identityInfo.newValue);
+    const oldInfo: IdentityInfo = <IdentityInfo> await storage.local.decrypt(changes.identityInfo.oldValue);
 
     return await eventOnIdentityInfoChanged(oldInfo, newInfo);
   }
 });
 
-async function initApp(handler: string) {
-  await logger.info('initApp is fired: ', [handler]);
-
-  await chrome.alarms.clearAll();
-  if (await SyncWorker.validate()) {
-    await SyncWorker.start();
-  }
-
-  DataWorker.start();
-  await initPopup();
-
-  //#region testing
-  await core.delay(100);
-  Logger.tracing = true;
-  ensureOptionPage();
-  //#endregion
-}
-
-async function initPopup() {
-  const storage = await chrome.storage.local.get('mode');
-
-  if (storage.mode === 3 || storage.mode === 4) {
-    chrome.action.setPopup({ popup: '' });
-  } else {
-    chrome.action.setPopup({ popup: 'popup.html' });
-  }
-}
-
-async function eventOnSyncInfoChanged(info: ISyncInfo) {
-  logger.info('eventOnSyncInfoChanged', { i: info });
-  const identity: IdentityInfo = <IdentityInfo>await storage.local.get('identityInfo') || {
-    id: null,
-    enabled: false,
-    token: null,
-    passphrase: null,
-    encrypted: false,
-  };
-
-  if (identity.locked && info.enabled && info.token && !info.encrypted && identity.encrypted) {
-    identity.locked = false;
-    await storage.cached.permanent('locked', false);
-  }
-
-  if (!identity.locked && info.enabled && info.token && info.encrypted && !identity.passphrase) {
-    identity.locked = true;
-    await storage.cached.permanent('locked', true);
-  }
-
-  if (!info.encrypted) {
-    identity.passphrase = null;
-  }
-
-  identity.enabled = info.enabled;
-  identity.encrypted = info.encrypted;
-  identity.token = info.token;
-
-  await storage.local.sensitive('identityInfo', identity);
-}
-
-async function eventOnIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
-  logger.info('eventOnIdentityInfoChanged', { i: newInfo });
-
-  if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
-    await SyncWorker.stop();
-    return await removeCachedAuthToken(oldInfo.token);
-  }
-
-  if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
-    return await SyncWorker.start();
-  }
-
-  if (newInfo && newInfo.locked) {
-    await ensureOptionPage();
-  }
-
-  return await SyncWorker.stop();
-}
-
-async function findTab(tabId: number): Promise<chrome.tabs.Tab> {
-  const tabs = await chrome.tabs.query({});
-
-  for (let i = 0; i < tabs.length; i++) {
-    if (tabs[i].id === tabId) {
-      return tabs[i];
-    }
-  }
-
-  return null;
-}
-
-async function ensureOptionPage() {
-  const data = await chrome.storage.session.get('optionPageId');
-
-  if (data && data.optionPageId) {
-    const tab = await findTab(<number>data.optionPageId);
-
-    if (tab) {
-      return chrome.tabs.update(tab.id, { active: true });
-    }
-  }
-
-  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
-}
-
-function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: number) {
-  if (tabId) {
-    if (windowId) {
-      chrome.windows.update(windowId, { focused: true });
-    }
-
-    return chrome.tabs.update(tabId, { active: true });
-  }
-
-  if (mode === 3) {
-    return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  }
-
-  if (mode === 4) {
-    if (window) {
-      chrome.windows.create({
-        focused: true,
-        url: chrome.runtime.getURL('index.html'),
-        type: 'popup',
-        left: window.left,
-        top: window.top,
-        width: window.width,
-        height: window.height,
-      });
-    } else {
-      chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
-    }
-  }
-}
 
 //#region testing
 chrome.runtime.onSuspend.addListener(async () => {
