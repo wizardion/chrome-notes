@@ -1,6 +1,7 @@
-import { BaseElement } from 'modules/core/base.component';
+import { BaseElement } from 'modules/core/components';
 import storage from 'modules/storage/storage';
 import { Logger } from 'modules/logger/logger';
+import { load, enqueue, dequeue } from 'modules/db/idb';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -49,7 +50,7 @@ export class DevModeElement extends BaseElement {
     this.cachePrint.onclick = (e) => { e.preventDefault(); this.printCache(); };
   }
 
-  protected attributeChanged(name: string, oldValue: string, newValue: string) {
+  protected attributeChanged(name: string) {
     if (name === 'disabled') {
       if (this.disabled) {
         this.fieldset.setAttribute('disabled', 'disabled');
@@ -65,7 +66,7 @@ export class DevModeElement extends BaseElement {
   }
 
   protected async printLogs() {
-    const cache = await storage.cached.get();
+    // const cache = await storage.cached.get();
 
     Logger.load().then((logs) => {
       console.clear();
@@ -102,13 +103,25 @@ export class DevModeElement extends BaseElement {
   protected async clearCache() {
     if (window.confirm('Please confirm the certainty of clearing all dynamic and permanent cached values.' +
                        '\nThe page will be reloaded.')) {
+      // const data = await load();
+
+      // for (let i = 0; i < data.length; i++) {
+      //   const item = data[i];
+
+      //   item.cState = [0, 0];
+      //   enqueue(item, 'update');
+      // }
+
+      // await dequeue();
+
       await storage.global.clear();
+      // await storage.cached.set('list', data);
       document.location.reload();
     }
   }
 
   protected async printCache() {
-    console.log((await storage.global.get()).local['cache']);
+    console.log((await storage.cached.get()));
   }
 
   get enabled(): boolean {

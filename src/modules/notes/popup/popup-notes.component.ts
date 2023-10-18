@@ -1,7 +1,6 @@
-import { BaseElement } from 'modules/core/base.component';
+import { BaseElement } from 'modules/core/components';
 import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
-import { IDBNote } from 'modules/db/interfaces';
 import { DetailsViewElement } from '../details-view/details-view.component';
 import { DbProvider } from 'modules/db/db-provider';
 import { INote } from '../details-view/details-view.model';
@@ -18,11 +17,13 @@ export class PopupNotesElement extends BaseElement {
   private listView: ListViewElement;
   private detailsView: DetailsViewElement;
   private selected?: INote;
+  private preserved?: INote;
   private items: INote[];
 
   constructor() {
     super();
 
+    this.items = [];
     this.template = <HTMLElement>template.cloneNode(true);
     this.listView = this.template.querySelector('[name="list-view"]');
     this.detailsView = this.template.querySelector('[name="details-view"]');
@@ -35,52 +36,53 @@ export class PopupNotesElement extends BaseElement {
   }
 
   protected async eventListeners() {
-    this.listView.addEventListener('add', () => this.draft());
-    this.detailsView.addEventListener('back', () => this.goBack());
-    this.detailsView.addEventListener('cancel', () => this.goBack());
-    this.detailsView.addEventListener('change', () => this.onChanged());
-    this.detailsView.addEventListener('create', () => this.create());
-    this.detailsView.addEventListener('delete', () => this.delete());
-    this.detailsView.addEventListener('preview', () => this.togglePreview());
-    this.detailsView.addEventListener('selectionchange', () => this.onSelectionPreviewChange());
-    SortHelper.addEventListener('finished', (f, s) => this.onItemOrderChange(f, s));
+    this.listView.addEventListener('add', () => !this.disabled && this.draft());
+    this.detailsView.addEventListener('back', () => !this.disabled && this.goBack());
+    this.detailsView.addEventListener('cancel', () => !this.disabled && this.goBack());
+    this.detailsView.addEventListener('change', () => !this.disabled && this.onChanged());
+    this.detailsView.addEventListener('create', () => !this.disabled && this.create());
+    this.detailsView.addEventListener('delete', () => !this.disabled && this.delete());
+    this.detailsView.addEventListener('preview', () => !this.disabled && this.togglePreview());
+    this.detailsView.addEventListener('selectionchange', () => !this.disabled && this.onSelectionPreviewChange());
+    SortHelper.addEventListener('finished', (f, s) => !this.disabled && this.onItemOrderChange(f, s));
   }
 
-  init(items: IDBNote[]) {
-    this.items = items;
-
-    for (let i = 0; i < this.items.length; i++) {
-      const note = this.items[i];
-      const item = document.createElement('list-item') as ListItemElement;
-
-      item.index = i + 1;
-      item.title = note.title;
-      item.date = new Date(note.updated);
-      note.item = item;
-
-      item.addEventListener('click', () => this.select(note));
-      item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.pickUp(e, this.listView.list, item));
-      this.listView.add(item);
+  init(items: INote[]) {
+    for (let i = 0; i < items.length; i++) {
+      this.addItem(items[i]);
     }
   }
 
-  select(item: IDBNote, rendered = true) {
+  addItem(note: INote) {
+    const item = document.createElement('list-item') as ListItemElement;
+
+    item.index = this.items.length + 1;
+    item.title = note.title;
+    item.date = new Date(note.updated);
+    note.item = item;
+
+    item.addEventListener('click', () => this.select(note));
+    item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.pickUp(e, this.listView.scrollable, item));
+    this.listView.add(item);
+    this.items.push(note);
+
+    if (this.preserved && !this.selected && this.preserved.id === note.id) {
+      this.selected = note;
+    }
+  }
+
+  select(item: INote, rendered = true) {
     this.listView.hidden = true;
     this.detailsView.hidden = false;
 
-    this.selected = item;
-
-    this.detailsView.focus();
     this.detailsView.setData({ title: item.title, description: item.description, selection: item.cState });
-
-    this.detailsView.preview = this.selected.preview;
-
-    if (this.selected.pState) {
-      this.detailsView.setPreviewState(this.selected.pState);
-    }
+    this.detailsView.setPreviewData(item.preview, item.pState);
 
     if (rendered) {
-      DbProvider.cache.set('selected', item.id);
+      this.selected = item;
+      DbProvider.cache.set('selected', this.selected);
+    } else {
+      this.preserved = item;
     }
   }
 
@@ -158,13 +160,14 @@ export class PopupNotesElement extends BaseElement {
   }
 
   async save() {
-    if (this.selected) {
+    if (this.selected && !this.disabled) {
       const draft = Object.assign({}, this.selected);
 
       delete draft.item;
 
-      this.selected.id = await DbProvider.save(draft);
-      await DbProvider.cache.set('list', this.items);
+      // console.log('...save()');
+      // this.selected.id = await DbProvider.save(draft);
+      // DbProvider.cache.set('selected', this.selected);
     }
   }
 
@@ -213,11 +216,20 @@ export class PopupNotesElement extends BaseElement {
       this.selected.updated = time;
       this.selected.item.date = new Date(time);
 
-      console.log('onChanged...');
+      // console.log('onChanged...');
       this.save();
     } else {
-      console.log('onChanged.draft ...');
+      // console.log('onChanged.draft ...');
       DbProvider.cache.set('draft', { title, description, selection });
     }
+  }
+
+  get disabled(): boolean {
+    return super.disabled;
+  }
+
+  set disabled(value: boolean) {
+    super.disabled = value;
+    this.preserved = value ? this.preserved : null;
   }
 }

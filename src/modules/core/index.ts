@@ -2,9 +2,6 @@ import { Encryptor } from 'modules/encryption/encryptor';
 import { IAppConfig } from './code.models';
 
 
-export { BaseElement } from './base.component';
-export { FormElement } from './form.component';
-
 const configs: IAppConfig = {
   delay: 500
 };

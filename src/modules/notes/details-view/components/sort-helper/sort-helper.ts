@@ -1,6 +1,7 @@
-import { 
-  ISortContainer, ISortCustomEvents, ISortEventListener, ISortEventListenerType, ISortEvents, 
-  ISortItem, ISortPoint 
+import {
+  ISortContainer, ISortCustomEvents, ISortEventListener, ISortEventListenerType, ISortEvents,
+  ISortItem,
+  ISortPoint,
 } from './sort-helper.model';
 
 
@@ -15,18 +16,20 @@ export class SortHelper {
   private static movingEvent: ISortEvents;
   private static childElementCount: number;
   private static collection: HTMLElement[];
+  private static interval?: NodeJS.Timeout;
 
   static get busy(): boolean {
     return this._busy;
   }
 
   static pickUp(e: MouseEvent, container: HTMLElement, element: HTMLElement) {
+    const parentElement = element.parentElement;
     const startY = (e.pageY - container.offsetTop) + container.scrollTop;
-    const maxTop = element.offsetHeight * (container.childElementCount - 1);
-    const index = this.buildCollection(container.children, element);
+    const maxTop = element.offsetHeight * (parentElement.childElementCount - 1);
+    const index = this.buildCollection(parentElement.children, element);
 
     this._busy = true;
-    this.childElementCount = (container.childElementCount - 1);
+    this.childElementCount = (parentElement.childElementCount - 1);
     this.item = {
       index: index,
       startIndex: index,
@@ -41,10 +44,12 @@ export class SortHelper {
       scrollHeight: container.scrollHeight,
       height: container.offsetHeight,
       maxY: Math.min(maxTop, container.scrollHeight - element.offsetHeight),
+      parentElement: parentElement,
       element: container
     };
 
     this.start(e.pageY);
+
     return false;
   }
 
@@ -56,12 +61,12 @@ export class SortHelper {
 
   private static start(pageY: number) {
     const point: ISortPoint = this.getPoint(pageY, this.container.element.scrollTop);
-    
+
     this.item.element.style.top = `${point.top}px`;
-    this.container.element.insertBefore(this.item.placeholder, this.item.element);
+    this.container.parentElement.insertBefore(this.item.placeholder, this.item.element);
     this.item.element.classList.add('drag');
     document.body.classList.add('hold');
-    
+
     this.movingEvent = {
       move: (e: MouseEvent) => this.mouseMoveHandler(e),
       end: () => this.finish(),
@@ -73,31 +78,15 @@ export class SortHelper {
     this.container.element.addEventListener('wheel', this.movingEvent.wheel);
   }
 
-  private static mouseMoveHandler(e: MouseEvent) {
-    const scrollTop = this.container.element.scrollTop;
-    const point: ISortPoint = this.getPoint(e.pageY, scrollTop);
-
-    // clearInterval(this.interval);
-
-    // if (point.top >= point.max && scrollTop + this.list.height < this.list.scrollHeight) {
-    //   return this.animateDown(e.pageY);
-    // }
-
-    // if (point.top <= point.min && scrollTop > 0) {
-    //   return this.animateUp(e.pageY);
-    // }
-
-    this.moveItem(point.top);
-  }
-
   private static finish() {
     this.container.element.removeEventListener('wheel', this.movingEvent.wheel);
     document.removeEventListener('mousemove', this.movingEvent.move);
     document.removeEventListener('mouseup', this.movingEvent.end);
 
-    this.container.element.insertBefore(this.item.element, this.item.placeholder);
+    this.container.parentElement.insertBefore(this.item.element, this.item.placeholder);
 
-    //clearInterval(this.interval);
+    clearInterval(this.interval);
+
     if (this.item.index !== this.item.startIndex && CUSTOM_EVENTS.finish) {
       CUSTOM_EVENTS.finish(this.item.startIndex, this.item.index);
     }
@@ -112,25 +101,40 @@ export class SortHelper {
     this._busy = false;
   }
 
+  private static mouseMoveHandler(e: MouseEvent) {
+    const scrollTop = this.container.element.scrollTop;
+    const point: ISortPoint = this.getPoint(e.pageY, scrollTop);
+
+    clearInterval(this.interval);
+
+    if (point.top >= point.max && scrollTop + this.container.height < this.container.scrollHeight) {
+      return this.animateDown(e.pageY);
+    }
+
+    if (point.top <= point.min && scrollTop > 0) {
+      return this.animateUp(e.pageY);
+    }
+
+    this.moveItem(point.top);
+  }
+
   private static moveItem(pageY: number) {
     const center = this.item.element.offsetTop + this.item.height / 2;
     const index = Math.max(Math.min(Math.floor(center / this.item.height), this.childElementCount), 0);
 
-    // if (this.item.index !== index && index <= this.item.note.index) {
     if (this.item.index !== index && index <= this.item.startIndex) {
       const scrollTop = this.container.element.scrollTop;
 
-      this.container.element.insertBefore(this.item.placeholder, this.collection[index]);
-      // this.container.element.scrollTop = scrollTop;
+      this.container.parentElement.insertBefore(this.item.placeholder, this.collection[index]);
+      this.container.element.scrollTop = scrollTop;
       this.item.index = index;
     }
 
-    // if (this.item.index !== index && index > this.item.note.index) {
     if (this.item.index !== index && index > this.item.startIndex) {
       const scrollTop = this.container.element.scrollTop;
-      
-      this.container.element.insertBefore(this.item.placeholder, this.collection[index].nextSibling);
-      // this.container.element.scrollTop = scrollTop;
+
+      this.container.parentElement.insertBefore(this.item.placeholder, this.collection[index].nextSibling);
+      this.container.element.scrollTop = scrollTop;
       this.item.index = index;
     }
 
@@ -139,8 +143,8 @@ export class SortHelper {
 
   private static getPoint(pageY: number, scrollTop: number): ISortPoint {
     const y = (pageY - this.container.offsetTop) + scrollTop;
-    const min = (scrollTop + this.container.offsetTop - this.item.height) + 0;
-    const max = Math.min((scrollTop + this.container.height - this.item.height) - 0, this.container.maxY);
+    const min = (scrollTop + this.container.offsetTop - this.item.height) + 1;
+    const max = Math.min((scrollTop + this.container.height - this.item.height) - 1, this.container.maxY);
 
     return {
       top: Math.max(Math.min(y - this.item.pageY, max), min),
@@ -153,9 +157,10 @@ export class SortHelper {
     let current = 0;
 
     this.collection = [];
+
     for (let i = 0; i < collection.length; i++) {
       const item = <HTMLElement> collection[i];
-      
+
       if (item === element) {
         current = i;
       }
@@ -173,6 +178,43 @@ export class SortHelper {
     placeholder.style.width = `${element.offsetWidth}px`;
 
     return placeholder;
+  }
+
+  private static animateUp(pageY: number) {
+    const pressure = ((this.container.offsetTop + this.item.pageY) - pageY) * 2;
+    const speed = Math.max(Math.min(70 - pressure, 70), 0);
+    const point = () => ((this.container.element.scrollTop + this.container.offsetTop) + 3) - this.item.height;
+
+    const moveAnimatedItem = () => {
+      if (!this.item || this.container.element.scrollTop <= 0) {
+        return clearInterval(this.interval);
+      }
+
+      this.container.element.scrollTop--;
+      this.moveItem(point());
+    };
+
+    moveAnimatedItem();
+    this.interval = setInterval(moveAnimatedItem, speed);
+  }
+
+  private static animateDown(pageY: number) {
+    const distance = (this.item.height - this.item.pageY);
+    const pressure = (pageY - (this.container.height + this.container.offsetTop - distance)) * 2;
+    const speed = Math.max(Math.min(70 - pressure, 70), 1);
+    const point = () => ((this.container.element.scrollTop + this.container.height) - 2) - this.item.height;
+
+    const moveAnimatedItem = () => {
+      if (!this.item || this.container.element.scrollTop + this.container.height >= this.container.scrollHeight) {
+        return clearInterval(this.interval);
+      }
+
+      this.container.element.scrollTop++;
+      this.moveItem(point());
+    };
+
+    moveAnimatedItem();
+    this.interval = setInterval(moveAnimatedItem, speed);
   }
 }
 

@@ -1,4 +1,4 @@
-import { ISyncInfo } from "modules/sync/components/interfaces";
+import { ISyncInfo } from 'modules/sync/components/interfaces';
 import { encrypt, decrypt } from 'modules/core';
 import { ISyncStorageData, ISyncStorageValue } from './interfaces';
 
@@ -21,7 +21,7 @@ export class SyncStorage {
 
   public static async decrypt(data: ISyncStorageValue): Promise<ISyncInfo> {
     if (data) {
-      const value: ISyncInfo = <ISyncInfo>await decrypt(data.value);
+      const value: ISyncInfo = <ISyncInfo> await decrypt(data.value);
 
       return {
         id: data.id,

@@ -1,7 +1,8 @@
 {
   "env": {
-    "es6": true,
-    "node": true
+    "es2022": true,
+    "node": true,
+    "browser": true
   },
   "parserOptions": {
     "sourceType": "script"
@@ -25,19 +26,10 @@
         "sourceType": "module"
       },
       "globals": {
-        "document": "readonly",
-        "customElements": "readonly",
-        "DocumentFragment": "readonly",
-        "HTMLElement": "readonly",
-        "MouseEvent": "readonly",
-        "HTMLFieldSetElement": "readonly",
-        "NodeList": "readonly",
-        "HTMLInputElement": "readonly",
-        "HTMLLinkElement": "readonly",
-        "HTMLDivElement": "readonly",
-        "HTMLSelectElement": "readonly",
-        "SVGElement": "readonly",
-        "window": "readonly"
+        "EventListener": "readonly",
+        "AddEventListenerOptions": "readonly",
+        "IDBTransactionMode": "readonly",
+        "NodeJS": "readonly"
       },
       "rules": {
         "no-bitwise": "error",

@@ -1,6 +1,6 @@
-export type ILogColors = "red" | "green" | "blue";
+export type ILogColors = 'red' | 'green' | 'blue';
 
-export enum ILogType {
+export enum ILogLevel {
   Info = 0,
   Warning = 1,
   Error = 2
@@ -17,7 +17,7 @@ export interface ILog {
   name: string,
   color: string,
   time: number,
-  type: ILogType,
+  level: ILogLevel,
   data: string;
 }
 
@@ -25,3 +25,5 @@ export interface ILogCommand {
   item: ILog,
   action: string
 }
+
+export const logLevel = ILogLevel.Info;

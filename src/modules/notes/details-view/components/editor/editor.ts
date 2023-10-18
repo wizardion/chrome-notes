@@ -1,19 +1,17 @@
-import {Compartment, EditorState, SelectionRange} from '@codemirror/state';
-import {EditorView, ViewUpdate, drawSelection, highlightSpecialChars, keymap} from '@codemirror/view';
-import {history, historyField} from '@codemirror/commands';
-import {markdown, markdownLanguage} from '@codemirror/lang-markdown';
+import { Compartment, EditorState, SelectionRange } from '@codemirror/state';
+import { EditorView, ViewUpdate, drawSelection, highlightSpecialChars, keymap } from '@codemirror/view';
+import { history } from '@codemirror/commands';
+import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { foldGutter, syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 import { markFolding } from './extensions/folding-icon';
 import { markdownHighlighting } from './extensions/syntax-highlighting';
 import { IEditorData, IExtension } from './extensions/extension.model';
 import { editorFromTextArea } from './extensions/from-text-area';
-import { editorKeymap, CODE_ACTIONS, CUSTOM_EVENTS, INTERVALS } from './extensions/editor-commands';
+import { CUSTOM_EVENTS, INTERVALS } from './extensions/editor-commands';
 import { mdRender } from './extensions/md-render';
+import { CODE_ACTIONS, editorKeymap } from './extensions/editor-keymap';
 
-
-
-type IHistory = {done: {changes: []}[]};
 
 export class Editor {
   locked: boolean;
@@ -26,9 +24,9 @@ export class Editor {
       foldGutter({ markerDOM: markFolding }),
       highlightSpecialChars(),
       history({ minDepth: 15 }),
-      
+
       syntaxHighlighting(markdownHighlighting, { fallback: true }),
-      markdown({base: markdownLanguage, codeLanguages: languages}),
+      markdown({ base: markdownLanguage, codeLanguages: languages }),
       drawSelection(),
 
       new Compartment().of(EditorState.tabSize.of(2)),
@@ -42,24 +40,12 @@ export class Editor {
     this.initControls(controls);
   }
 
-  private initControls(controls: NodeList) {
-    controls.forEach((item: HTMLElement) => {
-      const action = item.getAttribute('action');
-      const event = CODE_ACTIONS[action];
-
-      if (event) {
-        item.onclick = () => event(this.view);
-        item.onmousedown = (e: MouseEvent) => e.preventDefault();
-      }
-    });
-  }
-
   get value(): string {
     return this.view.state.doc.toString();
   }
 
   set value(text: string) {
-    this.view.setState(EditorState.create({doc: text, extensions: this.extensions}));
+    this.view.setState(EditorState.create({ doc: text, extensions: this.extensions }));
     this.range = this.view.state.selection.main;
   }
 
@@ -95,15 +81,15 @@ export class Editor {
       title = value && value.split(' ').splice(0, 6).join(' ') + ' ...';
     }
 
-    return {title: title, description: value, selection: this.getSelection()};
+    return { title: title, description: value, selection: this.getSelection() };
   }
 
   setData(data: IEditorData) {
     this.locked = true;
-    this.view.setState(EditorState.create({doc: data.description, extensions: this.extensions}));
+    this.view.setState(EditorState.create({ doc: data.description, extensions: this.extensions }));
     this.view.focus();
-    
-    if(data.selection) {
+
+    if (data.selection) {
       this.setSelection(data.selection);
     }
 
@@ -132,19 +118,31 @@ export class Editor {
     }
   }
 
+  private initControls(controls: NodeList) {
+    controls.forEach((item: HTMLElement) => {
+      const action = item.getAttribute('action');
+      const event = CODE_ACTIONS[action];
+
+      if (event) {
+        item.onclick = () => event(this.view);
+        item.onmousedown = (e: MouseEvent) => e.preventDefault();
+      }
+    });
+  }
+
   private setSelection(selection: number[]) {
     const [from, to] = selection;
 
     this.view.dispatch({
-      selection: {anchor: from, head: to}, 
-      effects: EditorView.scrollIntoView(from, {y: 'center'})
+      selection: { anchor: from, head: to },
+      effects: EditorView.scrollIntoView(from, { y: 'center' })
     });
   }
 
   private getSelection(): number[] {
     const range = this.view.state.selection.main;
 
-    return [range.from, range.to]; 
+    return [range.from, range.to];
   }
 
   private isDocChanged(view: ViewUpdate): boolean {

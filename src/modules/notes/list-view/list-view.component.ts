@@ -1,5 +1,4 @@
-import { BaseElement } from 'modules/core/base.component';
-import { FormElement } from 'modules/core/form.component';
+import { BaseElement, FormElement } from 'modules/core/components';
 import { IListViewForm, IEventListenerType } from './list-view.model';
 import { ListItemElement } from '../list-item/list-item.component';
 
@@ -20,8 +19,13 @@ export class ListViewElement extends BaseElement {
     this.form = new FormElement<IListViewForm>({
       add: this.template.querySelector('[name="add-note"]'),
       list: this.template.querySelector('[name="list-items"]'),
+      scrollable: this.template.querySelector('[name="scrollable"]'),
       items: []
     });
+  }
+
+  get scrollable(): HTMLElement {
+    return this.form.elements.scrollable;
   }
 
   get list(): HTMLElement {
@@ -40,9 +44,10 @@ export class ListViewElement extends BaseElement {
   addEventListener(type: IEventListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
     if (type === 'add') {
       this.form.elements.add.addEventListener('mousedown', (e) => e.preventDefault());
+
       return this.form.elements.add.addEventListener('click', listener);
     }
-    
+
     return super.addEventListener(type, listener, options);
   }
 }

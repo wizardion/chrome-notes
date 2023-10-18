@@ -1,21 +1,16 @@
 import { Logger } from 'modules/logger/logger';
-import { DataWorker } from './data-worker';
 import { SyncWorker } from './sync-worker';
-import storage from 'modules/storage/storage';
 import { ISyncInfo, IdentityInfo } from 'modules/sync/components/interfaces';
 import { removeCachedAuthToken } from 'modules/sync/components/drive';
 import { IWindow } from './models';
-import * as core from 'modules/core';
+import storage from 'modules/storage/storage';
+import { ISettingsArea, pageModes } from 'modules/settings/settings.model';
 
 
+export { BaseWorker } from './base-worker';
 export { DataWorker } from './data-worker';
 export { SyncWorker } from './sync-worker';
 export { IWindow, StorageChange, AreaName } from './models';
-
-export const workers: (DataWorker | SyncWorker)[] = [
-  DataWorker,
-  SyncWorker
-];
 
 const logger: Logger = new Logger('background/index.ts', 'green');
 
@@ -46,32 +41,45 @@ export async function ensureOptionPage() {
 }
 
 export async function initPopup() {
-  const storage = await chrome.storage.local.get('mode');
+  const settings = <ISettingsArea> await storage.local.get('settings');
 
-  if (storage.mode === 3 || storage.mode === 4) {
-    chrome.action.setPopup({ popup: '' });
-  } else {
-    chrome.action.setPopup({ popup: 'popup.html' });
-  }
+  await chrome.action.setPopup({ popup: pageModes[settings.common.mode].popup });
 }
 
-export async function initApp(handler: string) {
-  await logger.info('initApp is fired: ', [handler]);
+export function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: number) {
+  if (tabId) {
+    if (windowId) {
+      chrome.windows.update(windowId, { focused: true });
+    }
 
-  await chrome.alarms.clearAll();
-
-  if (await SyncWorker.validate()) {
-    await SyncWorker.start();
+    return chrome.tabs.update(tabId, { active: true });
   }
 
-  DataWorker.start();
-  await initPopup();
+  return chrome.tabs.create({ url: chrome.runtime.getURL(pageModes[mode].page) });
 
-  //#region testing
-  await core.delay(100);
-  Logger.tracing = true;
-  ensureOptionPage();
-  //#endregion
+  // if (mode === 0) {
+  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+  // }
+
+  // if (mode === 3) {
+  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+  // }
+
+  // if (mode === 4) {
+  //   if (window) {
+  //     chrome.windows.create({
+  //       focused: true,
+  //       url: chrome.runtime.getURL('index.html'),
+  //       type: 'popup',
+  //       left: window.left,
+  //       top: window.top,
+  //       width: window.width,
+  //       height: window.height,
+  //     });
+  //   } else {
+  //     chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
+  //   }
+  // }
 }
 
 export async function eventOnSyncInfoChanged(info: ISyncInfo) {
@@ -109,48 +117,18 @@ export async function eventOnIdentityInfoChanged(oldInfo: IdentityInfo, newInfo:
   logger.info('eventOnIdentityInfoChanged', { i: newInfo });
 
   if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
-    await SyncWorker.stop();
+    await SyncWorker.deregister();
 
     return await removeCachedAuthToken(oldInfo.token);
   }
 
   if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
-    return await SyncWorker.start();
+    return await SyncWorker.register();
   }
 
   if (newInfo && newInfo.locked) {
     await ensureOptionPage();
   }
 
-  return await SyncWorker.stop();
-}
-
-export function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: number) {
-  if (tabId) {
-    if (windowId) {
-      chrome.windows.update(windowId, { focused: true });
-    }
-
-    return chrome.tabs.update(tabId, { active: true });
-  }
-
-  if (mode === 3) {
-    return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  }
-
-  if (mode === 4) {
-    if (window) {
-      chrome.windows.create({
-        focused: true,
-        url: chrome.runtime.getURL('index.html'),
-        type: 'popup',
-        left: window.left,
-        top: window.top,
-        width: window.width,
-        height: window.height,
-      });
-    } else {
-      chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
-    }
-  }
+  return await SyncWorker.deregister();
 }

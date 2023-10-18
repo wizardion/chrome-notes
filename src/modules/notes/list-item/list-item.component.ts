@@ -1,6 +1,5 @@
-import { BaseElement } from 'modules/core/base.component';
+import { BaseElement, FormElement } from 'modules/core/components';
 import { IEventListenerType, IListFormItem } from './list-item.model';
-import { FormElement } from 'modules/core/form.component';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -76,7 +75,7 @@ export class ListItemElement extends BaseElement {
   animateItem() {
     const element = this.form.elements.item;
 
-    element.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    element.scrollIntoView({ behavior: 'instant', block: 'center' });
     element.animate({
       background: 'rgba(7, 166, 152, 0.12)',
       color: 'rgb(6, 115, 106)',
@@ -91,10 +90,12 @@ export class ListItemElement extends BaseElement {
 
   addEventListener(type: IEventListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
     if (type === 'sort:mousedown') {
-      this.form.elements.sort.addEventListener('mouseup', () => setTimeout(() => this._locked = false));
+      document.addEventListener('mouseup', () => setTimeout(() => this._locked = false));
+
       return this.form.elements.sort.addEventListener('mousedown', (e) => {
         e.preventDefault();
         this._locked = true;
+
         return listener(e);
       });
     }
@@ -102,7 +103,7 @@ export class ListItemElement extends BaseElement {
     if (type === 'click') {
       return super.addEventListener(type, (e) => !this._locked && listener(e), options);
     }
-    
+
     return super.addEventListener(type, listener, options);
   }
 }

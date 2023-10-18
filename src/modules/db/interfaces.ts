@@ -16,7 +16,7 @@ export interface IDBNote {
   html?: boolean;
   updated: number;
   created: number;
-  deleted?: boolean;
+  deleted: number;
   locked?: boolean;
 }
 

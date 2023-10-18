@@ -18,6 +18,7 @@ export interface ISortContainer {
   maxY?: number;
   height?: number;
   scrollHeight?: number;
+  parentElement: HTMLElement;
   element: HTMLElement;
 }
 
@@ -27,8 +28,10 @@ export interface ISortPoint {
   max: number;
 }
 
-// -----------------------------------------------------------------------------------------------------------------------
-export type ISortEventListenerType = 
+/**
+ * ------------------------------------------------------------------------------------------------------------------
+ */
+export type ISortEventListenerType =
   | 'switched'
   | 'finished';
 

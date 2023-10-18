@@ -1,4 +1,4 @@
-import { BaseElement } from 'modules/core/base.component';
+import { BaseElement } from 'modules/core/components';
 
 
 const template: DocumentFragment = BaseElement.component({

@@ -5,6 +5,7 @@ export type IEventListenerType = 'add' | 'click' | string;
 
 export interface IListViewForm {
   add: HTMLButtonElement;
+  scrollable: HTMLDivElement;
   list: HTMLDivElement;
   items: ListItemElement[];
 }

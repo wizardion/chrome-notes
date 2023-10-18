@@ -18,6 +18,7 @@ class MarkdownRender {
 
   public render(text: string): string {
     const html = this.md.render(text.replace(/^(\n|[ ]+\n|[ ]{2,3}(?=\w))/gim, '$1\\=\\?$1'));
+
     return html.replace(/=\?/gi, '&nbsp;');
   }
 

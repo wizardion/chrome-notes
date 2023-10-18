@@ -1,4 +1,4 @@
-import { BaseElement, FormElement } from 'modules/core';
+import { BaseElement, FormElement } from 'modules/core/components';
 import { ICommonSettingsForm } from './common-settings.model';
 
 

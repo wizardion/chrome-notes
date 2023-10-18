@@ -31,6 +31,37 @@ html, body {
   flex: 0 0 10em;
 }
 
+.alert {
+  width: 75%;
+  max-width: 850px;
+  margin: 5px auto;
+  border-radius: 4px;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.alert .icon {
+  flex: 0 0 24px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.alert .message {
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+  font-family: 'Roboto', 'Ubuntu', Sans-Serif;
+}
+
+.alert.error {
+  background-color: #9d232315;
+  color: #9d2323;
+  fill: #9d2323;
+  padding: 5px;
+  border: 1px solid #a32626;
+}
+
 fieldset {
   border: none;
   padding: 0;
@@ -58,10 +89,9 @@ fieldset:disabled {
 .row {
   width: 75%;
   max-width: 850px;
+  min-width: 475px;
   margin: 5px auto;
-  // padding: 10px;
   background: white;
-
   border: silver;
   border-radius: 4px;
   border: 1px solid #e0e0df;

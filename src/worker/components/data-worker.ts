@@ -1,4 +1,4 @@
-import { dump, enqueue, dequeue } from 'modules/db/idb';
+import { deleted, enqueue, dequeue } from 'modules/db/idb';
 import { Logger } from 'modules/logger/logger';
 import { BaseWorker } from './base-worker';
 
@@ -6,18 +6,19 @@ import { BaseWorker } from './base-worker';
 const logger: Logger = new Logger('data-worker.ts', 'green');
 
 export class DataWorker extends BaseWorker {
-  static readonly expirationPeriod = 3;
   static readonly worker = 'data-worker';
   static readonly period = 60;
 
-  static async process() {
-    const items = await dump();
+  async process() {
+    const items = await deleted();
     const today = new Date().getTime();
+
+    logger.info('deleted items:', items);
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
 
-      if (item.deleted && this.days(item.updated, today) > this.expirationPeriod) {
+      if (item.deleted && this.days(item.updated, today) > this.settings.common.expirationDays) {
         logger.info('enqueue(item', [item.title, item.created, item.updated]);
         enqueue(item, 'remove');
       }
@@ -26,7 +27,7 @@ export class DataWorker extends BaseWorker {
     await dequeue();
   }
 
-  private static days(updated: number, today: number) {
+  private days(updated: number, today: number) {
     const start = new Date(updated);
     const end = new Date(today);
 

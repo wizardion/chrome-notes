@@ -1,6 +1,8 @@
 import { IDBNote } from 'modules/db/interfaces';
 
 
+export { IDBNote } from 'modules/db/interfaces';
+
 export interface IDataDaft {
   title: string;
   description: string;
@@ -8,7 +10,7 @@ export interface IDataDaft {
 }
 
 export interface IPopupData {
-  items: IDBNote[];
-  index: number;
+  index?: number;
+  selected: IDBNote;
   draft: IDataDaft;
 }

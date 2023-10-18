@@ -1,7 +1,7 @@
 import * as core from 'modules/core';
-import * as drive from './components/drive'
+import * as drive from './components/drive';
 import { Encryptor } from 'modules/encryption/encryptor';
-import { IdentityInfo, IFileInfo, ISyncRequest, IPasswordRule, TokenError, ICloudInfo, IntegrityError } from './components/interfaces';
+import { IdentityInfo, IPasswordRule, TokenError, IntegrityError } from './components/interfaces';
 import * as process from './components/process';
 
 
@@ -61,7 +61,7 @@ export class Cloud {
     identity.token = await drive.renewToken();
     await process.exec('verifyIdentity', async () => {
       const file = await process.ensureFile(identity);
-      const rule = <IPasswordRule>await core.decrypt(file.data.rules);
+      const rule = <IPasswordRule> await core.decrypt(file.data.rules);
       const hours = Math.abs(rules.modified - rule.modified) / 36e5;
 
       if (hours > rules.minHours) {
@@ -79,7 +79,8 @@ export class Cloud {
         await process.setProcessInfo(identity);
         await core.delay();
       } else {
-        let plural = rules.minHours > 1? 's' : '';
+        const plural = rules.minHours > 1 ? 's' : '';
+
         throw new TokenError(`Please wait for at least ${rules.minHours} hour${plural} before trying again.`);
       }
     }, false);

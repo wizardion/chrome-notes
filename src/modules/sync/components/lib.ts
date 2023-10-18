@@ -1,5 +1,5 @@
 import * as idb from 'modules/db/idb';
-import { ISyncPair, ISyncItemInfo, ISyncInfo, IdentityInfo } from './interfaces';
+import { ISyncPair, ISyncItemInfo, IdentityInfo } from './interfaces';
 import { IDBNote } from 'modules/db/interfaces';
 import { Encryptor } from 'modules/encryption/encryptor';
 import { Logger } from 'modules/logger/logger';
@@ -24,7 +24,7 @@ export async function unzip(item: ISyncItemInfo, cryptor?: Encryptor): Promise<I
     html: null,
     updated: item.u,
     created: item.c,
-    deleted: false
+    deleted: 0
   };
 
   return data;
@@ -83,11 +83,12 @@ export async function getDBPair(data: ISyncItemInfo[]): Promise<ISyncPair[]> {
 }
 
 export async function lock(reason: string) {
-  const identityInfo: IdentityInfo = <IdentityInfo>await storage.local.get('identityInfo');
+  const identityInfo: IdentityInfo = <IdentityInfo> await storage.local.get('identityInfo');
 
   if (!identityInfo.locked) {
     identityInfo.locked = true;
     await storage.local.sensitive('identityInfo', identityInfo);
     await storage.cached.permanent('locked', true);
+    await logger.warn(reason);
   }
 }

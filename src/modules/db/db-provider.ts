@@ -4,6 +4,10 @@ import storage from 'modules/storage/storage';
 
 
 export class DbProvider {
+  public static get cache() {
+    return storage.cached;
+  }
+
   public static async save(item: IDBNote): Promise<number> {
     if (item.id) {
       await db.update(item);
@@ -11,14 +15,13 @@ export class DbProvider {
       item.id = await db.add(item);
     }
 
-    // console.log('save.item', item);
     return item.id;
   }
 
   public static async bulkSave(queue: IDBNote[], items?: IDBNote[]) {
     for (let i = 0; i < queue.length; i++) {
       const item = queue[i];
-      
+
       db.enqueue(item, 'update');
     }
 
@@ -30,15 +33,11 @@ export class DbProvider {
   }
 
   public static async remove(item: IDBNote, items?: IDBNote[]) {
-    item.deleted = true;
+    item.deleted = 1;
     await db.update(item);
 
     if (items) {
       await storage.cached.set('list', items);
     }
-  }
-
-  public static get cache() {
-    return storage.cached;
   }
 }

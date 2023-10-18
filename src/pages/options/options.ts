@@ -6,13 +6,16 @@ import { DevModeElement } from './components/dev-mode/dev';
 import { PasswordElement } from './components/passwords/password';
 import { ProgressElement } from './components/progress-bar/progress';
 import { IdentityInfo } from 'modules/sync/components/interfaces';
-import { IOptionControls, ISettingsArea, defaultSettings } from './components/options.model';
+import { IOptionControls, defaultSettings } from './components/options.model';
 import { devModeChanged, eventOnStorageChanged, settingsChanged, syncInfoChanged } from './components';
 import { CommonSettingsElement } from './components/common-settings/common-settings.component';
+import { AlertElement } from './components/alert/alert.component';
+import { ISettingsArea } from 'modules/settings/settings.model';
 
 
 const controls: IOptionControls = {};
 
+customElements.define(AlertElement.selector, AlertElement);
 customElements.define(ProgressElement.selector, ProgressElement);
 customElements.define(PasswordElement.selector, PasswordElement);
 customElements.define(CommonSettingsElement.selector, CommonSettingsElement);
@@ -26,6 +29,7 @@ storage.local.get('settings').then(async (current: ISettingsArea) => {
   controls.syncInfo = <SyncInfoElement>document.querySelector('sync-info');
   controls.devModeInfo = <DevModeElement>document.querySelector('dev-mode-info');
   controls.common = <CommonSettingsElement>document.querySelector('common-settings');
+  controls.alert = <AlertElement>document.querySelector('alert-message');
 
   settings.identity = <IdentityInfo> await storage.local.get('identityInfo');
   settings.sync = await storage.sync.get();
@@ -47,7 +51,7 @@ storage.local.get('settings').then(async (current: ISettingsArea) => {
   }
 
   if (settings.error) {
-    controls.syncInfo.message = settings.error.message;
+    controls.alert.error = settings.error.message;
   }
 
   controls.devModeInfo.enabled = settings.devMode === true;

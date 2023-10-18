@@ -190,6 +190,11 @@
   word-break: break-word;
 }
 
+.content-preview pre,
+.content-preview pre code {
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+}
+
 .content-preview > h1 + *,
 .content-preview > h2 + *,
 .content-preview > h3 + *,
@@ -220,23 +225,32 @@
 }
 
 .content-preview h2 {
+  padding-left: 1em;
+  padding-bottom: 0px;
   font-size: larger;
   font-weight: bold;
 }
 
 .content-preview h3 {
-  font-size: large;
+  padding-left: 1em;
+  padding-bottom: 0px;
+  // font-size: large;
+  font-size: 14px;
   font-weight: bold;
 }
 
 .content-preview h4 {
+  padding-left: 1em;
+  padding-bottom: 0px;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: normal;
   color: gray;
 }
 
 .content-preview h5, 
 .content-preview h6 {
+  padding-left: 1em;
+  padding-bottom: 0px;
   font-size: 14px;
   color: gray;
   font-style: italic;

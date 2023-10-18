@@ -1,5 +1,5 @@
 import { IStorageValue, IStorageData } from './interfaces';
-import {encrypt, decrypt} from 'modules/core';
+import { encrypt, decrypt } from 'modules/core';
 
 
 export class LocalStorage {
@@ -18,7 +18,6 @@ export class LocalStorage {
   }
 
   public static async set(key: string, value: object | number | string | boolean): Promise<void> {
-
     if (key === 'errorMessage') {
       console.log('value', value);
     }

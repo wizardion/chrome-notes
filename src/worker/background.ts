@@ -5,50 +5,83 @@ import { Logger } from 'modules/logger/logger';
 import { ISyncStorageValue } from 'modules/storage/interfaces';
 import { IdentityInfo } from 'modules/sync/components/interfaces';
 import {
-  DataWorker, SyncWorker, IWindow, StorageChange, AreaName, initApp, eventOnSyncInfoChanged,
-  eventOnIdentityInfoChanged, findTab, openPopup, ensureOptionPage
+  DataWorker, SyncWorker, BaseWorker, IWindow, StorageChange, AreaName, eventOnSyncInfoChanged,
+  eventOnIdentityInfoChanged, findTab, openPopup, ensureOptionPage, initPopup
 } from './components';
-import { ISettingsArea } from 'pages/options/components/options.model';
+import { CachedStorage } from 'modules/storage/cached';
+import { ISettingsArea } from 'modules/settings/settings.model';
 
 
 const logger: Logger = new Logger('background.ts', 'green');
+
+async function initApp(handler: string) {
+  //#region testing
+  const settings = <ISettingsArea> await storage.local.get('settings');
+
+  if (settings) {
+    settings.error = null;
+  }
+
+  await core.delay(100);
+  Logger.tracing = true;
+  await Logger.clear();
+  await storage.local.set('settings', settings);
+  ensureOptionPage();
+  //#endregion
+
+  await logger.addLine();
+  await logger.info('initApp is fired: ', [handler]);
+
+  await CachedStorage.init();
+  await chrome.alarms.clearAll();
+
+  if (await SyncWorker.validate()) {
+    await SyncWorker.register();
+  }
+
+  DataWorker.register();
+  await initPopup();
+}
 
 chrome.runtime.onInstalled.addListener(async () => initApp('onInstalled'));
 
 chrome.runtime.onStartup.addListener(async () => initApp('onStartup'));
 
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
-  const workers = [DataWorker, SyncWorker];
+  const settings = <ISettingsArea> await storage.local.get('settings');
+  const workers: (typeof BaseWorker)[] = [DataWorker, SyncWorker];
+
+  settings.error = null;
 
   for (let i = 0; i < workers.length; i++) {
-    const worker = workers[i];
+    const Base = workers[i];
 
-    if (alarm.name === worker.worker) {
-      const settings = <ISettingsArea> await storage.local.get('settings');
+    if (alarm.name === Base.worker) {
+      const worker = new Base(settings);
 
       await logger.addLine();
-      await logger.info(`${worker.worker} started`);
-      settings.error = null;
+      await logger.info(`${Base.worker} started`);
 
       try {
         await worker.process();
-        await storage.local.set('settings', settings);
       } catch (error) {
-        settings.error = { message: error.message };
-
-        await storage.local.set('settings', settings);
-        await logger.error('An error occurred during the process.\n', error.message);
-        await worker.stop();
-        await ensureOptionPage();
+        settings.error = { message: `Oops, something's wrong... ${error.message || String(error)}` };
+        await logger.warn('An error occurred during the process: ', settings.error.message);
+        await Base.deregister();
       } finally {
-        await logger.info(`${worker.worker} finished`);
+        await logger.info(`${Base.worker} finished`);
       }
     }
+  }
+
+  if (settings.error) {
+    await storage.local.set('settings', settings);
+    await ensureOptionPage();
   }
 });
 
 chrome.action.onClicked.addListener(async () => {
-  const local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'mode']);
+  const local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'settings']);
   const window: IWindow = local.window;
 
   // if (local.migrate) {
@@ -60,7 +93,8 @@ chrome.action.onClicked.addListener(async () => {
 
     openPopup(local.mode, window, tab && tab.id, tab && tab.windowId);
   } else {
-    openPopup(local.mode, window);
+    // console.log('');
+    openPopup(local.settings.common.mode, window);
   }
 });
 
@@ -83,96 +117,3 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
     return await eventOnIdentityInfoChanged(oldInfo, newInfo);
   }
 });
-
-
-//#region testing
-chrome.runtime.onSuspend.addListener(async () => {
-  await logger.info('onSuspend called');
-});
-
-chrome.runtime.onSuspendCanceled.addListener(async () => {
-  await logger.info('onSuspend is canceled');
-});
-
-chrome.runtime.onConnect.addListener(async () => {
-  await logger.info('onConnect is fired');
-});
-//#endregion
-
-//#region old.code
-// chrome.runtime.onInstalled.addListener(() => {
-
-//   chrome.storage.local.remove('logs');
-
-//   logger.clear().then(() => {
-//     logger.info('\t\t=> app installed!');
-//   });
-
-//   chrome.storage.local.get(['migrate', 'oldNotes', 'syncEnabled', 'internalKey', 'shareKey', 'applicationId'],
-//                             async function(result) {
-//     if (!result.applicationId) {
-//       sync.initApplication();
-//     }
-
-//     if (result.migrate && result.oldNotes) {
-//       await migrate(result.oldNotes);
-//       return chrome.storage.local.clear();
-//     }
-
-//     if (result.migrate) {
-//       chrome.action.setPopup({popup: ''}, ()=>{});
-//       await storage.cached.permanent('mode', 5);
-//       return chrome.tabs.create({url: chrome.runtime.getURL('migration.html')});
-//     }
-
-//     TEraseData();
-//     await chrome.storage.local.remove('syncProcessing');
-//     setPopup((await storage.cached.get(['mode'])).mode.value || 0);
-//     startSync();
-//   });
-// });
-
-// function openMigration() {
-//   var url = chrome.runtime.getURL('migration.html');
-
-//   chrome.tabs.query({url: url, currentWindow: true}, function (tabs) {
-//     if (tabs.length) {
-//       let tab = tabs[0];
-
-//       chrome.tabs.update(tab.id, {active: true});
-//     } else {
-//       chrome.tabs.query({url: url}, function (allTabs) {
-//         if (tabs.length) {
-//           let tab = allTabs[0];
-
-//           if (tab.windowId) {
-//             chrome.windows.update(tab.windowId, {focused: true});
-//           }
-
-//           chrome.tabs.update(tab.id, {active: true});
-//         } else {
-//           chrome.tabs.create({url: url});
-//         }
-//       });
-//     }
-//   });
-// }
-
-// async function startSync() {
-//   try {
-//     await logger.addLine();
-//     await logger.info('=>=>=> start Sync... lastError: ', chrome.runtime.lastError);
-//     var busy: boolean = await sync.isBusy();
-
-//     if (!busy) {
-//       await sync.start();
-//       await logger.info('=>=>=> Sync is completed, bytes: ',
-//                         await chrome.storage.sync.getBytesInUse(), chrome.storage.sync.QUOTA_BYTES, '!');
-//     } else {
-//       await logger.info('... busy');
-//     }
-//   } catch (error) {
-//     await logError(error);
-//   }
-// }
-//#endregion

@@ -1,9 +1,10 @@
 import { ISyncInfo } from 'modules/sync/components/interfaces';
 import { SyncInfoElement } from './sync-info/info.component';
-import { IAreaName, IOptionControls, ISettingsArea, IStorageChange } from './options.model';
+import { IAreaName, IOptionControls, IStorageChange } from './options.model';
 import { DevModeElement } from './dev-mode/dev.component';
 import { ISyncStorageValue } from 'modules/storage/interfaces';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
+import { ISettingsArea, pageModes } from 'modules/settings/settings.model';
 import storage from 'modules/storage/storage';
 import * as core from 'modules/core';
 
@@ -14,12 +15,7 @@ export async function settingsChanged(element: CommonSettingsElement, current: I
     expirationDays: element.expirationDays,
   };
 
-  if (current.common.mode === 3 || current.common.mode === 4) {
-    chrome.action.setPopup({ popup: '' });
-  } else {
-    chrome.action.setPopup({ popup: 'popup.html' });
-  }
-
+  await chrome.action.setPopup({ popup: pageModes[current.common.mode].popup });
   await storage.local.set('settings', current);
 }
 
@@ -96,9 +92,11 @@ export async function eventOnStorageChanged(changes: IStorageChange, namespace: 
     }
   }
 
-  if (namespace === 'session' && !controls.syncInfo.promise && changes.errorMessage && changes.errorMessage.newValue) {
-    const message = changes.errorMessage.newValue;
+  if (namespace === 'local' && changes.settings && changes.settings.newValue) {
+    const settings = <ISettingsArea> changes.settings.newValue;
 
-    controls.syncInfo.message = message;
+    if (settings.error) {
+      controls.alert.error = settings.error.message;
+    }
   }
 }

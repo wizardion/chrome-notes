@@ -1,22 +1,18 @@
-import { IDBNote } from 'modules/db/interfaces';
 import { IStorageData } from './interfaces';
-import { Logger } from 'modules/logger/logger';
 
-
-const logger: Logger = new Logger('cached.ts', 'green');
 
 export class CachedStorage {
+  protected static readonly key = 'cache';
   public static cache: IStorageData;
-  protected static key = 'cache';
 
   public static async set(key: string, value: string | number | object | boolean) {
     if (!value && value !== 0 && value !== false) {
       return this.remove([key]);
     }
 
-    this.cache = await this.load(this.key);
+    this.cache = this.cache || await this.load();
     this.cache[key] = { value: value, permanent: false };
-    await this.save(this.key, this.cache);
+    await this.save(this.cache);
   }
 
   public static async permanent(key: string, value: string | number | boolean | object) {
@@ -24,13 +20,13 @@ export class CachedStorage {
       return this.remove([key]);
     }
 
-    this.cache = await this.load(this.key);
+    this.cache = this.cache || await this.load();
     this.cache[key] = { value: value, permanent: true };
-    await this.save(this.key, this.cache);
+    await this.save(this.cache);
   }
 
   public static async get(keys?: string[]): Promise<IStorageData> {
-    this.cache = await this.load(this.key);
+    this.cache = this.cache || await this.load();
 
     if (keys) {
       const result: IStorageData = {};
@@ -48,7 +44,7 @@ export class CachedStorage {
   }
 
   public static async clear() {
-    this.cache = await this.load(this.key);
+    this.cache = this.cache || await this.load();
     const keys: string[] = Object.keys(this.cache);
 
     for (let i = 0; i < keys.length; i++) {
@@ -59,11 +55,11 @@ export class CachedStorage {
       }
     }
 
-    await this.save(this.key, this.cache);
+    await this.save(this.cache);
   }
 
   public static async remove(keys: string[]) {
-    this.cache = await this.load(this.key);
+    this.cache = this.cache || await this.load();
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
@@ -73,26 +69,28 @@ export class CachedStorage {
       }
     }
 
-    await this.save(this.key, this.cache);
+    await this.save(this.cache);
   }
 
-  public static async init(list: IDBNote[]) {
-    logger.info('set.list', list);
+  public static async init() {
+    const value = (await chrome.storage.local.get(this.key)) || {};
 
-    return this.set('list', list);
+    await chrome.storage.session.set({ [this.key]: value[this.key] });
   }
 
   public static async empty() {
     await chrome.storage.local.remove(this.key);
+    await chrome.storage.session.remove(this.key);
   }
 
-  protected static async save(key: string, value: IStorageData): Promise<void> {
-    await chrome.storage.local.set({ [key]: value });
+  protected static async save(value: IStorageData): Promise<void> {
+    await chrome.storage.local.set({ [this.key]: value });
+    await chrome.storage.session.set({ [this.key]: value });
   }
 
-  protected static async load(key: string): Promise<IStorageData> {
-    const value = (await chrome.storage.local.get(key)) || {};
-    
-    return value[key] || {};
+  protected static async load(): Promise<IStorageData> {
+    const value = (await chrome.storage.session.get(this.key)) || {};
+
+    return value[this.key] || {};
   }
 }

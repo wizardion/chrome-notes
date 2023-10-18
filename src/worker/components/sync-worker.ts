@@ -11,18 +11,18 @@ export class SyncWorker extends BaseWorker {
   static readonly worker = 'sync-worker';
   static readonly period = 5;
 
+  async process() {
+    if (!(await Cloud.busy())) {
+      await Cloud.sync();
+    } else {
+      await logger.info(`${SyncWorker.worker} is busy`);
+    }
+  }
+
   static async validate(identity?: IdentityInfo): Promise<boolean> {
     const identityInfo: IdentityInfo = identity || <IdentityInfo> await storage.local.get('identityInfo');
 
     return !!((identityInfo && identityInfo.enabled) &&
       (identityInfo.token && (!identityInfo.encrypted || identityInfo.passphrase) && !identityInfo.locked));
-  }
-
-  static async process() {
-    if (!(await Cloud.busy())) {
-      await Cloud.sync();
-    } else {
-      await logger.info(`${this.worker} is busy`);
-    }
   }
 }

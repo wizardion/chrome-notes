@@ -1,5 +1,5 @@
 import { Cloud } from 'modules/sync/cloud';
-import { BaseElement } from 'modules/core/base';
+import { BaseElement } from 'modules/core/components';
 import { TokenSecretDenied } from 'modules/sync/components/interfaces';
 import { ISyncInfoForm, IDecorator, IResponseDetails } from './interfaces';
 
