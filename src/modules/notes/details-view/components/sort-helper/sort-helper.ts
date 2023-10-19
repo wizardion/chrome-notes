@@ -24,31 +24,34 @@ export class SortHelper {
 
   static pickUp(e: MouseEvent, container: HTMLElement, element: HTMLElement) {
     const parentElement = element.parentElement;
-    const startY = (e.pageY - container.offsetTop) + container.scrollTop;
-    const maxTop = element.offsetHeight * (parentElement.childElementCount - 1);
-    const index = this.buildCollection(parentElement.children, element);
 
-    this._busy = true;
-    this.childElementCount = (parentElement.childElementCount - 1);
-    this.item = {
-      index: index,
-      startIndex: index,
-      height: element.offsetHeight,
-      element: element,
-      pageY: startY - element.offsetTop,
-      placeholder: this.createPlaceholder(element)
-    };
+    if (parentElement.childElementCount > 1) {
+      const startY = (e.pageY - container.offsetTop) + container.scrollTop;
+      const maxTop = element.offsetHeight * (parentElement.childElementCount - 1);
+      const index = this.buildCollection(parentElement.children, element);
 
-    this.container = {
-      offsetTop: container.offsetTop,
-      scrollHeight: container.scrollHeight,
-      height: container.offsetHeight,
-      maxY: Math.min(maxTop, container.scrollHeight - element.offsetHeight),
-      parentElement: parentElement,
-      element: container
-    };
+      this._busy = true;
+      this.childElementCount = (parentElement.childElementCount - 1);
+      this.item = {
+        index: index,
+        startIndex: index,
+        height: element.offsetHeight,
+        element: element,
+        pageY: startY - element.offsetTop,
+        placeholder: this.createPlaceholder(element)
+      };
 
-    this.start(e.pageY);
+      this.container = {
+        offsetTop: container.offsetTop,
+        scrollHeight: container.scrollHeight,
+        height: container.offsetHeight,
+        maxY: Math.min(maxTop, container.scrollHeight - element.offsetHeight),
+        parentElement: parentElement,
+        element: container
+      };
+
+      this.start(e.pageY);
+    }
 
     return false;
   }
@@ -63,6 +66,7 @@ export class SortHelper {
     const point: ISortPoint = this.getPoint(pageY, this.container.element.scrollTop);
 
     this.item.element.style.top = `${point.top}px`;
+    this.container.parentElement.insertBefore(this.item.placeholder, this.item.element);
     this.container.parentElement.insertBefore(this.item.placeholder, this.item.element);
     this.item.element.classList.add('drag');
     document.body.classList.add('hold');
@@ -144,7 +148,7 @@ export class SortHelper {
   private static getPoint(pageY: number, scrollTop: number): ISortPoint {
     const y = (pageY - this.container.offsetTop) + scrollTop;
     const min = (scrollTop + this.container.offsetTop - this.item.height) + 1;
-    const max = Math.min((scrollTop + this.container.height - this.item.height) - 1, this.container.maxY);
+    const max = Math.min((scrollTop + this.container.height - this.item.height) - 6, this.container.maxY);
 
     return {
       top: Math.max(Math.min(y - this.item.pageY, max), min),
@@ -174,6 +178,7 @@ export class SortHelper {
   private static createPlaceholder(element: HTMLElement): HTMLElement {
     const placeholder = document.createElement('div');
 
+    placeholder.classList.add('placeholder');
     placeholder.style.height = `${element.offsetHeight}px`;
     placeholder.style.width = `${element.offsetWidth}px`;
 

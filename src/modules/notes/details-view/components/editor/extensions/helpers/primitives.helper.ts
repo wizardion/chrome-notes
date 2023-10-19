@@ -7,12 +7,16 @@ export class PrimitivesHelper {
     const range = view.state.selection.main;
     const selection = view.state.sliceDoc(range.from, range.to);
 
-    const value = this.transform(selection, regex, template);
+    if (selection) {
+      const value = this.transform(selection, regex, template);
 
-    return {
-      changes: { from: range.from, to: range.to, insert: value },
-      selection: { anchor: range.from, head: range.from + value.length }
-    };
+      return {
+        changes: { from: range.from, to: range.to, insert: value },
+        selection: { anchor: range.from, head: range.from + value.length }
+      };
+    }
+
+    return null;
   }
 
   static toggleBold(view: EditorView): TransactionSpec | null {

@@ -9,6 +9,7 @@ import 'styles/style.scss';
 
 
 window.addEventListener('load', async () => {
+// customElements.whenDefined(PopupNotesElement.selector).then(async () => {
   const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
   const cache = await storage.cached.get();
   const configs: IPopupData = {

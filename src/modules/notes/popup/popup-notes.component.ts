@@ -166,8 +166,8 @@ export class PopupNotesElement extends BaseElement {
       delete draft.item;
 
       // console.log('...save()');
-      // this.selected.id = await DbProvider.save(draft);
-      // DbProvider.cache.set('selected', this.selected);
+      this.selected.id = await DbProvider.save(draft);
+      DbProvider.cache.set('selected', this.selected);
     }
   }
 

@@ -16,6 +16,10 @@
   line-height: 23px;
   // border-bottom: 1px dotted #07a69835;
   border-bottom: 1px dotted transparent;
+  // box-shadow: 1px 0px 4px 0px #056a6128;
+  box-shadow: 0px 0px 4px 0px #056a6118;
+  // box-shadow: 0px 0px 4px 0px #056a61;
+  z-index: 101;
 }
 
 .description-note {

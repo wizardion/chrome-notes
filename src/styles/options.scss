@@ -94,7 +94,8 @@ fieldset:disabled {
   background: white;
   border: silver;
   border-radius: 4px;
-  border: 1px solid #e0e0df;
+  // border: 1px solid #e0e0df;
+  box-shadow: 0px 0px 4px 0px #056a6128;
 }
 
 input[type='radio'],
@@ -266,7 +267,7 @@ input[type='button']:active {
 }
 
 select {
-  border-color: #06736a;
+  border-color: #06736a55;
   border-radius: 4px;
   color: #045c55;
   padding: 0px 5px 0px 15px;
