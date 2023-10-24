@@ -131,6 +131,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.component.ts', '.js', '.svg'],
     alias: {
+      core: path.resolve(__root__, 'src/core'),
       modules: path.resolve(__root__, 'src/modules'),
       styles: path.resolve(__root__, 'src/styles'),
       images: path.resolve(__root__, 'src/images'),

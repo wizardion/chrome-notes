@@ -1,4 +1,4 @@
-import { BaseElement, FormElement } from 'modules/core/components';
+import { BaseElement, FormElement } from 'core/components';
 import { IEventListenerType, IListFormItem } from './list-item.model';
 
 

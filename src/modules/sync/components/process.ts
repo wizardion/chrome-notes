@@ -1,20 +1,20 @@
 import * as lib from './lib';
-import * as idb from '../../db/idb';
-import * as core from 'modules/core';
+import { db } from 'modules/db';
+import { delay, encrypt, decrypt } from 'core';
 import * as drive from './drive';
-import storage from 'modules/storage/storage';
-import { Logger } from 'modules/logger/logger';
-import { Encryptor } from 'modules/encryption/encryptor';
+import { storage, ISyncInfo } from 'core/services';
+import { LoggerService } from 'modules/logger';
+import { EncryptorService } from 'modules/encryption';
 import {
   ISyncPair, ICloudInfo, TokenError, TokenSecretDenied, IProcessInfo, IntegrityError,
-  IPasswordRule, IdentityInfo, ISyncInfo, IFileInfo, ISyncRequest
+  IPasswordRule, IdentityInfo, IFileInfo, ISyncRequest
 } from './interfaces';
 
 
-const logger = new Logger('sync.ts', 'blue');
+const logger = new LoggerService('sync.ts', 'blue');
 
 //#region testing
-Logger.tracing = true;
+LoggerService.tracing = true;
 
 //#endregion
 
@@ -51,25 +51,25 @@ export async function validate(identityInfo: IdentityInfo): Promise<IdentityInfo
   return identityInfo;
 }
 
-export async function checkFileSecret(file: IFileInfo, cryptor?: Encryptor): Promise<boolean> {
+export async function checkFileSecret(file: IFileInfo, cryptor?: EncryptorService): Promise<boolean> {
   return !file.data.secret || (cryptor && (await cryptor.verify(file.data.secret)));
 }
 
-export async function ensureFile(identity: IdentityInfo, cryptor?: Encryptor): Promise<IFileInfo> {
+export async function ensureFile(identity: IdentityInfo, cryptor?: EncryptorService): Promise<IFileInfo> {
   let isNew: boolean = false;
 
   if (!identity.id) {
     identity.id = await drive.find(identity.token);
-    await core.delay();
+    await delay();
   }
 
   if (!identity.id) {
     const rules: IPasswordRule = { count: 0, modified: 0 };
-    const cloud: ICloudInfo = { modified: new Date().getTime(), items: [], rules: await core.encrypt(rules) };
+    const cloud: ICloudInfo = { modified: new Date().getTime(), items: [], rules: await encrypt(rules) };
 
     isNew = true;
     identity.id = await drive.create(identity.token, cloud);
-    await core.delay();
+    await delay();
   }
 
   const file: IFileInfo = await drive.get(identity.token, identity.id);
@@ -87,7 +87,11 @@ export async function ensureFile(identity: IdentityInfo, cryptor?: Encryptor): P
   return file;
 }
 
-async function syncItems(file: IFileInfo, oldCryptor?: Encryptor, newCryptor?: Encryptor): Promise<ICloudInfo> {
+async function syncItems(
+  file: IFileInfo,
+  oldCryptor?: EncryptorService,
+  newCryptor?: EncryptorService
+): Promise<ICloudInfo> {
   const cloud: ICloudInfo = { modified: file.data.modified, items: [], rules: file.data.rules };
   const pairInfo: ISyncPair[] = await lib.getDBPair(file.data.items);
   const modified: number = new Date().getTime();
@@ -103,14 +107,14 @@ async function syncItems(file: IFileInfo, oldCryptor?: Encryptor, newCryptor?: E
     // mark deleted
     if (info.db && !info.cloud && info.db.synced && !file.isNew && !info.db.deleted) {
       info.db.deleted = 1;
-      await idb.update(info.db);
+      await db.update(info.db);
       logger.info(i, ' - mark deleted local item: ', info.db.id);
       continue;
     }
 
     // update local
     if (info.cloud && (!info.db || info.db.updated < info.cloud.u)) {
-      const decorator = info.db ? idb.update : idb.add;
+      const decorator = info.db ? db.update : db.add;
 
       cloud.items.push(info.cloud);
       await decorator({ synced: modified, ...(await lib.unzip(info.cloud, oldCryptor)) });
@@ -121,7 +125,7 @@ async function syncItems(file: IFileInfo, oldCryptor?: Encryptor, newCryptor?: E
     // put updated on cloud
     if (info.db && !info.db.deleted && (!info.cloud || info.db.updated > info.cloud.u)) {
       cloud.modified = modified;
-      await idb.update({ synced: modified, ...info.db });
+      await db.update({ synced: modified, ...info.db });
       cloud.items.push(await lib.zip(info.db, (newCryptor || oldCryptor)));
       await logger.info(i, ' - pushed new/updated item to cloud: ', info.db.id);
       continue;
@@ -129,7 +133,7 @@ async function syncItems(file: IFileInfo, oldCryptor?: Encryptor, newCryptor?: E
 
     // keep the rest
     if (!info.db.deleted) {
-      await idb.update({ synced: modified, ...info.db });
+      await db.update({ synced: modified, ...info.db });
       cloud.items.push(await lib.zip(info.db, (newCryptor || oldCryptor)));
     }
   }
@@ -137,21 +141,21 @@ async function syncItems(file: IFileInfo, oldCryptor?: Encryptor, newCryptor?: E
   return cloud;
 }
 
-export async function sync(identity: IdentityInfo, oldCryptor?: Encryptor, newCryptor?: Encryptor) {
+export async function sync(identity: IdentityInfo, oldCryptor?: EncryptorService, newCryptor?: EncryptorService) {
   const file: IFileInfo = await ensureFile(identity, oldCryptor);
   const cloud: ICloudInfo = await syncItems(file, oldCryptor, newCryptor);
 
   if (cloud.modified !== file.data.modified || newCryptor) {
-    const encryptor = newCryptor || oldCryptor;
+    const EncryptorService = newCryptor || oldCryptor;
 
     await logger.info(' - new version will be updated.');
 
-    if (encryptor && !encryptor.transparent) {
-      cloud.secret = await encryptor.generateSecret();
+    if (EncryptorService && !EncryptorService.transparent) {
+      cloud.secret = await EncryptorService.generateSecret();
       await logger.info(' - generated new secret:', cloud.secret);
     }
 
-    cloud.rules = cloud.rules ? await core.encrypt(await core.decrypt(cloud.rules)) : cloud.rules;
+    cloud.rules = cloud.rules ? await encrypt(await decrypt(cloud.rules)) : cloud.rules;
     await drive.update(identity.token, identity.id, cloud);
   }
 }

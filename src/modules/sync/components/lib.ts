@@ -1,15 +1,14 @@
-import * as idb from 'modules/db/idb';
+import { db, IDBNote } from 'modules/db';
 import { ISyncPair, ISyncItemInfo, IdentityInfo } from './interfaces';
-import { IDBNote } from 'modules/db/interfaces';
-import { Encryptor } from 'modules/encryption/encryptor';
-import { Logger } from 'modules/logger/logger';
-import storage from 'modules/storage/storage';
+import { EncryptorService } from 'modules/encryption';
+import { LoggerService } from 'modules/logger';
+import { storage } from 'core/services';
 
 
-const logger: Logger = new Logger('lib.ts');
+const logger = new LoggerService('lib.ts');
 
 
-export async function unzip(item: ISyncItemInfo, cryptor?: Encryptor): Promise<IDBNote> {
+export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Promise<IDBNote> {
   const title = cryptor ? await cryptor.decrypt(item.t) : item.t;
   const description = cryptor ? await cryptor.decrypt(item.d) : item.d;
 
@@ -30,7 +29,7 @@ export async function unzip(item: ISyncItemInfo, cryptor?: Encryptor): Promise<I
   return data;
 }
 
-export async function zip(item: IDBNote, cryptor?: Encryptor): Promise<ISyncItemInfo> {
+export async function zip(item: IDBNote, cryptor?: EncryptorService): Promise<ISyncItemInfo> {
   const title = cryptor ? await cryptor.encrypt(item.title) : item.title;
   const description = cryptor ? await cryptor.encrypt(item.description) : item.description;
 
@@ -79,7 +78,7 @@ function map(items: IDBNote[], cloud: ISyncItemInfo[]): ISyncPair[] {
 }
 
 export async function getDBPair(data: ISyncItemInfo[]): Promise<ISyncPair[]> {
-  return map(await idb.dump(), data);
+  return map(await db.dump(), data);
 }
 
 export async function lock(reason: string) {
@@ -88,7 +87,7 @@ export async function lock(reason: string) {
   if (!identityInfo.locked) {
     identityInfo.locked = true;
     await storage.local.sensitive('identityInfo', identityInfo);
-    await storage.cached.permanent('locked', true);
+    // await storage.cached.permanent('locked', true);
     await logger.warn(reason);
   }
 }

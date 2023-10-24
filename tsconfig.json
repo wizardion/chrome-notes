@@ -11,6 +11,7 @@
     "baseUrl": "src",
     "moduleSuffixes": [".component", ""],
     "paths": {
+      "core/*": ["core/*"],
       "modules/*": ["modules/*"],
       "styles/*": ["styles/*"],
       "images/*": ["images/*"]

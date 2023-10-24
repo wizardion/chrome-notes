@@ -1039,11 +1039,11 @@ const decodeDict: {[key: string]: number} = {
 // };
 
 export function encode(data: Uint8Array): string {
-  var buffer: string[] = [];
+  const buffer: string[] = [];
 
   for (let i = 0; i < data.length; i++) {
     const element: string = encodeDict[data[i]];
-    
+
     buffer.push(element);
   }
 
@@ -1051,11 +1051,11 @@ export function encode(data: Uint8Array): string {
 }
 
 export function decode(data: string): Uint8Array {
-  var buffer: number[] = [];
+  const buffer: number[] = [];
 
   for (let i = 0; i < data.length; i++) {
     const element: number = decodeDict[data[i]];
-    
+
     buffer.push(element);
   }
 

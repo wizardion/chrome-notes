@@ -1,18 +1,16 @@
-import * as core from 'modules/core';
-import storage from 'modules/storage/storage';
+import * as core from 'core';
+import { ISyncStorageValue, storage } from 'core/services';
 // import {migrate} from 'modules/storage/migrate';
-import { Logger } from 'modules/logger/logger';
-import { ISyncStorageValue } from 'modules/storage/interfaces';
+import { LoggerService } from 'modules/logger';
 import { IdentityInfo } from 'modules/sync/components/interfaces';
 import {
   DataWorker, SyncWorker, BaseWorker, IWindow, StorageChange, AreaName, eventOnSyncInfoChanged,
   eventOnIdentityInfoChanged, findTab, openPopup, ensureOptionPage, initPopup
 } from './components';
-import { CachedStorage } from 'modules/storage/cached';
 import { ISettingsArea } from 'modules/settings/settings.model';
 
 
-const logger: Logger = new Logger('background.ts', 'green');
+const logger = new LoggerService('background.ts', 'green');
 
 async function initApp(handler: string) {
   //#region testing
@@ -23,8 +21,8 @@ async function initApp(handler: string) {
   }
 
   await core.delay(100);
-  Logger.tracing = true;
-  await Logger.clear();
+  LoggerService.tracing = true;
+  await LoggerService.clear();
   await storage.local.set('settings', settings);
   ensureOptionPage();
   //#endregion
@@ -32,7 +30,7 @@ async function initApp(handler: string) {
   await logger.addLine();
   await logger.info('initApp is fired: ', [handler]);
 
-  await CachedStorage.init();
+  // await CachedStorage.init();
   await chrome.alarms.clearAll();
 
   if (await SyncWorker.validate()) {

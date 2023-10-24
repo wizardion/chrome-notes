@@ -1,16 +1,16 @@
-import { deleted, enqueue, dequeue } from 'modules/db/idb';
-import { Logger } from 'modules/logger/logger';
+import { db } from 'modules/db';
+import { LoggerService } from 'modules/logger';
 import { BaseWorker } from './base-worker';
 
 
-const logger: Logger = new Logger('data-worker.ts', 'green');
+const logger = new LoggerService('data-worker.ts', 'green');
 
 export class DataWorker extends BaseWorker {
   static readonly worker = 'data-worker';
   static readonly period = 60;
 
   async process() {
-    const items = await deleted();
+    const items = await db.deleted();
     const today = new Date().getTime();
 
     logger.info('deleted items:', items);
@@ -20,11 +20,11 @@ export class DataWorker extends BaseWorker {
 
       if (item.deleted && this.days(item.updated, today) > this.settings.common.expirationDays) {
         logger.info('enqueue(item', [item.title, item.created, item.updated]);
-        enqueue(item, 'remove');
+        db.enqueue(item, 'remove');
       }
     }
 
-    await dequeue();
+    await db.dequeue();
   }
 
   private days(updated: number, today: number) {

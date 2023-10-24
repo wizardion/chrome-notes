@@ -7,6 +7,6 @@ export interface IListFormItem {
   date: HTMLSpanElement;
 }
 
-export type IEventListenerType = 
+export type IEventListenerType =
   | 'sort:mousedown'
   | 'click';

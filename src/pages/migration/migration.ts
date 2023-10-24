@@ -1,8 +1,93 @@
 import 'styles/migration.scss';
-import {migrate} from 'modules/storage/migrate';
+import { migrate } from 'core/utils/migrate';
 
 
-var oldNotes: string;
+let oldNotes: string;
+
+async function startMigrate() {
+  const whats = document.getElementById('whats-new');
+  const finished = document.getElementById('finished');
+  const progress = document.getElementById('progress');
+
+  await migrate(oldNotes);
+
+  setTimeout(() => {
+    progress.classList.add('hidden');
+    finished.classList.remove('hidden');
+    whats.classList.remove('hidden');
+
+    chrome.storage.local.clear();
+    localStorage.clear();
+  }, 8000);
+}
+
+function startMigration() {
+  const progressThumb = document.getElementById('progress-thumb');
+
+  setTimeout(() => {
+    progressThumb.classList.remove('hidden');
+    startMigrate();
+  }, 1000);
+}
+
+function cancelMigration(countdown: HTMLElement, interval: NodeJS.Timeout, e: PointerEvent) {
+  e.preventDefault();
+  clearInterval(interval);
+  countdown.classList.add('disabled');
+
+  this.value = ' Start  ';
+
+  this.onclick = () => {
+    const seconds: number = 30;
+    const countdownSeconds: HTMLElement = document.getElementById('countdown-seconds');
+
+    countdown.classList.remove('disabled');
+    countdownSeconds.innerText = seconds.toString();
+    this.value = 'Cancel';
+    // countDown();
+  };
+}
+
+function countDown() {
+  let seconds = 30;
+  const countdown: HTMLElement = document.getElementById('countdown');
+  const countdownSeconds: HTMLElement = document.getElementById('countdown-seconds');
+  const countdownCancel:HTMLElement = document.getElementById('countdown-cancel');
+  const progress = document.getElementById('progress');
+
+  countdown.classList.remove('hidden');
+  const interval = setInterval(() => {
+    if (!--seconds) {
+      countdown.classList.add('hidden');
+      progress.classList.remove('hidden');
+      clearInterval(interval);
+      startMigration();
+    }
+
+    countdownSeconds.innerText = seconds.toString();
+  }, 1000);
+
+  countdownCancel.onclick = cancelMigration.bind(countdownCancel, countdown, interval);
+}
+
+function closeWindow() {
+  window.close();
+}
+
+function clearInterface() {
+  const html = document.body.parentElement;
+  const body = document.createElement('body');
+  const close = document.createElement('input');
+
+  close.type = 'button';
+  close.classList.add('close');
+  close.value = 'Close';
+  close.onclick = closeWindow;
+
+  document.body.remove();
+  body.appendChild(close);
+  html.appendChild(body);
+}
 
 (() => {
   chrome.storage.local.get(['migrate', 'oldNotes'], function(result) {
@@ -18,88 +103,3 @@ var oldNotes: string;
     document.body.parentElement.style.display = 'initial';
   });
 })();
-
-function clearInterface() {
-  var html = document.body.parentElement;
-  var body = document.createElement('body');
-  var close = document.createElement('input');
-
-  close.type = 'button';
-  close.classList.add('close');
-  close.value = 'Close';
-  close.onclick = closeWindow;
-  
-  document.body.remove();
-  body.appendChild(close);
-  html.appendChild(body);
-}
-
-function closeWindow() {
-  window.close();
-}
-
-function cancelMigration(countdown: HTMLElement, interval: NodeJS.Timeout, e: PointerEvent) {
-  e.preventDefault();
-  clearInterval(interval);
-  countdown.classList.add('disabled');
-
-  this.value = ' Start  ';
-  this.onclick = () => {
-    var seconds: number = 30;
-    var countdownSeconds: HTMLElement = document.getElementById('countdown-seconds');
-
-    countdown.classList.remove('disabled');
-    countdownSeconds.innerText = seconds.toString();
-    this.value = 'Cancel';
-    countDown();
-  };
-}
-
-function countDown() {
-  var seconds: number = 30;
-  var interval: NodeJS.Timeout;
-  var countdown: HTMLElement = document.getElementById('countdown');
-  var countdownSeconds: HTMLElement = document.getElementById('countdown-seconds');
-  var countdownCancel:HTMLElement = document.getElementById('countdown-cancel');
-  var progress = document.getElementById('progress');
-
-  countdown.classList.remove('hidden');
-  interval = setInterval(() => {
-    if (!--seconds) {
-      countdown.classList.add('hidden');
-      progress.classList.remove('hidden');
-      clearInterval(interval);
-      startMigration();
-    }
-
-    countdownSeconds.innerText = seconds.toString();
-  }, 1000);
-
-  countdownCancel.onclick = cancelMigration.bind(countdownCancel, countdown, interval);
-}
-
-function startMigration() {
-  var progressThumb = document.getElementById('progress-thumb');
-  
-  setTimeout(() => {
-    progressThumb.classList.remove('hidden');
-    startMigrate();
-  }, 1000);
-}
-
-async function startMigrate() {
-  var whatsnew = document.getElementById('whats-new');
-  var finished = document.getElementById('finished');
-  var progress = document.getElementById('progress');
-
-  await migrate(oldNotes);
-  
-  setTimeout(() => {
-    progress.classList.add('hidden');
-    finished.classList.remove('hidden');
-    whatsnew.classList.remove('hidden');
-
-    chrome.storage.local.clear();
-    localStorage.clear();
-  }, 8000);  
-}

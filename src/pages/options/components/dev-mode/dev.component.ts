@@ -1,7 +1,7 @@
-import { BaseElement } from 'modules/core/components';
-import storage from 'modules/storage/storage';
-import { Logger } from 'modules/logger/logger';
-import { load, enqueue, dequeue } from 'modules/db/idb';
+import { BaseElement } from 'core/components';
+import { storage } from 'core/services';
+import { LoggerService } from 'modules/logger';
+// import { db } from 'modules/db';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -68,14 +68,14 @@ export class DevModeElement extends BaseElement {
   protected async printLogs() {
     // const cache = await storage.cached.get();
 
-    Logger.load().then((logs) => {
+    LoggerService.getAll().then((logs) => {
       console.clear();
 
       for (let i = 0; i < logs.length; i++) {
         const log = logs[i];
 
         // if (['base.ts', 'popup.ts', 'db.note.ts'].indexOf(log.name) >= 0) {
-        Logger.print(log);
+        LoggerService.print(log);
       }
 
       // Logger.print({
@@ -89,7 +89,7 @@ export class DevModeElement extends BaseElement {
   }
 
   protected clearLogs() {
-    Logger.clear();
+    LoggerService.clear();
     console.clear();
   }
 

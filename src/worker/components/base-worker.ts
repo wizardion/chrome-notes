@@ -1,8 +1,8 @@
-import { Logger } from 'modules/logger/logger';
+import { LoggerService } from 'modules/logger';
 import { ISettingsArea } from 'modules/settings/settings.model';
 
 
-const logger: Logger = new Logger('base-worker.ts', 'green');
+const logger = new LoggerService('base-worker.ts', 'green');
 
 export class BaseWorker {
   static readonly worker: string;

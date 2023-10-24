@@ -77,15 +77,11 @@
   text-align: center;
 }
 
-// .cm-line .cm-heading-1.cm-meta:first-child,
-// .cm-line .cm-heading-2.cm-meta:first-child,
-// .cm-line .cm-heading-3.cm-meta:first-child,
-// .cm-line .cm-heading-4.cm-meta:first-child,
-// .cm-line .cm-heading-5.cm-meta:first-child,
-// .cm-line .cm-heading-6.cm-meta:first-child {
 .cm-line .cm-heading-1.cm-meta:first-child {
-  opacity: 0;
+  opacity: 0.3;
   font-size: smaller;
+  float: left;
+  margin-top: 10px;
 }
 
 .cm-line:has(> .cm-meta:only-child) {
@@ -95,6 +91,8 @@
 .cm-line .cm-meta:only-child {
   opacity: 0.3 !important;
   display: inline !important;
+  float: none !important;
+  margin-top: 0 !important;
 }
 
 .cm-heading-1 {
@@ -159,164 +157,3 @@
 .cm-meta {
   opacity: 0.3;
 }
-
-// .cm-heading-2.cm-meta, 
-// .cm-heading-3.cm-meta, 
-// .cm-heading-4.cm-meta, 
-// .cm-heading-5.cm-meta, 
-// .cm-heading-6.cm-meta, 
-// .cm-bold.cm-meta, 
-// .cm-italic.cm-meta {
-//   font-size: 14px;
-// }
-
-// .cm-line :first-child.cm-list.cm-meta {
-//   opacity: 1;
-//   font-size: medium;
-// }
-
-// .cm-selectionBackground {
-//   background-color: #d9e9e9 !important; 
-// }
-
-// .ͼ5 {
-//   // display: none;
-//   opacity: 0.75;
-// }
-
-// // .ͼ7.ͼ5, 
-// // .ͼ9.ͼ5, 
-// // .ͼ8.ͼ5, 
-// // .ͼ6.ͼ5, .ͼ6.ͼc {
-// //   display: none;
-// // }
-
-// .ͼ7 {
-//   font-size: larger;
-//   text-decoration: none !important;
-// }
-
-// .ͼ6 {
-//   color: #06736a;
-// }
-
-// .cm-line .ͼ5:first-child {
-//   // display: none;
-//   // color: red !important;
-// }
-
-// .CodeMirror {
-//   height: 243px !important;
-//   line-height: 18px;
-//   padding: 0px !important;
-//   padding: 0px !important;
-//   padding-left: 3px !important;
-//   padding-right: 3px !important;
-
-//   font-size: 13px !important;
-//   font-family: 'Roboto Mono', 'Menlo', 'PT Mono', monospace, sans-serif !important;
-//   // border: none !important;
-//   border-radius: 0 !important;
-// }
-
-// .CodeMirror-wrap {
-//   border-top: 1px solid transparent;
-// }
-
-// .CodeMirror-scroll {
-//   padding-bottom: 50px !important;
-//   overflow: scroll !important;
-//   margin-bottom: -50px !important;
-//   margin-right: -50px !important;
-// }
-
-// .CodeMirror-cursor {
-//   border-left: 0 !important;
-//   width: 2px !important;
-
-//   border-radius: 4px !important;
-//   // background-color: #03534e;
-//   background-color: #023a36;
-//   opacity: 0.75;
-//   margin-left: -1px;
-// }
-
-// .CodeMirror-selected {
-//   background: #d9d9d9;
-// }
-
-// .CodeMirror-focused .CodeMirror-selected {
-//   background: #d9e9e9;
-// }
-
-// .CodeMirror-line::selection, 
-// .CodeMirror-line > span::selection, 
-// .CodeMirror-line > span > span::selection {
-//   background: #d9e9e9; 
-// }
-
-// .CodeMirror-code > .CodeMirror-line:first-child {
-//   text-align: center;
-// }
-
-// .CodeMirror-code > .CodeMirror-line:first-child > span {
-//   font-weight: bold;
-//   font-style: normal;
-//   font-size: 16px;
-//   line-height: 21px;
-// }
-
-// .CodeMirror-code > .CodeMirror-line:first-child > span::before {
-//   content: ' ';
-//   display: block;
-//   height: 5px;
-// }
-
-// .CodeMirror-code > .CodeMirror-line:first-child > span::after {
-//   content: ' ';
-//   display: block;
-//   height: 10px;
-//   margin-bottom: -21px;
-// }
-
-// .CodeMirror-code > .CodeMirror-line:first-child span {
-//   color: #06736a;
-// }
-
-// .CodeMirror-line .cm-link {
-//   // color: #00c;
-//   color: #06736a !important;
-//   text-decoration: none;
-// }
-
-// .CodeMirror-line .cm-header {
-//   color: black;
-// }
-
-// .CodeMirror-line .cm-url {
-//   color: #a11 !important;
-//   // color: #e33636;
-// }
-
-// //.cm-null 
-// .cm-spell-error {
-//   background: none !important;
-//   border-bottom: 1px dashed red !important;
-// }
-
-// // .cm-bracket, 
-// .cm-tag {
-//   color: dimgray !important;
-//   border-bottom: 1px dashed red !important;
-// }
-
-// .cm-comment, 
-// .cm-quote,
-// .cm-comment.cm-spell-error {
-//   background: none !important;
-//   color: dimgray;
-// }
-
-// // .cm-formatting {
-// //   opacity: 0.25;
-// // }

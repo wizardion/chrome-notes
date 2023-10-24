@@ -1,5 +1,4 @@
-import * as idb from '../db/idb';
-import { IDBNote } from '../db/interfaces';
+import { db, IDBNote } from 'modules/db';
 
 
 function fromString(text: string): IDBNote[] {
@@ -27,7 +26,7 @@ export async function migrate(data: string): Promise<boolean> {
   const notes = fromString(data);
 
   for (let i = 0; i < notes.length; i++) {
-    await idb.add(notes[i]);
+    await db.add(notes[i]);
   }
 
   return !!notes;

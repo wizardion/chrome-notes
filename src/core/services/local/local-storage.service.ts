@@ -1,8 +1,8 @@
-import { IStorageValue, IStorageData } from './interfaces';
-import { encrypt, decrypt } from 'modules/core';
+import { IStorageValue, IStorageData } from './local-storage.models';
+import { encrypt, decrypt } from 'core';
 
 
-export class LocalStorage {
+export class LocalStorageService {
   public static async get(key: string, defaults: any = null): Promise<object | number | boolean> {
     const data = await chrome.storage.local.get(key);
 

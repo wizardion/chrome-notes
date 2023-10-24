@@ -1,6 +1,6 @@
-import * as core from 'modules/core';
+import * as core from 'core';
 import * as drive from './components/drive';
-import { Encryptor } from 'modules/encryption/encryptor';
+import { EncryptorService } from 'modules/encryption';
 import { IdentityInfo, IPasswordRule, TokenError, IntegrityError } from './components/interfaces';
 import * as process from './components/process';
 
@@ -34,7 +34,7 @@ export class Cloud {
       const identity = await process.validate(await process.getIdentity());
 
       identity.token = await drive.renewToken();
-      await process.sync(identity, identity.passphrase && new Encryptor(identity.passphrase));
+      await process.sync(identity, identity.passphrase && new EncryptorService(identity.passphrase));
       await process.setProcessInfo(identity);
       await core.delay();
     });
@@ -45,7 +45,7 @@ export class Cloud {
       const identity = await process.validate(await process.getIdentity());
 
       identity.token = await drive.renewToken();
-      await process.sync(identity, new Encryptor(oldSecret), new Encryptor(newSecret));
+      await process.sync(identity, new EncryptorService(oldSecret), new EncryptorService(newSecret));
       await process.setProcessInfo(identity);
       await core.delay();
     }, false);
@@ -69,7 +69,9 @@ export class Cloud {
       }
 
       if (rule.count < rules.maxAttempts) {
-        rules.valid = await process.checkFileSecret(file, identity.passphrase && new Encryptor(identity.passphrase));
+        rules.valid = await process.checkFileSecret(
+          file, identity.passphrase && new EncryptorService(identity.passphrase)
+        );
 
         rule.modified = rules.modified;
         rule.count = !rules.valid ? rule.count + 1 : rule.count;

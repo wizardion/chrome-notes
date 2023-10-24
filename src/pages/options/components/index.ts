@@ -1,12 +1,10 @@
-import { ISyncInfo } from 'modules/sync/components/interfaces';
 import { SyncInfoElement } from './sync-info/info.component';
 import { IAreaName, IOptionControls, IStorageChange } from './options.model';
 import { DevModeElement } from './dev-mode/dev.component';
-import { ISyncStorageValue } from 'modules/storage/interfaces';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
 import { ISettingsArea, pageModes } from 'modules/settings/settings.model';
-import storage from 'modules/storage/storage';
-import * as core from 'modules/core';
+import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
+import * as core from 'core';
 
 
 export async function settingsChanged(element: CommonSettingsElement, current: ISettingsArea) {

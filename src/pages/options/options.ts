@@ -1,6 +1,6 @@
 import 'styles/options.scss';
 
-import storage from 'modules/storage/storage';
+import { storage } from 'core/services';
 import { SyncInfoElement } from './components/sync-info/info';
 import { DevModeElement } from './components/dev-mode/dev';
 import { PasswordElement } from './components/passwords/password';

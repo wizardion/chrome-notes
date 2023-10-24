@@ -26,6 +26,7 @@
         "sourceType": "module"
       },
       "globals": {
+        "KeyUsage": "readonly",
         "EventListener": "readonly",
         "AddEventListenerOptions": "readonly",
         "IDBTransactionMode": "readonly",

@@ -1,9 +1,9 @@
-import { Logger } from 'modules/logger/logger';
+import { LoggerService } from 'modules/logger';
 import { SyncWorker } from './sync-worker';
-import { ISyncInfo, IdentityInfo } from 'modules/sync/components/interfaces';
+import { IdentityInfo } from 'modules/sync/components/interfaces';
 import { removeCachedAuthToken } from 'modules/sync/components/drive';
 import { IWindow } from './models';
-import storage from 'modules/storage/storage';
+import { storage, ISyncInfo } from 'core/services';
 import { ISettingsArea, pageModes } from 'modules/settings/settings.model';
 
 
@@ -12,7 +12,7 @@ export { DataWorker } from './data-worker';
 export { SyncWorker } from './sync-worker';
 export { IWindow, StorageChange, AreaName } from './models';
 
-const logger: Logger = new Logger('background/index.ts', 'green');
+const logger = new LoggerService('background/index.ts', 'green');
 
 export async function findTab(tabId: number): Promise<chrome.tabs.Tab> {
   const tabs = await chrome.tabs.query({});
@@ -94,12 +94,12 @@ export async function eventOnSyncInfoChanged(info: ISyncInfo) {
 
   if (identity.locked && info.enabled && info.token && !info.encrypted && identity.encrypted) {
     identity.locked = false;
-    await storage.cached.permanent('locked', false);
+    // await storage.cached.permanent('locked', false);
   }
 
   if (!identity.locked && info.enabled && info.token && info.encrypted && !identity.passphrase) {
     identity.locked = true;
-    await storage.cached.permanent('locked', true);
+    // await storage.cached.permanent('locked', true);
   }
 
   if (!info.encrypted) {

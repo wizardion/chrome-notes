@@ -1,4 +1,5 @@
-import { ISyncInfo, IdentityInfo } from 'modules/sync/components/interfaces';
+import { ISyncInfo } from 'core/services';
+import { IdentityInfo } from 'modules/sync/components/interfaces';
 
 
 export interface IPageMode {

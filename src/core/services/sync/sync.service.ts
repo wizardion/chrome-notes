@@ -1,9 +1,8 @@
-import { ISyncInfo } from 'modules/sync/components/interfaces';
-import { encrypt, decrypt } from 'modules/core';
-import { ISyncStorageData, ISyncStorageValue } from './interfaces';
+import { ISyncStorageData, ISyncStorageValue, ISyncInfo } from './sync.models';
+import { encrypt, decrypt } from 'core';
 
 
-export class SyncStorage {
+export class SyncStorageService {
   protected static key: string = 'syncInfo';
 
   public static async get(): Promise<ISyncInfo> {

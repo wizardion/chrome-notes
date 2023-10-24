@@ -1,8 +1,8 @@
-import { IDBNote, IDBCommand, IDBCommandType } from './interfaces';
-import { Logger } from '../logger/logger';
+import { IDBNote, IDBCommand, IDBCommandType } from './db.models';
+import { LoggerService } from 'modules/logger';
 
 
-const logger: Logger = new Logger('db.ts');
+const logger = new LoggerService('db.ts');
 let __database: IDBDatabase;
 const __queueList: IDBCommand[] = [];
 
@@ -204,7 +204,6 @@ export async function update(item: IDBNote, objectStore?: IDBObjectStore): Promi
 
     return execute<void>(store.put(item));
   } catch (error) {
-    console.log('error', { e: error });
     logError(error);
     throw new Error(ERROR_MESSAGES.initiate);
   }

@@ -1,12 +1,12 @@
-import { Logger } from 'modules/logger/logger';
-import { ICloudInfo } from './interfaces';
-import { DriveSettings, IFileInfo, TokenError, TokenExpired } from './interfaces'
+import { LoggerService } from 'modules/logger';
+import { DriveSettings, IFileInfo, TokenError, TokenExpired, ICloudInfo } from './interfaces';
 
-const __delay: number = 1100;
-const logger: Logger = new Logger('drive.ts', 'blue');
+
+// const __delay = 1100;
+const logger = new LoggerService('drive.ts', 'blue');
 
 //#region testing
-Logger.tracing = true;
+LoggerService.tracing = true;
 //#endregion
 
 
@@ -40,6 +40,7 @@ async function patch(id: string, token: string, blob: Blob): Promise<string> {
   const url = `${DriveSettings.FILE_UPLOAD_API}/${id}?uploadType=multipart&fields=${DriveSettings.FILE_FIELDS}`;
   const response = await request(token, url, 'PATCH', form);
   const file: IFileInfo = await response.json();
+
   return file.id;
 }
 
@@ -55,6 +56,7 @@ async function mkdir(token: string): Promise<string> {
   const url = `${DriveSettings.FILE_UPLOAD_API}?uploadType=multipart&fields=${DriveSettings.FILE_FIELDS}`;
   const response = await request(token, url, 'POST', form);
   const file: IFileInfo = await response.json();
+
   return file.id;
 }
 
@@ -73,9 +75,11 @@ async function post(token: string, blob: Blob, folderId: string): Promise<string
   const url = `${DriveSettings.FILE_UPLOAD_API}?uploadType=multipart&fields=${DriveSettings.FILE_FIELDS}`;
   const response = await request(token, url, 'POST', form);
   const file: IFileInfo = await response.json();
+
   return file.id;
 }
-// ------------------------------------------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------------------------------------
 async function getFileMetadata(token: string, id: string): Promise<IFileInfo> {
   const response = await request(token, `${DriveSettings.FILE_GET_API}/${id}?fields=${DriveSettings.FILE_FIELDS}`);
 
@@ -127,36 +131,14 @@ export async function find(token: string): Promise<string> {
     throw new Error('Unexpected error');
   }
 }
-// ------------------------------------------------------------------------------------------------------------------------
-export async function deauthorize(token: string): Promise<void> {
-  return new Promise<void>(async (resolve, reject) => {
-    try {
-      await window.fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`);
-      await removeCachedAuthToken(token);
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
 
-export async function authorize(): Promise<string> {
-  return new Promise<string>(async (resolve, reject) => {
-    chrome.identity.getAuthToken({ 'interactive': true }, async (token: string) => {
-      if (token) {
-        resolve(token);
-      } else {
-        reject(chrome.runtime.lastError.message);
-      }
-    });
-  });
-}
-
+// --------------------------------------------------------------------------------------------------------------------
 export async function removeCachedAuthToken(token: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     chrome.identity.clearAllCachedAuthTokens(async () => {
       if (!token || chrome.runtime.lastError && chrome.runtime.lastError.message) {
-        let message = 'Token has not been provided.';
+        const message = 'Token has not been provided.';
+
         return reject(chrome.runtime.lastError && chrome.runtime.lastError.message || message);
       }
 
@@ -167,6 +149,30 @@ export async function removeCachedAuthToken(token: string): Promise<void> {
     });
   });
 }
+
+export async function deauthorize(token: string) {
+  try {
+    await window.fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`);
+    await removeCachedAuthToken(token);
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+export async function authorize(): Promise<string> {
+  try {
+    const tokenResult = await chrome.identity.getAuthToken({ 'interactive': true });
+
+    if (tokenResult && tokenResult.token) {
+      return tokenResult.token;
+    } else {
+      throw new Error(chrome.runtime.lastError.message);
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 
 export function renewToken(): Promise<string> {
   return new Promise<string>((resolve, reject) => {
@@ -221,10 +227,11 @@ export async function update(token: string, id: string, data: ICloudInfo): Promi
   }
 
   const blob = getBlobs(data);
+
   return await patch(id, token, blob);
 }
 
-//-------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 export class GoogleDrive {
   protected token: string;
 
@@ -233,11 +240,19 @@ export class GoogleDrive {
   }
 
   protected async patch() {
-
+    console.warn('Not Implemented yet.');
   }
 
   protected async request() {
+    console.warn('Not Implemented yet.');
+  }
 
+  public async get() {
+    console.warn('Not Implemented yet.');
+  }
+
+  public async put() {
+    console.warn('Not Implemented yet.');
   }
 
   public static renewToken(): Promise<string> {
@@ -250,13 +265,5 @@ export class GoogleDrive {
         resolve(token);
       });
     });
-  }
-
-  public async get() {
-
-  }
-
-  public async put() {
-
   }
 }

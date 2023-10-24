@@ -1,8 +1,6 @@
-import { IDBNote } from 'modules/db/interfaces';
+import { IDBNote } from 'modules/db';
 import { ListItemElement } from '../list-item/list-item.component';
 
-
-export { IPReviewState } from 'modules/db/interfaces';
 
 export interface IDetailsViewForm {
   back: HTMLButtonElement;
@@ -15,14 +13,14 @@ export interface IDetailsViewForm {
   description: HTMLTextAreaElement;
 }
 
-export type IEventListenerType = 
-  | 'back' 
-  | 'delete' 
-  | 'cancel' 
-  | 'change' 
-  | 'create' 
-  | 'preview' 
-  | 'save' 
+export type IEventListenerType =
+  | 'back'
+  | 'delete'
+  | 'cancel'
+  | 'change'
+  | 'create'
+  | 'preview'
+  | 'save'
   | 'selectionchange';
 
 export interface IDetailsIntervals {

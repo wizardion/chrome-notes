@@ -1,16 +1,8 @@
-import { IDBNote } from "modules/db/interfaces";
+import { IDBNote } from 'modules/db';
 
-// export type ISyncRequest = (identityInfo: IdentityInfo) => Promise<void>;
+
 export type ISyncRequest = (identityInfo?: IdentityInfo) => Promise<void>;
 
-//#region sync-storage: sharable
-export interface ISyncInfo {
-  id: number;
-  enabled: boolean;
-  token: string;
-  encrypted: boolean;
-}
-//#endregion
 
 //#region local-storage: sensitive
 export interface IdentityInfo {
@@ -40,31 +32,31 @@ export interface ISyncPair {
 }
 
 export interface ISyncItemInfo {
-  /** 
+  /**
    * @field id
   */
   i: number;
-  /** 
+  /**
 * @field title
 */
   t?: string;
-  /** 
+  /**
   * @field description
   */
   d?: string;
-  /** 
+  /**
   * @field order
   */
   o?: number;
-  /** 
+  /**
   * @field cState
   */
   s?: string;
-  /** 
+  /**
   * @field updated
   */
   u?: number;
-  /** 
+  /**
   * @field created
   */
   c?: number;
@@ -98,7 +90,7 @@ export enum DriveSettings {
 //#region Exertions
 export class TokenError extends Error {
   message: string;
-  status: number
+  status: number;
 
   constructor(message: string = 'Invalid authentication credentials') {
     super(message);

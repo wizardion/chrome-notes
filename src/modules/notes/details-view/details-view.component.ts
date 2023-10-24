@@ -1,9 +1,9 @@
-import { BaseElement, FormElement } from 'modules/core/components';
-import { IDetailsIntervals, IDetailsViewForm, IEventListenerType, IPReviewState } from './details-view.model';
+import { BaseElement, FormElement } from 'core/components';
+import { IDetailsIntervals, IDetailsViewForm, IEventListenerType } from './details-view.model';
 import { Editor } from './components/editor/editor';
 import { IEditorData } from './components/editor/extensions/extension.model';
-import { IDBNote } from 'modules/db/interfaces';
 import { NodeHelper } from './components/node-helper';
+import { IDBNote, IPReviewState } from 'modules/db';
 
 
 const INTERVALS: IDetailsIntervals = { changed: null, locked: null, delay: 800 };

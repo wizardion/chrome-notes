@@ -1,10 +1,10 @@
-import { BaseElement } from 'modules/core/components';
+import { BaseElement } from 'core/components';
 import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
 import { DetailsViewElement } from '../details-view/details-view.component';
-import { DbProvider } from 'modules/db/db-provider';
 import { INote } from '../details-view/details-view.model';
 import { SortHelper } from '../details-view/components/sort-helper/sort-helper';
+import { DbProviderService } from 'modules/db';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -80,7 +80,7 @@ export class PopupNotesElement extends BaseElement {
 
     if (rendered) {
       this.selected = item;
-      DbProvider.cache.set('selected', this.selected);
+      DbProviderService.cache.set('selected', this.selected);
     } else {
       this.preserved = item;
     }
@@ -94,7 +94,7 @@ export class PopupNotesElement extends BaseElement {
     this.selected?.item.animateItem();
     this.selected = null;
 
-    DbProvider.cache.remove(['draft', 'selected']);
+    DbProviderService.cache.remove(['draft', 'selected']);
   }
 
   draft(title?: string, description?: string, selection?: number[]) {
@@ -135,8 +135,8 @@ export class PopupNotesElement extends BaseElement {
     this.detailsView.draft = false;
 
     await this.save();
-    await DbProvider.cache.remove(['draft']);
-    await DbProvider.cache.set('selected', this.selected.id);
+    await DbProviderService.cache.remove(['draft']);
+    await DbProviderService.cache.set('selected', this.selected);
   }
 
   async delete() {
@@ -155,7 +155,7 @@ export class PopupNotesElement extends BaseElement {
     delete draft.item;
 
     item.remove();
-    await DbProvider.remove(draft, this.items);
+    await DbProviderService.remove(draft);
     this.goBack();
   }
 
@@ -166,8 +166,8 @@ export class PopupNotesElement extends BaseElement {
       delete draft.item;
 
       // console.log('...save()');
-      this.selected.id = await DbProvider.save(draft);
-      DbProvider.cache.set('selected', this.selected);
+      this.selected.id = await DbProviderService.save(draft);
+      DbProviderService.cache.set('selected', this.selected);
     }
   }
 
@@ -191,7 +191,7 @@ export class PopupNotesElement extends BaseElement {
       queue.push(draft);
     }
 
-    await DbProvider.bulkSave(queue, this.items);
+    await DbProviderService.bulkSave(queue);
   }
 
   onSelectionPreviewChange() {
@@ -220,7 +220,7 @@ export class PopupNotesElement extends BaseElement {
       this.save();
     } else {
       // console.log('onChanged.draft ...');
-      DbProvider.cache.set('draft', { title, description, selection });
+      DbProviderService.cache.set('draft', { title, description, selection });
     }
   }
 
