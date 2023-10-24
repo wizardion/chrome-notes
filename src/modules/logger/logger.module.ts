@@ -90,10 +90,10 @@ function initDB(): Promise<IDBDatabase> {
 function initObjectStore(mode: IDBTransactionMode): Promise<IDBObjectStore> {
   return new Promise<IDBObjectStore>((resolve, reject) => {
     initDB().then((db) => {
-      const transaction:IDBTransaction = db.transaction('notes', mode);
+      const transaction:IDBTransaction = db.transaction('logs', mode);
 
       transaction.onerror = reject;
-      resolve(transaction.objectStore('notes'));
+      resolve(transaction.objectStore('logs'));
     }).catch(reject);
   });
 }
