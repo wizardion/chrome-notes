@@ -10,11 +10,12 @@
 // storage.cached.get().then(cache => {
 //   var notes: HTMLElement = <HTMLElement>document.getElementById('notes');
 //   var editor: Base = buildEditor();
-  
+
 //   notes.classList.remove('hidden');
 
 //   if (cache.new && cache.new.value) {
-//     // editor.selectNew(<string>(cache.description && cache.description.value), <string>(cache.selection && cache.selection.value));
+//     // editor.selectNew(<string>(cache.description && cache.description.value),
+// <string>(cache.selection && cache.selection.value));
 //   } else if (cache.selected && cache.selected.value) {
 //     // editor.selectFromCache(fromIDBNoteString(<string>cache.selected.value));
 //   } else {

@@ -16,7 +16,7 @@ export class NodeHelper {
   public static setSelection(data: string, element: Node) {
     if (data && data.length > 1) {
       const [left, right, start, end] = data.split(':');
-      
+
       const leftNode: Node = this.getNode(left.split(','), element);
       const rightNode: Node = this.getNode(right.split(','), element);
 
@@ -36,7 +36,7 @@ export class NodeHelper {
       let child: Node = node;
       let siblings = 0;
 
-      while ((child = <HTMLElement>child.previousSibling) != null) {
+      while ((child = <HTMLElement>child.previousSibling) !== null) {
         siblings++;
       }
 
@@ -50,6 +50,7 @@ export class NodeHelper {
     }
 
     position.push(nodes);
+
     return position;
   }
 

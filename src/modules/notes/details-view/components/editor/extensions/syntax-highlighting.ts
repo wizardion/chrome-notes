@@ -1,17 +1,17 @@
-import {tags} from '@lezer/highlight';
-import {HighlightStyle} from '@codemirror/language';
+import { tags } from '@lezer/highlight';
+import { HighlightStyle } from '@codemirror/language';
 
 
 export const markdownHighlighting = HighlightStyle.define([
-  {tag: tags.list, class: 'cm-list'},
-  {tag: tags.heading1, class: 'cm-heading-1'},
-  {tag: tags.heading2, class: 'cm-heading-2'},
-  {tag: tags.heading3, class: 'cm-heading-3'},
-  {tag: tags.heading4, class: 'cm-heading-4'},
-  {tag: tags.heading5, class: 'cm-heading-5'},
-  {tag: tags.heading6, class: 'cm-heading-6'},
-  {tag: tags.quote, color: '#219', class: 'cm-quote'},
-  {tag: tags.monospace, color: '#219', class: 'cm-monospace'},
+  { tag: tags.list, class: 'cm-list' },
+  { tag: tags.heading1, class: 'cm-heading-1' },
+  { tag: tags.heading2, class: 'cm-heading-2' },
+  { tag: tags.heading3, class: 'cm-heading-3' },
+  { tag: tags.heading4, class: 'cm-heading-4' },
+  { tag: tags.heading5, class: 'cm-heading-5' },
+  { tag: tags.heading6, class: 'cm-heading-6' },
+  { tag: tags.quote, color: '#219', class: 'cm-quote' },
+  { tag: tags.monospace, color: '#219', class: 'cm-monospace' },
 
   { tag: tags.meta, color: '#404740', class: 'cm-meta' },
   // { tag: tags.meta, color: '#404740', display: 'none' },
