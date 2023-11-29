@@ -128,7 +128,7 @@ export class VisualView implements IEditorView {
 
     // const dom = domParser.parseFromString(md.render(data.description), 'text/html');
 
-    console.log('dom', dom);
+    // console.log('dom', dom);
 
 
     // const json = DOMParser.fromSchema(schema).parse(`<p>Hello world</p>`, {
