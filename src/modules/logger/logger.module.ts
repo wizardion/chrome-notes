@@ -2,11 +2,14 @@ import { ILog, ILogLevel, logLevel } from './logger.models';
 
 
 let __database: IDBDatabase;
-let __tracing: boolean;
 
 enum ERROR_MESSAGES {
   initiate= 'Failed to initiate the Logger.'
 }
+
+export const configs = {
+  tracing: false
+};
 
 function logError(e: (Error|Event|any)) {
   console.error('DB ERROR', e.stack || e.message || e.cause || e, e.target);
@@ -114,9 +117,8 @@ function execute<T>(request: IDBRequest): Promise<T> {
 export async function load(): Promise<ILog[]> {
   try {
     const store = await initObjectStore('readonly');
-    const index: IDBIndex = store.index('order');
 
-    return (await execute<ILog[]>(index.getAll()));
+    return (await execute<ILog[]>(store.getAll()));
   } catch (error) {
     logError(error);
     throw new Error(ERROR_MESSAGES.initiate);
@@ -145,7 +147,7 @@ export async function logInfo(level: ILogLevel, color: string, name: string, arg
       data: (args && args[0] !== '' && args[0] !== null) ? JSON.stringify(args) : null
     };
 
-    if (__tracing) {
+    if (configs.tracing) {
       print(log);
     }
 
@@ -157,7 +159,3 @@ export async function logInfo(level: ILogLevel, color: string, name: string, arg
     throw new Error(ERROR_MESSAGES.initiate);
   }
 }
-
-export const configs = {
-  tracing: __tracing
-};

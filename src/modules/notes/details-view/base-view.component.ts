@@ -1,9 +1,8 @@
 import { BaseElement, FormElement } from 'core/components';
 import { IDetailsIntervals, IDetailsViewForm, IEventListenerType } from './details-view.model';
-import { Editor } from './components/editor/editor';
-import { IEditorData } from './components/editor/extensions/extension.model';
 import { NodeHelper } from './components/node-helper';
 import { IDBNote, IPReviewState } from 'modules/db';
+import { IEditorView, IEditorData } from './components/models/editor.models';
 
 
 const INTERVALS: IDetailsIntervals = { changed: null, locked: null, delay: 800 };
@@ -12,10 +11,10 @@ const template: DocumentFragment = BaseElement.component({
 });
 
 export class DetailsViewElement extends BaseElement {
-  static readonly selector = 'details-view';
+  static readonly selector: string;
 
-  private form: FormElement<IDetailsViewForm>;
-  private editor: Editor;
+  protected form: FormElement<IDetailsViewForm>;
+  protected editor: IEditorView;
   private _draft: boolean;
   private _preview: boolean;
   private _locked: boolean;
@@ -34,8 +33,6 @@ export class DetailsViewElement extends BaseElement {
       previewer: this.template.querySelector('[name="previewer"]'),
       description: this.template.querySelector('[name="description"]'),
     });
-
-    this.editor = new Editor(this.form.elements.description, this.form.elements.formatters);
   }
 
   get data(): IEditorData {
@@ -192,7 +189,7 @@ export class DetailsViewElement extends BaseElement {
       this.form.elements.create.addEventListener('mousedown', (e) => e.preventDefault());
       this.form.elements.create.addEventListener('click', (e) => this.onCreateEventChange(e, listener));
 
-      return this.editor.addEventListener('shortcut:save', (e) => this.onCreateEventChange(e, listener));
+      return this.editor.addEventListener('save', (e) => this.onCreateEventChange(e, listener));
     }
 
     if (type === 'preview') {

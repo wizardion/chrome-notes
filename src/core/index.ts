@@ -24,7 +24,7 @@ export function delay(milliseconds: number = configs.delay): Promise<void> {
   return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
 }
 
-export async function encrypt(data: object): Promise<string> {
+export async function encrypt(data: any): Promise<string> {
   return encryptor.encrypt(JSON.stringify(data));
 }
 

@@ -1,5 +1,5 @@
 import { EditorView } from '@codemirror/view';
-import { IEditorCustomEvents, ICustomIntervals } from './extension.model';
+import { IEditorCustomEvents, ICustomIntervals } from '../../models/extensions.model';
 import { ListHelper } from './helpers/list.helper';
 import { PrimitivesHelper } from './helpers/primitives.helper';
 import { UrlHelper } from './helpers/url.helper';

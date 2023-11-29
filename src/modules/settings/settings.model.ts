@@ -2,19 +2,19 @@ import { ISyncInfo } from 'core/services';
 import { IdentityInfo } from 'modules/sync/components/interfaces';
 
 
-export interface IPageMode {
-  popup: string;
-  page: string | null;
+export interface ISettingsOptions {
+  sync?: boolean,
+  identity?: boolean
 }
 
-export const pageModes: Record<number, IPageMode> = {
-  0: { popup: 'popup.html', page: null },
-  1: { popup: 'popup.html', page: null },
-  3: { popup: '', page: 'popup.html' }
-};
+export interface IPageMode {
+  popup: string[];
+  page: string[] | null;
+}
 
 export interface ICommonSettings {
   mode: number | null;
+  editor: number | null;
   expirationDays: number | null;
 }
 

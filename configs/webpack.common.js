@@ -9,6 +9,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
 const processHtmlLoader = require('./html-preprocessor');
+const htmlWebpackConfig = require('./html-webpack.config');
 const __root__ = path.resolve(__dirname, '..');
 const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
 
@@ -17,6 +18,7 @@ module.exports = {
   entry: {
     index: path.resolve(__root__, 'src/pages/index/index.ts'),
     popup: path.resolve(__root__, 'src/pages/popup/popup.ts'),
+    visualPopup: path.resolve(__root__, 'src/pages/popup/popup-visual.ts'),
     background: path.resolve(__root__, 'src/worker/background.ts'),
     settings: path.resolve(__root__, 'src/pages/options/options.ts'),
     migration: path.resolve(__root__, 'src/pages/migration/migration.ts'),
@@ -152,111 +154,54 @@ module.exports = {
       filename: '[name].[chunkhash].css',
     }),
     new HtmlWebpackPlugin({
-      title: 'My Notes',
+      ...htmlWebpackConfig,
+
       filename: 'index.html',
       template: './src/pages/index/index.html',
-      scriptLoading: 'defer',
-      // inject: 'head',
-      inject: 'head',
-      minify: {
-        collapseWhitespace: true,
-        keepClosingSlash: true,
-        removeComments: true,
-        removeRedundantAttributes: false,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      },
       chunks: [
         'vendors',
         'index'
       ],
-      attributes: {
-        'async': function (tag) {
-          if (tag.tagName === 'script' && tag.attributes.src.match(/^index/gi)) {
-            return true;
-          }
-          return false;
-        }
-      },
     }),
     new HtmlWebpackPlugin({
-      title: 'My Notes',
+      ...htmlWebpackConfig,
+
       filename: 'popup.html',
       template: './src/pages/popup/popup.html',
-      // scriptLoading: 'blocking',
-      scriptLoading: 'defer',
-      // inject: 'head',
-      inject: 'head',
-      // inject: "body",
-      // minify: false,
-      minify: {
-        collapseWhitespace: true,
-        keepClosingSlash: true,
-        removeComments: true,
-        removeRedundantAttributes: false,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      },
       chunks: [
         'vendors',
         'popup'
       ],
-      attributes: {
-        'async': function (tag) {
-          if (tag.tagName === 'script' && tag.attributes.src.match(/^index/gi)) {
-            return true;
-          }
-          return false;
-        }
-      },
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+      
+      filename: 'popup-visual.html',
+      template: './src/pages/popup/popup.html',
+      chunks: [
+        'vendors',
+        'visualPopup'
+      ],
     }),
     new HtmlWebpackInjectAttributesPlugin(),
     new HtmlWebpackPlugin({
-      title: 'My Options',
-      appName: 'Notes',
+      ...htmlWebpackConfig,
+
       filename: 'options.html',
       template: './src/pages/options/options.html',
-      scriptLoading: 'defer',
-      inject: 'head',
-      minify: {
-        collapseWhitespace: true,
-        keepClosingSlash: true,
-        removeComments: true,
-        removeRedundantAttributes: false,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      },
       chunks: [
         'settings'
       ],
     }),
     new HtmlWebpackPlugin({
-      title: 'Migration',
+      ...htmlWebpackConfig,
+      
       filename: 'migration.html',
       template: './src/pages/migration/migration.html',
-      scriptLoading: 'blocking',
-      inject: 'body',
-      minify: {
-        collapseWhitespace: true,
-        keepClosingSlash: true,
-        removeComments: true,
-        removeRedundantAttributes: false,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      },
       chunks: [
         'migration'
       ],
     }),
-    // new htmlWebpackInjectAttributesPlugin({
-    //   // inject: "true",
-    //   async: true,
-    //   // test: {}
-    // }),
     new StatsWriterPlugin({
       filename: 'manifest.json',
       transform({ assetsByChunkName }) {

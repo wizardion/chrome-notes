@@ -6,20 +6,22 @@ import { foldGutter, syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 import { markFolding } from './extensions/folding-icon';
 import { markdownHighlighting } from './extensions/syntax-highlighting';
-import { IEditorData, IExtension } from './extensions/extension.model';
 import { editorFromTextArea } from './extensions/from-text-area';
 import { CUSTOM_EVENTS, INTERVALS } from './extensions/editor-commands';
 import { mdRender } from './extensions/md-render';
 import { CODE_ACTIONS, editorKeymap } from './extensions/editor-keymap';
+import { IExtension } from '../models/extensions.model';
+import { IEditorData, IEditorView } from '../models/editor.models';
 
 
-export class Editor {
+export class MarkdownView implements IEditorView {
   locked: boolean;
   view: EditorView;
-  extensions: IExtension[];
   range: SelectionRange;
 
-  constructor(textarea: HTMLTextAreaElement, controls?: NodeList, value?: string) {
+  private extensions: IExtension[];
+
+  constructor(element: HTMLElement, controls?: NodeList) {
     this.extensions = [
       foldGutter({ markerDOM: markFolding }),
       highlightSpecialChars(),
@@ -36,7 +38,7 @@ export class Editor {
       EditorView.updateListener.of((v: ViewUpdate) => this.updateListener(v))
     ];
 
-    this.view = editorFromTextArea(value, textarea, this.extensions);
+    this.view = editorFromTextArea('', <HTMLTextAreaElement> element, this.extensions);
     this.initControls(controls);
   }
 
@@ -44,14 +46,15 @@ export class Editor {
     return this.view.state.doc.toString();
   }
 
+  /** @deprecated Use `setData` instead. */
   set value(text: string) {
     this.view.setState(EditorState.create({ doc: text, extensions: this.extensions }));
     this.range = this.view.state.selection.main;
   }
 
-  get element(): HTMLElement {
-    return this.view.dom;
-  }
+  // get element(): HTMLElement {
+  //   return this.view.dom;
+  // }
 
   get hidden(): boolean {
     return this.view.dom.hidden;
@@ -108,13 +111,13 @@ export class Editor {
     return `<div>${html}</div>`;
   }
 
-  addEventListener(type: 'change' | 'shortcut:save', listener: EventListener): void {
+  addEventListener(type: 'change' | 'save', listener: EventListener): void {
     if (type === 'change') {
       CUSTOM_EVENTS.change = listener;
     }
 
-    if (type === 'shortcut:save') {
-      CUSTOM_EVENTS.save = (e) => this.saveEventHandler(e, listener);
+    if (type === 'save') {
+      CUSTOM_EVENTS.save = (e: Event) => this.saveEventHandler(e, listener);
     }
   }
 

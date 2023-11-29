@@ -2,7 +2,7 @@ import { CachedStorageService } from 'core/services/cached';
 import { PopupNotesElement } from 'modules/notes/popup/popup-notes.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
 import { ListItemElement } from 'modules/notes/list-item/list-item.component';
-import { MarkdownViewElement } from 'modules/notes/details-view/markdown-view.component';
+import { VisualViewElement } from 'modules/notes/details-view/visual-view.component';
 import { db } from 'modules/db';
 import 'styles/style.scss';
 
@@ -27,5 +27,5 @@ window.addEventListener('load', async () => {
 
 customElements.define(ListViewElement.selector, ListViewElement);
 customElements.define(ListItemElement.selector, ListItemElement);
-customElements.define(MarkdownViewElement.selector, MarkdownViewElement);
+customElements.define(VisualViewElement.selector, VisualViewElement);
 customElements.define(PopupNotesElement.selector, PopupNotesElement);

@@ -9,10 +9,3 @@ export interface ICustomIntervals {
   changed: NodeJS.Timeout;
   locked: NodeJS.Timeout;
 }
-
-export interface IEditorData {
-  title: string;
-  description: string;
-  selection?: number[] | null;
-}
-

@@ -2,9 +2,9 @@ import { LoggerService } from 'modules/logger';
 import { SyncWorker } from './sync-worker';
 import { IdentityInfo } from 'modules/sync/components/interfaces';
 import { removeCachedAuthToken } from 'modules/sync/components/drive';
-import { IWindow } from './models';
+// import { IWindow } from './models';
 import { storage, ISyncInfo } from 'core/services';
-import { ISettingsArea, pageModes } from 'modules/settings/settings.model';
+import { ISettingsArea, PAGE_MODES, getSettings } from 'modules/settings';
 
 
 export { BaseWorker } from './base-worker';
@@ -41,21 +41,25 @@ export async function ensureOptionPage() {
 }
 
 export async function initPopup() {
-  const settings = <ISettingsArea> await storage.local.get('settings');
+  const settings = await getSettings();
+  const mode = PAGE_MODES[settings.common.mode];
 
-  await chrome.action.setPopup({ popup: pageModes[settings.common.mode].popup });
+  await chrome.action.setPopup({ popup: mode.popup ? mode.popup[settings.common.editor] : '' });
 }
 
-export function openPopup(mode: number, window?: IWindow, tabId?: number, windowId?: number) {
-  if (tabId) {
-    if (windowId) {
-      chrome.windows.update(windowId, { focused: true });
-    }
+// export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {
+export function openPopup(settings: ISettingsArea) {
+  const mode = PAGE_MODES[settings.common.mode];
 
-    return chrome.tabs.update(tabId, { active: true });
-  }
+  // if (tabId) {
+  //   if (windowId) {
+  //     chrome.windows.update(windowId, { focused: true });
+  //   }
 
-  return chrome.tabs.create({ url: chrome.runtime.getURL(pageModes[mode].page) });
+  //   return chrome.tabs.update(tabId, { active: true });
+  // }
+
+  return chrome.tabs.create({ url: mode.page ? mode.page[settings.common.editor] : 'option.html' });
 
   // if (mode === 0) {
   //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });

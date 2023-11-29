@@ -22,6 +22,10 @@ class MarkdownRender {
     return html.replace(/=\?/gi, '&nbsp;');
   }
 
+  public parse(value: string, env: any): Token[] {
+    return this.md.parse(value, env);
+  }
+
   public unescapeAll(text: string): string {
     return this.md.utils.unescapeAll(text);
   }

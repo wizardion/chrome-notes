@@ -8,9 +8,9 @@ const template: DocumentFragment = BaseElement.component({
 
 export class CommonSettingsElement extends BaseElement {
   static readonly selector = 'common-settings';
-  static observedAttributes = ['disabled', 'default-index'];
 
   protected _mode: number;
+  protected _editor: number;
   protected _expirationDays: number;
   protected event: Event;
 
@@ -21,7 +21,8 @@ export class CommonSettingsElement extends BaseElement {
     this.template = <HTMLElement>template.cloneNode(true);
     this.form = new FormElement({
       fieldset: this.template.querySelector('fieldset'),
-      views: <NodeList> this.template.querySelectorAll('input[name="views"]'),
+      views: <NodeList> this.template.querySelectorAll('input[name="view"]'),
+      editors: <NodeList> this.template.querySelectorAll('input[name="editor"]'),
       expirationDays: this.template.querySelector('select[name="expirationDays"]')
     });
   }
@@ -38,24 +39,21 @@ export class CommonSettingsElement extends BaseElement {
 
       item.addEventListener('change', () => this.onModeChange(item));
     }
-  }
 
-  protected attributeChanged(name: string, oldValue: string, newValue: string) {
-    if (name === 'disabled') {
-      if (this.disabled) {
-        this.form.elements.fieldset.setAttribute('disabled', 'disabled');
-      } else {
-        this.form.elements.fieldset.removeAttribute('disabled');
-      }
-    }
+    for (let i = 0; i < this.form.elements.editors.length; i++) {
+      const item: HTMLInputElement = <HTMLInputElement> this.form.elements.editors[i];
 
-    if (name === 'default-index' && !this._mode && this._mode !== 0 && !isNaN(parseInt(newValue))) {
-      this.mode = parseInt(newValue);
+      item.addEventListener('change', () => this.onEditorChange(item));
     }
   }
 
   protected onModeChange(item: HTMLInputElement) {
     this._mode = Number(item.value);
+    this.dispatchEvent(this.event);
+  }
+
+  protected onEditorChange(item: HTMLInputElement) {
+    this._editor = Number(item.value);
     this.dispatchEvent(this.event);
   }
 
@@ -75,6 +73,25 @@ export class CommonSettingsElement extends BaseElement {
       if (parseInt(item.value) === index) {
         item.checked = true;
         this._mode = index;
+
+        return;
+      }
+    }
+  }
+
+  get editor(): number {
+    return this._editor;
+  }
+
+  set editor(index: number) {
+    for (let i = 0; i < this.form.elements.editors.length; i++) {
+      const item = <HTMLInputElement> this.form.elements.editors[i];
+
+      if (parseInt(item.value) === index) {
+        item.checked = true;
+        this._editor = index;
+
+        return;
       }
     }
   }

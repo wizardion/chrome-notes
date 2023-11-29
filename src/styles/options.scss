@@ -374,6 +374,10 @@ label:hover, input:hover {
   margin-bottom: 10px;
 }
 
+.margin-bottom-lg {
+  margin-bottom: 15px;
+}
+
 .margin-left {
   margin-left: 10px;
 }
@@ -597,19 +601,11 @@ span.info {
   }
 }
 
-// .sync-progress {
-//   width: 100%;
-//   display: block;
-// }
-
 .progress-bar {
-  // background-color: #045c5518;
   width: calc(100% - 150px);
   height: 4px;
   display: inline-block;
   border-radius: 4px;
-  // margin-top: 1px;
-  // margin-bottom: -1px;
   overflow: hidden;
   position: relative;
   border: 1px solid transparent;
@@ -646,19 +642,14 @@ span.info {
   top: 0px;
   background-color: #045c5575 !important;
   animation: in-progress 1.75s;
-  // animation: in-progress 10s;
-  // animation-timing-function: linear;
-  // animation: in-progress 5s;
   border: 1px solid #eaf0ef;
   height: calc(100% - 2px);
-  // animation: in-progress 1.5s;
   animation-fill-mode: forwards;
   animation-iteration-count: infinite;
 }
 
 .error-message {
   background-color: #ea8987dd;
-  /* background: white; */
   color: #9d2323;
   position: fixed;
   padding: 5px 10px;
@@ -674,9 +665,6 @@ span.info {
 
 ul.flat {
   text-align: end;
-  // display: inline-block;
-  // width: 72%;
-  float: right;
 }
 
 ul.flat li {
@@ -684,24 +672,12 @@ ul.flat li {
   margin: 0 10px 0 0px;
 }
 
-// ul.flat li input[type='radio']{
-//   margin: 0 10px 0 0px;
-// }
+ul li input[type="radio"]:checked+span {
+  color: #045c55;
+}
 
 @keyframes in-progress
 {
-  // 0% {
-  //   width: 10%;
-  //   left: -10%;
-	// }
-  // 60% {
-  //   width: 50%;
-	// 	left: 50%;
-	// }
-	// 100% {
-  //   width: 0%;
-	// 	left: 100%;
-	// }
   0% {
     width: 25%;
     left: -25%;
@@ -714,31 +690,6 @@ ul.flat li {
     width: 0%;
 		left: 100%;
 	}
-	// 100% {
-  //   width: 0%;
-	// 	left: 110%;
-	// }
-
-  // 0% {
-  //   width: 25%;
-  //   left: -25%;
-	// }
-  // 50% {
-  //   width: 5%;
-	// 	left: 95%;
-	// }
-  // // 50% {
-  // //   width: 10%;
-	// // 	left: 90%;
-	// // }
-  // // 60% {
-  // //   width: 15%;
-	// // 	left: 85%;
-	// // }
-	// 100% {
-  //   width: 25%;
-  //   left: -26%;
-	// }
 }
 
 // @media only screen and (max-height: 270px) {

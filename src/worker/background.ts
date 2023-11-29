@@ -80,20 +80,24 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
 
 chrome.action.onClicked.addListener(async () => {
   const local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'settings']);
-  const window: IWindow = local.window;
+  // const window: IWindow = local.window;
 
   // if (local.migrate) {
   //   return openMigration();
   // }
 
-  if (local.tabInfo) {
-    const tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
+  // if (local.tabInfo) {
+  //   const tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
 
-    openPopup(local.mode, window, tab && tab.id, tab && tab.windowId);
-  } else {
-    // console.log('');
-    openPopup(local.settings.common.mode, window);
-  }
+  //   console.log('tab', tab);
+
+  //   // openPopup(local.mode, window, tab && tab.id, tab && tab.windowId);
+  // } else {
+  //   // console.log('');
+  //   // openPopup(local.settings.common.mode, local.settings.common.editor, window);
+  // }
+
+  openPopup(local.settings?.value as ISettingsArea);
 });
 
 chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: AreaName) => {
@@ -109,9 +113,10 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
   }
 
   if (namespace === 'local' && changes.identityInfo) {
-    const newInfo: IdentityInfo = <IdentityInfo> await storage.local.decrypt(changes.identityInfo.newValue);
-    const oldInfo: IdentityInfo = <IdentityInfo> await storage.local.decrypt(changes.identityInfo.oldValue);
+    const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue);
+    const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue);
 
-    return await eventOnIdentityInfoChanged(oldInfo, newInfo);
+    logger.info('storage.onChanged', newInfo, oldInfo);
+    // return await eventOnIdentityInfoChanged(oldInfo, newInfo);
   }
 });

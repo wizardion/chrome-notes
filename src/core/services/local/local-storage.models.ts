@@ -1,9 +1,5 @@
-export interface IStorageValue {
-  value: string | number | object | boolean;
+export interface IStorageValue<T> {
+  value: T | string;
   permanent?: boolean;
   sensitive?: boolean;
-}
-
-export interface IStorageData {
-  [key: string]: IStorageValue;
 }
