@@ -1,9 +1,8 @@
 import { toggleMark } from 'prosemirror-commands';
 import { schema } from './schema';
-import { insertStar, makeNoteGroup } from './testing/commands';
 import { redo, undo } from 'prosemirror-history';
 import { Plugin } from 'prosemirror-state';
-import { toggleLink } from './commands';
+import { removeFormat, toMarkdown, toggleLink, toggleList } from './commands';
 import { MenuView } from './helpers/menu.view';
 import { IMenuItem } from './helpers/models/menu.models';
 
@@ -20,11 +19,15 @@ import { IMenuItem } from './helpers/models/menu.models';
 'redo': redo,
 */
 export const CODE_ACTIONS: Record<string, IMenuItem> = {
-  'bold': { command: toggleMark(schema.marks.shouting), dom: null },
-  'strikethrough': { command: makeNoteGroup, dom: null },
+  'bold': { command: toggleMark(schema.marks.strong), dom: null },
+  'italic': { command: toggleMark(schema.marks.italic), dom: null },
+  'strikethrough': { command: toggleMark(schema.marks.strike), dom: null },
   'link': { command: toggleLink, dom: null },
 
-  'orderedList': { command: insertStar, dom: null },
+  'orderedList': { command: toggleList, dom: null },
+  'unorderedList': { command: toMarkdown, dom: null },
+
+  'removeFormat': { command: removeFormat, dom: null },
 
   'undo': { command: undo, dom: null },
   'redo': { command: redo, dom: null },

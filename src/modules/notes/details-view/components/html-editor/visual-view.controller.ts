@@ -20,7 +20,9 @@ import { DOMParser, DOMSerializer } from 'prosemirror-model';
 // import * as model from 'prosemirror-model';
 // import { mdRender } from '../editor/extensions/md-render';
 import { defaultMarkdownParser, defaultMarkdownSerializer } from 'prosemirror-markdown';
-import { markdownParser, md } from './extensions/markdown.parser';
+import { markdownParser } from './extensions/markdown.parser';
+import { MarkdownSerializer } from './extensions/serializer/serializer';
+import { mdRender } from '../markdown/md-render';
 
 
 export class VisualView implements IEditorView {
@@ -42,8 +44,6 @@ export class VisualView implements IEditorView {
     //   history(),
     // ];
 
-    // this.plugins = exampleSetup({ schema, menuBar: false });
-
     this.plugins = [
       menu(controls),
       keymap(baseKeymap),
@@ -53,6 +53,7 @@ export class VisualView implements IEditorView {
     this.view = new EditorView(content, { state: EditorState.create({ schema: schema }) });
 
     // this.initControls(controls);
+    this.content = <HTMLElement> document.createElement('div');
     element.parentElement.insertBefore(content, element.nextSibling);
   }
 
@@ -84,9 +85,12 @@ export class VisualView implements IEditorView {
   }
 
   getData(): IEditorData {
-    const value = defaultMarkdownSerializer.serialize(this.view.state.doc);
+    const value = MarkdownSerializer.serialize(this.view.state);
     const { anchor, head } = this.view.state.selection.toJSON();
     let title: string = null;
+
+    console.log(value);
+    console.log('----------------------------------------------------------------------------');
 
     if ((/^[#]+\s+/g).test(value)) {
       const data: string[] = value.split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
@@ -103,54 +107,25 @@ export class VisualView implements IEditorView {
   setData(data: IEditorData) {
     this.locked = true;
 
-    // console.log('data', data.description);
+    this.content.innerHTML = mdRender.render(data.description);
 
-    // const html = mdRender.render(data.description);
-    // const tokens = mdRender.parse(data.description, {});
-    // md.parse(data.description);
-
-    const div = document.createElement('div');
-
-    div.innerHTML = md.render(data.description);
-
-    console.log('--- data.description ----------------------------------------------');
-    console.log(data.description);
-
-    console.log('--- div.innerHTML -------------------------------------------------');
-    console.log(div.innerHTML);
-    console.log('-------------------------------------------------------------------');
-    const tokens = md.parse(data.description, null);
-
-    console.log(tokens);
-    console.log('-------------------------------------------------------------------');
-
-    // const domParser = new DOMParser();
-
-    // const dom = domParser.parseFromString(md.render(data.description), 'text/html');
-
-    // console.log('dom', dom);
-
-
-    // const json = DOMParser.fromSchema(schema).parse(`<p>Hello world</p>`, {
-    //   preserveWhitespace: true
-    // });
-
-    // console.log('json', json);
-    // DOMSerializer.fromSchema(schema).
+    // console.log('--- data.description ----------------------------------------------');
+    // console.log(data.description);
+    // console.log('--- div.innerHTML -------------------------------------------------');
+    // console.log(this.content.innerHTML);
 
     this.view.updateState(
       EditorState.create({
         schema: schema,
-        // doc: markdownParser.parse(data.description),
-        doc: DOMParser.fromSchema(schema).parse(div),
-        // doc: model.DOMParser.fromSchema(schema).parse(dom),
+        doc: DOMParser.fromSchema(schema).parse(this.content),
         plugins: this.plugins,
         storedMarks: this.view.state.storedMarks
       })
     );
 
-    console.log(this.view.dom.innerHTML);
-    console.log('-------------------------------------------------------------------');
+    // console.log('--- view.dom.innerHTML --------------------------------------------');
+    // console.log(this.view.dom.innerHTML);
+    // console.log('-------------------------------------------------------------------');
 
     this.view.focus();
 
@@ -194,15 +169,20 @@ export class VisualView implements IEditorView {
 
   private setSelection(selection: number[]) {
     const [from, to] = selection;
-    const position = this.view.state.doc.resolve(from);
 
-    if (position?.parent.inlineContent) {
-      const transaction = this.view.state.tr;
+    try {
+      const position = this.view.state.doc.resolve(from);
 
-      transaction.doc.resolve(from).parent.inlineContent;
-      transaction.setSelection(TextSelection.create(transaction.doc, from, to));
-      transaction.scrollIntoView();
-      this.view.dispatch(transaction);
+      if (position?.parent.inlineContent) {
+        const transaction = this.view.state.tr;
+
+        transaction.doc.resolve(from).parent.inlineContent;
+        transaction.setSelection(TextSelection.create(transaction.doc, from, to));
+        transaction.scrollIntoView();
+        this.view.dispatch(transaction);
+      }
+    } catch (error) {
+      console.log('set selection error', error);
     }
   }
 

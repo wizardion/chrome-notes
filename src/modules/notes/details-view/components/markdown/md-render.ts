@@ -1,17 +1,19 @@
 import * as MarkdownIt from 'markdown-it';
 import * as Renderer from 'markdown-it/lib/renderer';
 import * as Token from 'markdown-it/lib/token';
-import taskLists from '@hedgedoc/markdown-it-task-lists';
 
+
+// import taskLists from '@hedgedoc/markdown-it-task-lists';
 // const taskLists = require('markdown-it-task-lists');
-
 type IOptions = MarkdownIt.Options;
 
 class MarkdownRender {
   private md: MarkdownIt;
 
   constructor() {
-    this.md = new MarkdownIt({ linkify: true, breaks: true }).use(taskLists);
+    // this.md = new MarkdownIt({ linkify: true, breaks: true }).use(taskLists);
+    this.md = new MarkdownIt('commonmark', { html: false, linkify: true, breaks: true });
+    // this.md = new MarkdownIt('commonmark', { html: false, linkify: true });
 
     this.md.renderer.rules['link_open'] = this.linkOpen.bind(this);
   }

@@ -60,7 +60,7 @@ export function removeFormat(view: EditorView) {
   const text = view.state.sliceDoc(range.from, range.to);
 
   if (text) {
-    import('./md-render').then(({ mdRender }) => {
+    import('../../markdown/md-render').then(({ mdRender }) => {
       const html = mdRender.render(text).replace(/(th|td)>\n<(th|td)/gi, '$1> <$2');
       const dirt = mdRender.unescapeAll(html.replace(/(<([^>]+)>)/gi, ''));
       const value = dirt.replace(/^[\s\n\r]+|[\s\n\r]+$|(\n)[\s\n\r]+/gi, '$1');

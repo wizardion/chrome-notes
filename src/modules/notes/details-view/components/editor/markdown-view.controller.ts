@@ -1,3 +1,6 @@
+import './assets/preview.scss';
+import './assets/codemirror.scss';
+
 import { Compartment, EditorState, SelectionRange } from '@codemirror/state';
 import { EditorView, ViewUpdate, drawSelection, highlightSpecialChars, keymap } from '@codemirror/view';
 import { history } from '@codemirror/commands';
@@ -8,7 +11,7 @@ import { markFolding } from './extensions/folding-icon';
 import { markdownHighlighting } from './extensions/syntax-highlighting';
 import { editorFromTextArea } from './extensions/from-text-area';
 import { CUSTOM_EVENTS, INTERVALS } from './extensions/editor-commands';
-import { mdRender } from './extensions/md-render';
+import { mdRender } from '../markdown/md-render';
 import { CODE_ACTIONS, editorKeymap } from './extensions/editor-keymap';
 import { IExtension } from '../models/extensions.model';
 import { IEditorData, IEditorView } from '../models/editor.models';
