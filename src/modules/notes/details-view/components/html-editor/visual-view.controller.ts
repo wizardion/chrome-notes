@@ -1,7 +1,5 @@
 
-// import './assets/styles.scss';
-import './assets/preview.scss';
-import './assets/editor.scss';
+import './assets/editor.view.scss';
 
 import { EditorView } from 'prosemirror-view';
 import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
@@ -10,19 +8,15 @@ import { baseKeymap } from 'prosemirror-commands';
 import { history } from 'prosemirror-history';
 import { IEditorData, IEditorView } from '../models/editor.models';
 import { CUSTOM_EVENTS, INTERVALS } from '../editor/extensions/editor-commands';
-// import { CODE_ACTIONS, editKeymap } from './extensions/editor-keymap';
-// import { markdownParser } from './extensions/helpers/markdown.parser';
 import { markdownSerializer } from './extensions/testing/helpers/markdown-serializer';
-// import { schema } from './extensions/helpers/schema';
 import { menu } from './extensions/menu';
 import { schema } from './extensions/schema';
-import { DOMParser, DOMSerializer } from 'prosemirror-model';
-// import * as model from 'prosemirror-model';
-// import { mdRender } from '../editor/extensions/md-render';
-import { defaultMarkdownParser, defaultMarkdownSerializer } from 'prosemirror-markdown';
-import { markdownParser } from './extensions/markdown.parser';
+import { DOMParser } from 'prosemirror-model';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
 import { mdRender } from '../markdown/md-render';
+import { buildKeymap } from './extensions/keymap';
+import { gapCursor } from 'prosemirror-gapcursor';
+import { dropCursor } from 'prosemirror-dropcursor';
 
 
 export class VisualView implements IEditorView {
@@ -37,16 +31,14 @@ export class VisualView implements IEditorView {
     const content = <HTMLElement> document.createElement('div');
 
     content.id = 'editor';
-    content.classList.add('content-preview');
-    // this.plugins = [
-    //   keymap(baseKeymap),
-    //   keymap(editKeymap),
-    //   history(),
-    // ];
+    content.classList.add('visual-editor');
 
     this.plugins = [
       menu(controls),
+      keymap(buildKeymap(schema)),
       keymap(baseKeymap),
+      dropCursor({ color: 'gray', width: 1 }),
+      gapCursor(),
       history(),
     ];
 

@@ -12,16 +12,31 @@ class MarkdownRender {
 
   constructor() {
     // this.md = new MarkdownIt({ linkify: true, breaks: true }).use(taskLists);
-    this.md = new MarkdownIt('commonmark', { html: false, linkify: true, breaks: true });
-    // this.md = new MarkdownIt('commonmark', { html: false, linkify: true });
+    // this.md = new MarkdownIt('commonmark', { html: false, linkify: true, breaks: true });
+    this.md = new MarkdownIt('commonmark', { html: false, linkify: true, breaks: false });
 
     this.md.renderer.rules['link_open'] = this.linkOpen.bind(this);
   }
 
-  public render(text: string): string {
-    const html = this.md.render(text.replace(/^(\n|[ ]+\n|[ ]{2,3}(?=\w))/gim, '$1\\=\\?$1'));
+  public render(text: string, trailingSpaces = ''): string {
+    // const html = this.md.render(text.replace(/^(\n|[ ]+\n|[ ]{2,3}(?=\w))/gim, '$1\\=\\?$1'));
 
-    return html.replace(/=\?/gi, '&nbsp;');
+    // return html.replace(/=\?/gi, '&nbsp;');
+    // return this.md.render(text, {});
+    const lines = text.split('\n');
+    const stack: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+
+      if (!line.length) {
+        line += '\\';
+      }
+
+      stack.push(line + '\n');
+    }
+
+    return this.md.render(stack.join('\n')).replace(/<p>\\<\/p>/g, `<p><span>${trailingSpaces}</span></p>`);
   }
 
   public parse(value: string, env: any): Token[] {

@@ -1,25 +1,14 @@
-import { EditorState, Transaction } from 'prosemirror-state';
+import { EditorState, Transaction, Command } from 'prosemirror-state';
 import { UrlHelper } from './helpers/url.helper';
 import { FormatHelper } from './helpers/format.helper';
 import { MarkdownSerializer } from './serializer/serializer';
-import { ListHelper } from './helpers/list.helper';
+import { ListCommandHelper } from './helpers/list.helper';
+import { NodeType } from 'prosemirror-model';
 
 
 export function toggleLink(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
   if (dispatch) {
     const transaction = UrlHelper.toggle(state);
-
-    if (transaction) {
-      dispatch(transaction);
-    }
-  }
-
-  return UrlHelper.check(state);
-}
-
-export function toggleList(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
-  if (dispatch) {
-    const transaction = ListHelper.toggle(state);
 
     if (transaction) {
       dispatch(transaction);
@@ -47,4 +36,16 @@ export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => vo
   }
 
   return true;
+}
+
+export function toggleList(listType: NodeType): Command {
+  const command = (state: EditorState, dispatch: (tr: Transaction) => void): boolean => {
+    if (dispatch) {
+      return ListCommandHelper.toggle(listType, state, dispatch);
+    }
+
+    return ListCommandHelper.check(state);
+  };
+
+  return command;
 }

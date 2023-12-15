@@ -26,7 +26,7 @@ export class MarkdownView implements IEditorView {
 
   constructor(element: HTMLElement, controls?: NodeList) {
     this.extensions = [
-      foldGutter({ markerDOM: markFolding }),
+      // foldGutter({ markerDOM: markFolding }),
       highlightSpecialChars(),
       history({ minDepth: 15 }),
 
@@ -109,7 +109,10 @@ export class MarkdownView implements IEditorView {
   }
 
   render() {
-    const html = mdRender.render(this.value);
+    const html = mdRender.render(this.value, '&nbsp;');
+
+    console.log(html);
+    console.log('-----------------------------------------------------------');
 
     return `<div>${html}</div>`;
   }

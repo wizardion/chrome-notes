@@ -114,7 +114,7 @@ export class PopupNotesElement extends BaseElement {
     this.selected.pState = this.detailsView.getPreviewState();
 
     this.save();
-    console.log('togglePreview', [this.selected.preview, this.selected.pState]);
+    // console.log('togglePreview', [this.selected.preview, this.selected.pState]);
   }
 
   async create() {
@@ -219,7 +219,7 @@ export class PopupNotesElement extends BaseElement {
       this.selected.item.date = new Date(time);
 
       // console.log('onChanged...');
-      // this.save();
+      this.save();
     } else {
       // console.log('onChanged.draft ...');
       // DbProviderService.cache.set('draft', { title, description, selection });

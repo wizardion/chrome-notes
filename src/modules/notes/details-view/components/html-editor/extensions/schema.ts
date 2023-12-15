@@ -3,13 +3,13 @@ import { Schema } from 'prosemirror-model';
 
 export const schema = new Schema({
   nodes: {
-    text: {
-      group: 'inline',
+    doc: {
+      content: 'block+'
     },
     paragraph: {
       group: 'block',
       content: 'inline*',
-      toDOM() { return ['p', 0]; },
+      toDOM: () => ['p', 0],
       parseDOM: [{ tag: 'p' }]
     },
     heading: {
@@ -25,42 +25,56 @@ export const schema = new Schema({
         { tag: 'h5', attrs: { level: 5 } },
         { tag: 'h6', attrs: { level: 6 } }
       ],
-      toDOM(node) { return ['h' + node.attrs.level, 0]; }
+      toDOM: (node) => ['h' + node.attrs.level, 0]
     },
-    star: {
-      inline: true,
+    text: {
       group: 'inline',
-      toDOM() { return ['star', '🟊']; },
-      parseDOM: [{ tag: 'star' }]
+    },
+
+    bulletList: {
+      content: 'listItem+',
+      group: 'block',
+      parseDOM: [{ tag: 'ul' }],
+      toDOM: () => ['ul', 0]
+    },
+    orderedList: {
+      content: 'listItem+',
+      group: 'block',
+      parseDOM: [{ tag: 'ol' }],
+      toDOM: () => ['ol', 0]
+    },
+    listItem: {
+      content: 'paragraph block*',
+      defining: true,
+      parseDOM: [{ tag: 'li' }],
+      toDOM: () => ['li', 0]
     },
     break: {
       inline: true,
       group: 'inline',
       selectable: false,
       parseDOM: [{ tag: 'br' }],
-      toDOM() { return ['br']; }
-    },
-    doc: {
-      content: 'block+'
+      leafText: () => '\n',
+      toDOM: () => ['br']
     }
   },
   marks: {
     strong: {
-      toDOM() { return ['strong', 0]; },
+      toDOM: () => ['strong', 0],
       parseDOM: [{ tag: 'strong' }]
     },
     italic: {
-      toDOM() { return ['em', 0]; },
+      toDOM: () => ['em', 0],
       parseDOM: [{ tag: 'em' }]
     },
     strike: {
-      toDOM() { return ['del', 0]; },
+      toDOM: () => ['del', 0],
       parseDOM: [{ tag: 'del' }]
     },
     link: {
       attrs: { href: {} },
-      toDOM(node) { return ['a', { href: node.attrs.href }, 0]; },
-      parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => { return { href: dom.href }; } }],
+      toDOM: (node) => ['a', { href: node.attrs.href }, 0],
+      parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => ({ href: dom.href }) }],
       inclusive: false
     }
   }

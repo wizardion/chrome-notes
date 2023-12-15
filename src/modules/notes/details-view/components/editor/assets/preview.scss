@@ -11,7 +11,7 @@
   width: 100%;
   min-height: 203px;
   box-sizing: border-box;
-  padding: 9px 3px 0 18px;
+  padding: 9px 3px 0 6px;
   overflow-x: hidden;
   overflow-y: scroll;
   height: 244px !important;
@@ -48,49 +48,63 @@
 }
 
 .content-preview ul {
-  list-style: none;
+  // list-style: none;
+  list-style-type: "- ";
+  list-style-position: outside;
   margin: 0 0;
-  padding-left: 2em;
-  text-indent: -2em;
-  white-space: normal;
+  padding-left: 1.5em;
 }
 
-.content-preview ul li:before {
-  content: "-";
-  padding-right: 5px;
-}
+// .content-preview li::marker {
+//   content: '- ';
+//   color: gray;
+//   // font-size: 1.2em;
+// }
 
-.content-preview ol {
-  margin: 0 0;
-  padding-left: 2em;
-  white-space: normal;
-}
+// .content-preview ul {
+//   list-style: none;
+//   margin: 0 0;
+//   padding-left: 2em;
+//   text-indent: -2em;
+//   white-space: normal;
+// }
 
-.content-preview ul li:first-child,
-.content-preview ol li:first-child {
-  padding-top: 1px;
-}
+// .content-preview ul li:before {
+//   content: "-";
+//   padding-right: 5px;
+// }
 
-.content-preview ul li:last-child,
-.content-preview ol li:last-child {
-  padding-bottom: 1px;
-}
+// .content-preview ol {
+//   margin: 0 0;
+//   padding-left: 2em;
+//   white-space: normal;
+// }
+
+// .content-preview ul li:first-child,
+// .content-preview ol li:first-child {
+//   padding-top: 1px;
+// }
+
+// .content-preview ul li:last-child,
+// .content-preview ol li:last-child {
+//   padding-bottom: 1px;
+// }
 
 // .content-preview ul.contains-task-list {
 //   list-style-type: none;
 //   padding-left: 15px;
 // }
 
-.content-preview ul li.task-list-item:before {
-  content: "-";
-  display: none;
-}
+// .content-preview ul li.task-list-item:before {
+//   content: "-";
+//   display: none;
+// }
 
-.content-preview  li.task-list-item input {
-  margin: -2px 8px 0px 0px;
-  display: inline-block;
-  vertical-align: middle;
-}
+// .content-preview  li.task-list-item input {
+//   margin: -2px 8px 0px 0px;
+//   display: inline-block;
+//   vertical-align: middle;
+// }
 
 .content-preview blockquote {
   border-left: 2px solid darkgray;
