@@ -45,7 +45,7 @@ export class ListCommandHelper {
   }
 
   static check(state: EditorState): boolean {
-    return !state.selection.empty;
+    return !!state;
   }
 
   private static changeListType(state: EditorState, itemType: NodeType, dispatch: (tr: Transaction) => void): boolean {
