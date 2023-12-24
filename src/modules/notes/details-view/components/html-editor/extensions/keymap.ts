@@ -5,7 +5,7 @@ import { chainCommands, exitCode } from 'prosemirror-commands';
 import { splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
 // import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
 // import { undo, redo } from 'prosemirror-history';
-// import { undoInputRule } from 'prosemirror-inputrules';
+import { undoInputRule } from 'prosemirror-inputrules';
 import { Command } from 'prosemirror-state';
 import { Schema } from 'prosemirror-model';
 import { redo, undo } from 'prosemirror-history';
@@ -133,6 +133,7 @@ export function buildKeymap(schema: Schema) {
   const keys: Record<string, Command> = {
     'Mod-z': undo,
     'Shift-Mod-z': redo,
+    'Backspace': undoInputRule
   };
 
   if (schema.nodes.listItem) {

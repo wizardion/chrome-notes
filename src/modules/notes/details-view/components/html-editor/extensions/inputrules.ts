@@ -1,19 +1,52 @@
-import { inputRules, wrappingInputRule, textblockTypeInputRule,
-  smartQuotes, emDash, ellipsis } from 'prosemirror-inputrules';
+import {
+  inputRules, wrappingInputRule,
+  emDash, ellipsis, textblockTypeInputRule
+} from 'prosemirror-inputrules';
 import { NodeType, Schema } from 'prosemirror-model';
 
-/// Given a list node type, returns an input rule that turns a bullet
-/// (dash, plush, or asterisk) at the start of a textblock into a
-/// bullet list.
+
+/* taken from `prosemirror-example-setup/src/inputrules.ts` */
+export function orderedListRule(nodeType: NodeType) {
+  return wrappingInputRule(/^(\d+)\.\s$/, nodeType, match => ({ order: +match[1] }),
+    (match, node) => node.childCount + node.attrs.order === +match[1]);
+}
+
+/* taken from `prosemirror-example-setup/src/inputrules.ts` */
 export function bulletListRule(nodeType: NodeType) {
   return wrappingInputRule(/^\s*([-+*])\s$/, nodeType);
 }
 
-export function buildInputRules(schema: Schema) {
-  let rules = smartQuotes.concat(ellipsis, emDash), type;
+/* taken from `prosemirror-example-setup/src/inputrules.ts` */
+export function headingRule(nodeType: NodeType) {
+  const re = new RegExp('^(#{1,6})\\s$');
 
-  if (type = schema.nodes.bullet_list) {
-    rules.push(bulletListRule(type));
+  return textblockTypeInputRule(re, nodeType, match => ({ level: match[1].length }));
+}
+
+export function codeBlockRule(nodeType: NodeType) {
+  return textblockTypeInputRule(/^```$/, nodeType);
+}
+
+/* taken from `prosemirror-example-setup/src/inputrules.ts` */
+export function buildInputRules(schema: Schema) {
+  const rules = [].concat(ellipsis, emDash);
+
+  if (schema.nodes.bulletList) {
+    const item = schema.nodes.bulletList;
+
+    rules.push(bulletListRule(item));
+  }
+
+  if (schema.nodes.orderedList) {
+    const item = schema.nodes.orderedList;
+
+    rules.push(orderedListRule(item));
+  }
+
+  if (schema.nodes.heading) {
+    const item = schema.nodes.heading;
+
+    rules.push(headingRule(item));
   }
 
   return inputRules({ rules });

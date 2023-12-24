@@ -19,6 +19,7 @@ import { buildKeymap } from './extensions/keymap';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { dropCursor } from 'prosemirror-dropcursor';
 import { virtualCursor } from './extensions/cursor';
+import { buildInputRules } from './extensions/inputrules';
 
 
 export class VisualView implements IEditorView {
@@ -37,6 +38,7 @@ export class VisualView implements IEditorView {
 
     this.plugins = [
       menu(controls),
+      buildInputRules(schema),
       keymap(buildKeymap(schema)),
       keymap(baseKeymap),
       dropCursor({ color: 'gray', width: 1 }),
