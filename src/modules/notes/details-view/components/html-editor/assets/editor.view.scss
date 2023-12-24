@@ -4,7 +4,7 @@
   resize: none;
   border: none;
   background: transparent;
-  flex: 1 1 auto;
+  // flex: 1 1 auto;
   white-space: normal;
   word-break: break-word;
   font-weight: 400;
@@ -20,12 +20,6 @@
   // font-family: 'Roboto Mono', monospace, sans-serif !important;
   font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
   line-height: 1.4;
-
-  position: absolute;
-  left: 0px;
-  width: 100%;
-  background: white;
-  z-index: 100;
 }
 
 .visual-editor > .ProseMirror-focused {
@@ -34,8 +28,10 @@
 }
 
 .ProseMirror {
+  word-wrap: break-word;
   white-space: pre-wrap;
-  // border: 1px solid lightblue;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
 }
 
 // .menubar {
@@ -105,11 +101,6 @@
 }
 
 .visual-editor ::selection {
-  background: #d7d4f0;
-}
-
-.visual-editor ::selection {
-  // background: #07a6983d;
   background: #d7d4f0;
 }
 

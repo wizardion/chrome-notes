@@ -12,14 +12,14 @@
   text-align: center;
   color: #e8b600;
   color: #07a698;
-  position: relative;
+  // position: relative;
   line-height: 23px;
   // border-bottom: 1px dotted #07a69835;
   border-bottom: 1px dotted transparent;
   // box-shadow: 1px 0px 4px 0px #056a6128;
   box-shadow: 0px 0px 4px 0px #056a6118;
   // box-shadow: 0px 0px 4px 0px #056a61;
-  z-index: 101;
+  // z-index: 101;
 }
 
 .description-note {
@@ -27,23 +27,23 @@
 }
 
 .content {
-  height: 228px;
+  // height: 228px;
 
   overflow-y: hidden;
   overflow-x: hidden;
   outline: none;
-  padding: 2px;
+  // padding: 2px;
   resize: none;
   border: none;
-  padding: 6px;
+  // padding: 6px;
   background: transparent;
-  padding-top: 10px;
+  // padding-top: 10px;
 
   padding: 0px;
   height: 244px;
-  position: relative !important;
+  // position: relative !important;
 
-  background: white;
+  // background: white;
   border-radius: 6px;
   margin: 0 0px 0 0px;
   // border: 1px dashed #d7e9e965;

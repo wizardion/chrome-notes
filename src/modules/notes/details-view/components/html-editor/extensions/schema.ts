@@ -74,8 +74,7 @@ export const schema = new Schema({
     link: {
       attrs: { href: {} },
       toDOM: (node) => ['a', { href: node.attrs.href }, 0],
-      parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => ({ href: dom.href }) }],
-      inclusive: false
+      parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => ({ href: dom.href }) }]
     }
   }
 });

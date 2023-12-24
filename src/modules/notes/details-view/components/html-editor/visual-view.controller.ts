@@ -1,5 +1,6 @@
 
 import './assets/editor.view.scss';
+import './assets/virtual-cursor.scss';
 
 import { EditorView } from 'prosemirror-view';
 import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
@@ -17,6 +18,7 @@ import { mdRender } from '../markdown/md-render';
 import { buildKeymap } from './extensions/keymap';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { dropCursor } from 'prosemirror-dropcursor';
+import { virtualCursor } from './extensions/cursor';
 
 
 export class VisualView implements IEditorView {
@@ -40,6 +42,7 @@ export class VisualView implements IEditorView {
       dropCursor({ color: 'gray', width: 1 }),
       gapCursor(),
       history(),
+      virtualCursor()
     ];
 
     this.view = new EditorView(content, { state: EditorState.create({ schema: schema }) });
