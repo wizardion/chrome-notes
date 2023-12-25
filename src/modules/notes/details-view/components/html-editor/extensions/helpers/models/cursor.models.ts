@@ -15,6 +15,12 @@ export interface IRect {
 export interface ISelectionRange {
   cursor: IPoint;
   collapsed: boolean;
+  boundingRect: IRect,
+  clientRects: IRect[];
+}
+
+export interface ISelectionRects {
+  boundingRect: IRect,
   clientRects: IRect[];
 }
 

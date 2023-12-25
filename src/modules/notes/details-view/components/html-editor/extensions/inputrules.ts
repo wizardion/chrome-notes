@@ -1,8 +1,34 @@
 import {
   inputRules, wrappingInputRule,
-  emDash, ellipsis, textblockTypeInputRule
+  emDash, ellipsis, textblockTypeInputRule, InputRule
 } from 'prosemirror-inputrules';
-import { NodeType, Schema } from 'prosemirror-model';
+import { NodeType, MarkType, Schema, Attrs } from 'prosemirror-model';
+
+
+function markInputRule(regexp: RegExp, markType: MarkType, attrs?: Attrs) {
+  return new InputRule(regexp, (state, match, start, end) => {
+    const transaction = state.tr;
+
+    if (match[1]) {
+      const textStart = start + match[0].indexOf(match[1]);
+      const textEnd = textStart + match[1].length;
+
+      if (textEnd < end) {
+        transaction.delete(textEnd, end);
+      }
+
+      if (textStart > start) {
+        transaction.delete(start, textStart);
+      }
+
+      end = start + match[1].length;
+
+      return transaction.addMark(start, end, markType.create(attrs));
+    }
+
+    return null;
+  });
+}
 
 
 /* taken from `prosemirror-example-setup/src/inputrules.ts` */
@@ -27,6 +53,12 @@ export function codeBlockRule(nodeType: NodeType) {
   return textblockTypeInputRule(/^```$/, nodeType);
 }
 
+export function markEm(mark: MarkType) {
+  return markInputRule(/_(\w+)_\s$/, mark);
+}
+
+// export const quotes = new InputRule(/'\w+$/, '\'\'');
+
 /* taken from `prosemirror-example-setup/src/inputrules.ts` */
 export function buildInputRules(schema: Schema) {
   const rules = [].concat(ellipsis, emDash);
@@ -47,6 +79,12 @@ export function buildInputRules(schema: Schema) {
     const item = schema.nodes.heading;
 
     rules.push(headingRule(item));
+  }
+
+  if (schema.marks.italic) {
+    const item = schema.marks.italic;
+
+    rules.push(markEm(item));
   }
 
   return inputRules({ rules });
