@@ -3,15 +3,29 @@ import {
   emDash, ellipsis, textblockTypeInputRule, InputRule
 } from 'prosemirror-inputrules';
 import { NodeType, MarkType, Schema, Attrs } from 'prosemirror-model';
+import { EditorState } from 'prosemirror-state';
 
 
-function markInputRule(regexp: RegExp, markType: MarkType, attrs?: Attrs) {
-  return new InputRule(regexp, (state, match, start, end) => {
-    const transaction = state.tr;
+export interface IMatchGroup {
+  value: string;
+  attrs?: Attrs | null;
+}
 
-    if (match[1]) {
-      const textStart = start + match[0].indexOf(match[1]);
-      const textEnd = textStart + match[1].length;
+function markInputRule(regexp: RegExp, markType: MarkType, matcher?: (match: RegExpMatchArray) => IMatchGroup) {
+  return new InputRule(regexp, (state: EditorState, match: RegExpMatchArray, start: number, end: number) => {
+    const group: IMatchGroup = { value: match[1], attrs: null };
+
+    if (matcher) {
+      const { attrs, value } = matcher(match);
+
+      group.attrs = attrs;
+      group.value = value;
+    }
+
+    if (group.value) {
+      const transaction = state.tr;
+      const textStart = start + match[0].indexOf(group.value);
+      const textEnd = textStart + group.value.length;
 
       if (textEnd < end) {
         transaction.delete(textEnd, end);
@@ -21,9 +35,9 @@ function markInputRule(regexp: RegExp, markType: MarkType, attrs?: Attrs) {
         transaction.delete(start, textStart);
       }
 
-      end = start + match[1].length;
+      end = start + group.value.length;
 
-      return transaction.addMark(start, end, markType.create(attrs));
+      return transaction.addMark(start, end, markType.create(group.attrs));
     }
 
     return null;
@@ -54,38 +68,36 @@ export function codeBlockRule(nodeType: NodeType) {
 }
 
 export function markEm(mark: MarkType) {
-  return markInputRule(/_(\w+)_\s$/, mark);
+  return markInputRule(/_(\w+)_\s|\*(\w+)\*\s$/, mark, m => ({ value: m[1] || m[2] }));
 }
 
-// export const quotes = new InputRule(/'\w+$/, '\'\'');
+export function markStrong(mark: MarkType) {
+  return markInputRule(/\*\*(\w+)\*\*\s$/, mark);
+}
+
+export function markStrike(mark: MarkType) {
+  return markInputRule(/~~(\w+)~~\s$/, mark);
+}
+
+export function markLink(mark: MarkType) {
+  return markInputRule(/\[(?<text>.*)\]\((?<url>.+)\)\s/g, mark, m => (
+    { attrs: { href: m.groups.url }, value: m.groups.text }
+  ));
+}
 
 /* taken from `prosemirror-example-setup/src/inputrules.ts` */
 export function buildInputRules(schema: Schema) {
-  const rules = [].concat(ellipsis, emDash);
-
-  if (schema.nodes.bulletList) {
-    const item = schema.nodes.bulletList;
-
-    rules.push(bulletListRule(item));
-  }
-
-  if (schema.nodes.orderedList) {
-    const item = schema.nodes.orderedList;
-
-    rules.push(orderedListRule(item));
-  }
-
-  if (schema.nodes.heading) {
-    const item = schema.nodes.heading;
-
-    rules.push(headingRule(item));
-  }
-
-  if (schema.marks.italic) {
-    const item = schema.marks.italic;
-
-    rules.push(markEm(item));
-  }
+  const rules = [
+    ellipsis,
+    emDash,
+    bulletListRule(schema.nodes.bulletList),
+    orderedListRule(schema.nodes.orderedList),
+    headingRule(schema.nodes.heading),
+    markStrong(schema.marks.strong),
+    markStrike(schema.marks.strike),
+    markEm(schema.marks.italic),
+    markLink(schema.marks.link)
+  ];
 
   return inputRules({ rules });
 }

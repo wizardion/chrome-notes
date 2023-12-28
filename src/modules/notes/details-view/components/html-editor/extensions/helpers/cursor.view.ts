@@ -63,7 +63,6 @@ export class CursorView {
   }
 
   private updateSelection(view: EditorView) {
-    console.clear();
     const range = this.getSelectionRange(view);
 
     if (range) {
