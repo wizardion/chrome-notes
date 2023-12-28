@@ -38,6 +38,15 @@ export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => vo
   return true;
 }
 
+// TODO to be implemented.
+export function indent(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
+  if (dispatch) {
+    console.log('state', state);
+  }
+
+  return true;
+}
+
 export function toggleList(listType: NodeType): Command {
   const command = (state: EditorState, dispatch: (tr: Transaction) => void): boolean => {
     if (dispatch) {

@@ -1,14 +1,13 @@
 // import {
 //   wrapIn, setBlockType, chainCommands, toggleMark, exitCode, joinUp, joinDown, lift, selectParentNode
 // } from 'prosemirror-commands';
-import { chainCommands, exitCode } from 'prosemirror-commands';
+import { chainCommands, exitCode, toggleMark } from 'prosemirror-commands';
 import { splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
-// import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
-// import { undo, redo } from 'prosemirror-history';
 import { undoInputRule } from 'prosemirror-inputrules';
-import { Command } from 'prosemirror-state';
+import { Command, EditorState } from 'prosemirror-state';
 import { Schema } from 'prosemirror-model';
 import { redo, undo } from 'prosemirror-history';
+import { indent, toggleLink } from './commands';
 
 
 const mac = typeof navigator !== 'undefined' ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false;
@@ -66,15 +65,6 @@ const mac = typeof navigator !== 'undefined' ? /Mac|iP(hone|[oa]d)/.test(navigat
   bind('Mod-BracketLeft', lift);
   bind('Escape', selectParentNode);
 
-  if (type = schema.marks.strong) {
-    bind('Mod-b', toggleMark(type));
-    bind('Mod-B', toggleMark(type));
-  }
-
-  if (type = schema.marks.em) {
-    bind('Mod-i', toggleMark(type));
-    bind('Mod-I', toggleMark(type));
-  }
 
   if (type = schema.marks.code)
   {bind('Mod-`', toggleMark(type));}
@@ -129,11 +119,26 @@ const mac = typeof navigator !== 'undefined' ? /Mac|iP(hone|[oa]d)/.test(navigat
   return keys;
 }*/
 
+export function saveChanges(state: EditorState): boolean {
+  console.log('saveChanges...', state, );
+
+  return true;
+}
+
 export function buildKeymap(schema: Schema) {
+  const { strong, italic } = schema.marks;
   const keys: Record<string, Command> = {
     'Mod-z': undo,
     'Shift-Mod-z': redo,
-    'Backspace': undoInputRule
+    'Backspace': undoInputRule,
+    'Mod-b': toggleMark(strong),
+    'Mod-B': toggleMark(strong),
+    'Mod-i': toggleMark(italic),
+    'Mod-I': toggleMark(italic),
+    'Mod-l': toggleLink,
+    'Tab': indent,
+    'Mod-s': saveChanges,
+    'Mod-S': saveChanges,
   };
 
   if (schema.nodes.listItem) {
@@ -142,7 +147,6 @@ export function buildKeymap(schema: Schema) {
     keys['Enter'] = splitListItem(item);
     keys['Tab'] = sinkListItem(item);
     keys['Shift-Tab'] = liftListItem(item);
-    keys['Mod-z'] = undo;
   }
 
   if (schema.nodes.break) {
