@@ -54,6 +54,8 @@
 .ProseMirror .vr-selection-layer svg.vr-selection path {
   stroke: #BBDBDC;
   fill: #D4E6E885;
+  // fill: transparent;
+  // stroke: #663399;
 }
 
 .ProseMirror-focused .vr-selection-layer .vr-selection>* {

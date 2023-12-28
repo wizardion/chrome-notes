@@ -19,11 +19,6 @@ export interface ISelectionRange {
   clientRects: IRect[];
 }
 
-export interface ISelectionRects {
-  boundingRect: IRect,
-  clientRects: IRect[];
-}
-
 export enum IDirection {
   left = 0,
   right = 1,
