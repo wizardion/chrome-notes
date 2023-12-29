@@ -135,6 +135,8 @@ module.exports = {
     alias: {
       core: path.resolve(__root__, 'src/core'),
       modules: path.resolve(__root__, 'src/modules'),
+      components: path.resolve(__root__, 'src/components'),
+      pages: path.resolve(__root__, 'src/pages'),
       styles: path.resolve(__root__, 'src/styles'),
       images: path.resolve(__root__, 'src/images'),
     }

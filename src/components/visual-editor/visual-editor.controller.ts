@@ -7,22 +7,25 @@ import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import { history } from 'prosemirror-history';
-import { IEditorData, IEditorView } from '../models/editor.models';
-import { CUSTOM_EVENTS, INTERVALS } from '../editor/extensions/editor-commands';
-import { markdownSerializer } from './extensions/testing/helpers/markdown-serializer';
-import { menu } from './extensions/menu';
-import { schema } from './extensions/schema';
 import { DOMParser } from 'prosemirror-model';
-import { MarkdownSerializer } from './extensions/serializer/serializer';
-import { mdRender } from '../markdown/md-render';
-import { buildKeymap } from './extensions/keymap';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { dropCursor } from 'prosemirror-dropcursor';
+
+import { IEditorData, IEditorView } from 'components/models/editor.models';
+import { CUSTOM_EVENTS, INTERVALS } from 'components/models/extensions.model';
+import { mdRender } from 'modules/markdown';
+
+import { menu } from './extensions/menu';
+import { schema } from './extensions/schema';
+import { buildKeymap } from './extensions/keymap';
 import { virtualCursor } from './extensions/cursor';
 import { buildInputRules } from './extensions/inputrules';
+import { MarkdownSerializer } from './extensions/serializer/serializer';
+
+import { markdownSerializer } from './extensions/testing/helpers/markdown-serializer';
 
 
-export class VisualView implements IEditorView {
+export class VisualEditor implements IEditorView {
   view: EditorView;
 
   private locked: boolean;

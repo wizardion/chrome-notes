@@ -1,5 +1,5 @@
 import { DetailsViewElement } from './base-view.component';
-import { MarkdownView } from './components/editor/markdown-view.controller';
+import { MarkdownEditor } from 'components/markdown-editor';
 
 
 export class MarkdownViewElement extends DetailsViewElement {
@@ -8,6 +8,6 @@ export class MarkdownViewElement extends DetailsViewElement {
   constructor() {
     super();
 
-    this.editor = new MarkdownView(this.form.elements.description, this.form.elements.formatters);
+    this.editor = new MarkdownEditor(this.form.elements.description, this.form.elements.formatters);
   }
 }

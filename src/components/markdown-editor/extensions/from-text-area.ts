@@ -1,5 +1,5 @@
 import { EditorView } from '@codemirror/view';
-import { IExtension } from '../../models/extensions.model';
+import { IExtension } from 'components/models/extensions.model';
 
 
 export function editorFromTextArea(value: string, textarea: HTMLTextAreaElement, extensions: IExtension[]) {

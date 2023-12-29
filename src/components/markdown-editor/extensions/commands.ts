@@ -1,19 +1,9 @@
 import { EditorView } from '@codemirror/view';
-import { IEditorCustomEvents, ICustomIntervals } from '../../models/extensions.model';
 import { ListHelper } from './helpers/list.helper';
 import { PrimitivesHelper } from './helpers/primitives.helper';
 import { UrlHelper } from './helpers/url.helper';
+import { CUSTOM_EVENTS } from 'components/models/extensions.model';
 
-
-export const CUSTOM_EVENTS: IEditorCustomEvents = {
-  change: null,
-  save: null
-};
-
-export const INTERVALS: ICustomIntervals = {
-  changed: null,
-  locked: null
-};
 
 export function toggleBold(view: EditorView) {
   const transaction = PrimitivesHelper.toggleBold(view);
@@ -60,7 +50,7 @@ export function removeFormat(view: EditorView) {
   const text = view.state.sliceDoc(range.from, range.to);
 
   if (text) {
-    import('../../markdown/md-render').then(({ mdRender }) => {
+    import('modules/markdown/md-render').then(({ mdRender }) => {
       const html = mdRender.render(text).replace(/(th|td)>\n<(th|td)/gi, '$1> <$2');
       const dirt = mdRender.unescapeAll(html.replace(/(<([^>]+)>)/gi, ''));
       const value = dirt.replace(/^[\s\n\r]+|[\s\n\r]+$|(\n)[\s\n\r]+/gi, '$1');

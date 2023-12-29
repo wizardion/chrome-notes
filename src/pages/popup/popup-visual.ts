@@ -1,5 +1,5 @@
 import { CachedStorageService } from 'core/services/cached';
-import { PopupNotesElement } from 'modules/notes/popup/popup-notes.component';
+import { PopupNotesElement } from 'modules/notes/popup/popup.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
 import { ListItemElement } from 'modules/notes/list-item/list-item.component';
 import { VisualViewElement } from 'modules/notes/details-view/visual-view.component';

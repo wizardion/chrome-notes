@@ -13,6 +13,8 @@
     "paths": {
       "core/*": ["core/*"],
       "modules/*": ["modules/*"],
+      "components/*": ["components/*"],
+      "pages/*": ["pages/*"],
       "styles/*": ["styles/*"],
       "images/*": ["images/*"]
     }

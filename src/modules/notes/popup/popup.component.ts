@@ -3,12 +3,13 @@ import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
 import { DetailsViewElement } from '../details-view/base-view.component';
 import { INote } from '../details-view/details-view.model';
-import { SortHelper } from '../details-view/components/sort-helper/sort-helper';
+
 import { DbProviderService } from 'modules/db';
+import { SortHelper } from 'modules/sort-helper';
 
 
 const template: DocumentFragment = BaseElement.component({
-  templateUrl: './popup-notes.component.html'
+  templateUrl: './popup.component.html'
 });
 
 export class PopupNotesElement extends BaseElement {

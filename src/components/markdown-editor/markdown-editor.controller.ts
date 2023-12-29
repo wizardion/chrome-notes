@@ -5,19 +5,19 @@ import { Compartment, EditorState, SelectionRange } from '@codemirror/state';
 import { EditorView, ViewUpdate, drawSelection, highlightSpecialChars, keymap } from '@codemirror/view';
 import { history } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
-import { foldGutter, syntaxHighlighting } from '@codemirror/language';
+import { syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
-import { markFolding } from './extensions/folding-icon';
+
+import { mdRender } from 'modules/markdown/md-render';
+import { CUSTOM_EVENTS, IExtension, INTERVALS } from 'components/models/extensions.model';
+import { IEditorData, IEditorView } from 'components/models/editor.models';
+
 import { markdownHighlighting } from './extensions/syntax-highlighting';
 import { editorFromTextArea } from './extensions/from-text-area';
-import { CUSTOM_EVENTS, INTERVALS } from './extensions/editor-commands';
-import { mdRender } from '../markdown/md-render';
-import { CODE_ACTIONS, editorKeymap } from './extensions/editor-keymap';
-import { IExtension } from '../models/extensions.model';
-import { IEditorData, IEditorView } from '../models/editor.models';
+import { CODE_ACTIONS, editorKeymap } from './extensions/keymap';
 
 
-export class MarkdownView implements IEditorView {
+export class MarkdownEditor implements IEditorView {
   locked: boolean;
   view: EditorView;
   range: SelectionRange;

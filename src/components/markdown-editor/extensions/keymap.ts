@@ -3,7 +3,7 @@ import { defaultKeymap, historyKeymap, indentWithTab, undo, redo } from '@codemi
 import { markdownKeymap } from '@codemirror/lang-markdown';
 import {
   toggleUrl, toggleBold, toggleItalic, toggleStrike, saveChanges, removeFormat, toggleList
-} from './editor-commands';
+} from './commands';
 
 
 export const CODE_ACTIONS: Record<string, (view: EditorView) => void> = {

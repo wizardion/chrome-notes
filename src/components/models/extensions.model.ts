@@ -9,3 +9,13 @@ export interface ICustomIntervals {
   changed: NodeJS.Timeout;
   locked: NodeJS.Timeout;
 }
+
+export const CUSTOM_EVENTS: IEditorCustomEvents = {
+  change: null,
+  save: null
+};
+
+export const INTERVALS: ICustomIntervals = {
+  changed: null,
+  locked: null
+};
