@@ -1,7 +1,9 @@
 // import {
 //   wrapIn, setBlockType, chainCommands, toggleMark, exitCode, joinUp, joinDown, lift, selectParentNode
 // } from 'prosemirror-commands';
-import { chainCommands, exitCode, toggleMark } from 'prosemirror-commands';
+import {
+  chainCommands, createParagraphNear, liftEmptyBlock, newlineInCode, splitBlock, toggleMark
+} from 'prosemirror-commands';
 import { splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
 import { undoInputRule } from 'prosemirror-inputrules';
 import { Command, EditorState } from 'prosemirror-state';
@@ -149,18 +151,14 @@ export function buildKeymap(schema: Schema) {
     keys['Shift-Tab'] = liftListItem(item);
   }
 
-  if (schema.nodes.break) {
-    const br = schema.nodes.break, cmd = chainCommands(exitCode, (state, dispatch) => {
-      if (dispatch) {dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView());}
+  if (schema.nodes.paragraph) {
+    const command = chainCommands(newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock);
 
-      return true;
-    });
-
-    keys['Mod-Enter'] = cmd;
-    keys['Shift-Enter'] = cmd;
+    keys['Mod-Enter'] = command;
+    keys['Shift-Enter'] = command;
 
     if (mac) {
-      keys['Ctrl-Enter'] = cmd;
+      keys['Ctrl-Enter'] = command;
     }
   }
 

@@ -23,4 +23,8 @@ export class VisualViewElement extends DetailsViewElement {
     //   this.form.elements.previewer.hidden = false;
     // }, 1000);
   }
+
+  set preview(value: boolean) {
+
+  }
 }

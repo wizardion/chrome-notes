@@ -33,9 +33,10 @@ export const serializingSchema: ISerializingSchema = {
     listItem: {
       toString(content: string, attrs: ISerializingAttributes, depth?: number) {
         const { index, listType } = attrs;
-        const text = `${(listType as string).replace(/^\d/, `${(index + 1)}`)} ${content}`;
+        const indent = (depth - 1 > 0) ? ' '.repeat(depth) : '';
+        const mark = indent + (listType as string).replace(/^\d/, `${(index + 1)}`) + ' ';
 
-        return `${(depth - 1 > 0) ? ' '.repeat(depth) : ''}${text}`;
+        return mark + content.replace(/\n(?!$)/g, `\n${' '.repeat(mark.length)}`);
       }
     },
     paragraph: {

@@ -18,7 +18,8 @@ export class MarkdownSerializer {
       }
     });
 
-    return blocks.join('');
+    // TODO Temporary solution until the scheme fixes.
+    return blocks.join('').replace(/\n\n$/g, '\n');
   }
 
   private static renderBlock(node: ISerializingNode, depth = 0): string {
@@ -32,15 +33,12 @@ export class MarkdownSerializer {
     const result: string[] = [];
 
     content.forEach((node, index) => {
-      if (node.content) {
+      if (node.type !== 'text') {
         node.attrs = Object.assign({}, attrs, node.attrs, { index: index });
-
-        return result.push(this.renderBlock(node, depth));
+        result.push(this.renderBlock(node, depth));
       }
 
-      if (node.type === 'text') {
-        result.push(this.toString(node));
-      }
+      result.push(this.toString(node));
     });
 
     return result.join('');

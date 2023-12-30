@@ -30,7 +30,6 @@ export const schema = new Schema({
     text: {
       group: 'inline',
     },
-
     bulletList: {
       content: 'listItem+',
       group: 'block',
@@ -49,14 +48,14 @@ export const schema = new Schema({
       parseDOM: [{ tag: 'li' }],
       toDOM: () => ['li', 0]
     },
-    break: {
-      inline: true,
-      group: 'inline',
-      selectable: false,
-      parseDOM: [{ tag: 'br' }],
-      leafText: () => '\n',
-      toDOM: () => ['br']
-    }
+    // break: {
+    //   inline: true,
+    //   group: 'inline',
+    //   selectable: false,
+    //   parseDOM: [{ tag: 'br' }],
+    //   leafText: () => '\n',
+    //   toDOM: () => ['br']
+    // }
   },
   marks: {
     strong: {
