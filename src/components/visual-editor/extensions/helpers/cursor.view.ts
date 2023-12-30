@@ -11,19 +11,15 @@ export class CursorView {
 
   private selection: SVGSVGElement;
   private polygon: SVGPathElement;
+  private doc: Document;
 
   constructor(view: EditorView) {
-    // this.view = view;
-    // this.doc = view.dom.ownerDocument;
-    this.cursor = document.createElement('div');
-    this.layer = document.createElement('div');
-    this.selection = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    this.polygon = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    // this.selection = [
-    //   document.createElement('div'),
-    //   document.createElement('div'),
-    //   document.createElement('div')
-    // ];
+    this.doc = view.dom.ownerDocument;
+
+    this.cursor = this.doc.createElement('div');
+    this.layer = this.doc.createElement('div');
+    this.selection = this.doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.polygon = this.doc.createElementNS('http://www.w3.org/2000/svg', 'path');
 
     this.cursor.classList.add('vr-cursor');
     this.selection.classList.add('vr-selection');
@@ -32,22 +28,6 @@ export class CursorView {
     this.selection.appendChild(this.polygon);
     this.layer.appendChild(this.cursor);
     this.layer.appendChild(this.selection);
-
-    // for (let i = 0; i < this.selection.length; i++) {
-    //   const element = this.selection[i];
-
-    //   element.classList.add('vr-selection');
-    //   this.layer.appendChild(element);
-    // }
-
-    // view.dom.style.position = 'relative';
-    // this.event = () => this.update(view, null);
-    // this.doc.addEventListener('selectionchange', this.event);
-
-    // if (window.ResizeObserver) {
-    //   this.observer = new window.ResizeObserver(() => this.event());
-    //   this.observer.observe(view.dom.parentElement);
-    // }
 
     this.update(view, null);
   }
@@ -60,6 +40,10 @@ export class CursorView {
     }
 
     return this.updateSelection(view);
+  }
+
+  destroy() {
+    this.layer.remove();
   }
 
   private updateSelection(view: EditorView) {
@@ -196,7 +180,7 @@ export class CursorView {
   }
 
   private getDirection(selection: Selection): IDirection {
-    const range = document.createRange();
+    const range = this.doc.createRange();
 
     if (range) {
       range.setStart(selection.anchorNode, selection.anchorOffset);
@@ -292,8 +276,6 @@ export class CursorView {
     return lines.concat(this.removeGap(lines[line], this.normalize(current, root)));
   }
 
-  // Restart CSS animation
-  // https://css-tricks.com/restart-css-animation/
   private restartAnimation(element: HTMLElement, className: string) {
   // -> removing the class
     element.classList.remove(className);

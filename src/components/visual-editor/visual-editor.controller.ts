@@ -22,8 +22,6 @@ import { virtualCursor } from './extensions/cursor';
 import { buildInputRules } from './extensions/inputrules';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
 
-// import { markdownSerializer } from './extensions/testing/helpers/markdown-serializer';
-
 
 export class VisualEditor implements IEditorView {
   view: EditorView;
@@ -100,7 +98,6 @@ export class VisualEditor implements IEditorView {
     }
 
     return { title: title, description: value, selection: [anchor, head] };
-    // return { title: 'title', description: 'value', selection: [0, 0] };
   }
 
   setData(data: IEditorData) {
