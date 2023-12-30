@@ -1,5 +1,5 @@
 import { EditorState } from 'prosemirror-state';
-import { ISerializingContent, ISerializingNode } from './models/serializer.models';
+import { ISerializingAttributes, ISerializingNode } from './models/serializer.models';
 import { serializingSchema } from './md-schema';
 
 
@@ -7,52 +7,56 @@ export class MarkdownSerializer {
   private static schema = serializingSchema;
 
   static serialize(state: EditorState): string {
-    const lines: string[] = [];
     const { schema } = state;
+    const blocks: string[] = [];
 
     state.doc.forEach(block => {
       const node = block.toJSON() as ISerializingNode;
 
       if (schema.nodes[node.type] && this.schema.nodes[node.type]) {
-        lines.push(this.renderBlock(node));
+        blocks.push(this.renderBlock(node));
       }
     });
 
-    console.log('serialize..................');
-    console.log(lines.join('\n'));
-
-    return lines.join('\n');
+    return blocks.join('');
   }
 
-  private static renderBlock(node: ISerializingNode): string {
+  private static renderBlock(node: ISerializingNode, depth = 0): string {
     const block = this.schema.nodes[node.type];
+    const content = this.gerContent(node.content || [], block.attrs, depth + 1);
 
-    console.log('node', node);
-
-    return block.toString(this.gerContent(node.content), node.attrs);
+    return block.toString(content, node.attrs, depth);
   }
 
-  private static gerContent(content: ISerializingContent[]) {
+  private static gerContent(content: ISerializingNode[], attrs: ISerializingAttributes, depth: number): string {
     const result: string[] = [];
 
-    content.forEach(i => {
-      if (i.type === 'text') {
-        let text = i.text;
+    content.forEach((node, index) => {
+      if (node.content) {
+        node.attrs = Object.assign({}, attrs, node.attrs, { index: index });
 
-        if (i.marks) {
-          i.marks.forEach(mark => {
-            if (this.schema.marks[mark.type]) {
-              text = this.schema.marks[mark.type].toString(text, mark.attrs);
-            }
-          });
-        }
+        return result.push(this.renderBlock(node, depth));
+      }
 
-        result.push(text);
-      } else if (this.schema.nodes[i.type]) {
-        result.push(this.schema.nodes[i.type].toString(i.text));
+      if (node.type === 'text') {
+        result.push(this.toString(node));
       }
     });
 
     return result.join('');
+  }
+
+  private static toString(node: ISerializingNode): string {
+    let text = node.text;
+
+    node.marks?.forEach(item => {
+      const mark = this.schema.marks[item.type];
+
+      if (mark) {
+        text = mark.toString(text, item.attrs);
+      }
+    });
+
+    return text;
   }
 }

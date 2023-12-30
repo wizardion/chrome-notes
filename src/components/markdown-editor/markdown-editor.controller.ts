@@ -45,6 +45,7 @@ export class MarkdownEditor implements IEditorView {
     this.initControls(controls);
   }
 
+  /** @deprecated Use `getData` instead. */
   get value(): string {
     return this.view.state.doc.toString();
   }

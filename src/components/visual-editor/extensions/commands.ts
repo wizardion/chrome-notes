@@ -32,7 +32,12 @@ export function removeFormat(state: EditorState, dispatch: (tr: Transaction) => 
 
 export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
   if (dispatch) {
-    MarkdownSerializer.serialize(state);
+    console.clear();
+    const content = MarkdownSerializer.serialize(state);
+
+    console.log('');
+    console.log(content);
+    console.log('');
   }
 
   return true;

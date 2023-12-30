@@ -1,10 +1,10 @@
-import { ISerializingSchema } from './models/serializer.models';
+import { ISerializingAttributes, ISerializingSchema } from './models/serializer.models';
 
 
 export const serializingSchema: ISerializingSchema = {
   nodes: {
     heading: {
-      toString(content: string, attrs?: Record<string, any>) {
+      toString(content: string, attrs?: ISerializingAttributes) {
         const level = attrs.level as number;
         const levels: Record<number, string> = {
           1: '#',
@@ -15,12 +15,32 @@ export const serializingSchema: ISerializingSchema = {
           6: '######',
         };
 
-        return `${levels[level]} ${content}`;
+        return `${levels[level]} ${content}\n`;
+      }
+    },
+    bulletList: {
+      attrs: { listType: '-' },
+      toString(content: string) {
+        return content;
+      }
+    },
+    orderedList: {
+      attrs: { listType: '1.' },
+      toString(content: string) {
+        return content;
+      }
+    },
+    listItem: {
+      toString(content: string, attrs: ISerializingAttributes, depth?: number) {
+        const { index, listType } = attrs;
+        const text = `${(listType as string).replace(/^\d/, `${(index + 1)}`)} ${content}`;
+
+        return `${(depth - 1 > 0) ? ' '.repeat(depth) : ''}${text}`;
       }
     },
     paragraph: {
       toString(content: string) {
-        return content;
+        return content + '\n';
       }
     },
     break: {
@@ -32,21 +52,21 @@ export const serializingSchema: ISerializingSchema = {
   marks: {
     strong: {
       toString(content: string) {
-        return `**${content}**`;
+        return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1**$2**$3');
       }
     },
     italic: {
       toString(content: string) {
-        return `*${content}*`;
+        return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1*$2*$3');
       }
     },
     strike: {
       toString(content: string) {
-        return `~~${content}~~`;
+        return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1~~$2~~$3');
       }
     },
     link: {
-      toString(content: string, attrs?: Record<string, any>) {
+      toString(content: string, attrs?: ISerializingAttributes) {
         const href = attrs?.href as string;
 
         return `[${content}](${href})`;

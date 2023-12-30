@@ -22,7 +22,7 @@ import { virtualCursor } from './extensions/cursor';
 import { buildInputRules } from './extensions/inputrules';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
 
-import { markdownSerializer } from './extensions/testing/helpers/markdown-serializer';
+// import { markdownSerializer } from './extensions/testing/helpers/markdown-serializer';
 
 
 export class VisualEditor implements IEditorView {
@@ -57,8 +57,10 @@ export class VisualEditor implements IEditorView {
     element.parentElement.insertBefore(content, element.nextSibling);
   }
 
+  /** @deprecated Use `getData` instead. */
   get value(): string {
-    return markdownSerializer.serialize(this.view.state.doc);
+    // return markdownSerializer.serialize(this.view.state.doc);
+    return '';
   }
 
   /** @deprecated Use `setData` instead. */
@@ -88,9 +90,6 @@ export class VisualEditor implements IEditorView {
     const value = MarkdownSerializer.serialize(this.view.state);
     const { anchor, head } = this.view.state.selection.toJSON();
     let title: string = null;
-
-    console.log(value);
-    console.log('----------------------------------------------------------------------------');
 
     if ((/^[#]+\s+/g).test(value)) {
       const data: string[] = value.split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
