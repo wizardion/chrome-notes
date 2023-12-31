@@ -11,18 +11,12 @@ class MarkdownRender {
   private md: MarkdownIt;
 
   constructor() {
-    // this.md = new MarkdownIt({ linkify: true, breaks: true }).use(taskLists);
-    // this.md = new MarkdownIt('commonmark', { html: false, linkify: true, breaks: true });
     this.md = new MarkdownIt('commonmark', { html: false, linkify: true, breaks: false });
 
     this.md.renderer.rules['link_open'] = this.linkOpen.bind(this);
   }
 
   public render(text: string, trailingSpaces = ''): string {
-    // const html = this.md.render(text.replace(/^(\n|[ ]+\n|[ ]{2,3}(?=\w))/gim, '$1\\=\\?$1'));
-
-    // return html.replace(/=\?/gi, '&nbsp;');
-    // return this.md.render(text, {});
     const lines = text.split('\n');
     const stack: string[] = [];
 
@@ -51,7 +45,7 @@ class MarkdownRender {
     return self.renderToken(tokens, id, options);
   }
 
-  // // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
+  // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
   private linkOpen(tokens: Token[], id: number, options: IOptions, env: object, self: Renderer) {
     const aIndex = tokens[id].attrIndex('target');
 

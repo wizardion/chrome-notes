@@ -102,13 +102,7 @@ export class VisualEditor implements IEditorView {
 
   setData(data: IEditorData) {
     this.locked = true;
-
     this.content.innerHTML = mdRender.render(data.description);
-
-    // console.log('--- data.description ----------------------------------------------');
-    // console.log(data.description);
-    // console.log('--- div.innerHTML -------------------------------------------------');
-    // console.log(this.content.innerHTML);
 
     this.view.updateState(
       EditorState.create({
@@ -119,12 +113,7 @@ export class VisualEditor implements IEditorView {
       })
     );
 
-    // console.log('--- view.dom.innerHTML --------------------------------------------');
-    // console.log(this.view.dom.innerHTML);
-    // console.log('-------------------------------------------------------------------');
-
     this.view.focus();
-
     this.setSelection(data.selection);
 
     clearInterval(INTERVALS.locked);
