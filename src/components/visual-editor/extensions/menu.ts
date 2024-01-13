@@ -1,4 +1,4 @@
-import { toggleMark } from 'prosemirror-commands';
+import { setBlockType, toggleMark } from 'prosemirror-commands';
 import { schema } from './schema';
 import { redo, undo } from 'prosemirror-history';
 import { Plugin } from 'prosemirror-state';
@@ -12,6 +12,13 @@ export const CODE_ACTIONS: Record<string, IMenuItem> = {
   'italic': { command: toggleMark(schema.marks.italic), dom: null },
   'strikethrough': { command: toggleMark(schema.marks.strike), dom: null },
   'link': { command: toggleLink, dom: null },
+
+  'paragraph': { command: setBlockType(schema.nodes.paragraph), dom: null },
+  'heading-1': { command: setBlockType(schema.nodes.heading, { level: 1 }), dom: null },
+  'heading-2': { command: setBlockType(schema.nodes.heading, { level: 2 }), dom: null },
+  'heading-3': { command: setBlockType(schema.nodes.heading, { level: 3 }), dom: null },
+  'heading-4': { command: setBlockType(schema.nodes.heading, { level: 4 }), dom: null },
+  'heading-5': { command: setBlockType(schema.nodes.heading, { level: 5 }), dom: null },
 
   'orderedList': { command: toggleList(schema.nodes.orderedList), dom: null },
   'unorderedList': { command: toggleList(schema.nodes.bulletList), dom: null },

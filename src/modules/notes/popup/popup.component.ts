@@ -107,7 +107,7 @@ export class PopupNotesElement extends BaseElement {
     this.detailsView.preview = null;
     this.selected = null;
 
-    this.detailsView.setData({ title: title || '', description: description || '', selection: selection });
+    this.detailsView.setData({ title: title || '', description: description || '', selection: selection || [0, 0] });
   }
 
   togglePreview() {

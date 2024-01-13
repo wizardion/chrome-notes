@@ -4,27 +4,19 @@ import { Decoration, DecorationSet } from 'prosemirror-view';
 
 
 export function virtualCursor(): Plugin {
-  let cursorView: CursorView;
-
   return new Plugin({
     view(editorView) {
-      cursorView = new CursorView(editorView);
-
-      return cursorView;
+      return new CursorView(editorView);
     },
     props: {
       decorations: (state: EditorState) => {
-        if (cursorView) {
-          return DecorationSet.create(state.doc, [
-            Decoration.widget(0, cursorView.layer, {
-              key: 'virtual-selection',
-              side: -1,
-              ignoreSelection: true
-            }),
-          ]);
-        }
-
-        return null;
+        return DecorationSet.create(state.doc, [
+          Decoration.widget(0, CursorView.widget, {
+            key: 'virtual-selection',
+            side: -1,
+            ignoreSelection: true
+          }),
+        ]);
       },
       attributes: {
         class: 'vr-selection-enabled',

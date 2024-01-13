@@ -1,5 +1,6 @@
 import { IDBNote } from 'modules/db';
 import { ListItemElement } from '../list-item/list-item.component';
+import { EditorControlsElement } from '../editor-controls/editor-controls.component';
 
 
 export interface IDetailsViewForm {
@@ -7,11 +8,28 @@ export interface IDetailsViewForm {
   cancel: HTMLButtonElement;
   create: HTMLButtonElement;
   delete: HTMLButtonElement;
-  preview: HTMLInputElement;
-  formatters: NodeList;
-  previewer: HTMLPreElement;
+  menu: EditorControlsElement;
+  menuGroup: HTMLFieldSetElement;
   description: HTMLTextAreaElement;
+  head: HTMLElement;
+  content: HTMLElement;
+  preview: HTMLElement;
+  previewer: HTMLPreElement;
 }
+
+// export interface IMarkdownViewForm {
+//   back: HTMLButtonElement;
+//   cancel: HTMLButtonElement;
+//   create: HTMLButtonElement;
+//   delete: HTMLButtonElement;
+//   menu: EditorControlsElement;
+//   menuGroup: HTMLFieldSetElement;
+//   description: HTMLTextAreaElement;
+//   head: HTMLElement;
+//   content: HTMLElement;
+//   preview: HTMLElement;
+//   previewer: HTMLPreElement;
+// }
 
 export type IEventListenerType =
   | 'back'

@@ -1,0 +1,106 @@
+.dropdown-menu {
+  position: absolute;
+  width: fit-content;
+  z-index: 2000;
+  box-shadow: 1px 3px 6px 0px #00000045;
+  border: 1px solid white;
+  border-radius: 4px;
+  background: #FFFFFF;
+  padding: 1px 0px 1px 0px;
+  font-size: 12px;
+}
+
+.dropdown-menu button {
+  display: block;
+  cursor: pointer;
+  text-align: left;
+  padding: 3px 10px 3px 6px;
+  min-width: 100%;
+
+  background-color: transparent;
+  border-radius: 3px !important;
+  border: 1px solid transparent !important;
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+
+  color: #06736a;
+  user-select: none;
+}
+
+.dropdown-menu button:first-child {
+  border-top-color: transparent !important;
+  margin-top: 6px;
+}
+
+.dropdown-menu button:hover {
+  background-color: #D4E6E885;
+  border-color: #FFFFFFfb !important;
+  color: #e33636;
+  fill: #e33636;
+}
+
+.dropdown-menu button:focus {
+  // border: 1px solid #07a698 !important;
+  border: 1px solid #06736a !important;
+  // border-radius: 2px !important;
+}
+
+.dropdown-menu button:active {
+  background-color: #07a69819;
+  border-color: #07a69820 !important;
+  // border-radius: 2px !important;
+  // opacity: 0.5;
+  color: #e33636a5;
+  fill: #e33636a5;
+}
+
+.dropdown-menu button:disabled {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  cursor: inherit;
+  color: #a8b6b6;
+  fill: #a8b6b6;
+  pointer-events: none;
+}
+
+// .dropdown-menu button:focus:first-child {
+//   border-top-color: transparent;
+// }
+
+// .dropdown-menu button:focus:last-child {
+//   border-bottom-color: transparent;
+// }
+
+.dropdown-toggle {
+  width: fit-content !important;
+  align-items: center;
+  justify-content: center;
+  padding-left: 6px;
+  padding-right: 6px;
+  line-height: 19px;
+}
+
+.dropdown.opened .dropdown-toggle {
+  // box-shadow: 1px 2px 4px 0px rgba(0, 0, 0, 0.1);
+
+
+  color: #e33636a5;
+  fill: #e33636a5;
+}
+
+.dropdown-toggle svg {
+  display: inline-block;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+}
+
+.dropdown-toggle svg .up {
+  display: none;
+}
+
+.dropdown.opened .dropdown-toggle svg .down {
+  display: none;
+}
+
+.dropdown.opened .dropdown-toggle svg .up {
+  display: inherit;
+}

@@ -73,15 +73,15 @@
   font-size: smaller;
 }
 
-.cm-line:has(> .cm-heading-1) {
-  text-align: center;
-}
+// .cm-line:has(> .cm-heading-1) {
+//   text-align: center;
+// }
 
 .cm-line .cm-heading-1.cm-meta:first-child {
   opacity: 0.3;
   font-size: smaller;
-  float: left;
-  margin-top: 10px;
+  // float: left;
+  // margin-top: 10px;
 }
 
 .cm-line:has(> .cm-meta:only-child) {
@@ -96,7 +96,7 @@
 }
 
 .cm-heading-1 {
-  display: inline-block;
+  // display: inline-block;
   // flex: 1 1 auto;
   // text-align: center;
   color: #06736a;
@@ -106,7 +106,8 @@
 
 .cm-heading-2 {
   font-size: larger;
-  font-weight: bold;
+  // font-weight: bold;
+  color: gray;
 }
 
 .cm-heading-3 {
@@ -163,7 +164,7 @@
 }
 
 .cm-focused .cm-selectionBackground {
-  background: #056a6125 !important;
+  background: #D4E6E885 !important;
 }
 
 .cm-cursor {

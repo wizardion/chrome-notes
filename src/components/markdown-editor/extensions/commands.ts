@@ -3,6 +3,7 @@ import { ListHelper } from './helpers/list.helper';
 import { PrimitivesHelper } from './helpers/primitives.helper';
 import { UrlHelper } from './helpers/url.helper';
 import { CUSTOM_EVENTS } from 'components/models/extensions.model';
+import { HeadingHelper } from './helpers/heading.helper';
 
 
 export function toggleBold(view: EditorView) {
@@ -39,6 +40,16 @@ export function toggleUrl(view: EditorView) {
 
 export function toggleList(view: EditorView, template: string) {
   const transaction = ListHelper.toggle(view, template);
+
+  if (transaction) {
+    view.dispatch(transaction);
+  }
+}
+
+export function toggleHeading(view: EditorView, template: string) {
+  view.focus();
+
+  const transaction = HeadingHelper.toggle(view, template);
 
   if (transaction) {
     view.dispatch(transaction);

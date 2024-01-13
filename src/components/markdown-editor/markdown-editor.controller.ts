@@ -56,9 +56,9 @@ export class MarkdownEditor implements IEditorView {
     this.range = this.view.state.selection.main;
   }
 
-  // get element(): HTMLElement {
-  //   return this.view.dom;
-  // }
+  get element(): HTMLElement {
+    return this.view.scrollDOM;
+  }
 
   get hidden(): boolean {
     return this.view.dom.hidden;
@@ -112,8 +112,8 @@ export class MarkdownEditor implements IEditorView {
   render() {
     const html = mdRender.render(this.value, '&nbsp;');
 
-    console.log(html);
-    console.log('-----------------------------------------------------------');
+    // console.log(html);
+    // console.log('-----------------------------------------------------------');
 
     return `<div>${html}</div>`;
   }
@@ -134,8 +134,11 @@ export class MarkdownEditor implements IEditorView {
       const event = CODE_ACTIONS[action];
 
       if (event) {
-        item.onclick = () => event(this.view);
-        item.onmousedown = (e: MouseEvent) => e.preventDefault();
+        item.onmousedown = (e) => {
+          e.preventDefault();
+          event(this.view);
+        };
+        // item.onmousedown = (e: MouseEvent) => e.preventDefault();
       }
     });
   }

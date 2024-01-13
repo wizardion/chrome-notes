@@ -1,8 +1,11 @@
+import './assets/details-view.scss';
 import { BaseElement, FormElement } from 'core/components';
 import { IDetailsIntervals, IDetailsViewForm, IEventListenerType } from './details-view.model';
 import { NodeHelper } from './components/node-helper';
 import { IDBNote, IPReviewState } from 'modules/db';
 import { IEditorView, IEditorData } from 'components/models/editor.models';
+import { EditorControlsElement } from '../editor-controls/editor-controls.component';
+import { Debounce } from 'modules/effects';
 
 
 const INTERVALS: IDetailsIntervals = { changed: null, locked: null, delay: 800 };
@@ -15,7 +18,7 @@ export class DetailsViewElement extends BaseElement {
 
   protected form: FormElement<IDetailsViewForm>;
   protected editor: IEditorView;
-  private _draft: boolean;
+  protected _draft: boolean;
   private _preview: boolean;
   private _locked: boolean;
 
@@ -24,15 +27,26 @@ export class DetailsViewElement extends BaseElement {
 
     this.template = <HTMLElement>template.cloneNode(true);
     this.form = new FormElement<IDetailsViewForm>({
+      content: this.template.querySelector('[name="details-view"]'),
+      head: this.template.querySelector('[name="details-controls"]'),
       back: this.template.querySelector('[name="back"]'),
       cancel: this.template.querySelector('[name="cancel"]'),
       create: this.template.querySelector('[name="create"]'),
       delete: this.template.querySelector('[name="delete"]'),
-      preview: this.template.querySelector('[name="preview"]'),
-      formatters: <NodeList> this.template.querySelectorAll('button[action]'),
-      previewer: this.template.querySelector('[name="previewer"]'),
+      menu: (this.template.querySelector('[name="controls"]') as EditorControlsElement),
+      menuGroup: this.template.querySelector('[name="controls-group"]'),
       description: this.template.querySelector('[name="description"]'),
+      preview: this.template.querySelector('[name="preview"]'),
+      previewer: this.template.querySelector('[name="previewer"]'),
     });
+  }
+
+  protected eventListeners(): void {
+    const storeScroll = (e: Event) => {
+      this.form.elements.content.dataset.scroll = ((e.target as HTMLElement).scrollTop > 0).toString();
+    };
+
+    this.editor.element.addEventListener('scroll', Debounce.debounce(storeScroll), { passive: true });
   }
 
   get data(): IEditorData {
@@ -55,7 +69,7 @@ export class DetailsViewElement extends BaseElement {
     this._draft = value;
 
     this.form.elements.delete.hidden = value;
-    this.form.elements.preview.parentElement.hidden = value;
+    this.form.elements.preview.hidden = value;
     this.form.elements.create.hidden = !value;
     this.form.elements.cancel.hidden = !value;
     this.form.elements.back.hidden = value;
@@ -63,14 +77,10 @@ export class DetailsViewElement extends BaseElement {
 
   set preview(value: boolean) {
     this.form.elements.previewer.hidden = !value;
-    this.form.elements.preview.checked = value;
+    this.form.elements.preview.dataset.checked = value.toString();
     this._preview = value;
 
-    for (let i = 0; i < this.form.elements.formatters.length; i++) {
-      const element = <HTMLButtonElement> this.form.elements.formatters[i];
-
-      element.disabled = value;
-    }
+    this.form.elements.menuGroup.disabled = value;
 
     if (value) {
       this.form.elements.previewer.innerHTML = this.editor.render();
@@ -193,9 +203,13 @@ export class DetailsViewElement extends BaseElement {
     }
 
     if (type === 'preview') {
-      this.form.elements.preview.parentElement.addEventListener('mousedown', (e) => e.preventDefault());
+      this.form.elements.preview.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        listener(e);
+      });
 
-      return this.form.elements.preview.addEventListener('click', listener);
+      // return this.form.elements.preview.addEventListener('mousedown', listener);
+      return;
     }
 
     if (type === 'change') {

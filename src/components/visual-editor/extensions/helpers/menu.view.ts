@@ -11,10 +11,10 @@ export class MenuView {
     this.view = view;
 
     items.forEach(item => {
-      item.event = (e: MouseEvent) => {
+      item.event = (e: MouseEvent | KeyboardEvent) => {
         e.preventDefault();
-        this.view.focus();
 
+        this.view.focus();
         item.command(this.view.state, this.view.dispatch, this.view);
       };
 

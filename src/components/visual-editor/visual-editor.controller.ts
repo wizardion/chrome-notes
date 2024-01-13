@@ -29,13 +29,14 @@ export class VisualEditor implements IEditorView {
   private locked: boolean;
   private plugins: Plugin[];
 
+  private html: HTMLElement;
   private content: HTMLElement;
 
   constructor(element: HTMLElement, controls?: NodeList) {
-    const content = <HTMLElement> document.createElement('div');
+    this.content = <HTMLElement> document.createElement('div');
 
-    content.id = 'editor';
-    content.classList.add('visual-editor');
+    this.content.id = 'editor';
+    this.content.classList.add('visual-editor');
 
     this.plugins = [
       menu(controls),
@@ -48,11 +49,11 @@ export class VisualEditor implements IEditorView {
       virtualCursor()
     ];
 
-    this.view = new EditorView(content, { state: EditorState.create({ schema: schema }) });
+    this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });
 
     // this.initControls(controls);
-    this.content = <HTMLElement> document.createElement('div');
-    element.parentElement.insertBefore(content, element.nextSibling);
+    this.html = <HTMLElement> document.createElement('div');
+    element.parentElement.insertBefore(this.content, element.nextSibling);
   }
 
   /** @deprecated Use `getData` instead. */
@@ -66,6 +67,10 @@ export class VisualEditor implements IEditorView {
     // this.view.updateState(
     //   EditorState.create({ doc: markdownParser.parse(text), plugins: this.plugins })
     // );
+  }
+
+  get element(): HTMLElement {
+    return this.content;
   }
 
   get hidden(): boolean {
@@ -102,12 +107,12 @@ export class VisualEditor implements IEditorView {
 
   setData(data: IEditorData) {
     this.locked = true;
-    this.content.innerHTML = mdRender.render(data.description);
+    this.html.innerHTML = mdRender.render(data.description);
 
     this.view.updateState(
       EditorState.create({
         schema: schema,
-        doc: DOMParser.fromSchema(schema).parse(this.content),
+        doc: DOMParser.fromSchema(schema).parse(this.html),
         plugins: this.plugins,
         storedMarks: this.view.state.storedMarks
       })

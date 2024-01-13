@@ -14,6 +14,8 @@
 
 .ProseMirror-focused {
   --vr-cursor-color: #056a61;
+  --vr-cursor-selection: #D4E6E885;
+  --vr-cursor-selection-border: #BBDBDC;
 }
 
 .ProseMirror .vr-selection-layer {
@@ -26,14 +28,13 @@
 }
 
 .ProseMirror .vr-selection-layer .vr-cursor {
-  // --vr-cursor-color: #d10d5f;
   position: absolute;
   cursor: text;
   pointer-events: none;
-  transform: translate(-0.5px);
+  transform: translate(-0.75px);
   user-select: none;
   -webkit-user-select: none;
-  border-left: 1px solid var(--vr-cursor-color);
+  border-left: 1.5px solid var(--vr-cursor-color);
   z-index: -1;
 }
 
@@ -46,16 +47,14 @@
 .ProseMirror .vr-selection-layer svg.vr-selection {
   position: absolute;
   z-index: -2;
-  // background: #d10d5f15;
-  // border: 1px solid rebeccapurple;
 }
 
 .ProseMirror .vr-selection-layer svg.vr-selection polygon,
 .ProseMirror .vr-selection-layer svg.vr-selection path {
-  stroke: #BBDBDC;
-  fill: #D4E6E885;
-  // fill: transparent;
-  // stroke: #663399;
+  // stroke: #BBDBDC;
+  // fill: #D4E6E885;
+  stroke: var(--vr-cursor-selection-border, #d9d9d9);
+  fill: var(--vr-cursor-selection, #e9e9e9);
 }
 
 .ProseMirror-focused .vr-selection-layer .vr-selection>* {

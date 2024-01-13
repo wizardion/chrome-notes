@@ -8,7 +8,7 @@ export interface IEditorView {
   get value(): string;
   set value(text: string);
 
-  // get element(): HTMLElement;
+  get element(): HTMLElement;
 
   get hidden(): boolean;
   set hidden(value: boolean);

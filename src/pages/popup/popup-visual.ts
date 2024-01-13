@@ -5,6 +5,8 @@ import { ListItemElement } from 'modules/notes/list-item/list-item.component';
 import { VisualViewElement } from 'modules/notes/details-view/visual-view.component';
 import { db } from 'modules/db';
 import 'styles/style.scss';
+import { EditorControlsElement } from 'modules/notes/editor-controls/editor-controls.component';
+import { DropdownMenuElement } from 'components/dropdown-menu/dropdown-menu.component';
 
 
 window.addEventListener('load', async () => {
@@ -25,6 +27,8 @@ window.addEventListener('load', async () => {
   notes.hidden = false;
 });
 
+customElements.define(DropdownMenuElement.selector, DropdownMenuElement);
+customElements.define(EditorControlsElement.selector, EditorControlsElement);
 customElements.define(ListViewElement.selector, ListViewElement);
 customElements.define(ListItemElement.selector, ListItemElement);
 customElements.define(VisualViewElement.selector, VisualViewElement);

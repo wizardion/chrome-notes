@@ -3,12 +3,13 @@ import { EditorView } from 'prosemirror-view';
 import { IDirection, IRect, ISelectionRange } from './models/cursor.models';
 
 
-const radius = 2;
+export const radius = 2;
+export const widget = document.createElement('div');
 
 export class CursorView {
-  public cursor: HTMLDivElement;
-  public layer: HTMLElement;
+  public static widget = widget;
 
+  private cursor: HTMLDivElement;
   private selection: SVGSVGElement;
   private polygon: SVGPathElement;
   private doc: Document;
@@ -17,19 +18,18 @@ export class CursorView {
     this.doc = view.dom.ownerDocument;
 
     this.cursor = this.doc.createElement('div');
-    this.layer = this.doc.createElement('div');
     this.selection = this.doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
     this.polygon = this.doc.createElementNS('http://www.w3.org/2000/svg', 'path');
 
     this.cursor.classList.add('vr-cursor');
     this.selection.classList.add('vr-selection');
-    this.layer.classList.add('vr-selection-layer');
+    widget.classList.add('vr-selection-layer');
 
     this.selection.appendChild(this.polygon);
-    this.layer.appendChild(this.cursor);
-    this.layer.appendChild(this.selection);
+    widget.appendChild(this.cursor);
+    widget.appendChild(this.selection);
 
-    this.update(view, null);
+    setTimeout(() => this.update(view, null), 10);
   }
 
   update(view: EditorView, lastState: EditorState) {
@@ -43,7 +43,8 @@ export class CursorView {
   }
 
   destroy() {
-    this.layer.remove();
+    this.cursor.remove();
+    this.selection.remove();
   }
 
   private updateSelection(view: EditorView) {
