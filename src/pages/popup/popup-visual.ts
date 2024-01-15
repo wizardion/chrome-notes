@@ -1,12 +1,12 @@
+import 'styles/style.scss';
+import { db } from 'modules/db';
 import { CachedStorageService } from 'core/services/cached';
 import { PopupNotesElement } from 'modules/notes/popup/popup.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
 import { ListItemElement } from 'modules/notes/list-item/list-item.component';
-import { VisualViewElement } from 'modules/notes/details-view/visual-view.component';
-import { db } from 'modules/db';
-import 'styles/style.scss';
+import { VisualViewElement } from 'modules/notes/visual-view/visual-view.component';
 import { EditorControlsElement } from 'modules/notes/editor-controls/editor-controls.component';
-import { DropdownMenuElement } from 'components/dropdown-menu/dropdown-menu.component';
+import { DropdownMenuElement } from 'components/dropdown-menu';
 
 
 window.addEventListener('load', async () => {

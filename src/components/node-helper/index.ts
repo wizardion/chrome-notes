@@ -24,6 +24,7 @@ export class NodeHelper {
         const selection: Selection = document.getSelection();
 
         selection.setBaseAndExtent(leftNode, Number(start), rightNode, Number(end));
+        leftNode.parentElement?.scrollIntoView({ block: 'center' });
       }
     }
   }

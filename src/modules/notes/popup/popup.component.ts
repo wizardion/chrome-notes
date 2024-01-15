@@ -1,8 +1,8 @@
 import { BaseElement } from 'core/components';
 import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
-import { DetailsViewElement } from '../details-view/base-view.component';
-import { INote } from '../details-view/details-view.model';
+import { DetailsBaseElement } from '../details-base/details-base.component';
+import { INote } from '../details-base/details-base.model';
 
 import { DbProviderService } from 'modules/db';
 import { SortHelper } from 'modules/sort-helper';
@@ -16,7 +16,7 @@ export class PopupNotesElement extends BaseElement {
   static readonly selector = 'popup-notes';
 
   private listView: ListViewElement;
-  private detailsView: DetailsViewElement;
+  private detailsView: DetailsBaseElement;
   private selected?: INote;
   private preserved?: INote;
   private items: INote[];
@@ -43,8 +43,7 @@ export class PopupNotesElement extends BaseElement {
     this.detailsView.addEventListener('change', () => !this.disabled && this.onChanged());
     this.detailsView.addEventListener('create', () => !this.disabled && this.create());
     this.detailsView.addEventListener('delete', () => !this.disabled && this.delete());
-    this.detailsView.addEventListener('preview', () => !this.disabled && this.togglePreview());
-    this.detailsView.addEventListener('selectionchange', () => !this.disabled && this.onSelectionPreviewChange());
+
     SortHelper.addEventListener('finished', (f, s) => !this.disabled && this.onItemOrderChange(f, s));
   }
 
@@ -76,15 +75,14 @@ export class PopupNotesElement extends BaseElement {
     this.listView.hidden = true;
     this.detailsView.hidden = false;
 
-    this.detailsView.setData({ title: item.title, description: item.description, selection: item.cState });
-    this.detailsView.setPreviewData(item.preview, item.pState);
-
     if (rendered) {
       this.selected = item;
       DbProviderService.cache.set('selected', this.selected);
     } else {
       this.preserved = item;
     }
+
+    this.detailsView.setData(item);
   }
 
   goBack() {
@@ -104,18 +102,18 @@ export class PopupNotesElement extends BaseElement {
     this.listView.hidden = true;
     this.detailsView.draft = true;
     this.detailsView.hidden = false;
-    this.detailsView.preview = null;
     this.selected = null;
 
-    this.detailsView.setData({ title: title || '', description: description || '', selection: selection || [0, 0] });
-  }
-
-  togglePreview() {
-    this.selected.preview = this.detailsView.togglePreview();
-    this.selected.pState = this.detailsView.getPreviewState();
-
-    this.save();
-    // console.log('togglePreview', [this.selected.preview, this.selected.pState]);
+    this.detailsView.setData({
+      id: null,
+      order: null,
+      updated: null,
+      created: null,
+      deleted: null,
+      title: title || '',
+      description: description || '',
+      cState: selection || [0, 0]
+    });
   }
 
   async create() {
@@ -197,29 +195,21 @@ export class PopupNotesElement extends BaseElement {
     await DbProviderService.bulkSave(queue);
   }
 
-  onSelectionPreviewChange() {
-    if (this.selected && this.selected.preview) {
-      this.selected.pState = this.detailsView.getPreviewState();
-
-      console.log('onSelectionChange...');
-      this.save();
-    }
-  }
-
   onChanged() {
-    const { title, description, selection } = this.detailsView.data;
+    const item = this.detailsView.getData();
 
     if (this.selected) {
       const time = new Date().getTime();
 
-      this.selected.title = title;
-      this.selected.description = description;
-      this.selected.cState = selection;
-      this.selected.item.title = title;
+      this.selected.title = item.title;
+      this.selected.description = item.description;
+      this.selected.cState = item.cState;
+      this.selected.pState = item.pState;
+      this.selected.item.title = item.title;
       this.selected.updated = time;
       this.selected.item.date = new Date(time);
 
-      // console.log('onChanged...');
+      console.log('onChanged...');
       this.save();
     } else {
       // console.log('onChanged.draft ...');

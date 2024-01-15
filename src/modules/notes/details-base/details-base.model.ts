@@ -4,40 +4,21 @@ import { EditorControlsElement } from '../editor-controls/editor-controls.compon
 
 
 export interface IDetailsViewForm {
+  head: HTMLElement;
   back: HTMLButtonElement;
   cancel: HTMLButtonElement;
   create: HTMLButtonElement;
   delete: HTMLButtonElement;
   menu: EditorControlsElement;
   menuGroup: HTMLFieldSetElement;
-  description: HTMLTextAreaElement;
-  head: HTMLElement;
-  content: HTMLElement;
-  preview: HTMLElement;
-  previewer: HTMLPreElement;
 }
 
-// export interface IMarkdownViewForm {
-//   back: HTMLButtonElement;
-//   cancel: HTMLButtonElement;
-//   create: HTMLButtonElement;
-//   delete: HTMLButtonElement;
-//   menu: EditorControlsElement;
-//   menuGroup: HTMLFieldSetElement;
-//   description: HTMLTextAreaElement;
-//   head: HTMLElement;
-//   content: HTMLElement;
-//   preview: HTMLElement;
-//   previewer: HTMLPreElement;
-// }
-
-export type IEventListenerType =
+export type IDetailsListenerType =
   | 'back'
   | 'delete'
   | 'cancel'
   | 'change'
   | 'create'
-  | 'preview'
   | 'save'
   | 'selectionchange';
 

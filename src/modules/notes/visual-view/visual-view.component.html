@@ -4,13 +4,9 @@
     <button name="cancel" class="link back cancel" hidden><include src="./images/back.svg"></include>&nbsp;Cancel</button>
     <button name="create" class="button save" hidden><include src="./images/save.svg"></include></button>
     <button name="delete" class="button delete"><include src="./images/delete.svg"></include></button>
-    <label name="preview" class="checkbox edit" title="preview" hidden>
-      <span class="checkmark"><include src="./images/code.svg"></include></span>
-    </label>
     <fieldset name="controls-group"><editor-controls name="controls"></editor-controls></fieldset>
   </div>
   <div name="content" class="content">
-    <pre name="previewer" class="content-preview" tabindex="2" hidden></pre>
-    <textarea name="description" class="description-note hidden-scroll"></textarea>
+    <pre name="editor" class="editor" tabindex="2"></pre>
   </div>
 </div>

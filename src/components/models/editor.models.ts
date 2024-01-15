@@ -5,9 +5,6 @@ export interface IEditorData {
 }
 
 export interface IEditorView {
-  get value(): string;
-  set value(text: string);
-
   get element(): HTMLElement;
 
   get hidden(): boolean;
@@ -21,6 +18,7 @@ export interface IEditorView {
 
   focus(): void;
   render(): string;
+  setSelection(selection: number[]): void;
 
   addEventListener(type: 'change' | 'save', listener: EventListener): void;
 }
