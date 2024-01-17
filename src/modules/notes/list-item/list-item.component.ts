@@ -1,3 +1,4 @@
+import './assets/list-items.scss';
 import { BaseElement, FormElement } from 'core/components';
 import { IEventListenerType, IListFormItem } from './list-item.model';
 

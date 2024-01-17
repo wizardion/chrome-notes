@@ -12,6 +12,11 @@
   // box-sizing: border-box;
 }
 
+.list-view .list-item > div {
+  margin-top: 1px;
+  margin-bottom: -1px;
+}
+
 .list-view .list-item:hover,
 .hold .list-item.drag,
 .hold .list-item.drag:hover {
@@ -49,7 +54,7 @@
 
 .list-item .list-title {
   width: 100%;
-  height: 25px;
+  // height: 25px;
 
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -62,15 +67,19 @@
   opacity: 0.65 !important;
 }
 
-.sort,
+.list-item .sort,
 .list-view .hold .list-item:hover .sort {
-  width: 25px;
+  width: 20px;
   height:25px;
-  margin-right: 5px;
+  margin-right: 4px;
   margin-left: -5px;
-  background-color: #07a698;
-  -webkit-mask:  url('../images/sort.svg') no-repeat 50% 50%;
-  mask: url('../images/sort.svg') no-repeat 50% 50%;
+  color: #07a698;
+  fill: #07a698;
+}
+
+.list-item svg {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .sort[disabled] {
@@ -82,24 +91,27 @@
 .list-view .list-item:hover .sort[disabled] {
   background-color: gray;
   opacity: 0.5 !important;
+
+  color: gray;
+  fill: gray;
 }
 
 .list-view .list-item:hover .sort,
 .list-view .hold .list-item.drag:hover .sort,
 .sort:active,
 .list-view .list-item:active .sort {
-  background-color: #056a61;
+  color: #056a61;
+  fill: #056a61;
 }
 
-.to-note, 
+.list-item .to-note, 
 .list-view .list-item.edit-item:hover .to-note,
 .list-view .hold .list-item:hover .to-note {
   width: 14px;
-  // margin-right: 3px;
-  background-color: #07a698;
-  -webkit-mask:  url('../images/forward.svg') no-repeat 50% 50%;
-  mask: url('../images/forward.svg') no-repeat 50% 50%;
   margin-right: 5px;
+
+  color: #07a698;
+  fill: #07a698;
 }
 
 .list-view .list-item.drag {
@@ -115,17 +127,20 @@
   // box-shadow: -1px 3px 6px 0px #ddd;
   // box-shadow: -1px 3px 6px 0px #ccc;
   border-radius: 3px;
-  line-height: 24px !important;
-  height: 24px !important;
+  line-height: 23px !important;
+  height: 23px !important;
   z-index: 1000;
   // margin-left: 15px;
+  margin-top: 1px;
 }
 
 .list-view .list-item.drag .sort {
   margin-left: -5px;
   margin-right: 7px;
   margin-top: -1px;
-  background-color: #e33636;
+  // background-color: #e33636;
+  color: #e33636;
+  fill: #e33636;
 }
 
 .list-view list-item:last-child .list-item,

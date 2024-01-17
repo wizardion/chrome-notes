@@ -23,6 +23,13 @@ window.addEventListener('load', async () => {
     notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
   }
 
+  if (configs.selected || configs.draft) {
+    return setTimeout(() => {
+      db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
+      notes.hidden = false;
+    }, 50);
+  }
+
   db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
   notes.hidden = false;
 });

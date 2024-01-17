@@ -1,7 +1,7 @@
 export interface IListFormItem {
   item: HTMLDivElement;
   button: HTMLInputElement;
-  sort: HTMLInputElement;
+  sort: HTMLButtonElement;
   index: HTMLSpanElement;
   title: HTMLSpanElement;
   date: HTMLSpanElement;
