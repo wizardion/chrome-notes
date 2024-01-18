@@ -17,11 +17,17 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   protected _locked: boolean;
 
   protected eventListeners(): void {
-    const storeScroll = (e: Event) => {
-      this.dataset.scroll = ((e.target as HTMLElement).scrollTop > 0).toString();
-    };
+    let dataScroll = false;
+    const debounced = Debounce.debounce((e: Event) => {
+      const scrolled = (e.target as HTMLElement).scrollTop > 0;
 
-    this.editor.element.addEventListener('scroll', Debounce.debounce(storeScroll), { passive: true });
+      if (dataScroll !== scrolled) {
+        dataScroll = scrolled;
+        this.dataset.scroll = dataScroll.toString();
+      }
+    });
+
+    this.editor.element.addEventListener('scroll', debounced, { capture: true, passive: true });
   }
 
   get draft(): boolean {
@@ -35,6 +41,11 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     this.form.elements.create.hidden = !value;
     this.form.elements.cancel.hidden = !value;
     this.form.elements.back.hidden = value;
+  }
+
+  set hidden(value: boolean) {
+    this.dataset.scroll = 'false';
+    super.hidden = value;
   }
 
   getData(): INote {

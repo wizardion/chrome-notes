@@ -146,6 +146,7 @@
 .list-view list-item:last-child .list-item,
 .list-view .placeholder:last-child {
   border-color: transparent !important;
+  border-bottom: none !important;
 }
 
 .list-view .list-items .placeholder {

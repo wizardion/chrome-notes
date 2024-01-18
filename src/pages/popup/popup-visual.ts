@@ -9,30 +9,41 @@ import { EditorControlsElement } from 'modules/notes/editor-controls/editor-cont
 import { DropdownMenuElement } from 'components/dropdown-menu';
 
 
-window.addEventListener('load', async () => {
-  const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
-  const configs = await CachedStorageService.get();
+Promise.all([
+  customElements.whenDefined(DropdownMenuElement.selector),
+  customElements.whenDefined(EditorControlsElement.selector),
+  customElements.whenDefined(ListViewElement.selector),
+  customElements.whenDefined(ListItemElement.selector),
+  customElements.whenDefined(VisualViewElement.selector),
+  customElements.whenDefined(PopupNotesElement.selector),
+]).then(async () => {
+  setTimeout(async () => {
+    const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
+    const configs = await CachedStorageService.get();
 
-  if (configs.selected) {
-    notes.hidden = false;
-    notes.select(configs.selected, false);
-  }
-
-  if (configs.draft) {
-    notes.hidden = false;
-    notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
-  }
-
-  if (configs.selected || configs.draft) {
-    return setTimeout(() => {
-      db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
+    if (configs.selected) {
       notes.hidden = false;
-    }, 50);
-  }
+      notes.select(configs.selected, false);
+    }
 
-  db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
-  notes.hidden = false;
+    if (configs.draft) {
+      notes.hidden = false;
+      notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
+    }
+
+    if (configs.selected || configs.draft) {
+      return setTimeout(() => {
+        db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
+        notes.hidden = false;
+      }, 50);
+    }
+
+    db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
+    notes.hidden = false;
+  }, 1);
 });
+
+// window.addEventListener('load', async () => {});
 
 customElements.define(DropdownMenuElement.selector, DropdownMenuElement);
 customElements.define(EditorControlsElement.selector, EditorControlsElement);

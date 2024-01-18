@@ -6,6 +6,7 @@ details-view[data-scroll='true'] {
 
   .head:before {
     background-color: #fbfbfd;
+    // background-color: #fff;
   }
 }
 
@@ -19,10 +20,13 @@ details-view[data-scroll='true'] {
   z-index: 101;
   
   background-color: #fff;
+  // background-color: #fbfbfd;
   box-shadow: 0;
 
   transition: background-color .25s linear;
   transition: box-shadow .25s linear;
+
+  
 
   // box-shadow: 0;
   // transition: box-shadow 2.75s;
@@ -44,6 +48,7 @@ details-view[data-scroll='true'] {
   content: "";
   position: absolute;
   background: #ffffff;
+  // background-color: #fbfbfd;
   width: 100%;
   height: 25px;
   left: 0;

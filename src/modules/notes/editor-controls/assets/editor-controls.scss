@@ -228,6 +228,11 @@ fieldset:disabled button {
   // border-right: 1px solid #d7e9e965 !important;
   // border-bottom: 1px solid #d7e9e965 !important;
 
+  // border-color: #fbfbfd !important;
+  // background-color: #fbfbfd !important;
+  border-color: #fff !important;
+  background-color: #fff !important;
+
   font-size: 13px !important;
   z-index: -2 !important;
 }
@@ -271,6 +276,8 @@ fieldset:disabled button {
 
 details-view[data-scroll='true'] {
   .dropdown-menu {
+    // border-color: #fff !important;
+    // background-color: #fff !important;
     border-color: #fbfbfd !important;
     background-color: #fbfbfd !important;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.25) !important;

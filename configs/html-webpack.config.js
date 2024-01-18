@@ -4,7 +4,8 @@
 module.exports = {
   title: 'My Notes',
   scriptLoading: 'defer',
-  inject: 'head',
+  // scriptLoading: 'module',
+  inject: 'body',
   minify: {
     collapseWhitespace: true,
     keepClosingSlash: true,
