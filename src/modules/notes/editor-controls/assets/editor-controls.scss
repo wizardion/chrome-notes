@@ -203,42 +203,33 @@ fieldset:disabled button {
 
 .dropdown-menu {
   transform: translate(-8px);
-
-  // box-shadow: 1px 3px 6px 0px #00000045;
-  box-shadow: 1px 1px 5px #056a6128 !important;
-  // box-shadow: 0px 3px 4px 0px #00000015 !important;
-  // box-shadow: 0px 3px 4px 0px #056a6118 !important;
-  // box-shadow: 0px 3px 3px 0px #056a6148 !important;
-  // box-shadow: 0px 0px 4px 0px #056a6118 !important;
-
-  // box-shadow: 1px 4px 4px 0px #056a6128 !important;
+  box-shadow: 1px 1px 5px #056a6118 !important;
+  // box-shadow: none !important;
 
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   border-bottom-left-radius: 4px !important;
   border-bottom-right-radius: 4px !important;
 
-  border-color: transparent !important;
-  // border-left: 1px dotted #07a69825 !important;
-  // border-bottom: 1px dotted #07a69825 !important;
-  // border-right: 1px dotted #07a69825 !important;
+  background-color: #fbfbfd !important;
 
-  // border-left-color: whitesmoke !important;
-  // border-left: 1px solid #d7e9e965 !important;
-  // border-right: 1px solid #d7e9e965 !important;
-  // border-bottom: 1px solid #d7e9e965 !important;
-
-  // border-color: #fbfbfd !important;
-  // background-color: #fbfbfd !important;
-  border-color: #fff !important;
-  background-color: #fff !important;
+  border-left: 1px solid #EEF4F2 !important;
+  border-bottom: 1px solid #EEF4F2 !important;
+  border-right: 1px solid #EEF4F2 !important;
 
   font-size: 13px !important;
   z-index: -2 !important;
+
+  transition: box-shadow .25s linear, border-top-color .25s linear;
 }
 
 .dropdown-menu > * {
   font-size: 13px;
+  border-color: #fbfbfd !important;
+}
+
+.dropdown-menu button:hover {
+  border-color: #fbfbfd !important;
 }
 
 .dropdown-menu .normal-text {
@@ -276,8 +267,6 @@ fieldset:disabled button {
 
 details-view[data-scroll='true'] {
   .dropdown-menu {
-    // border-color: #fff !important;
-    // background-color: #fff !important;
     border-color: #fbfbfd !important;
     background-color: #fbfbfd !important;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.25) !important;
