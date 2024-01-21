@@ -84,7 +84,7 @@ export class ListItemElement extends BaseElement {
     }, {
       fill: 'forwards',
       direction: 'reverse',
-      duration: 500,
+      duration: 1000,
       iterations: 1,
     });
   }

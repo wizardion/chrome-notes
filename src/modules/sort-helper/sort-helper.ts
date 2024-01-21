@@ -26,9 +26,11 @@ export class SortHelper {
     const parentElement = element.parentElement;
 
     if (parentElement.childElementCount > 1) {
+      const style = window.getComputedStyle(container);
       const startY = (e.pageY - container.offsetTop) + container.scrollTop;
       const maxTop = element.offsetHeight * (parentElement.childElementCount - 1);
       const index = this.buildCollection(parentElement.children, element);
+      const border = (parseFloat(style.borderTopWidth) || 0) + (parseFloat(style.borderBottomWidth) || 0);
 
       this._busy = true;
       this.childElementCount = (parentElement.childElementCount - 1);
@@ -43,7 +45,7 @@ export class SortHelper {
 
       this.container = {
         offsetTop: container.offsetTop,
-        scrollHeight: container.scrollHeight,
+        scrollHeight: container.scrollHeight + border,
         height: container.offsetHeight,
         maxY: Math.min(maxTop, container.scrollHeight - element.offsetHeight),
         parentElement: parentElement,
@@ -77,14 +79,16 @@ export class SortHelper {
       wheel: (e: MouseEvent) => e.preventDefault()
     };
 
-    document.addEventListener('mousemove', this.movingEvent.move);
+    window.addEventListener('mousemove', this.movingEvent.move);
     document.addEventListener('mouseup', this.movingEvent.end);
     this.container.element.addEventListener('wheel', this.movingEvent.wheel);
   }
 
   private static finish() {
+    const scrollTop = this.container.element.scrollTop;
+
     this.container.element.removeEventListener('wheel', this.movingEvent.wheel);
-    document.removeEventListener('mousemove', this.movingEvent.move);
+    window.removeEventListener('mousemove', this.movingEvent.move);
     document.removeEventListener('mouseup', this.movingEvent.end);
 
     this.container.parentElement.insertBefore(this.item.element, this.item.placeholder);
@@ -99,6 +103,7 @@ export class SortHelper {
     this.item.element.classList.remove('drag');
     this.item.element.style.top = '';
     this.item.placeholder.remove();
+    this.container.element.scrollTop = scrollTop;
 
     this.item = null;
     this.collection = null;
@@ -188,15 +193,16 @@ export class SortHelper {
   private static animateUp(pageY: number) {
     const pressure = ((this.container.offsetTop + this.item.pageY) - pageY) * 2;
     const speed = Math.max(Math.min(70 - pressure, 70), 0);
-    const point = () => ((this.container.element.scrollTop + this.container.offsetTop) + 3) - this.item.height;
 
     const moveAnimatedItem = () => {
-      if (!this.item || this.container.element.scrollTop <= 0) {
+      const scrollTop = this.container.element.scrollTop - 1;
+
+      if (!this.item || scrollTop <= 0) {
         return clearInterval(this.interval);
       }
 
-      this.container.element.scrollTop--;
-      this.moveItem(point());
+      this.container.element.scrollTop = scrollTop;
+      this.moveItem((scrollTop + this.container.offsetTop - this.item.height) + 1);
     };
 
     moveAnimatedItem();
@@ -207,15 +213,16 @@ export class SortHelper {
     const distance = (this.item.height - this.item.pageY);
     const pressure = (pageY - (this.container.height + this.container.offsetTop - distance)) * 2;
     const speed = Math.max(Math.min(70 - pressure, 70), 1);
-    const point = () => ((this.container.element.scrollTop + this.container.height) - 2) - this.item.height;
 
     const moveAnimatedItem = () => {
-      if (!this.item || this.container.element.scrollTop + this.container.height >= this.container.scrollHeight) {
+      const scrollTop = this.container.element.scrollTop + 1;
+
+      if (!this.item || scrollTop + this.container.height >= this.container.scrollHeight) {
         return clearInterval(this.interval);
       }
 
-      this.container.element.scrollTop++;
-      this.moveItem(point());
+      this.container.element.scrollTop = scrollTop;
+      this.moveItem(Math.min((scrollTop + this.container.height - this.item.height) - 6, this.container.maxY));
     };
 
     moveAnimatedItem();
