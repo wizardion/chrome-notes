@@ -8,13 +8,14 @@ export interface ISettingsOptions {
 }
 
 export interface IPageMode {
-  popup: string[];
-  page: string[] | null;
+  popup: string[][] | null;
+  page: string | null;
 }
 
 export interface ICommonSettings {
   mode: number | null;
   editor: number | null;
+  popupSize: number | null;
   expirationDays: number | null;
 }
 

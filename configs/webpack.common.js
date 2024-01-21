@@ -17,8 +17,10 @@ const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev
 module.exports = {
   entry: {
     index: path.resolve(__root__, 'src/pages/index/index.ts'),
-    popup: path.resolve(__root__, 'src/pages/popup/popup.ts'),
-    visualPopup: path.resolve(__root__, 'src/pages/popup/popup-visual.ts'),
+
+    popupMarkdown: path.resolve(__root__, 'src/pages/popup/markdown/index.ts'),
+    popupVisual: path.resolve(__root__, 'src/pages/popup/visual/index.ts'),
+
     background: path.resolve(__root__, 'src/worker/background.ts'),
     settings: path.resolve(__root__, 'src/pages/options/options.ts'),
     migration: path.resolve(__root__, 'src/pages/migration/migration.ts'),
@@ -165,6 +167,7 @@ module.exports = {
         'index'
       ],
     }),
+
     new HtmlWebpackPlugin({
       ...htmlWebpackConfig,
 
@@ -172,7 +175,17 @@ module.exports = {
       template: './src/pages/popup/popup.html',
       chunks: [
         'vendors',
-        'popup'
+        'popupMarkdown'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-middle.html',
+      template: './src/pages/popup/popup-middle.html',
+      chunks: [
+        'vendors',
+        'popupMarkdown'
       ],
     }),
     new HtmlWebpackPlugin({
@@ -182,7 +195,17 @@ module.exports = {
       template: './src/pages/popup/popup.html',
       chunks: [
         'vendors',
-        'visualPopup'
+        'popupVisual'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-visual-middle.html',
+      template: './src/pages/popup/popup-middle.html',
+      chunks: [
+        'vendors',
+        'popupVisual'
       ],
     }),
     new HtmlWebpackInjectAttributesPlugin(),

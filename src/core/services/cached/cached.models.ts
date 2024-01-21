@@ -10,6 +10,7 @@ export interface IDataDaft {
 export interface ICachedItem {
   selected?: IDBNote;
   draft?: IDataDaft;
+  popupSize?: number;
 }
 
-export type ICachedItems = 'selected' | 'draft';
+export type ICachedItems = 'selected' | 'draft' | 'size';

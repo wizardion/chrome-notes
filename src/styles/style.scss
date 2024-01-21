@@ -1,17 +1,4 @@
-html, body {
-  // background: white;
-  background: silver;
-
-  width: 600px;
-  height: 270px;
-  border:0;
-  margin: 0px;
-  padding: 0px;
-
-  overflow: hidden;
-  font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
-}
-
+[hidden],
 .hidden {
   display: none;
 }
@@ -93,6 +80,6 @@ input, button {
 
 
 @import 'list-view';
-@import 'mode-mixed';
-@import 'mode-compact';
-@import 'mode-full';
+// @import 'mode-mixed';
+// @import 'mode-compact';
+// @import 'mode-full';

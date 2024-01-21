@@ -1,0 +1,35 @@
+html, body {
+// body {
+  // background: white;
+  background: silver;
+
+  width: 600px;
+  height: 270px;
+  border:0;
+  margin: 0px;
+  padding: 0px;
+
+  overflow: hidden;
+  font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
+}
+
+.middle {
+  height: 450px;
+  background-color: #e33636;
+}
+
+.middle .details-view .content {
+  height: 425px;
+}
+
+.middle .details-view .cm-editor {
+  height: 424px !important;
+}
+
+.middle .list-view .list-content {
+  height: 424px;
+}
+
+.middle .list-view .list-scroll {
+  max-height: 417px;
+}

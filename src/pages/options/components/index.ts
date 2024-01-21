@@ -9,14 +9,16 @@ import * as core from 'core';
 
 export async function settingsChanged(element: CommonSettingsElement, settings: ISettingsArea) {
   const mode = PAGE_MODES[element.mode];
+  const page = mode.popup ? mode.popup[element.editor][element.popupSize] : '';
 
   settings.common = {
     mode: element.mode,
     editor: element.editor,
+    popupSize: element.popupSize,
     expirationDays: element.expirationDays,
   };
 
-  await chrome.action.setPopup({ popup: mode.popup ? mode.popup[element.editor] : '' });
+  await chrome.action.setPopup({ popup: page });
   await storage.local.set('settings', settings);
 }
 

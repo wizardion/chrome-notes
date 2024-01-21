@@ -1,4 +1,4 @@
-import 'styles/options.scss';
+import './assets/options.scss';
 
 import { SyncInfoElement } from './components/sync-info/info';
 import { DevModeElement } from './components/dev-mode/dev';
@@ -50,6 +50,7 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   controls.devModeInfo.enabled = settings.devMode === true;
   controls.common.mode = settings.common?.mode;
   controls.common.editor = settings.common?.editor;
+  controls.common.popupSize = settings.common?.popupSize;
   controls.common.expirationDays = settings.common?.expirationDays;
   controls.content.hidden = false;
 

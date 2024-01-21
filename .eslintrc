@@ -30,7 +30,8 @@
         "EventListener": "readonly",
         "AddEventListenerOptions": "readonly",
         "IDBTransactionMode": "readonly",
-        "NodeJS": "readonly"
+        "NodeJS": "readonly",
+        "CustomElementConstructor": "readonly"
       },
       "rules": {
         "no-bitwise": "error",

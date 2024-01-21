@@ -15,14 +15,15 @@ export const DEFAULT_SETTINGS: ISettingsArea = {
   common: {
     mode: 0,
     editor: 0,
+    popupSize: 0,
     expirationDays: 3
   }
 };
 
 export const PAGE_MODES: Record<number, IPageMode> = {
-  0: { popup: ['popup.html', 'popup-visual.html'], page: null },
-  1: { popup: ['popup.html', 'popup-visual.html'], page: null },
-  3: { popup: null, page: ['popup.html', 'popup-visual.html'] }
+  0: { popup: [['popup.html', 'popup-middle.html'], ['popup-visual.html', 'popup-visual-middle.html']], page: null },
+  1: { popup: [['popup.html', 'popup-middle.html'], ['popup-visual.html', 'popup-visual-middle.html']], page: null },
+  3: { popup: null, page: 'popup.html' }
 };
 
 export { ISettingsArea };

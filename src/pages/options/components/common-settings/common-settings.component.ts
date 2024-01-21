@@ -11,6 +11,7 @@ export class CommonSettingsElement extends BaseElement {
 
   protected _mode: number;
   protected _editor: number;
+  protected _popupSize: number;
   protected _expirationDays: number;
   protected event: Event;
 
@@ -19,10 +20,12 @@ export class CommonSettingsElement extends BaseElement {
   constructor() {
     super();
     this.template = <HTMLElement>template.cloneNode(true);
-    this.form = new FormElement({
+    this.form = new FormElement<ICommonSettingsForm>({
       fieldset: this.template.querySelector('fieldset'),
       views: <NodeList> this.template.querySelectorAll('input[name="view"]'),
       editors: <NodeList> this.template.querySelectorAll('input[name="editor"]'),
+      popupOptions: <HTMLElement> this.template.querySelector('div[name="popup-options"]'),
+      popupSize: <NodeList> this.template.querySelectorAll('input[name="popup-size"]'),
       expirationDays: this.template.querySelector('select[name="expirationDays"]')
     });
   }
@@ -45,15 +48,27 @@ export class CommonSettingsElement extends BaseElement {
 
       item.addEventListener('change', () => this.onEditorChange(item));
     }
+
+    for (let i = 0; i < this.form.elements.popupSize.length; i++) {
+      const item: HTMLInputElement = <HTMLInputElement> this.form.elements.popupSize[i];
+
+      item.addEventListener('change', () => this.onPopupChange(item));
+    }
   }
 
   protected onModeChange(item: HTMLInputElement) {
     this._mode = Number(item.value);
+    this.form.elements.popupOptions.hidden = (this._mode >= 3);
     this.dispatchEvent(this.event);
   }
 
   protected onEditorChange(item: HTMLInputElement) {
     this._editor = Number(item.value);
+    this.dispatchEvent(this.event);
+  }
+
+  protected onPopupChange(item: HTMLInputElement) {
+    this._popupSize = Number(item.value);
     this.dispatchEvent(this.event);
   }
 
@@ -73,6 +88,7 @@ export class CommonSettingsElement extends BaseElement {
       if (parseInt(item.value) === index) {
         item.checked = true;
         this._mode = index;
+        this.form.elements.popupOptions.hidden = (this._mode >= 3);
 
         return;
       }
@@ -90,6 +106,23 @@ export class CommonSettingsElement extends BaseElement {
       if (parseInt(item.value) === index) {
         item.checked = true;
         this._editor = index;
+
+        return;
+      }
+    }
+  }
+
+  get popupSize(): number {
+    return this._popupSize;
+  }
+
+  set popupSize(index: number) {
+    for (let i = 0; i < this.form.elements.popupSize.length; i++) {
+      const item = <HTMLInputElement> this.form.elements.popupSize[i];
+
+      if (parseInt(item.value) === index) {
+        item.checked = true;
+        this._popupSize = index;
 
         return;
       }

@@ -34,3 +34,15 @@
 .dynamic-scroll::-webkit-scrollbar-thumb:hover {
   visibility: visible;
 }
+
+.list-scroll::-webkit-scrollbar-track {
+  background: white;
+}
+
+.list-scroll::-webkit-scrollbar-thumb {
+  border: none;
+}
+
+.list-scroll::-webkit-scrollbar {
+  width: 3px;
+}

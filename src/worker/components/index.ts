@@ -43,23 +43,16 @@ export async function ensureOptionPage() {
 export async function initPopup() {
   const settings = await getSettings();
   const mode = PAGE_MODES[settings.common.mode];
+  const page = mode.popup ? mode.popup[settings.common.editor][settings.common.popupSize] : '';
 
-  await chrome.action.setPopup({ popup: mode.popup ? mode.popup[settings.common.editor] : '' });
+  await chrome.action.setPopup({ popup: page });
 }
 
 // export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {
 export function openPopup(settings: ISettingsArea) {
   const mode = PAGE_MODES[settings.common.mode];
 
-  // if (tabId) {
-  //   if (windowId) {
-  //     chrome.windows.update(windowId, { focused: true });
-  //   }
-
-  //   return chrome.tabs.update(tabId, { active: true });
-  // }
-
-  return chrome.tabs.create({ url: mode.page ? mode.page[settings.common.editor] : 'option.html' });
+  return chrome.tabs.create({ url: mode.page || 'option.html' });
 
   // if (mode === 0) {
   //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
