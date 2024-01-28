@@ -2,23 +2,21 @@ import { SyncInfoElement } from './sync-info/info.component';
 import { IAreaName, IOptionControls, IStorageChange } from './options.model';
 import { DevModeElement } from './dev-mode/dev.component';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
-import { ISettingsArea, PAGE_MODES } from 'modules/settings';
+import { ISettingsArea, getPopupPage } from 'modules/settings';
 import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
 import * as core from 'core';
 
 
 export async function settingsChanged(element: CommonSettingsElement, settings: ISettingsArea) {
-  const mode = PAGE_MODES[element.mode];
-  const page = mode.popup ? mode.popup[element.editor][element.popupSize] : '';
-
   settings.common = {
     mode: element.mode,
     editor: element.editor,
     popupSize: element.popupSize,
+    appearance: element.appearance,
     expirationDays: element.expirationDays,
   };
 
-  await chrome.action.setPopup({ popup: page });
+  await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
   await storage.local.set('settings', settings);
 }
 

@@ -1,6 +1,6 @@
 import { LocalStorageService } from 'core/services/local';
 import { SyncStorageService } from 'core/services/sync';
-import { IPageMode, ISettingsArea, ISettingsOptions } from './settings.model';
+import { ICommonSettings, IPageMode, ISettingsArea, ISettingsOptions } from './settings.model';
 import { IdentityInfo } from 'modules/sync/components/interfaces';
 
 
@@ -16,13 +16,38 @@ export const DEFAULT_SETTINGS: ISettingsArea = {
     mode: 0,
     editor: 0,
     popupSize: 0,
-    expirationDays: 3
+    appearance: 0,
+    expirationDays: 3,
   }
 };
 
 export const PAGE_MODES: Record<number, IPageMode> = {
-  0: { popup: [['popup.html', 'popup-middle.html'], ['popup-visual.html', 'popup-visual-middle.html']], page: null },
-  1: { popup: [['popup.html', 'popup-middle.html'], ['popup-visual.html', 'popup-visual-middle.html']], page: null },
+  0: {
+    popup: [
+      [
+        ['popup.html', 'popup-light.html', 'popup-dark.html'],
+        ['popup-middle.html', 'popup-middle-light.html', 'popup-middle-dark.html']
+      ],
+      [
+        ['popup-visual.html', 'popup-visual-light.html', 'popup-visual-dark.html'],
+        ['popup-visual-middle.html', 'popup-visual-middle-light.html', 'popup-visual-middle-dark.html']
+      ],
+    ],
+    page: null
+  },
+  1: {
+    popup: [
+      [
+        ['popup.html', 'popup-light.html', 'popup-dark.html'],
+        ['popup-middle.html', 'popup-middle-light.html', 'popup-middle-dark.html']
+      ],
+      [
+        ['popup-visual.html', 'popup-visual-light.html', 'popup-visual-dark.html'],
+        ['popup-visual-middle.html', 'popup-visual-middle-light.html', 'popup-visual-middle-dark.html']
+      ],
+    ],
+    page: null
+  },
   3: { popup: null, page: 'popup.html' }
 };
 
@@ -38,4 +63,10 @@ export async function getSettings(options: ISettingsOptions = settingsOptions): 
     identity: options.identity ? await LocalStorageService.get<IdentityInfo>('identityInfo') : null,
     error: settings.error
   };
+}
+
+export function getPopupPage(settings: ICommonSettings) {
+  const mode = PAGE_MODES[settings.mode];
+
+  return mode.popup ? mode.popup[settings.editor][settings.popupSize][settings.appearance] : '';
 }

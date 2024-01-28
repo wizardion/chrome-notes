@@ -13,6 +13,7 @@ export class CommonSettingsElement extends BaseElement {
   protected _editor: number;
   protected _popupSize: number;
   protected _expirationDays: number;
+  protected _appearance: number;
   protected event: Event;
 
   private form: FormElement<ICommonSettingsForm>;
@@ -26,6 +27,7 @@ export class CommonSettingsElement extends BaseElement {
       editors: <NodeList> this.template.querySelectorAll('input[name="editor"]'),
       popupOptions: <HTMLElement> this.template.querySelector('div[name="popup-options"]'),
       popupSize: <NodeList> this.template.querySelectorAll('input[name="popup-size"]'),
+      appearance: <NodeList> this.template.querySelectorAll('input[name="appearance"]'),
       expirationDays: this.template.querySelector('select[name="expirationDays"]')
     });
   }
@@ -54,6 +56,12 @@ export class CommonSettingsElement extends BaseElement {
 
       item.addEventListener('change', () => this.onPopupChange(item));
     }
+
+    for (let i = 0; i < this.form.elements.appearance.length; i++) {
+      const item: HTMLInputElement = <HTMLInputElement> this.form.elements.appearance[i];
+
+      item.addEventListener('change', () => this.onAppearanceChange(item));
+    }
   }
 
   protected onModeChange(item: HTMLInputElement) {
@@ -69,6 +77,11 @@ export class CommonSettingsElement extends BaseElement {
 
   protected onPopupChange(item: HTMLInputElement) {
     this._popupSize = Number(item.value);
+    this.dispatchEvent(this.event);
+  }
+
+  protected onAppearanceChange(item: HTMLInputElement) {
+    this._appearance = Number(item.value);
     this.dispatchEvent(this.event);
   }
 
@@ -106,6 +119,23 @@ export class CommonSettingsElement extends BaseElement {
       if (parseInt(item.value) === index) {
         item.checked = true;
         this._editor = index;
+
+        return;
+      }
+    }
+  }
+
+  get appearance(): number {
+    return this._appearance;
+  }
+
+  set appearance(index: number) {
+    for (let i = 0; i < this.form.elements.appearance.length; i++) {
+      const item = <HTMLInputElement> this.form.elements.appearance[i];
+
+      if (parseInt(item.value) === index) {
+        item.checked = true;
+        this._appearance = index;
 
         return;
       }

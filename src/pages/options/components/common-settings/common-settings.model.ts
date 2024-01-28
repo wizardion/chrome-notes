@@ -3,6 +3,7 @@ export interface ICommonSettingsForm {
   views: NodeList;
   editors: NodeList;
   popupSize: NodeList;
+  appearance: NodeList;
   popupOptions: HTMLElement;
   expirationDays: HTMLSelectElement;
 }

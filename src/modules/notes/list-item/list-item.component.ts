@@ -78,8 +78,8 @@ export class ListItemElement extends BaseElement {
 
     element.scrollIntoView({ behavior: 'instant', block: 'center' });
     element.animate({
-      background: 'rgba(7, 166, 152, 0.12)',
-      color: 'rgb(6, 115, 106)',
+      background: 'var(--base-highlight-color)',
+      color: 'var(--base-color-dark)',
       opacity: [1, 0.7],
     }, {
       fill: 'forwards',

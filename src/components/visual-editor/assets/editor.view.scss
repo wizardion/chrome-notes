@@ -17,11 +17,11 @@
   font-size: 14px;
   font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
   line-height: 1.4;
+  background: var(--editor-background);
 }
 
 .visual-editor > .ProseMirror-focused {
   outline: none;
-  // background-color: #c6cbd1;
 }
 
 .ProseMirror {
@@ -32,6 +32,8 @@
   padding: 1px;
   cursor: text;
   min-height: 232px;
+  background: var(--editor-background);
+  color: var(--base-text-color);
 }
 
 .visual-editor .title + p {
@@ -59,36 +61,35 @@
 }
 
 .visual-editor li::marker {
-  color: #06736a;
+  color: var(--base-color-dark);
 }
 
 .visual-editor blockquote {
-  border-left: 2px solid darkgray;
+  border-left: 2px solid var(--editor-color-blockquote-stroke);
   padding-left: 20px;
   margin-left: 5px;
-  color: darkslategray;
+  color: var(--editor-color-blockquote);
 }
 
 .visual-editor a {
-  color: #06736a;
+  color: var(--base-color-dark);
 }
 
 .visual-editor a:hover {
   text-decoration: underline !important;
-  color: #e33636;
+  color: var(--base-color-hover);
 }
 
 .visual-editor a:active {
-  color: #a32626;
+  color: var(--base-color-active);
 }
 
 .visual-editor a:visited {
-  // color: #0673Aa;
-  color: #06736a;
+  color: var(--base-color-dark);
 }
 
 .visual-editor ::selection {
-  background: #d7d4f0;
+  background: var(--editor-selection-background);
 }
 
 .visual-editor table {
@@ -105,7 +106,7 @@
 }
 
 .visual-editor table tr {
-  background-color: white;
+  background-color: var(--editor-background);
   border-top: 1px solid #c6cbd1;
 }
 
@@ -137,7 +138,7 @@
   margin: 0;
 
   font-size: 13px;
-  color: #06736a;
+  color: var(--base-color-dark);
 }
 
 .visual-editor pre {
@@ -148,7 +149,7 @@
   border: 1px solid lightgray;
   border-radius: 2px;
   padding: 2px 7px 2px 7px;
-  color: #06736a;
+  color: var(--base-color-dark);
   margin: 3px 0px 3px 0;
 
   white-space: pre-wrap;
@@ -182,9 +183,8 @@
 .visual-editor h1 {
   display: block;
   display: block;
-  color: #06736a;
+  color: var(--base-color-dark);
   font-size: x-large;
-  // text-align: center;
   font-weight: bold;
   padding: 0px;
   padding-left: 15px;
@@ -195,14 +195,12 @@
   padding-bottom: 0px;
   font-size: larger;
   font-weight: normal;
-  // text-align: center;
-  color: gray;
+  color: var(--editor-color-heading);
 }
 
 .visual-editor h3 {
   padding-left: 1em;
   padding-bottom: 0px;
-  // font-size: large;
   font-size: 14px;
   font-weight: bold;
 }
@@ -212,7 +210,7 @@
   padding-bottom: 0px;
   font-size: 14px;
   font-weight: normal;
-  color: gray;
+  color: var(--editor-color-heading);
 }
 
 .visual-editor h5, 
@@ -220,7 +218,7 @@
   padding-left: 1em;
   padding-bottom: 0px;
   font-size: 14px;
-  color: gray;
+  color: var(--editor-color-heading);
   font-style: italic;
   font-weight: normal;
 }

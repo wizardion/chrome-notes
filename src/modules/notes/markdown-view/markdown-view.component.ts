@@ -55,7 +55,10 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
 
     this.editor.element.addEventListener('scroll', debounced, { capture: true, passive: true });
     this.form.elements.htmlViewer.addEventListener('scroll', debounced, { capture: true, passive: true });
-    this.form.elements.preview.addEventListener('mousedown', () => this.togglePreview());
+    this.form.elements.preview.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      this.togglePreview();
+    });
   }
 
   addEventListener(type: IDetailsListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
@@ -126,7 +129,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       const scrollTop = this.form.elements.htmlViewer.scrollTop;
 
       this.preview = value;
-      this.editor.focus();
       this.editor.setSelection(this.note.cState);
       this.editor.scrollTop = scrollTop;
     }

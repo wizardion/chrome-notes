@@ -5,11 +5,11 @@
   padding-left: 10px;
   color: inherit;
   cursor: inherit;
-  border-bottom: 1px dashed #07429813;
+  border-bottom: 1px dashed var(--base-background-stroke);
   white-space: nowrap;
   overflow: hidden;
   display: flex;
-  // box-sizing: border-box;
+  color: var(--base-text-color);
 }
 
 .list-view .list-item > div {
@@ -21,8 +21,8 @@
 .hold .list-item.drag,
 .hold .list-item.drag:hover {
   cursor: pointer;
-  color: #06736a;
-  background: linear-gradient(to right, #07a69810, #07a69801);
+  color: var(--base-color-dark);
+  background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-second-color));
 }
 
 .list-view .list-item:active {
@@ -32,30 +32,26 @@
 .list-view .list-item.edit-item:hover {
   background: transparent;
   cursor: default;
-  border-bottom: 1px solid #07429813;
+  border-bottom: 1px solid var(--base-background-stroke);
 }
 
 .list-item .date-time {
   margin-right: 3px;
-  color:#07a698;
+  color:var(--base-color);
   font-size: 11px;
 }
 
 .list-item:hover .date-time {
-  // color: seagreen;
-  color: #056a61;
+  color: var(--base-color);
 }
 
 .list-item:active .date-time,
 .list-view .list-item.drag .date-time {
-  // color: darkgreen;
-  color: #056a61;
+  color: var(--base-color);
 }
 
 .list-item .list-title {
   width: 100%;
-  // height: 25px;
-
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -73,8 +69,8 @@
   height:25px;
   margin-right: 4px;
   margin-left: -5px;
-  color: #07a698;
-  fill: #07a698;
+  color: var(--base-color);
+  fill: var(--base-color);
 }
 
 .list-item svg {
@@ -89,19 +85,18 @@
 .sort[disabled]:hover, 
 .sort[disabled]:active,
 .list-view .list-item:hover .sort[disabled] {
-  background-color: gray;
+  background-color: var(--control-disabled-color);
   opacity: 0.5 !important;
-
-  color: gray;
-  fill: gray;
+  color: var(--control-disabled-color);
+  fill: var(--control-disabled-color);
 }
 
 .list-view .list-item:hover .sort,
 .list-view .hold .list-item.drag:hover .sort,
 .sort:active,
 .list-view .list-item:active .sort {
-  color: #056a61;
-  fill: #056a61;
+  color: var(--base-color);
+  fill: var(--base-color);
 }
 
 .list-item .to-note, 
@@ -109,28 +104,23 @@
 .list-view .hold .list-item:hover .to-note {
   width: 14px;
   margin-right: 5px;
-
-  color: #07a698;
-  fill: #07a698;
+  color: var(--base-color);
+  fill: var(--base-color);
 }
 
 .list-view .list-item.drag {
   position: absolute;
-  background: linear-gradient(to right, #e9f8f7, white) !important;
+  background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-second-color)) !important;
   opacity: 1 !important;
   left: 2px;
   right: 2px;
-  // padding-right: 5px;
   padding-right: 2px;
   border-bottom: 1px solid transparent !important;
-  box-shadow: -1px 2px 4px 0px #cdcdcd;
-  // box-shadow: -1px 3px 6px 0px #ddd;
-  // box-shadow: -1px 3px 6px 0px #ccc;
+  box-shadow: -1px 2px 4px 0px var(--base-shadow-drag);
   border-radius: 3px;
   line-height: 23px !important;
   height: 23px !important;
   z-index: 1000;
-  // margin-left: 15px;
   margin-top: 1px;
 }
 
@@ -138,26 +128,20 @@
   margin-left: -5px;
   margin-right: 7px;
   margin-top: -1px;
-  // background-color: #e33636;
-  color: #e33636;
-  fill: #e33636;
+  color: var(--base-color-hover);
+  fill: var(--base-color-hover);
 }
 
 .list-view list-item:last-child .list-item,
 .list-view .placeholder:last-child {
   border-color: transparent !important;
-  // border-bottom: transparent !important;
 }
 
 .list-view .list-items .placeholder {
-  border-bottom: 1px dashed #07429813;
+  border-bottom: 1px dashed var(--base-background-stroke);
   box-sizing: border-box;
 }
 
 .hold {
   cursor: pointer;
 }
-
-// .hold .list-view .list-items {
-//   margin-bottom: 3px;
-// }

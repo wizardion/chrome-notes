@@ -1,7 +1,7 @@
+@use 'colors';
+
 html, body {
-// body {
-  // background: white;
-  background: silver;
+  background: var(--body-background);
 
   width: 600px;
   height: 270px;
@@ -15,21 +15,26 @@ html, body {
 
 .middle {
   height: 450px;
-  background-color: #e33636;
 }
 
 .middle .details-view .content {
   height: 425px;
 }
 
+.middle .list-view .list-content,
+.middle .details-view .content-preview,
+.middle .details-view .visual-editor,
 .middle .details-view .cm-editor {
   height: 424px !important;
-}
-
-.middle .list-view .list-content {
-  height: 424px;
 }
 
 .middle .list-view .list-scroll {
   max-height: 417px;
 }
+
+// @media (prefers-color-scheme: dark) {
+//   html, body {
+//     color: #FFFFFF;
+//     background-color: red;
+//   }
+// }

@@ -51,6 +51,7 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   controls.common.mode = settings.common?.mode;
   controls.common.editor = settings.common?.editor;
   controls.common.popupSize = settings.common?.popupSize;
+  controls.common.appearance = settings.common?.appearance;
   controls.common.expirationDays = settings.common?.expirationDays;
   controls.content.hidden = false;
 

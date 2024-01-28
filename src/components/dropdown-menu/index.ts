@@ -188,7 +188,7 @@ export class DropdownMenuElement extends BaseElement {
 
     window.addEventListener('mousedown', this.mouseEvent);
     window.addEventListener('keydown', this.keyboardEvent);
-    window.addEventListener('blur', this.focusEvent);
+    // window.addEventListener('blur', this.focusEvent);
   }
 
   private static closeMenu(): boolean {

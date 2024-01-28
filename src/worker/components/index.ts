@@ -4,7 +4,7 @@ import { IdentityInfo } from 'modules/sync/components/interfaces';
 import { removeCachedAuthToken } from 'modules/sync/components/drive';
 // import { IWindow } from './models';
 import { storage, ISyncInfo } from 'core/services';
-import { ISettingsArea, PAGE_MODES, getSettings } from 'modules/settings';
+import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
 
 
 export { BaseWorker } from './base-worker';
@@ -42,10 +42,8 @@ export async function ensureOptionPage() {
 
 export async function initPopup() {
   const settings = await getSettings();
-  const mode = PAGE_MODES[settings.common.mode];
-  const page = mode.popup ? mode.popup[settings.common.editor][settings.common.popupSize] : '';
 
-  await chrome.action.setPopup({ popup: page });
+  await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
 }
 
 // export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {

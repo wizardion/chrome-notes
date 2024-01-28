@@ -8,14 +8,13 @@
 
 /* Hide the native cursor */
 .ProseMirror.vr-selection-enabled ::selection {
-  background: #d7d4f055;
   background: transparent;
 }
 
 .ProseMirror-focused {
-  --vr-cursor-color: #056a61;
-  --vr-cursor-selection: #D4E6E885;
-  --vr-cursor-selection-border: #BBDBDC;
+  --vr-cursor-color: var(--editor-selection-cursor);
+  --vr-cursor-selection: var(--editor-selection-background);
+  --vr-cursor-selection-border: var(--editor-selection-stroke);
 }
 
 .ProseMirror .vr-selection-layer {
@@ -35,12 +34,12 @@
   user-select: none;
   -webkit-user-select: none;
   border-left: 1.5px solid var(--vr-cursor-color);
-  z-index: -1;
+  z-index: 101;
 }
 
 .ProseMirror .vr-selection-layer .vr-selection>* {
   position: absolute;
-  background: #e9e9e9;
+  background: var(--editor-inactive-selection-background);
   z-index: -2;
 }
 
@@ -51,15 +50,13 @@
 
 .ProseMirror .vr-selection-layer svg.vr-selection polygon,
 .ProseMirror .vr-selection-layer svg.vr-selection path {
-  // stroke: #BBDBDC;
-  // fill: #D4E6E885;
-  stroke: var(--vr-cursor-selection-border, #d9d9d9);
-  fill: var(--vr-cursor-selection, #e9e9e9);
+  stroke: var(--vr-cursor-selection-border, var(--editor-inactive-selection-stroke));
+  fill: var(--vr-cursor-selection, var(--editor-inactive-selection-background));
 }
 
-.ProseMirror-focused .vr-selection-layer .vr-selection>* {
-  background: #056a6125;
-}
+// .ProseMirror-focused .vr-selection-layer .vr-selection>* {
+//   background: #056a6125;
+// }
 
 .ProseMirror-focused .vr-cursor-blink {
   animation: steps(1) vr-cursor-blink 1.2s infinite;

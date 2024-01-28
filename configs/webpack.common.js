@@ -16,6 +16,7 @@ const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev
 
 module.exports = {
   entry: {
+    theme: path.resolve(__root__, 'src/styles/auto-theme.scss'),
     index: path.resolve(__root__, 'src/pages/index/index.ts'),
 
     popupMarkdown: path.resolve(__root__, 'src/pages/popup/markdown/index.ts'),
@@ -174,6 +175,28 @@ module.exports = {
       filename: 'popup.html',
       template: './src/pages/popup/popup.html',
       chunks: [
+        
+        'vendors',
+        'popupMarkdown',
+        'theme',
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-light.html',
+      template: './src/pages/popup/popup-light.html',
+      chunks: [
+        'vendors',
+        'popupMarkdown'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-dark.html',
+      template: './src/pages/popup/popup-dark.html',
+      chunks: [
         'vendors',
         'popupMarkdown'
       ],
@@ -184,13 +207,35 @@ module.exports = {
       filename: 'popup-middle.html',
       template: './src/pages/popup/popup-middle.html',
       chunks: [
+        'theme',
         'vendors',
         'popupMarkdown'
       ],
     }),
     new HtmlWebpackPlugin({
       ...htmlWebpackConfig,
-      
+
+      filename: 'popup-middle-light.html',
+      template: './src/pages/popup/popup-middle-light.html',
+      chunks: [
+        'vendors',
+        'popupMarkdown'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-middle-dark.html',
+      template: './src/pages/popup/popup-middle-dark.html',
+      chunks: [
+        'vendors',
+        'popupMarkdown'
+      ],
+    }),
+
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
       filename: 'popup-visual.html',
       template: './src/pages/popup/popup.html',
       chunks: [
@@ -201,6 +246,27 @@ module.exports = {
     new HtmlWebpackPlugin({
       ...htmlWebpackConfig,
 
+      filename: 'popup-visual-light.html',
+      template: './src/pages/popup/popup-light.html',
+      chunks: [
+        'vendors',
+        'popupVisual'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-visual-dark.html',
+      template: './src/pages/popup/popup-dark.html',
+      chunks: [
+        'vendors',
+        'popupVisual'
+      ],
+    }),
+
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
       filename: 'popup-visual-middle.html',
       template: './src/pages/popup/popup-middle.html',
       chunks: [
@@ -208,6 +274,27 @@ module.exports = {
         'popupVisual'
       ],
     }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-visual-middle-light.html',
+      template: './src/pages/popup/popup-middle-light.html',
+      chunks: [
+        'vendors',
+        'popupVisual'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
+      filename: 'popup-visual-middle-dark.html',
+      template: './src/pages/popup/popup-middle-dark.html',
+      chunks: [
+        'vendors',
+        'popupVisual'
+      ],
+    }),
+
     new HtmlWebpackInjectAttributesPlugin(),
     new HtmlWebpackPlugin({
       ...htmlWebpackConfig,
