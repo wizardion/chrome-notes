@@ -5,13 +5,16 @@ import { DevModeElement } from './components/dev-mode/dev';
 import { PasswordElement } from './components/passwords/password';
 import { ProgressElement } from './components/progress-bar/progress';
 import { IOptionControls } from './components/options.model';
-import { devModeChanged, eventOnStorageChanged, settingsChanged, syncInfoChanged } from './components';
+import {
+  devModeChanged, eventOnStorageChanged, eventOncColorChanged, settingsChanged, syncInfoChanged
+} from './components';
 import { CommonSettingsElement } from './components/common-settings/common-settings.component';
 import { AlertElement } from './components/alert/alert.component';
 import { getSettings, ISettingsArea } from 'modules/settings';
 
 
 const controls: IOptionControls = {};
+const mediaColorScheme = '(prefers-color-scheme: dark)';
 
 customElements.define(AlertElement.selector, AlertElement);
 customElements.define(ProgressElement.selector, ProgressElement);
@@ -27,6 +30,7 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   controls.common = <CommonSettingsElement>document.querySelector('common-settings');
   controls.alert = <AlertElement>document.querySelector('alert-message');
 
+  window.matchMedia(mediaColorScheme).addEventListener('change', (e) => eventOncColorChanged(settings, e));
   controls.syncInfo.addEventListener('sync-info:change', () => syncInfoChanged(controls.syncInfo, settings));
   controls.devModeInfo.addEventListener('mode:change', () => devModeChanged(controls.devModeInfo, settings));
   controls.common.addEventListener('settings:change', () => settingsChanged(controls.common, settings));
@@ -54,6 +58,11 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   controls.common.appearance = settings.common?.appearance;
   controls.common.expirationDays = settings.common?.expirationDays;
   controls.content.hidden = false;
+
+  if (settings.common?.appearance === 2 || settings.common?.appearance === 0 &&
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('theme-dark');
+  }
 
   await chrome.storage.session.set({ optionPageId: (await chrome.tabs.getCurrent()).id });
 });

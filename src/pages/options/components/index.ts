@@ -7,6 +7,16 @@ import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
 import * as core from 'core';
 
 
+export function eventOncColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
+  const dark = e ? e.matches : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  if (settings.common?.appearance === 2 || settings.common?.appearance === 0 && dark) {
+    document.body.classList.add('theme-dark');
+  } else {
+    document.body.classList.remove('theme-dark');
+  }
+}
+
 export async function settingsChanged(element: CommonSettingsElement, settings: ISettingsArea) {
   settings.common = {
     mode: element.mode,
@@ -16,6 +26,7 @@ export async function settingsChanged(element: CommonSettingsElement, settings: 
     expirationDays: element.expirationDays,
   };
 
+  eventOncColorChanged(settings);
   await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
   await storage.local.set('settings', settings);
 }
