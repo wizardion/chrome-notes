@@ -16,7 +16,10 @@ const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev
 
 module.exports = {
   entry: {
-    theme: path.resolve(__root__, 'src/styles/auto-theme.scss'),
+    autoTheme: path.resolve(__root__, 'src/styles/themes/auto.scss'),
+    lightTheme: path.resolve(__root__, 'src/styles/themes/light.scss'),
+    darkTheme: path.resolve(__root__, 'src/styles/themes/dark.scss'),
+
     index: path.resolve(__root__, 'src/pages/index/index.ts'),
 
     popupMarkdown: path.resolve(__root__, 'src/pages/popup/markdown/index.ts'),
@@ -177,7 +180,7 @@ module.exports = {
       chunks: [
         'vendors',
         'popupMarkdown',
-        'theme',
+        'autoTheme',
       ],
     }),
     new HtmlWebpackPlugin({
@@ -186,6 +189,7 @@ module.exports = {
       filename: 'popup-light.html',
       template: './src/pages/popup/popup-light.html',
       chunks: [
+        'lightTheme',
         'vendors',
         'popupMarkdown'
       ],
@@ -196,6 +200,7 @@ module.exports = {
       filename: 'popup-dark.html',
       template: './src/pages/popup/popup-dark.html',
       chunks: [
+        'darkTheme',
         'vendors',
         'popupMarkdown'
       ],
@@ -208,7 +213,7 @@ module.exports = {
       chunks: [
         'vendors',
         'popupMarkdown',
-        'theme',
+        'autoTheme',
       ],
     }),
     new HtmlWebpackPlugin({
@@ -217,6 +222,7 @@ module.exports = {
       filename: 'popup-middle-light.html',
       template: './src/pages/popup/popup-middle-light.html',
       chunks: [
+        'lightTheme',
         'vendors',
         'popupMarkdown'
       ],
@@ -227,6 +233,7 @@ module.exports = {
       filename: 'popup-middle-dark.html',
       template: './src/pages/popup/popup-middle-dark.html',
       chunks: [
+        'darkTheme',
         'vendors',
         'popupMarkdown'
       ],
@@ -240,7 +247,7 @@ module.exports = {
       chunks: [
         'vendors',
         'popupVisual',
-        'theme',
+        'autoTheme',
       ],
     }),
     new HtmlWebpackPlugin({
@@ -249,6 +256,7 @@ module.exports = {
       filename: 'popup-visual-light.html',
       template: './src/pages/popup/popup-light.html',
       chunks: [
+        'lightTheme',
         'vendors',
         'popupVisual'
       ],
@@ -259,6 +267,7 @@ module.exports = {
       filename: 'popup-visual-dark.html',
       template: './src/pages/popup/popup-dark.html',
       chunks: [
+        'darkTheme',
         'vendors',
         'popupVisual'
       ],
@@ -272,7 +281,7 @@ module.exports = {
       chunks: [
         'vendors',
         'popupVisual',
-        'theme',
+        'autoTheme',
       ],
     }),
     new HtmlWebpackPlugin({
@@ -281,6 +290,7 @@ module.exports = {
       filename: 'popup-visual-middle-light.html',
       template: './src/pages/popup/popup-middle-light.html',
       chunks: [
+        'lightTheme',
         'vendors',
         'popupVisual'
       ],
@@ -291,6 +301,7 @@ module.exports = {
       filename: 'popup-visual-middle-dark.html',
       template: './src/pages/popup/popup-middle-dark.html',
       chunks: [
+        'darkTheme',
         'vendors',
         'popupVisual'
       ],

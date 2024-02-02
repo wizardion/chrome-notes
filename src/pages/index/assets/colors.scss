@@ -1,0 +1,10 @@
+@use 'styles/themes/colors';
+
+
+@each $name, $map in colors.$themes {
+  .theme-#{$name} {
+    @each $key, $value in $map {
+      --#{$key}: #{$value};
+    }
+  }
+}
