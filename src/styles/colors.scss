@@ -2,7 +2,7 @@ $themes: (
   light: (
     'body-background': silver,
     'base-color': #07a698,
-    'base-color-dark': #06736a,
+    'base-bright-color': #06736a,
     'base-color-hover': #e33636,
     'base-color-active': #e3363685,
     'base-background': #fbfbfd,
@@ -14,7 +14,7 @@ $themes: (
     'base-scrollbar': #D6D6D6,
     'base-scrollbar-hover': #555,
 
-    'base-shadow': rgba(0, 0, 0, 0.4),
+    'base-shadow': rgba(0, 0, 0, 0.2),
     'base-shadow-tile': #056a6115,
     'base-shadow-drag': #cdcdcd,
 
@@ -29,6 +29,8 @@ $themes: (
     'editor-background': white,
     'editor-color-heading': gray,
     'editor-color-subtitle': gray,
+
+    'editor-highlight-color': #06736a,
 
     'editor-quote-color': dimgray,
     'editor-quote-background': #f6f8fa,
@@ -48,53 +50,55 @@ $themes: (
     'editor-text-url': #219,
   ),
   dark: (
-    'body-background': #0C0E12, // #0C0E12, //1B1C1D, 28292A, 22262B
-    'base-color': #07a698,
-    'base-color-dark': #14968b,
-    'base-color-hover': darken(#c6c7cF, 25%), //rgba(#c6c7cF, 0.75), //rgba(#c6538c, 0.85),
-    'base-color-active': darken(#c6c7cF, 45%), //rgba(#c6c7cF, 0.45),
-    'base-background': #202429, // 22262B, 202429
-    'base-tile-background': #25292E,
-    'base-background-stroke': rgba(#31363C, .65), // #EEF4F2
-    'base-background-second-stroke': rgba(#31363C, .85), // #d7e9e995
+    'body-background': #28292A,
+    'base-color': scale-color(#aecbfa, $saturation: -30%),
+    'base-bright-color': #e3e3e3,
+    'base-color-hover': scale-color(darken(#c6c7cF, 10%), $saturation: -30%),
+    'base-color-active': darken(#c6c7cF, 35%),
+    'base-background': #28292A,
+
+    'base-tile-background': lighten(#28292A, 1%),
+    'base-background-stroke': rgba(#31363C, .65),
+    'base-background-second-stroke': rgba(#31363C, .95),
     'base-text-color': #B9B9BB,
 
     'base-scrollbar': #747474,
     'base-scrollbar-hover': #A4A8AD,
 
-    'base-shadow': rgba(0, 0, 0, 0.5),
+    'base-shadow': rgba(0, 0, 0, 0.3),
     'base-shadow-tile': rgba(0, 0, 0, 0.2),
     'base-shadow-drag': rgba(25, 25, 25, 1),
 
-    'base-highlight-color': darken(#31363C, 1%), // darken(#31363C, 1%), // 347a7b
-    'base-highlight-second-color': #25292E,
+    'base-highlight-color': darken(#31363C, 1%),
+    'base-highlight-second-color': lighten(#28292A, 1%),
 
-    'control-disabled-color': #41464C, //rgba(#07a698, .25),
+    'control-disabled-color': lighten(#41464C, 15%), //#41464C,
     'control-disabled-background': transparent,
-    'control-disabled-stroke': rgba(#31363C, .45),
-    'control-active-background': rgba(#31363C, .45), //#fbfeff
+    'control-disabled-stroke': rgba(#31363C, .55),
+    'control-active-background': rgba(#31363C, .45),
 
-    'editor-background': #25292E, // #28292A,
+    'editor-background': lighten(#28292A, 1%),
     'editor-color-heading': gray,
     'editor-color-subtitle': gray,
+
+    'editor-highlight-color': #e3e3e3,
 
     'editor-quote-color': gray,
     'editor-quote-background': darken(#31363C, 1%),
     'editor-quote-stroke': #444a51,
 
-    // 'editor-selection-cursor': grayscale(lighten(#14968b, 50%)), // 14968b
-    'editor-selection-cursor': #EDA757, // white, // 14968b
-    'editor-selection-background': #D4E6E812, // #D4E6E815, darken(#D4E6E8, 70%)
-    'editor-selection-stroke': #BBDBDC20,
-    'editor-inactive-selection-background': darken(#35393F, 10%),
-    'editor-inactive-selection-stroke': darken(#35393F, 10%),
+    'editor-selection-cursor': #EDA757,
+    'editor-selection-background': scale-color(lighten(#2a2c2d, 7%), $blue: 4%, $green: 1%),
+    'editor-selection-stroke': scale-color(lighten(#2a2c2d, 15%), $blue: 4%, $green: 1%),
+    'editor-inactive-selection-background': darken(#2a2c2d, 3%),
+    'editor-inactive-selection-stroke': darken(#2a2c2d, 3%),
 
-    'editor-menu-focus': #14968b,
+    'editor-menu-focus': #e3e3e3,
     'editor-menu-stroke': rgba(#31363C, .65),
     'editor-menu-stroke-dimmed': rgba(#31363C, .65),
     'editor-menu-stroke-scrolled': rgba(#31363C, .65),
 
-    'editor-text-url': rgb(63, 137, 207),
+    'editor-text-url': darken(#aecbfa, 12%),
   )
 );
 

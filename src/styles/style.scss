@@ -60,25 +60,6 @@ input, button {
   fill: var(--base-color-active);
 }
 
-// .animate {
-//   background: linear-gradient(to right, #07a69815, #07a69800 45%);
-//   background-size: 200% 100%;
-//   animation: colorChange 2.520s;
-// }
-
-// @keyframes colorChange
-// {
-//   0% {
-//     color: $base-color-dark;
-// 		background-position: 0% 0%;
-// 	}
-// 	100% {
-//     color: inherit;
-// 		background-position: 100% 0%;
-// 	}
-// }
-
-
 @import 'list-view';
 // @import 'mode-mixed';
 // @import 'mode-compact';

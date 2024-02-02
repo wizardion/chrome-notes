@@ -14,6 +14,8 @@ export class AlertElement extends BaseElement {
     super();
     this.template = <HTMLElement>template.cloneNode(true);
     this.message = this.template.querySelector('[name="message"]');
+
+    // this.error = 'This is a test message!';
   }
 
   set error(value: string) {

@@ -61,7 +61,7 @@
 }
 
 .visual-editor li::marker {
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
 }
 
 .visual-editor blockquote {
@@ -72,7 +72,7 @@
 }
 
 .visual-editor a {
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
 }
 
 .visual-editor a:hover {
@@ -85,7 +85,7 @@
 }
 
 .visual-editor a:visited {
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
 }
 
 .visual-editor ::selection {
@@ -138,7 +138,7 @@
   margin: 0;
 
   font-size: 13px;
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
 }
 
 .visual-editor pre {
@@ -149,7 +149,7 @@
   border: 1px solid lightgray;
   border-radius: 2px;
   padding: 2px 7px 2px 7px;
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
   margin: 3px 0px 3px 0;
 
   white-space: pre-wrap;
@@ -183,7 +183,7 @@
 .visual-editor h1 {
   display: block;
   display: block;
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
   font-size: x-large;
   font-weight: bold;
   padding: 0px;

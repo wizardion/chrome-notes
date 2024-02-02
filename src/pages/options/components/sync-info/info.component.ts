@@ -72,6 +72,9 @@ export class SyncInfoElement extends BaseElement {
 
     this.form.passphrase.addEventListener('password:change', () => this.passphraseChanged());
     // this.form.passphrase.addEventListener('password:dirtiness', () => this.passwordDirtinessChanged());
+
+    // this.promise = true;
+    // this.form.progressBar.spinning = true;
   }
 
   protected attributeChanged() {

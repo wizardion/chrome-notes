@@ -210,7 +210,7 @@ fieldset:disabled button {
 
 .dropdown-menu button:hover {
   background-color: var(--editor-selection-background) !important;
-  color: var(--base-color-dark) !important;
+  color: var(--base-bright-color) !important;
 }
 
 .dropdown-menu .normal-text {
@@ -218,9 +218,13 @@ fieldset:disabled button {
 }
 
 .dropdown-menu .title {
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
   font-size: large;
   font-weight: bold;
+}
+
+.dropdown-menu .title:hover {
+  color: var(--editor-highlight-color) !important;
 }
 
 .dropdown-menu .subtitle {

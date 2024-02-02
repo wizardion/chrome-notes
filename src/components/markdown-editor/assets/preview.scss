@@ -48,7 +48,7 @@
 }
 
 .content-preview a {
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
 }
 
 .content-preview a:hover {
@@ -61,7 +61,7 @@
 }
 
 .content-preview a:visited {
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
 }
 
 .content-preview ::selection {
@@ -155,7 +155,7 @@
 .content-preview h1 {
   display: block;
   display: block;
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
   font-size: x-large;
   font-weight: bold;
   padding: 0px;
@@ -196,5 +196,5 @@
 }
 
 .content-preview li::marker {
-  color: var(--base-color-dark);
+  color: var(--editor-highlight-color);
 }

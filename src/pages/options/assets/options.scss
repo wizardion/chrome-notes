@@ -17,6 +17,7 @@ html, body {
   color: var(--base-text-color);
 
   // transition: --body-color 0.5s ease-in-out;
+  line-height: 25px;
 }
 
 .row-flex {
@@ -88,7 +89,7 @@ fieldset:disabled {
   width: 75%;
   max-width: 850px;
   min-width: 475px;
-  margin: 5px auto;
+  margin: 15px auto;
   background: var(--tile-background-color);
   border: var(--tile-border-color);
   border-radius: 4px;
@@ -183,6 +184,13 @@ input[type='checkbox']:disabled:after {
 input[type='checkbox']:disabled:checked:after {
   background-color: var(--control-inactive-text-color);
   border-color: var(--control-transparent-color);
+}
+
+input[type='checkbox'],
+input[type='radio'],
+input[type='checkbox'] + span,
+input[type='radio'] + span {
+  cursor: pointer;
 }
 
 input[type='password'] {
@@ -330,16 +338,12 @@ div ul {
 }
 
 .title {
-  color: var(--control-bright-color);
+  color: var(--base-bright-color);
   font-weight: normal;
   text-align: center;
   font-size: 25px;
   padding: 0px;
   margin: 30px 0 20px 0px;
-}
-
-label:hover, input:hover {
-  cursor: pointer;
 }
 
 [hidden],
@@ -604,4 +608,13 @@ ul li input[type="radio"]:checked+span {
     width: 0%;
 		left: 100%;
 	}
+}
+
+input:disabled,
+button:disabled,
+.dangerous:disabled,
+input[type='radio']:disabled + span,
+input[type='checkbox']:disabled + span {
+  pointer-events: none;
+  cursor: default !important;
 }

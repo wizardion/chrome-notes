@@ -175,7 +175,6 @@ module.exports = {
       filename: 'popup.html',
       template: './src/pages/popup/popup.html',
       chunks: [
-        
         'vendors',
         'popupMarkdown',
         'theme',
@@ -207,9 +206,9 @@ module.exports = {
       filename: 'popup-middle.html',
       template: './src/pages/popup/popup-middle.html',
       chunks: [
-        'theme',
         'vendors',
-        'popupMarkdown'
+        'popupMarkdown',
+        'theme',
       ],
     }),
     new HtmlWebpackPlugin({
@@ -240,7 +239,8 @@ module.exports = {
       template: './src/pages/popup/popup.html',
       chunks: [
         'vendors',
-        'popupVisual'
+        'popupVisual',
+        'theme',
       ],
     }),
     new HtmlWebpackPlugin({
@@ -271,7 +271,8 @@ module.exports = {
       template: './src/pages/popup/popup-middle.html',
       chunks: [
         'vendors',
-        'popupVisual'
+        'popupVisual',
+        'theme',
       ],
     }),
     new HtmlWebpackPlugin({

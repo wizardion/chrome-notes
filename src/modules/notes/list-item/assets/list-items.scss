@@ -21,7 +21,7 @@
 .hold .list-item.drag,
 .hold .list-item.drag:hover {
   cursor: pointer;
-  color: var(--base-color-dark);
+  color: var(--base-bright-color);
   background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-second-color));
 }
 
