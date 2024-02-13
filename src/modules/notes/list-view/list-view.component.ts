@@ -1,6 +1,7 @@
 import { BaseElement, FormElement } from 'core/components';
 import { IListViewForm, IEventListenerType } from './list-view.model';
 import { ListItemElement } from '../list-item/list-item.component';
+import { Debounce, DynamicScroll } from 'modules/effects';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -22,6 +23,13 @@ export class ListViewElement extends BaseElement {
       scrollable: this.template.querySelector('[name="scrollable"]'),
       items: []
     });
+  }
+
+  protected eventListeners(): void {
+    const watcher = DynamicScroll.watch(this.form.elements.scrollable);
+    const debounced = Debounce.debounce(() => watcher.toggle());
+
+    this.form.elements.scrollable.addEventListener('scroll', debounced, { capture: true, passive: true });
   }
 
   get scrollable(): HTMLElement {

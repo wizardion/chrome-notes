@@ -1,0 +1,106 @@
+html, body {
+  height: 268px;
+}
+
+.notes {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+list-view{
+  width: 130px;
+}
+
+details-view {
+  flex: 1 1 130px;
+}
+
+.list-item .list-index, 
+.list-item .list-index + div,
+.list-item .date-time,
+.details-view .head .link.back {
+  display: none;
+}
+
+.list-items .list-item:active {
+  opacity: 1 !important;
+}
+
+.list-items .list-item.selected, 
+.list-items .list-item.selected:hover,
+.list-items .list-item.selected:active {
+  color: var(--base-bright-color);
+  background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-color));
+  cursor: default !important;
+}
+
+.list-view .list-content {
+  margin-left: 4px;
+  margin-right: 3px;
+  height: 242px;
+}
+
+.list-view .list-scroll {
+  box-shadow: none;
+  border-width: 1px;
+  border-color: var(--base-background-stroke);
+  max-height: 237px;
+  border-radius: 8px;
+}
+
+.list-scroll::-webkit-scrollbar {
+  border-radius: 8px !important;
+}
+
+.list-scroll::-webkit-scrollbar-track {
+  border-radius: 8px !important;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.list-view .list-scroll .list-items {
+  border: 1px solid var(--base-tile-background);
+}
+
+.details-view {
+  height: 268px;
+}
+
+.details-view .head {
+  text-align: left;
+}
+
+.details-view .content {
+  border-left-color: var(--base-background-stroke);
+  border-bottom-color: var(--base-background-stroke);
+  border-right-color: var(--base-background-stroke);
+  height: 237px;
+  margin-right: 5px;
+}
+
+.cm-editor, 
+.content-preview,
+.visual-editor {
+  height: 235px !important;
+}
+
+details-view[data-scroll='true'] {
+  .head {
+    // box-shadow: 3px 5px 5px -5px var(--base-shadow);
+    box-shadow: none;
+  }
+
+  .details-view .head:before {
+    height: 26px;
+  }
+
+  .content {
+    border-top-color: var(--base-background-stroke);
+  }
+
+  .dropdown-menu {
+    border-left: 1px solid var(--editor-menu-stroke) !important;
+    border-bottom: 1px solid var(--editor-menu-stroke-dimmed) !important;
+    border-right: 1px solid var(--editor-menu-stroke-dimmed) !important;
+  }
+}

@@ -31,13 +31,14 @@
   visibility: hidden;
 }
 
-.dynamic-scroll[data-hidden-scroll='false']::-webkit-scrollbar-thumb,
-.dynamic-scroll::-webkit-scrollbar-thumb:hover {
+.dynamic-scroll[data-hidden-scroll='false']::-webkit-scrollbar-thumb {
   visibility: visible;
 }
 
 .list-scroll::-webkit-scrollbar-track {
   background: var(--base-tile-background);
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .list-scroll::-webkit-scrollbar-thumb {

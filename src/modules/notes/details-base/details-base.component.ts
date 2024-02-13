@@ -3,7 +3,7 @@ import { BaseElement, FormElement } from 'core/components';
 import { IDetailsViewForm, IDetailsListenerType, INote } from './details-base.model';
 import { IDBNote } from 'modules/db';
 import { IEditorView } from 'components/models/editor.models';
-import { Debounce } from 'modules/effects';
+import { Debounce, DynamicScroll } from 'modules/effects';
 
 
 export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsViewForm> extends BaseElement {
@@ -18,6 +18,7 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
 
   protected eventListeners(): void {
     let dataScroll = false;
+    const watcher = DynamicScroll.watch(this.editor.element);
     const debounced = Debounce.debounce((e: Event) => {
       const scrolled = (e.target as HTMLElement).scrollTop > 0;
 
@@ -25,6 +26,8 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
         dataScroll = scrolled;
         this.dataset.scroll = dataScroll.toString();
       }
+
+      watcher.toggle();
     });
 
     this.editor.element.addEventListener('scroll', debounced, { capture: true, passive: true });

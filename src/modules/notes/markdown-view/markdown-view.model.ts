@@ -6,10 +6,3 @@ export interface IMarkdownViewForm extends IDetailsViewForm {
   preview: HTMLElement;
   htmlViewer: HTMLPreElement;
 }
-
-export interface IMarkdownViewIntervals {
-  changed: NodeJS.Timeout | null;
-  locked: NodeJS.Timeout | null;
-  delay: number;
-}
-

@@ -10,6 +10,7 @@ export class DbProviderService {
 
   public static async save(item: IDBNote): Promise<number> {
     if (item.id) {
+      console.log('...save', { preview: item.preview });
       await db.update(item);
     } else {
       item.id = await db.add(item);

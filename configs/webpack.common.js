@@ -10,6 +10,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
 const processHtmlLoader = require('./html-preprocessor');
 const htmlWebpackConfig = require('./html-webpack.config');
+const htmlPlugins = require('./html-plugins');
 const __root__ = path.resolve(__dirname, '..');
 const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
 
@@ -24,6 +25,8 @@ module.exports = {
 
     popupMarkdown: path.resolve(__root__, 'src/pages/popup/markdown/index.ts'),
     popupVisual: path.resolve(__root__, 'src/pages/popup/visual/index.ts'),
+    popupMarkdownMixed: path.resolve(__root__, 'src/pages/popup/mixed-markdown/index.ts'),
+    popupVisualMixed: path.resolve(__root__, 'src/pages/popup/mixed-visual/index.ts'),
 
     background: path.resolve(__root__, 'src/worker/background.ts'),
     settings: path.resolve(__root__, 'src/pages/options/options.ts'),
@@ -172,140 +175,10 @@ module.exports = {
       ],
     }),
 
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup.html',
-      template: './src/pages/popup/popup.html',
-      chunks: [
-        'vendors',
-        'popupMarkdown',
-        'autoTheme',
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-light.html',
-      template: './src/pages/popup/popup-light.html',
-      chunks: [
-        'lightTheme',
-        'vendors',
-        'popupMarkdown'
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-dark.html',
-      template: './src/pages/popup/popup-dark.html',
-      chunks: [
-        'darkTheme',
-        'vendors',
-        'popupMarkdown'
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-middle.html',
-      template: './src/pages/popup/popup-middle.html',
-      chunks: [
-        'vendors',
-        'popupMarkdown',
-        'autoTheme',
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-middle-light.html',
-      template: './src/pages/popup/popup-middle-light.html',
-      chunks: [
-        'lightTheme',
-        'vendors',
-        'popupMarkdown'
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-middle-dark.html',
-      template: './src/pages/popup/popup-middle-dark.html',
-      chunks: [
-        'darkTheme',
-        'vendors',
-        'popupMarkdown'
-      ],
-    }),
-
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-visual.html',
-      template: './src/pages/popup/popup.html',
-      chunks: [
-        'vendors',
-        'popupVisual',
-        'autoTheme',
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-visual-light.html',
-      template: './src/pages/popup/popup-light.html',
-      chunks: [
-        'lightTheme',
-        'vendors',
-        'popupVisual'
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-visual-dark.html',
-      template: './src/pages/popup/popup-dark.html',
-      chunks: [
-        'darkTheme',
-        'vendors',
-        'popupVisual'
-      ],
-    }),
-
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-visual-middle.html',
-      template: './src/pages/popup/popup-middle.html',
-      chunks: [
-        'vendors',
-        'popupVisual',
-        'autoTheme',
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-visual-middle-light.html',
-      template: './src/pages/popup/popup-middle-light.html',
-      chunks: [
-        'lightTheme',
-        'vendors',
-        'popupVisual'
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      ...htmlWebpackConfig,
-
-      filename: 'popup-visual-middle-dark.html',
-      template: './src/pages/popup/popup-middle-dark.html',
-      chunks: [
-        'darkTheme',
-        'vendors',
-        'popupVisual'
-      ],
-    }),
+    ...htmlPlugins('popupMarkdown', 'popup'),
+    ...htmlPlugins('popupVisual', 'popup-visual'),
+    ...htmlPlugins('popupMarkdownMixed', 'mixed-popup'),
+    ...htmlPlugins('popupVisualMixed', 'mixed-popup-visual'),
 
     new HtmlWebpackInjectAttributesPlugin(),
     new HtmlWebpackPlugin({

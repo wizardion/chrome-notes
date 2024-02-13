@@ -1,14 +1,14 @@
-import { BaseElement, FormElement, IEventListener } from 'core/components';
+import { BaseElement, FormElement, IEventListener, IIntervals } from 'core/components';
 import { DetailsBaseElement } from 'modules/notes/details-base/details-base.component';
 import { MarkdownEditor } from 'components/markdown-editor';
-import { IMarkdownViewForm, IMarkdownViewIntervals } from './markdown-view.model';
+import { IMarkdownViewForm } from './markdown-view.model';
 import { EditorControlsElement } from '../editor-controls/editor-controls.component';
-import { Debounce } from 'modules/effects';
+import { Debounce, DynamicScroll } from 'modules/effects';
 import { IDetailsListenerType, INote } from '../details-base/details-base.model';
 import { NodeHelper } from 'components/node-helper';
 
 
-const INTERVALS: IMarkdownViewIntervals = { changed: null, locked: null, delay: 400 };
+const INTERVALS: IIntervals = { changed: null, locked: null, delay: 400 };
 const template: DocumentFragment = BaseElement.component({
   templateUrl: './markdown-view.component.html'
 });
@@ -44,6 +44,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
 
   protected eventListeners(): void {
     let dataScroll = false;
+    const watcher = DynamicScroll.watch(this.editor.element);
     const debounced = Debounce.debounce((e: Event) => {
       const scrolled = (e.target as HTMLElement).scrollTop > 0;
 
@@ -51,6 +52,8 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
         dataScroll = scrolled;
         this.dataset.scroll = dataScroll.toString();
       }
+
+      watcher.toggle();
     });
 
     this.editor.element.addEventListener('scroll', debounced, { capture: true, passive: true });
@@ -63,10 +66,12 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
 
   addEventListener(type: IDetailsListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
     if (type === 'change') {
-      this.listeners.set(type, listener);
-      this.listeners.set('selectionEvent', () => this.onChange(listener));
+      const handler = () => this.onChange(listener);
 
-      return this.editor.addEventListener('change', listener);
+      this.listeners.set(type, handler);
+      this.listeners.set('selectionEvent', handler);
+
+      return this.editor.addEventListener('change', handler);
     }
 
     return super.addEventListener(type, listener, options);
@@ -116,6 +121,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   }
 
   private togglePreview() {
+    const listener = this.listeners.get('change');
     const value = !this._preview;
 
     this._locked = true;
@@ -124,11 +130,13 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       const scrollTop = this.editor.scrollTop;
 
       this.preview = value;
+      this.note.preview = value;
       this.form.elements.htmlViewer.scrollTop = scrollTop;
     } else {
       const scrollTop = this.form.elements.htmlViewer.scrollTop;
 
       this.preview = value;
+      this.note.preview = value;
       this.editor.setSelection(this.note.cState);
       this.editor.scrollTop = scrollTop;
     }
@@ -136,7 +144,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
     clearInterval(INTERVALS.locked);
     INTERVALS.locked = setTimeout(() => {
       this._locked = false;
-      this.onChange(this.listeners.get('change'));
+      listener();
     }, INTERVALS.delay);
   }
 

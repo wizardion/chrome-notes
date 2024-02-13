@@ -38,12 +38,15 @@ export const PAGE_MODES: Record<number, IPageMode> = {
   1: {
     popup: [
       [
-        ['popup.html', 'popup-light.html', 'popup-dark.html'],
-        ['popup-middle.html', 'popup-middle-light.html', 'popup-middle-dark.html']
+        ['mixed-popup.html', 'mixed-popup-light.html', 'mixed-popup-dark.html'],
+        ['mixed-popup-middle.html', 'mixed-popup-middle-light.html', 'mixed-popup-middle-dark.html']
       ],
       [
-        ['popup-visual.html', 'popup-visual-light.html', 'popup-visual-dark.html'],
-        ['popup-visual-middle.html', 'popup-visual-middle-light.html', 'popup-visual-middle-dark.html']
+        ['mixed-popup-visual.html', 'mixed-popup-visual-light.html', 'mixed-popup-visual-dark.html'],
+        [
+          'mixed-popup-visual-middle.html', 'mixed-popup-visual-middle-light.html',
+          'mixed-popup-visual-middle-dark.html'
+        ]
       ],
     ],
     page: null

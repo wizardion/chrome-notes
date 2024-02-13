@@ -141,13 +141,13 @@ export class VisualEditor implements IEditorView {
   }
 
   addEventListener(type: 'change' | 'save', listener: EventListener): void {
-    if (type === 'change') {
-      CUSTOM_EVENTS.change = listener;
-    }
+    // if (type === 'change') {
+    //   CUSTOM_EVENTS.change = listener;
+    // }
 
-    if (type === 'save') {
-      CUSTOM_EVENTS.save = (e: Event) => this.saveEventHandler(e, listener);
-    }
+    // if (type === 'save') {
+    //   CUSTOM_EVENTS.save = (e: Event) => this.saveEventHandler(e, listener);
+    // }
   }
 
   private initControls(controls: NodeList) {

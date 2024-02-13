@@ -123,7 +123,6 @@ export async function iterate(iterator: (i: IDBNote) => void) {
           }
 
           cursor.continue();
-          // resolve();
         } else {
           resolve();
         }
