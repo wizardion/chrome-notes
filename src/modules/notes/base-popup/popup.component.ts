@@ -47,6 +47,7 @@ export abstract class PopupBaseElement extends BaseElement {
     if (this.preserved && !this.selected && this.preserved.id === note.id) {
       this.selected = note;
       this.selected.item.classList.add('selected');
+      setTimeout(() => this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' }), 1);
     }
   }
 
