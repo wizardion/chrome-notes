@@ -1,7 +1,7 @@
 import 'styles/style.scss';
 import { db } from 'modules/db';
 import { CachedStorageService } from 'core/services/cached';
-import { PopupNotesElement } from 'modules/notes/popup/popup.component';
+import { WindowNotesElement } from 'modules/notes/window/window.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
 import { ListItemElement } from 'modules/notes/list-item/list-item.component';
 import { MarkdownViewElement } from 'modules/notes/markdown-view/markdown-view.component';
@@ -15,7 +15,7 @@ export function whenDefined(): Promise<CustomElementConstructor[]> {
   customElements.define(ListViewElement.selector, ListViewElement);
   customElements.define(ListItemElement.selector, ListItemElement);
   customElements.define(MarkdownViewElement.selector, MarkdownViewElement);
-  customElements.define(PopupNotesElement.selector, PopupNotesElement);
+  customElements.define(WindowNotesElement.selector, WindowNotesElement);
 
   return Promise.all([
     customElements.whenDefined(DropdownMenuElement.selector),
@@ -23,13 +23,14 @@ export function whenDefined(): Promise<CustomElementConstructor[]> {
     customElements.whenDefined(ListViewElement.selector),
     customElements.whenDefined(ListItemElement.selector),
     customElements.whenDefined(MarkdownViewElement.selector),
-    customElements.whenDefined(PopupNotesElement.selector),
+    customElements.whenDefined(WindowNotesElement.selector),
   ]);
 }
 
 export async function init() {
-  const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
+  const notes = document.getElementById('simple-popup-notes') as WindowNotesElement;
   const configs = await CachedStorageService.get();
+  let selected = !!configs.selected;
 
   if (configs.selected) {
     notes.hidden = false;
@@ -41,13 +42,29 @@ export async function init() {
     notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
   }
 
-  if (configs.selected || configs.draft) {
-    return setTimeout(() => {
-      db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
-      notes.hidden = false;
-    }, 50);
-  }
+  // if (configs.selected || configs.draft) {
+  //   return setTimeout(() => {
+  //     db.iterate(item => {
+  //       console.log('selected', [selected]);
 
-  db.iterate(item => notes.addItem(item)).then(() => notes.disabled = false);
+  //       if (!selected) {
+  //         notes.select(item, false);
+  //         selected = true;
+  //       }
+
+  //       notes.addItem(item);
+  //     }).then(() => notes.disabled = false);
+  //     notes.hidden = false;
+  //   }, 50);
+  // }
+
+  db.iterate(item => {
+    if (!selected) {
+      notes.select(item, false);
+      selected = true;
+    }
+
+    notes.addItem(item);
+  }).then(() => notes.disabled = false);
   notes.hidden = false;
 }

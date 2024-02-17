@@ -51,6 +51,10 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     super.hidden = value;
   }
 
+  get elements(): T {
+    return this.form.elements;
+  }
+
   getData(): INote {
     const data = this.editor.getData();
 

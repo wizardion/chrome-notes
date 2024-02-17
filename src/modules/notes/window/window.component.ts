@@ -1,4 +1,4 @@
-import './assets/mixed.scss';
+import './assets/window.scss';
 import { BaseElement } from 'core/components';
 import { PopupBaseElement } from '../base-popup/popup.component';
 import { DbProviderService } from 'modules/db';
@@ -6,10 +6,10 @@ import { INote } from '../details-base/details-base.model';
 
 
 const template: DocumentFragment = BaseElement.component({
-  templateUrl: './popup.component.html'
+  templateUrl: './window.component.html'
 });
 
-export class PopupMixedNotesElement extends PopupBaseElement {
+export class WindowNotesElement extends PopupBaseElement {
   static readonly selector = 'popup-notes';
 
   constructor() {
@@ -25,9 +25,10 @@ export class PopupMixedNotesElement extends PopupBaseElement {
     const svg = this.template.querySelector('[name="cancel-svg"]');
 
     super.render();
-    const head = this.listView.elements.add.parentElement;
+    const addNote = this.listView.elements.add;
+    const head = this.detailsView.elements.cancel.parentNode;
 
-    head.insertBefore(this.detailsView.elements.cancel, head.firstChild);
+    head.insertBefore(addNote, head.firstChild);
 
     this.detailsView.elements.cancel.innerText = '';
     this.detailsView.elements.cancel.appendChild(svg);
@@ -59,8 +60,8 @@ export class PopupMixedNotesElement extends PopupBaseElement {
   }
 
   draft(title?: string, description?: string, selection?: number[]) {
-    this.detailsView.draft = true;
     this.preserved = this.selected;
+    this.detailsView.draft = true;
     this.listView.elements.add.hidden = true;
     this.selected?.item.classList.remove('selected');
     this.selected = null;

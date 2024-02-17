@@ -1,20 +1,62 @@
 import './assets/colors.scss';
-import 'styles/body.scss';
+import './assets/body.scss';
+import { ISettingsArea, getSettings } from 'modules/settings';
+import { IAreaName, IStorageChange } from 'pages/options/components/options.model';
+import { IEventListener } from 'core/components';
 
 
-import('./init').then(({ init, whenDefined }) => whenDefined().then(() => init()));
+const mediaColorScheme = '(prefers-color-scheme: dark)';
+const listeners = new Map<string, IEventListener>();
 
-// document.body.classList.remove('theme-dark');
+function eventOncColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
+  const dark = e ? e.matches : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-// if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-//   // dark mode
-//   console.log('dark mode');
-// } else {
-//   console.log('light mode');
-// }
+  if (settings.common?.appearance === 2 || settings.common?.appearance === 0 && dark) {
+    document.body.classList.add('theme-dark');
+  } else {
+    document.body.classList.remove('theme-dark');
+  }
+}
 
-// window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-//   const newColorScheme = event.matches ? 'dark' : 'light';
+function eventOnStorageChanged(changes: IStorageChange, namespace: IAreaName) {
+  if (namespace === 'local' && changes.settings && changes.settings.newValue) {
+    const settings = changes.settings?.newValue.value as ISettingsArea;
 
-//   console.log('mode', [newColorScheme]);
-// });
+    if (settings.common?.appearance !== 0) {
+      window.matchMedia(mediaColorScheme).removeEventListener('change', listeners.get('media:change'));
+    }
+
+    if (settings.common?.appearance === 0) {
+      listeners.set('media:change', (e) => eventOncColorChanged(settings, e as MediaQueryListEvent));
+      window.matchMedia(mediaColorScheme).addEventListener('change', listeners.get('media:change'));
+    }
+
+    eventOncColorChanged(settings);
+  }
+}
+
+function addEventListeners(settings: ISettingsArea) {
+  chrome.storage.onChanged.addListener((c, n) => eventOnStorageChanged(c, n));
+
+  if (settings.common?.appearance === 0) {
+    listeners.set('media:change', (e) => eventOncColorChanged(settings, e as MediaQueryListEvent));
+    window.matchMedia(mediaColorScheme).addEventListener('change', listeners.get('media:change'));
+  }
+}
+
+getSettings({ sync: true, identity: true }).then(settings => {
+  if (settings.common.editor === 0) {
+    import('./markdown').then(({ init, whenDefined }) => whenDefined().then(() => init()));
+  }
+
+  if (settings.common.editor === 1) {
+    import('./visual').then(({ init, whenDefined }) => whenDefined().then(() => init()));
+  }
+
+  if (settings.common?.appearance === 2 || settings.common?.appearance === 0 &&
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('theme-dark');
+  }
+
+  setTimeout(() => addEventListeners(settings), 300);
+});

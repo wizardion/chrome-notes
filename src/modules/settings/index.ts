@@ -51,7 +51,7 @@ export const PAGE_MODES: Record<number, IPageMode> = {
     ],
     page: null
   },
-  3: { popup: null, page: 'popup.html' }
+  3: { popup: null, page: 'index.html' }
 };
 
 export { ISettingsArea };

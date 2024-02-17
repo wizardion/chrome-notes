@@ -60,4 +60,12 @@ input, button {
   fill: var(--base-color-active);
 }
 
+.button:disabled,
+.link:disabled {
+  color: var(--control-disabled-color);
+  fill: var(--control-disabled-color);
+  cursor: default;
+  pointer-events: none;
+}
+
 @import 'list-view';

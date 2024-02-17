@@ -44,6 +44,10 @@ export class ListViewElement extends BaseElement {
     return this.form.elements.items;
   }
 
+  get elements(): IListViewForm {
+    return this.form.elements;
+  }
+
   add(item: ListItemElement) {
     this.form.elements.items.push(item);
     this.form.elements.list.appendChild(item);

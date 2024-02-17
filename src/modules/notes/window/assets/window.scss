@@ -1,24 +1,30 @@
-html, body {
-  height: 268px;
-}
-
 .notes {
   display: flex;
   flex-wrap: wrap;
 }
 
-list-view{
-  width: 130px;
+list-view {
+  width: 250px;
+  height: 100vh;
+}
+
+.list-view {
+  height: 100%;
 }
 
 details-view {
-  flex: 1 1 130px;
+  flex: 1 1 250px;
+  height: 100vh;
+}
+
+.details-view {
+  height: 100%;
 }
 
 .list-item .list-index, 
 .list-item .list-index + div,
 .list-item .date-time,
-.details-view .head .link.back {
+.details-view .head .link.back:not(.cancel) {
   display: none;
 }
 
@@ -37,24 +43,15 @@ details-view {
 .list-view .list-content {
   margin-left: 4px;
   margin-right: 3px;
-  height: 242px;
+  height: calc(100% - 25px);
 }
 
 .list-view .list-scroll {
   box-shadow: none;
   border-width: 1px;
   border-color: var(--base-background-stroke);
-  max-height: 237px;
+  max-height: calc(100% - 8px);
   border-radius: 8px;
-}
-
-.list-view .list-controls .cancel {
-  position: absolute;
-  left: 5px;
-}
-
-.list-view .list-controls .cancel svg {
-  margin-top: 4px;
 }
 
 .list-scroll::-webkit-scrollbar {
@@ -71,26 +68,68 @@ details-view {
   border: 1px solid var(--base-tile-background);
 }
 
-.details-view {
-  height: 268px;
-}
-
 .details-view .head {
   text-align: left;
+  padding-left: 10px;
+}
+
+.details-view .head .cancel {
+  margin-left: 0px;
+  position: relative;
+  left: 0 !important;
+  margin-right: 4px;
+}
+
+.details-view .head .button.add svg,
+.details-view .head .cancel svg {
+  margin-top: 4px;
+}
+
+.head .controls-group {
+  margin-left: 35px;
+  margin-right: 35px;
+}
+
+.details-view .head .button.save {
+  position: relative;
+  float: none;
+  right: 0;
+}
+
+
+.details-view .head .checkbox.edit {
+  right: 43px;
+}
+
+.details-view .head .checkbox.edit svg {
+  margin-left: 4px;
+}
+
+.details-view .head .button.delete {
+  right: 15px;
 }
 
 .details-view .content {
   border-left-color: var(--base-background-stroke);
   border-bottom-color: var(--base-background-stroke);
   border-right-color: var(--base-background-stroke);
-  height: 237px;
+  height: calc(100% - 33px);
   margin-right: 5px;
+}
+
+.details-view ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.details-view ::-webkit-scrollbar-thumb {
+  border-width: 4px;
 }
 
 .cm-editor, 
 .content-preview,
 .visual-editor {
-  height: 235px !important;
+  height: 100% !important;
+  font-size: 14px !important;
 }
 
 .ProseMirror {
@@ -99,7 +138,6 @@ details-view {
 
 details-view[data-scroll='true'] {
   .head {
-    // box-shadow: 3px 5px 5px -5px var(--base-shadow);
     box-shadow: none;
   }
 

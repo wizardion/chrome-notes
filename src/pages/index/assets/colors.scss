@@ -1,10 +1,32 @@
 @use 'styles/themes/colors';
 
 
+// @each $name, $map in colors.$themes {
+//   .theme-#{$name} {
+//     @each $key, $value in $map {
+//       --#{$key}: #{$value};
+//     }
+//   }
+// }
+
 @each $name, $map in colors.$themes {
-  .theme-#{$name} {
-    @each $key, $value in $map {
-      --#{$key}: #{$value};
-    }
+  @if $name == 'light' {
+    // @media (prefers-color-scheme: light) {
+      :root {
+        @each $key, $value in $map {
+          --#{$key}: #{$value};
+        }
+      }
+    // }
   }
+
+  @if $name == 'dark' {
+    // @media (prefers-color-scheme: dark) {
+      .theme-#{$name} {
+        @each $key, $value in $map {
+          --#{$key}: #{$value};
+        }
+      }
+    }
+  // }
 }
