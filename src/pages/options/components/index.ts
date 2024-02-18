@@ -4,8 +4,39 @@ import { DevModeElement } from './dev-mode/dev.component';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
 import { ISettingsArea, getPopupPage } from 'modules/settings';
 import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
+import { CachedStorageService } from 'core/services/cached';
+import { db } from 'modules/db';
 import * as core from 'core';
 
+
+async function resetTextSelection() {
+  const items = await db.dump();
+  const configs = await CachedStorageService.get();
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+
+    item.cState = [0, 0];
+    item.pState = null;
+
+    db.enqueue(item, 'update');
+  }
+
+  if (configs.selected) {
+    configs.selected.cState = [0, 0];
+    configs.selected.pState = null;
+
+    await CachedStorageService.set('selected', configs.selected);
+  }
+
+  if (configs.draft) {
+    configs.draft.selection = [0, 0];
+
+    await CachedStorageService.set('draft', configs.draft);
+  }
+
+  await db.dequeue();
+}
 
 export function eventOncColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
   const dark = e ? e.matches : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -18,6 +49,12 @@ export function eventOncColorChanged(settings: ISettingsArea, e?: MediaQueryList
 }
 
 export async function settingsChanged(element: CommonSettingsElement, settings: ISettingsArea) {
+  if (settings.common.editor !== element.editor) {
+    element.disabled = true;
+    await resetTextSelection();
+    element.disabled = false;
+  }
+
   settings.common = {
     mode: element.mode,
     editor: element.editor,

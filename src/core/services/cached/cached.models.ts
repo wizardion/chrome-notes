@@ -13,4 +13,4 @@ export interface ICachedItem {
   popupSize?: number;
 }
 
-export type ICachedItems = 'selected' | 'draft' | 'size';
+export type ICachedItems = 'selected' | 'draft';

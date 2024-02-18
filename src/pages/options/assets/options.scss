@@ -72,6 +72,7 @@ fieldset:disabled svg {
 }
 
 fieldset:disabled span,
+fieldset:disabled select,
 fieldset:disabled label,
 fieldset:disabled legend,
 fieldset:disabled a,
@@ -283,6 +284,7 @@ select:focus {
   outline: none;
 }
 
+select:disabled,
 button:disabled,
 input[type='text']:disabled,
 input[type='password']:disabled,

@@ -137,6 +137,7 @@ export class VisualEditor implements IEditorView {
       }
     } catch (error) {
       console.log('set selection error', error);
+      this.setSelection([0, 0]);
     }
   }
 

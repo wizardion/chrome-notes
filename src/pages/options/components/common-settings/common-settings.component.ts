@@ -169,4 +169,13 @@ export class CommonSettingsElement extends BaseElement {
       this.form.elements.expirationDays.value = value.toString();
     }
   }
+
+  get disabled(): boolean {
+    return super.disabled;
+  }
+
+  set disabled(value: boolean) {
+    super.disabled = value;
+    this.form.elements.fieldset.disabled = value;
+  }
 }
