@@ -59,6 +59,12 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   controls.common.expirationDays = settings.common?.expirationDays;
   controls.content.hidden = false;
 
+  if (location.search.match(/develop=true/gi)) {
+    const develop = document.getElementById('develop') as HTMLDivElement;
+
+    develop.hidden = false;
+  }
+
   if (settings.common?.appearance === 2 || settings.common?.appearance === 0 &&
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.body.classList.add('theme-dark');

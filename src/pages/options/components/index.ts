@@ -26,12 +26,8 @@ export async function settingsChanged(element: CommonSettingsElement, settings: 
     expirationDays: element.expirationDays,
   };
 
-  const page = getPopupPage(settings.common);
-
-  console.log('page', [page]);
-
   eventOncColorChanged(settings);
-  await chrome.action.setPopup({ popup: page });
+  await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
   await storage.local.set('settings', settings);
 }
 
