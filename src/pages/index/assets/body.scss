@@ -1,9 +1,11 @@
-html, body {
+html,
+body {
   background: var(--body-background);
 
   min-width: 800px;
   min-height: 150px;
-  border:0;
+  height: 100vh;
+  border: 0;
   margin: 0px;
   padding: 0px;
 
