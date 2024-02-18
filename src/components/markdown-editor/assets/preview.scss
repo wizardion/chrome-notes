@@ -13,7 +13,6 @@
   padding: 9px 3px 0 6px;
   overflow-x: hidden;
   overflow-y: scroll;
-  height: 244px !important;
   font-size: 14px;
   font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
   line-height: 1.4;
@@ -48,7 +47,7 @@
 }
 
 .content-preview a {
-  color: var(--editor-highlight-color);
+  color: var(--editor-text-url);
 }
 
 .content-preview a:hover {

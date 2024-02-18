@@ -7,7 +7,7 @@ html, body {
   flex-wrap: wrap;
 }
 
-list-view{
+list-view {
   width: 130px;
 }
 
@@ -87,10 +87,20 @@ details-view {
   margin-right: 5px;
 }
 
+.middle .details-view .content {
+  height: 417px;
+}
+
 .cm-editor, 
 .content-preview,
 .visual-editor {
   height: 235px !important;
+}
+
+.middle .cm-editor, 
+.middle .content-preview,
+.middle .visual-editor {
+  height: 415px !important;
 }
 
 .ProseMirror {
@@ -99,7 +109,6 @@ details-view {
 
 details-view[data-scroll='true'] {
   .head {
-    // box-shadow: 3px 5px 5px -5px var(--base-shadow);
     box-shadow: none;
   }
 

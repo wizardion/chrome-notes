@@ -11,7 +11,15 @@ html, body {
   font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
 }
 
-.middle {
+.list-view .list-content,
+.details-view .content-preview,
+.details-view .visual-editor,
+.details-view .cm-editor {
+  height: 244px;
+}
+
+.middle, 
+.middle .details-view {
   height: 450px;
 }
 
@@ -23,7 +31,7 @@ html, body {
 .middle .details-view .content-preview,
 .middle .details-view .visual-editor,
 .middle .details-view .cm-editor {
-  height: 424px !important;
+  height: 424px;
 }
 
 .middle .list-view .list-scroll {
