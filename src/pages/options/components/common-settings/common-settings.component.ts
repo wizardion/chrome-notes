@@ -28,7 +28,8 @@ export class CommonSettingsElement extends BaseElement {
       popupOptions: <HTMLElement> this.template.querySelector('div[name="popup-options"]'),
       popupSize: <NodeList> this.template.querySelectorAll('input[name="popup-size"]'),
       appearance: <NodeList> this.template.querySelectorAll('input[name="appearance"]'),
-      expirationDays: this.template.querySelector('select[name="expirationDays"]')
+      expirationDays: this.template.querySelector('select[name="expirationDays"]'),
+      progressBar: this.template.querySelector('progress-bar')
     });
   }
 
@@ -62,6 +63,8 @@ export class CommonSettingsElement extends BaseElement {
 
       item.addEventListener('change', () => this.onAppearanceChange(item));
     }
+
+    this.form.elements.progressBar.addEventListener('progress:animation-complete', () => this.onAnimationComplete());
   }
 
   protected onModeChange(item: HTMLInputElement) {
@@ -88,6 +91,10 @@ export class CommonSettingsElement extends BaseElement {
   protected onExpirationDaysChange(item: HTMLSelectElement) {
     this._expirationDays = Number(item.value);
     this.dispatchEvent(this.event);
+  }
+
+  protected onAnimationComplete() {
+    this.form.elements.fieldset.disabled = false;
   }
 
   get mode(): number {
@@ -176,6 +183,10 @@ export class CommonSettingsElement extends BaseElement {
 
   set disabled(value: boolean) {
     super.disabled = value;
-    this.form.elements.fieldset.disabled = value;
+    this.form.elements.progressBar.spinning = value;
+
+    if (value) {
+      this.form.elements.fieldset.disabled = true;
+    }
   }
 }

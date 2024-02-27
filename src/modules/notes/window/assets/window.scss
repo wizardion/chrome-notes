@@ -21,6 +21,12 @@ details-view {
   height: 100%;
 }
 
+.list-view .list-item,
+.list-view .hold .list-item:hover {
+  border-radius: 4px;
+  border-left-width: 2px;
+}
+
 .list-item .list-index, 
 .list-item .list-index + div,
 .list-item .date-time,
@@ -32,12 +38,25 @@ details-view {
   opacity: 1 !important;
 }
 
-.list-items .list-item.selected, 
-.list-items .list-item.selected:hover,
-.list-items .list-item.selected:active {
+.list-items list-item:has(+ .selected:not(.drag)),
+.list-items .selected:not(.drag) {
+  border-color: transparent;
+}
+
+.list-items .selected .list-item, 
+.list-items .selected .list-item:hover,
+.list-items .selected .list-item:active {
   color: var(--base-bright-color);
-  background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-color));
+  // background: var(--base-highlight-color);
+  background: var(--editor-selection-background);
+  // border-color: transparent;
   cursor: default !important;
+}
+
+.list-view .drag.selected .list-item { 
+  background: var(--editor-selection-background) !important;
+  border-left-color: var(--editor-selection-background);
+  border-right-color: var(--editor-selection-background);
 }
 
 .list-view .list-content {
@@ -64,9 +83,9 @@ details-view {
   margin-bottom: 4px;
 }
 
-.list-view .list-scroll .list-items {
-  border: 1px solid var(--base-tile-background);
-}
+// .list-view .list-scroll .list-items {
+//   border: 1px solid var(--base-tile-background);
+// }
 
 .details-view .head {
   text-align: left;

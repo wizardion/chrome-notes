@@ -11,6 +11,7 @@ export interface ISortItem {
   height?: number;
   element?: HTMLElement;
   placeholder?: HTMLElement;
+  offsetHeight?: number;
 }
 
 export interface ISortContainer {

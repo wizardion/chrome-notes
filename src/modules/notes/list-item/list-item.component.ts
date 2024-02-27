@@ -61,18 +61,6 @@ export class ListItemElement extends BaseElement {
     this.form.elements.date.innerText = value.toDateString();
   }
 
-  get offsetTop(): number {
-    return this.form.elements.item.offsetTop;
-  }
-
-  get style(): CSSStyleDeclaration {
-    return this.form.elements.item.style;
-  }
-
-  get classList(): DOMTokenList {
-    return this.form.elements.item.classList;
-  }
-
   animateItem() {
     const element = this.form.elements.item;
 

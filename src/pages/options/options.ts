@@ -5,12 +5,12 @@ import { DevModeElement } from './components/dev-mode/dev';
 import { PasswordElement } from './components/passwords/password';
 import { ProgressElement } from './components/progress-bar/progress';
 import { IOptionControls } from './components/options.model';
-import {
-  devModeChanged, eventOnStorageChanged, eventOncColorChanged, settingsChanged, syncInfoChanged
-} from './components';
 import { CommonSettingsElement } from './components/common-settings/common-settings.component';
 import { AlertElement } from './components/alert/alert.component';
 import { getSettings, ISettingsArea } from 'modules/settings';
+import {
+  devModeChanged, eventOnStorageChanged, eventOncColorChanged, settingsChanged, syncInfoChanged
+} from './components';
 
 
 const controls: IOptionControls = {};

@@ -16,7 +16,8 @@ $themes: (
 
     'base-shadow': rgba(0, 0, 0, 0.2),
     'base-shadow-tile': #056a6115,
-    'base-shadow-drag': #cdcdcd,
+    // 'base-shadow-drag': #cdcdcd,
+    'base-shadow-drag': #A2A1A3,
 
     'base-highlight-color': #F1F8F7, // 347a7b
     'base-highlight-second-color': white,
@@ -37,7 +38,8 @@ $themes: (
     'editor-quote-stroke': lightgray,
 
     'editor-selection-cursor': #056a61,
-    'editor-selection-background': #D4E6E885,
+    // 'editor-selection-background': #D4E6E885,
+    'editor-selection-background': #EAF2F3,
     'editor-selection-stroke': #BBDBDC,
     'editor-inactive-selection-background': #e9e9e9,
     'editor-inactive-selection-stroke': #d9d9d9,
@@ -67,7 +69,7 @@ $themes: (
 
     'base-shadow': rgba(0, 0, 0, 0.3),
     'base-shadow-tile': rgba(0, 0, 0, 0.2),
-    'base-shadow-drag': rgba(25, 25, 25, 1),
+    'base-shadow-drag': rgba(20, 20, 20, 1),
 
     'base-highlight-color': darken(#31363C, 0%),
     'base-highlight-second-color': lighten(#28292A, 1%),

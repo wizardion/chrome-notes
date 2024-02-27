@@ -40,7 +40,7 @@ export abstract class PopupBaseElement extends BaseElement {
     note.item = item;
 
     item.addEventListener('click', () => this.selected?.id !== note.id && this.select(note));
-    item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.pickUp(e, this.listView.scrollable, item));
+    item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.start(e, this.listView.scrollable, item));
     this.listView.add(item);
     this.items.push(note);
 
@@ -109,7 +109,7 @@ export abstract class PopupBaseElement extends BaseElement {
     item.date = new Date(note.updated);
 
     item.addEventListener('click', () => this.select(note));
-    item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.pickUp(e, this.listView.list, item));
+    item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.start(e, this.listView.scrollable, item));
 
     this.listView.add(item);
     this.items.push(note);
@@ -193,7 +193,11 @@ export abstract class PopupBaseElement extends BaseElement {
 
       this.save();
     } else {
-      // DbProviderService.cache.set('draft', { title, description, selection });
+      DbProviderService.cache.set('draft', {
+        title: item.title,
+        description: item.description,
+        selection: item.cState
+      });
     }
   }
 

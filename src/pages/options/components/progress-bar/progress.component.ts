@@ -37,7 +37,6 @@ export class ProgressElement extends BaseElement {
     this.progress.classList.remove('animating');
     this.thumb.removeEventListener('animationiteration', this.animationEvent);
     this.dispatchEvent(this.event);
-    // this.promise.
   }
 
   public finish(delay?: number): Promise<void> {

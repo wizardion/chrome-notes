@@ -211,6 +211,7 @@ fieldset:disabled button {
 .dropdown-menu button:hover {
   background-color: var(--editor-selection-background) !important;
   color: var(--base-bright-color) !important;
+  border-radius: 3px !important;
 }
 
 .dropdown-menu .normal-text {

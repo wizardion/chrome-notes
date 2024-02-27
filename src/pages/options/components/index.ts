@@ -35,6 +35,7 @@ async function resetTextSelection() {
     await CachedStorageService.set('draft', configs.draft);
   }
 
+  await core.delay(750);
   await db.dequeue();
 }
 

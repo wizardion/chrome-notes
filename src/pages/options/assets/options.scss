@@ -1,12 +1,13 @@
 @use 'colors';
 
-html, body {
+html,
+body {
   background: var(--body-color);
 
   min-width: 400px;
   min-height: 150px;
 
-  border:0;
+  border: 0;
   margin: 0px;
   padding: 0px;
 
@@ -24,10 +25,19 @@ html, body {
   display: flex;
 }
 
+.row-flex.small-space {
+  line-height: 16px;
+}
+
 .row-flex-group {
   font-style: italic;
   color: var(--base-highlight-color);
   flex: 0 0 10em;
+}
+
+.row-flex-body {
+  width: 100%;
+  padding: 0 30px 0 0px;
 }
 
 .alert {
@@ -288,7 +298,7 @@ select:disabled,
 button:disabled,
 input[type='text']:disabled,
 input[type='password']:disabled,
-input[type='button']:disabled, 
+input[type='button']:disabled,
 .dangerous:disabled {
   color: var(--control-inactive-text-color) !important;
   fill: var(--control-inactive-text-color) !important;
@@ -398,7 +408,7 @@ div ul {
   margin-left: 5px;
 }
 
-.info div {
+.info > div {
   margin-top: 5px;
 }
 
@@ -531,10 +541,17 @@ span.info {
 }
 
 @media only screen and (max-width: 600px) {
-  html, body {
+
+  html,
+  body {
     width: 600px;
     height: 270px;
   }
+}
+
+.sync-progress {
+  width: 100%;
+  display: inline-block;
 }
 
 .progress-bar {
@@ -545,26 +562,25 @@ span.info {
   overflow: hidden;
   position: relative;
   border: 1px solid transparent;
+  box-sizing: border-box;
+  margin-top: -2px;
+  vertical-align: middle;
+  top: 0px;
+}
+
+.sync-progress .progress-bar {
+  width: 100%;
 }
 
 .progress-bar .progress-thumb {
   float: left;
-  background-color: var(--base-highlight-color);
+  background-color: var(--progress-thumb-color);
   border-radius: 4px;
   height: 100%;
   width: 0%;
   margin-top: 0px;
   margin-left: 0px;
-}
-
-.progress-background {
-  width: 100%;
-  height: 4px;
-  background-color: var(--control-bright-color);
-  border-radius: 4px;
-  position: relative;
-  top: 11px;
-  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .progress-bar.animating {
@@ -572,13 +588,10 @@ span.info {
 }
 
 .progress-bar .animate {
-  width: 10%;
+  width: 15%;
   position: absolute;
   top: 0px;
-  background-color: var(--control-bright-color) !important;
-  animation: in-progress 1.75s;
-  border: 1px solid var(--control-inactive-background-color);
-  height: calc(100% - 2px);
+  animation: in-progress 2s;
   animation-fill-mode: forwards;
   animation-iteration-count: infinite;
 }
@@ -592,24 +605,22 @@ ul.flat li {
   margin: 0 10px 0 0px;
 }
 
-ul li input[type="radio"]:checked+span {
+ul li input[type="radio"]:checked + span {
   color: var(--base-highlight-color);
 }
 
-@keyframes in-progress
-{
+@keyframes in-progress {
   0% {
-    width: 25%;
-    left: -25%;
-	}
+    left: -15%;
+  }
+
   75% {
-    width: 15%;
-		left: 85%;
-	}
-	100% {
-    width: 0%;
-		left: 100%;
-	}
+    left: 85%;
+  }
+
+  100% {
+    left: 100%;
+  }
 }
 
 input:disabled,
