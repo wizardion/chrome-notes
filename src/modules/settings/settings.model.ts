@@ -32,3 +32,8 @@ export interface ISettingsArea {
   identity?: IdentityInfo | null;
   error?: ISettingsError | null;
 }
+
+export interface ITabInfo {
+  id: number;
+  window: number;
+}

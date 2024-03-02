@@ -4,10 +4,10 @@ import { ISyncStorageValue, storage } from 'core/services';
 import { LoggerService } from 'modules/logger';
 import { IdentityInfo } from 'modules/sync/components/interfaces';
 import {
-  DataWorker, SyncWorker, BaseWorker, IWindow, StorageChange, AreaName, eventOnSyncInfoChanged,
-  eventOnIdentityInfoChanged, findTab, openPopup, ensureOptionPage, initPopup
+  DataWorker, SyncWorker, BaseWorker, StorageChange, AreaName, eventOnSyncInfoChanged,
+  openPopup, ensureOptionPage, initPopup
 } from './components';
-import { ISettingsArea } from 'modules/settings/settings.model';
+import { ISettingsArea, ITabInfo } from 'modules/settings/settings.model';
 
 
 const logger = new LoggerService('background.ts', 'green');
@@ -80,24 +80,8 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
 
 chrome.action.onClicked.addListener(async () => {
   const local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'settings']);
-  // const window: IWindow = local.window;
 
-  // if (local.migrate) {
-  //   return openMigration();
-  // }
-
-  // if (local.tabInfo) {
-  //   const tab: chrome.tabs.Tab = await findTab(local.tabInfo.id);
-
-  //   console.log('tab', tab);
-
-  //   // openPopup(local.mode, window, tab && tab.id, tab && tab.windowId);
-  // } else {
-  //   // console.log('');
-  //   // openPopup(local.settings.common.mode, local.settings.common.editor, window);
-  // }
-
-  openPopup(local.settings?.value as ISettingsArea);
+  openPopup(local.settings?.value as ISettingsArea, local.tabInfo as ITabInfo);
 });
 
 chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: AreaName) => {

@@ -35,6 +35,14 @@ export class WindowNotesElement extends PopupBaseElement {
     this.detailsView.elements.cancel.classList.remove('back');
   }
 
+  protected async eventListeners() {
+    super.eventListeners();
+
+    const tabInfo = await chrome.tabs.getCurrent();
+
+    chrome.storage.local.set({ tabInfo: { id: tabInfo.id, window: tabInfo.windowId } });
+  }
+
   goBack() {
     this.detailsView.draft = false;
 

@@ -129,27 +129,23 @@ export class SortHelper {
   }
 
   private static moveItem(pageY: number) {
-    const center = this.item.element.offsetTop + this.item.height / 2;
+    const center = pageY + this.item.height / 2;
     const index = Math.max(Math.min(Math.floor(center / this.item.offsetHeight), this.childElementCount), 0);
 
     if (this.item.index !== index) {
+      const startIndex = this.item.startIndex;
+      const direction = Math.sign(this.item.startIndex - index);
       const placeholderY = this.item.offsetHeight *  (index - this.item.startIndex);
 
-      for (let i = Math.min(this.item.index, index) + 1; i <= Math.max(this.item.index, index); i++) {
-        if (index === this.item.startIndex) {
-          this.collection[this.item.index].style.transform = `translateY(0px)`;
+      for (let i = Math.min(startIndex, this.item.index); i <= Math.max(startIndex, this.item.index); i++) {
+        if (i !== this.item.startIndex) {
+          this.collection[i].style.transform = `translateY(0px)`;
         }
+      }
 
-        if (index < this.item.startIndex) {
-          const offsetTop = (index < this.item.index) ? this.item.offsetHeight : 0;
-
-          this.collection[i - 1].style.transform = `translateY(${offsetTop}px)`;
-        }
-
-        if (index > this.item.startIndex) {
-          const offsetTop = (index < this.item.index) ? 0 : this.item.offsetHeight * -1;
-
-          this.collection[i].style.transform = `translateY(${offsetTop}px)`;
+      for (let i = Math.min(startIndex, index); i <= Math.max(startIndex, index); i++) {
+        if (i !== this.item.startIndex) {
+          this.collection[i].style.transform = `translateY(${(this.item.offsetHeight * direction)}px)`;
         }
       }
 
@@ -184,6 +180,7 @@ export class SortHelper {
         current = i;
       }
 
+      item.style.transform = `translateY(0px)`;
       this.collection.push(item);
     }
 

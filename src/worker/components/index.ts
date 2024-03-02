@@ -5,6 +5,7 @@ import { removeCachedAuthToken } from 'modules/sync/components/drive';
 // import { IWindow } from './models';
 import { storage, ISyncInfo } from 'core/services';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
+import { ITabInfo } from 'modules/settings/settings.model';
 
 
 export { BaseWorker } from './base-worker';
@@ -14,7 +15,7 @@ export { IWindow, StorageChange, AreaName } from './models';
 
 const logger = new LoggerService('background/index.ts', 'green');
 
-export async function findTab(tabId: number): Promise<chrome.tabs.Tab> {
+export async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
   const tabs = await chrome.tabs.query({});
 
   for (let i = 0; i < tabs.length; i++) {
@@ -47,8 +48,18 @@ export async function initPopup() {
 }
 
 // export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {
-export function openPopup(settings: ISettingsArea) {
+export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
   const mode = PAGE_MODES[settings.common.mode];
+
+  if (tabInfo) {
+    const tab = await findTab(tabInfo.id);
+
+    if (tab) {
+      await chrome.windows.update(tab.windowId, { focused: true });
+
+      return chrome.tabs.update(tab.id, { active: true });
+    }
+  }
 
   return chrome.tabs.create({ url: mode.page || 'option.html' });
 
