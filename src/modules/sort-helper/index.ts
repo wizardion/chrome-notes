@@ -134,7 +134,7 @@ export class SortHelper {
 
     if (this.item.index !== index) {
       const startIndex = this.item.startIndex;
-      const direction = Math.sign(this.item.startIndex - index);
+      const offsetTop = this.item.offsetHeight * Math.sign(startIndex - index);
       const placeholderY = this.item.offsetHeight *  (index - this.item.startIndex);
 
       for (let i = Math.min(startIndex, this.item.index); i <= Math.max(startIndex, this.item.index); i++) {
@@ -145,7 +145,7 @@ export class SortHelper {
 
       for (let i = Math.min(startIndex, index); i <= Math.max(startIndex, index); i++) {
         if (i !== this.item.startIndex) {
-          this.collection[i].style.transform = `translateY(${(this.item.offsetHeight * direction)}px)`;
+          this.collection[i].style.transform = `translateY(${offsetTop}px)`;
         }
       }
 
