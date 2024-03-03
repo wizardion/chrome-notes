@@ -5,8 +5,9 @@ export interface ISortEvents {
 }
 
 export interface ISortItem {
-  startIndex?: number;
-  index?: number;
+  startIndex: number;
+  index: number;
+  previous: number;
   pageY?: number;
   height?: number;
   element?: HTMLElement;

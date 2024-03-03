@@ -42,6 +42,7 @@ export class SortHelper {
       this.item = {
         index: index,
         startIndex: index,
+        previous: index,
         height: 0,
         element: element,
         pageY: startY - element.offsetTop,
@@ -128,11 +129,29 @@ export class SortHelper {
     this.moveItem(point.top);
   }
 
-  private static moveItem(pageY: number) {
+  private static moveItem(pageY: number, mingle?: boolean) {
     const center = pageY + this.item.height / 2;
     const index = Math.max(Math.min(Math.floor(center / this.item.offsetHeight), this.childElementCount), 0);
 
-    if (this.item.index !== index) {
+    if (!mingle && this.item.index !== index && Math.abs(this.item.previous - index) < 2) {
+      const offsetTop = this.item.offsetHeight * Math.sign(this.item.startIndex - index);
+      const placeholderY = this.item.offsetHeight *  (index - this.item.startIndex);
+      const start = Math.min(this.item.startIndex, index);
+      const end = Math.max(this.item.startIndex, index);
+
+      for (let i = Math.min(this.item.index, index); i <= Math.max(this.item.index, index); i++) {
+        if (i !== this.item.startIndex) {
+          const top = i >= start && i <= end ? offsetTop : 0;
+
+          this.collection[i].style.transform = `translateY(${top}px)`;
+        }
+      }
+
+      this.item.placeholder.style.transform = `translateY(${placeholderY}px)`;
+      this.item.previous = index;
+    }
+
+    if (!mingle && this.item.index !== index && Math.abs(this.item.previous - index) > 1) {
       const startIndex = this.item.startIndex;
       const offsetTop = this.item.offsetHeight * Math.sign(startIndex - index);
       const placeholderY = this.item.offsetHeight *  (index - this.item.startIndex);
@@ -150,9 +169,10 @@ export class SortHelper {
       }
 
       this.item.placeholder.style.transform = `translateY(${placeholderY}px)`;
-      this.item.index = index;
+      this.item.previous = index;
     }
 
+    this.item.index = index;
     this.item.element.style.top = `${pageY}px`;
   }
 
@@ -199,40 +219,43 @@ export class SortHelper {
 
   private static animateUp(pageY: number) {
     const pressure = ((this.container.offsetTop + this.item.pageY) - pageY) * 2;
-    const speed = Math.max(Math.min(35 - pressure, 35), 0);
+    const interval = Math.max(Math.min(35 - pressure, 35), 1);
+    const speed = Math.max(Math.round(pressure / 100), 1);
 
     const moveAnimatedItem = () => {
-      const scrollTop = this.container.element.scrollTop - 1;
+      const scrollTop = this.container.element.scrollTop - speed;
 
       if (!this.item || scrollTop <= 0) {
         return clearInterval(this.interval);
       }
 
       this.container.element.scrollTop = scrollTop;
-      this.moveItem((scrollTop + this.container.offsetTop - this.item.height) + 1);
+      this.moveItem((scrollTop + this.container.offsetTop - this.item.height) + 1, speed > 2);
     };
 
     moveAnimatedItem();
-    this.interval = setInterval(moveAnimatedItem, speed);
+    this.interval = setInterval(moveAnimatedItem, interval);
   }
 
   private static animateDown(pageY: number) {
     const distance = (this.item.height - this.item.pageY);
     const pressure = (pageY - (this.container.height + this.container.offsetTop - distance)) * 2;
-    const speed = Math.max(Math.min(35 - pressure, 35), 1);
+    const interval = Math.max(Math.min(35 - pressure, 35), 1);
+    const speed = Math.max(Math.round(pressure / 100) - 1, 1);
 
     const moveAnimatedItem = () => {
-      const scrollTop = this.container.element.scrollTop + 1;
+      const scrollTop = this.container.element.scrollTop + speed;
+      const topY = Math.min((scrollTop + this.container.height - this.item.height) - 6, this.container.maxY);
 
       if (!this.item || scrollTop + this.container.height >= this.container.scrollHeight) {
         return clearInterval(this.interval);
       }
 
       this.container.element.scrollTop = scrollTop;
-      this.moveItem(Math.min((scrollTop + this.container.height - this.item.height) - 6, this.container.maxY));
+      this.moveItem(topY, speed > 2);
     };
 
     moveAnimatedItem();
-    this.interval = setInterval(moveAnimatedItem, speed);
+    this.interval = setInterval(moveAnimatedItem, interval);
   }
 }
