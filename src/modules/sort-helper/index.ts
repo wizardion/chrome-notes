@@ -134,46 +134,52 @@ export class SortHelper {
     const index = Math.max(Math.min(Math.floor(center / this.item.offsetHeight), this.childElementCount), 0);
 
     if (!mingle && this.item.index !== index && Math.abs(this.item.previous - index) < 2) {
-      const offsetTop = this.item.offsetHeight * Math.sign(this.item.startIndex - index);
-      const placeholderY = this.item.offsetHeight *  (index - this.item.startIndex);
-      const start = Math.min(this.item.startIndex, index);
-      const end = Math.max(this.item.startIndex, index);
-
-      for (let i = Math.min(this.item.index, index); i <= Math.max(this.item.index, index); i++) {
-        if (i !== this.item.startIndex) {
-          const top = i >= start && i <= end ? offsetTop : 0;
-
-          this.collection[i].style.transform = `translateY(${top}px)`;
-        }
-      }
-
-      this.item.placeholder.style.transform = `translateY(${placeholderY}px)`;
-      this.item.previous = index;
-    }
-
-    if (!mingle && this.item.index !== index && Math.abs(this.item.previous - index) > 1) {
-      const startIndex = this.item.startIndex;
-      const offsetTop = this.item.offsetHeight * Math.sign(startIndex - index);
-      const placeholderY = this.item.offsetHeight *  (index - this.item.startIndex);
-
-      for (let i = Math.min(startIndex, this.item.index); i <= Math.max(startIndex, this.item.index); i++) {
-        if (i !== this.item.startIndex) {
-          this.collection[i].style.transform = `translateY(0px)`;
-        }
-      }
-
-      for (let i = Math.min(startIndex, index); i <= Math.max(startIndex, index); i++) {
-        if (i !== this.item.startIndex) {
-          this.collection[i].style.transform = `translateY(${offsetTop}px)`;
-        }
-      }
-
-      this.item.placeholder.style.transform = `translateY(${placeholderY}px)`;
-      this.item.previous = index;
+      this.shuffle(this.item.startIndex, this.item.index, index);
+    } else if (!mingle && (this.item.index !== index || this.item.previous !== index)
+        && Math.abs(this.item.previous - index) > 2) {
+      this.shuffleAll(this.item.startIndex, index);
     }
 
     this.item.index = index;
     this.item.element.style.top = `${pageY}px`;
+  }
+
+  private static shuffle(startIndex: number, previous: number, index: number): void {
+    const offsetTop = this.item.offsetHeight * Math.sign(startIndex - index);
+    const placeholderY = this.item.offsetHeight *  (index - startIndex);
+    const start = Math.min(startIndex, index);
+    const end = Math.max(startIndex, index);
+
+    for (let i = Math.min(previous, index); i <= Math.max(previous, index); i++) {
+      if (i !== startIndex) {
+        const top = i >= start && i <= end ? offsetTop : 0;
+
+        this.collection[i].style.transform = `translateY(${top}px)`;
+      }
+    }
+
+    this.item.placeholder.style.transform = `translateY(${placeholderY}px)`;
+    this.item.previous = index;
+  }
+
+  private static shuffleAll(startIndex: number, index: number): void {
+    const offsetTop = this.item.offsetHeight * Math.sign(startIndex - index);
+    const placeholderY = this.item.offsetHeight *  (index - startIndex);
+
+    for (let i = 0; i < this.collection.length; i++) {
+      if (i !== startIndex) {
+        this.collection[i].style.transform = `translateY(0px)`;
+      }
+    }
+
+    for (let i = Math.min(startIndex, index); i <= Math.max(startIndex, index); i++) {
+      if (i !== startIndex) {
+        this.collection[i].style.transform = `translateY(${offsetTop}px)`;
+      }
+    }
+
+    this.item.placeholder.style.transform = `translateY(${placeholderY}px)`;
+    this.item.previous = index;
   }
 
   private static getPoint(pageY: number, scrollTop: number): ISortPoint {
@@ -224,13 +230,17 @@ export class SortHelper {
 
     const moveAnimatedItem = () => {
       const scrollTop = this.container.element.scrollTop - speed;
+      const topY = (scrollTop + this.container.offsetTop - this.item.height) + 1;
 
       if (!this.item || scrollTop <= 0) {
+        this.container.element.scrollTop = 0;
+        this.moveItem(topY);
+
         return clearInterval(this.interval);
       }
 
       this.container.element.scrollTop = scrollTop;
-      this.moveItem((scrollTop + this.container.offsetTop - this.item.height) + 1, speed > 2);
+      this.moveItem(topY, speed > 2);
     };
 
     moveAnimatedItem();
@@ -248,6 +258,9 @@ export class SortHelper {
       const topY = Math.min((scrollTop + this.container.height - this.item.height) - 6, this.container.maxY);
 
       if (!this.item || scrollTop + this.container.height >= this.container.scrollHeight) {
+        this.container.element.scrollTop = this.container.scrollHeight - this.container.height;
+        this.moveItem(topY);
+
         return clearInterval(this.interval);
       }
 
