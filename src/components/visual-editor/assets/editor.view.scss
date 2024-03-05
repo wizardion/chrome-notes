@@ -17,6 +17,7 @@
   font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
   line-height: 1.4;
   background: var(--editor-background);
+  cursor: text;
 }
 
 .visual-editor > .ProseMirror-focused {
@@ -125,6 +126,7 @@
 
 .visual-editor p {
   margin: 0px 0 0px 0;
+  width: fit-content;
 }
 
 .visual-editor :not(pre) > code {

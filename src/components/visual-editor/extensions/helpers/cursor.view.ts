@@ -202,7 +202,7 @@ export class CursorView {
     };
 
     if (result.right - result.left < 1) {
-      result.right += (radius * 2);
+      result.right += (radius * 4);
     }
 
     return result;
@@ -288,4 +288,34 @@ export class CursorView {
     // -> and re-adding the class
     element.classList.add(className);
   }
+
+  /* private drawTracing(range: Range, root: DOMRect | IRect) {
+    const clientRects = range.getClientRects();
+
+    console.clear();
+    console.log('-', range);
+
+    for (let i = 0; i < this.polygons?.length; i++) {
+      this.polygons[i].remove();
+    }
+
+    this.polygons = [];
+    const toRect = (rect: DOMRect) => ({
+      left: rect.left - root.left,
+      top: rect.top - root.top,
+      right: rect.right - root.left,
+      bottom: rect.bottom - root.top,
+    });
+
+    for (let i = 0; i < clientRects.length; i++) {
+      const polygon = this.doc.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const rect = toRect(clientRects.item(i));
+
+      polygon.setAttribute('d', this.drawPath([rect]));
+      polygon.style.stroke = 'red';
+
+      this.polygons.push(polygon);
+      this.selection.appendChild(polygon);
+    }
+  } */
 }
