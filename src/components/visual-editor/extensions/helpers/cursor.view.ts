@@ -4,6 +4,7 @@ import { IDirection, IRect, ISelectionRange } from './models/cursor.models';
 
 
 export const radius = 2;
+export const minimum = radius * 4;
 export const widget = document.createElement('div');
 
 export class CursorView {
@@ -171,8 +172,10 @@ export class CursorView {
     return {
       cursor: {
         left: !collapsed && forward ? cursorRect.right : cursorRect.left,
-        top: collapsed ? cursorRect.top : cursorRect.top + radius,
-        height: (collapsed ? cursorRect.bottom : cursorRect.bottom - (radius * 2)) - cursorRect.top
+        // top: collapsed ? cursorRect.top : cursorRect.top + radius,
+        // height: (collapsed ? cursorRect.bottom : cursorRect.bottom - (radius * 2)) - cursorRect.top
+        top: cursorRect.top,
+        height: cursorRect.bottom - cursorRect.top
       },
       collapsed: collapsed,
       boundingRect: this.copyRect(this.normalize(editorBoundaries, editorBoundaries)),
@@ -194,26 +197,32 @@ export class CursorView {
   }
 
   private normalize(rect: DOMRect | IRect, root: DOMRect | IRect): IRect {
-    const result = {
+    return {
       left: rect.left - root.left,
       top: rect.top - root.top,
       right: rect.right - root.left,
       bottom: rect.bottom - root.top,
     };
-
-    if (result.right - result.left < 1) {
-      result.right += (radius * 4);
-    }
-
-    return result;
   }
 
-  private removeGap(first: IRect, second: IRect): IRect {
+  private removeGap(first: IRect, second: IRect, root?: DOMRect | IRect): IRect {
     if (first && first.top !== second.top) {
       const gap = (second.top - first.bottom) / 2;
 
       first.bottom += gap;
       second.top -= gap;
+    }
+
+    if (first) {
+      second.left = 1;
+    }
+
+    if (root) {
+      second.right = Math.min(second.right + minimum, (root.right - root.left) - 1);
+    }
+
+    if (second.right - second.left < 1) {
+      second.right += minimum;
     }
 
     return second;
@@ -245,7 +254,7 @@ export class CursorView {
       const rect = this.copyRect(clientRects.item(i));
 
       if (rect.top >= current.bottom) {
-        lines.push(this.removeGap(lines[line], this.normalize(current, root)));
+        lines.push(this.removeGap(lines[line], this.normalize(current, root), root));
 
         current = rect;
         previous = rect;
@@ -291,9 +300,6 @@ export class CursorView {
 
   /* private drawTracing(range: Range, root: DOMRect | IRect) {
     const clientRects = range.getClientRects();
-
-    console.clear();
-    console.log('-', range);
 
     for (let i = 0; i < this.polygons?.length; i++) {
       this.polygons[i].remove();

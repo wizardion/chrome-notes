@@ -11,6 +11,10 @@
   background: transparent;
 }
 
+.ProseMirror.vr-selection-enabled > p:has(br) {
+  width: fit-content;
+}
+
 .ProseMirror-focused {
   --vr-cursor-color: var(--editor-selection-cursor);
   --vr-cursor-selection: var(--editor-selection-background);
