@@ -21,6 +21,7 @@ import { buildKeymap } from './extensions/keymap';
 import { virtualCursor } from './extensions/cursor';
 import { buildInputRules } from './extensions/inputrules';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
+import { clipboard } from './extensions/clipboard';
 
 
 export class VisualEditor implements IEditorView {
@@ -47,7 +48,8 @@ export class VisualEditor implements IEditorView {
       dropCursor({ color: 'gray', width: 1 }),
       gapCursor(),
       history(),
-      virtualCursor()
+      virtualCursor(),
+      clipboard()
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });

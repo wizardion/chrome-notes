@@ -213,9 +213,9 @@ export class CursorView {
       second.top -= gap;
     }
 
-    if (first) {
-      second.left = 1;
-    }
+    // if (first) {
+    // second.left = 1;
+    // }
 
     if (root) {
       second.right = Math.min(second.right + minimum, (root.right - root.left) - 1);

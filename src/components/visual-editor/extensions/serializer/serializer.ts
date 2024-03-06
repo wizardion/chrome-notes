@@ -1,16 +1,17 @@
 import { EditorState } from 'prosemirror-state';
 import { ISerializingAttributes, ISerializingNode } from './models/serializer.models';
 import { serializingSchema } from './md-schema';
+import { Fragment } from 'prosemirror-model';
 
 
 export class MarkdownSerializer {
-  private static schema = serializingSchema;
+  protected static schema = serializingSchema;
 
-  static serialize(state: EditorState): string {
+  static serialize(state: EditorState, content?: Fragment): string {
     const { schema } = state;
     const blocks: string[] = [];
 
-    state.doc.forEach(block => {
+    (content || state.doc).forEach(block => {
       const node = block.toJSON() as ISerializingNode;
 
       if (schema.nodes[node.type] && this.schema.nodes[node.type]) {
@@ -22,14 +23,14 @@ export class MarkdownSerializer {
     return blocks.join('').replace(/\n\n$/g, '\n');
   }
 
-  private static renderBlock(node: ISerializingNode, depth = 0): string {
+  protected static renderBlock(node: ISerializingNode, depth = 0): string {
     const block = this.schema.nodes[node.type];
     const content = this.gerContent(node.content || [], block.attrs, depth + 1);
 
     return block.toString(content, node.attrs, depth);
   }
 
-  private static gerContent(content: ISerializingNode[], attrs: ISerializingAttributes, depth: number): string {
+  protected static gerContent(content: ISerializingNode[], attrs: ISerializingAttributes, depth: number): string {
     const result: string[] = [];
 
     content.forEach((node, index) => {
@@ -44,7 +45,7 @@ export class MarkdownSerializer {
     return result.join('');
   }
 
-  private static toString(node: ISerializingNode): string {
+  protected static toString(node: ISerializingNode): string {
     let text = node.text;
 
     node.marks?.forEach(item => {
