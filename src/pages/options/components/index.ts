@@ -11,7 +11,7 @@ import * as core from 'core';
 
 async function resetTextSelection() {
   const items = await db.dump();
-  const configs = await CachedStorageService.get();
+  const cache = await CachedStorageService.dump();
 
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
@@ -22,20 +22,19 @@ async function resetTextSelection() {
     db.enqueue(item, 'update');
   }
 
-  if (configs.selected) {
-    configs.selected.cState = [0, 0];
-    configs.selected.pState = null;
+  if (cache.selected) {
+    cache.selected.cState = [0, 0];
+    cache.selected.pState = null;
 
-    await CachedStorageService.set('selected', configs.selected);
+    await CachedStorageService.set('selected', cache.selected);
   }
 
-  if (configs.draft) {
-    configs.draft.selection = [0, 0];
+  if (cache.draft) {
+    cache.draft.selection = [0, 0];
 
-    await CachedStorageService.set('draft', configs.draft);
+    await CachedStorageService.set('draft', cache.draft);
   }
 
-  await core.delay(750);
   await db.dequeue();
 }
 
@@ -51,9 +50,7 @@ export function eventOnColorChanged(settings: ISettingsArea, e?: MediaQueryListE
 
 export async function settingsChanged(element: CommonSettingsElement, settings: ISettingsArea) {
   if (settings.common.editor !== element.editor) {
-    element.disabled = true;
     await resetTextSelection();
-    element.disabled = false;
   }
 
   settings.common = {

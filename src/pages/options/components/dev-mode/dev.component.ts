@@ -114,7 +114,7 @@ export class DevModeElement extends BaseElement {
 
       // await dequeue();
 
-      await storage.global.clear();
+      await storage.cached.clear();
       // await storage.cached.set('list', data);
       document.location.reload();
     }
