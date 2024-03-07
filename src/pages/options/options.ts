@@ -9,7 +9,7 @@ import { CommonSettingsElement } from './components/common-settings/common-setti
 import { AlertElement } from './components/alert/alert.component';
 import { getSettings, ISettingsArea } from 'modules/settings';
 import {
-  devModeChanged, eventOnStorageChanged, eventOncColorChanged, settingsChanged, syncInfoChanged
+  devModeChanged, eventOnStorageChanged, eventOnColorChanged, settingsChanged, syncInfoChanged
 } from './components';
 
 
@@ -30,7 +30,7 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   controls.common = <CommonSettingsElement>document.querySelector('common-settings');
   controls.alert = <AlertElement>document.querySelector('alert-message');
 
-  window.matchMedia(mediaColorScheme).addEventListener('change', (e) => eventOncColorChanged(settings, e));
+  window.matchMedia(mediaColorScheme).addEventListener('change', (e) => eventOnColorChanged(settings, e));
   controls.syncInfo.addEventListener('sync-info:change', () => syncInfoChanged(controls.syncInfo, settings));
   controls.devModeInfo.addEventListener('mode:change', () => devModeChanged(controls.devModeInfo, settings));
   controls.common.addEventListener('settings:change', () => settingsChanged(controls.common, settings));

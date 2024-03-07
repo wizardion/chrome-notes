@@ -6,7 +6,7 @@ export class CachedStorageService {
   protected static readonly key = 'cache2';
   public static item: ICachedItem;
 
-  public static async set(key: ICachedItems, value: IDBNote | IDataDaft, ) {
+  public static async set(key: ICachedItems, value: IDBNote | IDataDaft) {
     this.item = this.item || ((await chrome.storage.session.get(this.key) || {})[this.key] || {}) as ICachedItem;
 
     if (key === 'selected') {

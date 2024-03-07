@@ -39,7 +39,7 @@ async function resetTextSelection() {
   await db.dequeue();
 }
 
-export function eventOncColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
+export function eventOnColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
   const dark = e ? e.matches : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   if (settings.common?.appearance === 2 || settings.common?.appearance === 0 && dark) {
@@ -64,7 +64,7 @@ export async function settingsChanged(element: CommonSettingsElement, settings: 
     expirationDays: element.expirationDays,
   };
 
-  eventOncColorChanged(settings);
+  eventOnColorChanged(settings);
   await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
   await storage.local.set('settings', settings);
 }

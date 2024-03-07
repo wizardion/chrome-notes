@@ -85,6 +85,10 @@ export function markLink(mark: MarkType) {
   ));
 }
 
+export function markCode(mark: MarkType) {
+  return markInputRule(/`(\w+)`\s$/, mark);
+}
+
 /* taken from `prosemirror-example-setup/src/inputrules.ts` */
 export function buildInputRules(schema: Schema) {
   const rules = [
@@ -96,7 +100,8 @@ export function buildInputRules(schema: Schema) {
     markStrong(schema.marks.strong),
     markStrike(schema.marks.strike),
     markEm(schema.marks.italic),
-    markLink(schema.marks.link)
+    markLink(schema.marks.link),
+    // markCode(schema.marks.code)
   ];
 
   return inputRules({ rules });
