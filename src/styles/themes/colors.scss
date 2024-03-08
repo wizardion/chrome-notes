@@ -16,7 +16,6 @@ $themes: (
 
     'base-shadow': rgba(0, 0, 0, 0.2),
     'base-shadow-tile': #056a6115,
-    // 'base-shadow-drag': #cdcdcd,
     'base-shadow-drag': #A2A1A3,
 
     'base-highlight-color': #F1F8F7, // 347a7b
@@ -34,8 +33,8 @@ $themes: (
     'editor-highlight-color': #06736a,
 
     'editor-quote-color': dimgray,
-    'editor-quote-background': #f6f8fa,
-    'editor-quote-stroke': lightgray,
+    'editor-quote-background': #f6f8fac9,
+    'editor-quote-stroke': rgba(211, 211, 211, 0.707),
 
     'editor-selection-cursor': #056a61,
     // 'editor-selection-background': #D4E6E885,

@@ -48,15 +48,23 @@ export const schema = new Schema({
       parseDOM: [{ tag: 'li' }],
       toDOM: () => ['li', 0]
     },
-    // codeBlock: {
-    //   content: 'text*',
-    //   marks: '',
-    //   group: 'block',
-    //   code: true,
-    //   defining: true,
-    //   parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-    //   toDOM: () => ['pre', ['code', 0]]
-    // }
+    codeBlock: {
+      content: 'text*',
+      marks: '',
+      group: 'block',
+      code: true,
+      defining: true,
+      parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
+      toDOM: () => ['pre', ['code', 0]]
+    },
+    blockquote: {
+      // content: 'block+',
+      content: 'text*',
+      group: 'block',
+      defining: true,
+      parseDOM: [{ tag: 'blockquote' }],
+      toDOM: () => ['blockquote', 0]
+    }
     // break: {
     //   inline: true,
     //   group: 'inline',
@@ -84,9 +92,9 @@ export const schema = new Schema({
       toDOM: (node) => ['a', { href: node.attrs.href }, 0],
       parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => ({ href: dom.href }) }]
     },
-    // code: {
-    //   toDOM: () => ['code', 0],
-    //   parseDOM: [{ tag: 'code' }]
-    // }
+    code: {
+      toDOM: () => ['code', 0],
+      parseDOM: [{ tag: 'code' }]
+    }
   }
 });

@@ -66,8 +66,8 @@
 
 .visual-editor blockquote {
   border-left: 2px solid var(--editor-quote-stroke);
-  padding-left: 20px;
-  margin-left: 5px;
+  padding: 0px 0px 0px 10px;
+  margin: 0px 0px 0px 5px;
   color: var(--editor-quote-color);
 }
 
@@ -128,24 +128,28 @@
   margin: 0px 0 0px 0;
 }
 
-// .visual-editor :not(pre) > code {
-//   // background: ghostwhite;
-//   // background-color: #f6f8fa;
+.visual-editor :not(pre) > code,
+.visual-editor pre {
+  position: relative;
+  color: var(--editor-quote-color);
+}
 
-//   border: 1px solid var(--editor-quote-stroke);
-//   border-radius: 3px;
-//   // padding: 0px 1px 0px 1px;
-//   margin: 0;
+.visual-editor :not(pre) > code::after,
+.visual-editor pre::after {
+  content: "";  
+  border-radius: 3px;
 
-//   // font-size: 13px;
-//   // color: var(--editor-highlight-color);
-//   color: var(--editor-quote-color);
-// }
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: -1000;
 
-// .visual-editor :not(pre) > code::before {
-//   content: "";
-//   background: rebeccapurple;
-// }
+  border: 1px solid var(--editor-quote-stroke);
+  color: var(--editor-quote-color);
+  background: var(--editor-quote-background);
+}
 
 // .visual-editor pre {
 // //   display: block;

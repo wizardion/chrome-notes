@@ -67,6 +67,11 @@ export function codeBlockRule(nodeType: NodeType) {
   return textblockTypeInputRule(/^```$/, nodeType);
 }
 
+export function blockquote(nodeType: NodeType) {
+  // return wrappingInputRule(/^>\s$/, nodeType);
+  return textblockTypeInputRule(/^>\s$/, nodeType);
+}
+
 export function markEm(mark: MarkType) {
   return markInputRule(/_(\w+)_\s|\*(\w+)\*\s$/, mark, m => ({ value: m[1] || m[2] }));
 }
@@ -86,7 +91,7 @@ export function markLink(mark: MarkType) {
 }
 
 export function markCode(mark: MarkType) {
-  return markInputRule(/`(\w+)`\s$/, mark);
+  return markInputRule(/`(\s?\w+\s?)`\s$/, mark);
 }
 
 /* taken from `prosemirror-example-setup/src/inputrules.ts` */
@@ -97,11 +102,14 @@ export function buildInputRules(schema: Schema) {
     bulletListRule(schema.nodes.bulletList),
     orderedListRule(schema.nodes.orderedList),
     headingRule(schema.nodes.heading),
+    codeBlockRule(schema.nodes.codeBlock),
+    blockquote(schema.nodes.blockquote),
+
     markStrong(schema.marks.strong),
     markStrike(schema.marks.strike),
     markEm(schema.marks.italic),
     markLink(schema.marks.link),
-    // markCode(schema.marks.code)
+    markCode(schema.marks.code)
   ];
 
   return inputRules({ rules });
