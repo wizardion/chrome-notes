@@ -68,7 +68,6 @@ export function codeBlockRule(nodeType: NodeType) {
 }
 
 export function blockquote(nodeType: NodeType) {
-  // return wrappingInputRule(/^>\s$/, nodeType);
   return textblockTypeInputRule(/^>\s$/, nodeType);
 }
 

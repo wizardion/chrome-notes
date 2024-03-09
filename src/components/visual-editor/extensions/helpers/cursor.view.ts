@@ -161,19 +161,20 @@ export class CursorView {
 
     const clientRects = range.getClientRects();
     const editorBoundaries = this.copyRect(view.dom.getBoundingClientRect());
-    const rects: IRect[] = clientRects.length
-      ? this.toRectLines(clientRects, editorBoundaries)
-      : [this.normalize(view.coordsAtPos(view.state.selection.$from.pos) as DOMRect, editorBoundaries)];
-
     const collapsed = range.collapsed;
     const forward = range.collapsed || this.getDirection(selection) === IDirection.right;
-    const cursorRect = rects[forward ? rects.length - 1 : 0];
+
+    const rects: IRect[] = !collapsed && clientRects.length
+      ? this.toRectLines(clientRects, editorBoundaries)
+      : [this.normalize(view.coordsAtPos(view.state.selection.from) as DOMRect, editorBoundaries)];
+
+    const cursorRect = this.normalize(view.coordsAtPos(
+      !forward ? view.state.selection.from : view.state.selection.to
+    ) as DOMRect, editorBoundaries);
 
     return {
       cursor: {
         left: !collapsed && forward ? cursorRect.right : cursorRect.left,
-        // top: collapsed ? cursorRect.top : cursorRect.top + radius,
-        // height: (collapsed ? cursorRect.bottom : cursorRect.bottom - (radius * 2)) - cursorRect.top
         top: cursorRect.top,
         height: cursorRect.bottom - cursorRect.top
       },
@@ -298,27 +299,50 @@ export class CursorView {
     element.classList.add(className);
   }
 
-  /* private drawTracing(range: Range, root: DOMRect | IRect) {
-    const clientRects = range.getClientRects();
-
+  /* private polygons: SVGPathElement[];
+  private drawTracing(clientRects: DOMRect[], root: DOMRect | IRect, boundingRect?:  DOMRect | IRect) {
     for (let i = 0; i < this.polygons?.length; i++) {
       this.polygons[i].remove();
     }
 
     this.polygons = [];
-    const toRect = (rect: DOMRect) => ({
-      left: rect.left - root.left,
-      top: rect.top - root.top,
-      right: rect.right - root.left,
-      bottom: rect.bottom - root.top,
-    });
+
+    const toRect = (rect: IRect) => {
+      const result = {
+        left: rect.left - root.left,
+        top: rect.top - root.top,
+        right: rect.right - root.left,
+        bottom: rect.bottom - root.top,
+      };
+
+      if (result.right - result.left < 1) {
+        result.right = result.left + minimum;
+      }
+
+      if (result.bottom - result.top < 1) {
+        result.bottom = result.top + minimum;
+      }
+
+      return result;
+    };
+
+    if (boundingRect) {
+      setTimeout(() => {
+        this.selection.style.display = '';
+        this.selection.setAttribute('width', `${boundingRect.right - boundingRect.left}`);
+        this.selection.setAttribute('height', `${boundingRect.bottom - boundingRect.top}`);
+        this.selection.style.left = `${boundingRect.left}px`;
+        this.selection.style.top = `${boundingRect.top}px`;
+      });
+    }
 
     for (let i = 0; i < clientRects.length; i++) {
       const polygon = this.doc.createElementNS('http://www.w3.org/2000/svg', 'path');
-      const rect = toRect(clientRects.item(i));
+      const rect = toRect(clientRects[i]);
+      const path = this.drawPath([rect]);
 
-      polygon.setAttribute('d', this.drawPath([rect]));
-      polygon.style.stroke = 'red';
+      polygon.setAttribute('d', path);
+      polygon.style.stroke = '#ff00004f';
 
       this.polygons.push(polygon);
       this.selection.appendChild(polygon);

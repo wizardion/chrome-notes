@@ -134,6 +134,11 @@
   color: var(--editor-quote-color);
 }
 
+.visual-editor pre {
+  padding: 5px 10px 5px 10px;
+  margin: 5px 0px 5px 0px;
+}
+
 .visual-editor :not(pre) > code::after,
 .visual-editor pre::after {
   content: "";  
