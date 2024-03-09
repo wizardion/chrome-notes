@@ -1,12 +1,16 @@
 import { EditorState, Plugin } from 'prosemirror-state';
 import { CursorView } from './helpers/cursor.view';
-import { Decoration, DecorationSet } from 'prosemirror-view';
+import { Decoration, DecorationSet, EditorView } from 'prosemirror-view';
 
 
 export function virtualCursor(): Plugin {
+  let view: CursorView;
+
   return new Plugin({
     view(editorView) {
-      return new CursorView(editorView);
+      view = new CursorView(editorView);
+
+      return view;
     },
     props: {
       decorations: (state: EditorState) => {
@@ -18,6 +22,7 @@ export function virtualCursor(): Plugin {
           }),
         ]);
       },
+      handleKeyDown: (v: EditorView, e: KeyboardEvent): boolean => view?.handleKeyDown(v, e),
       attributes: {
         class: 'vr-selection-enabled',
       },

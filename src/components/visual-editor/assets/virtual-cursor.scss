@@ -41,6 +41,21 @@
   z-index: 101;
 }
 
+.ProseMirror .vr-selection-layer .vr-cursor.virtual-cursor-left {
+  width: 1ch;
+  transform: translate(calc(-1ch + -1px));
+  border-bottom: 1.5px dotted var(--vr-cursor-color);
+  border-right: 1.5px solid var(--vr-cursor-color);
+  border-left: none;
+}
+
+.ProseMirror .vr-selection-layer .vr-cursor.virtual-cursor-right {
+  width: 1ch;
+  border-bottom: 1.5px dotted var(--vr-cursor-color);
+  border-left: 1.5px solid var(--vr-cursor-color);
+  border-right: none;
+}
+
 .ProseMirror .vr-selection-layer .vr-selection>* {
   position: absolute;
   background: var(--editor-inactive-selection-background);

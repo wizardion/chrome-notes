@@ -1,6 +1,7 @@
-import { EditorState } from 'prosemirror-state';
+import { EditorState, Selection as ISelection, TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { IDirection, IRect, ISelectionRange } from './models/cursor.models';
+import { Mark, ResolvedPos } from 'prosemirror-model';
 
 
 export const radius = 2;
@@ -36,11 +37,66 @@ export class CursorView {
   update(view: EditorView, lastState: EditorState) {
     const state = view.state;
 
+    this.updateCursorMarks(state);
+
     if (lastState && lastState.doc.eq(state.doc) && lastState.selection.eq(state.selection)) {
       return;
     }
 
     return this.updateSelection(view);
+  }
+
+  // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L59`
+  handleKeyDown(view: EditorView, event: KeyboardEvent): boolean {
+    const { selection } = view.state;
+
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing ||
+        !['ArrowLeft', 'ArrowRight'].includes(event.key) || !this.isTextSelection(selection) || !selection.empty
+    ) {
+      return false;
+    }
+
+    const $pos = selection.$head;
+    const [marksBefore, marksAfter] = this.getMarksAround($pos);
+    const marks = view.state.storedMarks || $pos.marks();
+
+    // Don't move the cursor, only change the stored marks
+    if (marksBefore && marksAfter && !Mark.sameSet(marksBefore, marksAfter)) {
+      if (event.key === 'ArrowLeft' && !Mark.sameSet(marksBefore, marks)) {
+        view.dispatch(view.state.tr.setStoredMarks(marksBefore));
+
+        return true;
+      }
+
+      if (event.key === 'ArrowRight' && !Mark.sameSet(marksAfter, marks)) {
+        view.dispatch(view.state.tr.setStoredMarks(marksAfter));
+
+        return true;
+      }
+    }
+
+    // Move the cursor and also change the stored marks
+    if (event.key === 'ArrowLeft' && $pos.textOffset === 1) {
+      view.dispatch(
+        view.state.tr
+          .setSelection(TextSelection.create(view.state.doc, $pos.pos - 1))
+          .setStoredMarks($pos.marks()),
+      );
+
+      return true;
+    }
+
+    if (event.key === 'ArrowRight' && $pos.textOffset + 1 === $pos.parent.maybeChild($pos.index())?.nodeSize) {
+      view.dispatch(
+        view.state.tr
+          .setSelection(TextSelection.create(view.state.doc, $pos.pos + 1))
+          .setStoredMarks($pos.marks()),
+      );
+
+      return true;
+    }
+
+    return false;
   }
 
   destroy() {
@@ -55,6 +111,7 @@ export class CursorView {
       this.cursor.style.top = `${range.cursor.top}px`;
       this.cursor.style.left = `${range.cursor.left}px`;
       this.cursor.style.height = `${range.cursor.height}px`;
+
       this.restartAnimation(this.cursor, 'vr-cursor-blink');
 
       if (!range.collapsed && range.clientRects.length) {
@@ -297,6 +354,44 @@ export class CursorView {
 
     // -> and re-adding the class
     element.classList.add(className);
+  }
+
+  // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L176`
+  private isTextSelection(selection: ISelection): boolean {
+    return selection && typeof selection === 'object' && '$cursor' in selection;
+  }
+
+  // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L164`
+  private getMarksAround($pos: ResolvedPos) {
+    const index = $pos.index();
+    const after = $pos.parent.maybeChild(index);
+
+    // When inside a text node, just return the text node's marks
+    let before = $pos.textOffset ? after : null;
+
+    if (!before && index > 0) {
+      before = $pos.parent.maybeChild(index - 1);
+    }
+
+    return [before?.marks, after?.marks] as const;
+  }
+
+  private updateCursorMarks(state: EditorState) {
+    const selection = state.selection;
+    const $pos = state.selection.$head;
+    const [marksBefore, marksAfter] = this.getMarksAround($pos);
+    const marks = state.storedMarks || $pos.marks();
+    let className = 'vr-cursor';
+
+    if ('$cursor' in selection && marksBefore && marksAfter && marks && !Mark.sameSet(marksBefore, marksAfter)) {
+      if (Mark.sameSet(marksBefore, marks)) {
+        className += ' virtual-cursor-left';
+      } else if (Mark.sameSet(marksAfter, marks)) {
+        className += ' virtual-cursor-right';
+      }
+    }
+
+    this.cursor.className = className;
   }
 
   /* private polygons: SVGPathElement[];
