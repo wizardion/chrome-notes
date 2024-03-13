@@ -1,6 +1,7 @@
 
 import './assets/editor.view.scss';
 import './assets/virtual-cursor.scss';
+import './assets/tooltip.scss';
 
 import { EditorView } from 'prosemirror-view';
 import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
@@ -22,6 +23,7 @@ import { virtualCursor } from './extensions/cursor';
 import { buildInputRules } from './extensions/inputrules';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
 import { clipboard } from './extensions/clipboard';
+import { cursorLink } from './extensions/cursor-link';
 
 
 export class VisualEditor implements IEditorView {
@@ -49,7 +51,8 @@ export class VisualEditor implements IEditorView {
       gapCursor(),
       history(),
       virtualCursor(),
-      clipboard()
+      clipboard(),
+      cursorLink()
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });

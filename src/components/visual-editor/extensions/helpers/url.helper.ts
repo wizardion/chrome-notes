@@ -35,24 +35,7 @@ export class UrlHelper extends BaseHelper {
     return null;
   }
 
-  private static transformText(state: EditorState, from: number, to: number, selectedText: string): Transaction {
-    const value = this.template.replace(/\$\{text\}/gim, selectedText);
-    const transaction = state.tr.replaceWith(from, to, state.schema.text(value));
-
-    transaction.setSelection(TextSelection.create(transaction.doc, from + value.length - 4, from + value.length - 1));
-
-    return transaction;
-  }
-
-  private static transformLink(state: EditorState, from: number, to: number, text: string, url: string): Transaction {
-    const transaction = state.tr.replaceWith(from, to, state.schema.text(text));
-
-    transaction.addMark(from, from + text.length, state.schema.marks.link.create({ href: url }));
-
-    return transaction;
-  }
-
-  private static removeLink(state: EditorState, from: number, to: number): Transaction {
+  static removeLink(state: EditorState, from: number, to: number): Transaction {
     const transaction = state.tr.removeMark(from, to, state.schema.marks.link);
     const steps = transaction.steps.filter((s) => s instanceof (RemoveMarkStep)) as RemoveMarkStep[];
 
@@ -78,6 +61,61 @@ export class UrlHelper extends BaseHelper {
         intended += (textLink.length - text.length);
       }
     }
+
+    return transaction;
+  }
+
+  static removeMark(state: EditorState, from: number, to: number): Transaction {
+    return state.tr.removeMark(from, to, state.schema.marks.link);
+  }
+
+  static linkAround(state: EditorState, pos: number): number[] {
+    const $pos = state.doc.resolve(pos);
+
+    const { parent, parentOffset } = $pos;
+    const start = parent.childAfter(parentOffset);
+
+    if (!start.node) {
+      return null;
+    }
+
+    const link = start.node.marks.find((mark) => mark.type === state.schema.marks.link);
+
+    if (!link) {
+      return null;
+    }
+
+    let startIndex = $pos.index();
+    let startPos = $pos.start() + start.offset;
+    let endIndex = startIndex + 1;
+    let endPos = startPos + start.node.nodeSize;
+
+    while (startIndex > 0 && link.isInSet(parent.child(startIndex - 1).marks)) {
+      startIndex -= 1;
+      startPos -= parent.child(startIndex).nodeSize;
+    }
+
+    while (endIndex < parent.childCount && link.isInSet(parent.child(endIndex).marks)) {
+      endPos += parent.child(endIndex).nodeSize;
+      endIndex += 1;
+    }
+
+    return [ startPos, endPos ];
+  }
+
+  private static transformText(state: EditorState, from: number, to: number, selectedText: string): Transaction {
+    const value = this.template.replace(/\$\{text\}/gim, selectedText);
+    const transaction = state.tr.replaceWith(from, to, state.schema.text(value));
+
+    transaction.setSelection(TextSelection.create(transaction.doc, from + value.length - 4, from + value.length - 1));
+
+    return transaction;
+  }
+
+  private static transformLink(state: EditorState, from: number, to: number, text: string, url: string): Transaction {
+    const transaction = state.tr.replaceWith(from, to, state.schema.text(text));
+
+    transaction.addMark(from, from + text.length, state.schema.marks.link.create({ href: url }));
 
     return transaction;
   }

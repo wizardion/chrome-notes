@@ -75,6 +75,11 @@ export const schema = new Schema({
     // }
   },
   marks: {
+    link: {
+      attrs: { href: {} },
+      toDOM: (node) => ['a', { href: node.attrs.href }, 0],
+      parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => ({ href: dom.href }) }]
+    },
     strong: {
       toDOM: () => ['strong', 0],
       parseDOM: [{ tag: 'strong' }]
@@ -86,11 +91,6 @@ export const schema = new Schema({
     strike: {
       toDOM: () => ['del', 0],
       parseDOM: [{ tag: 'del' }]
-    },
-    link: {
-      attrs: { href: {} },
-      toDOM: (node) => ['a', { href: node.attrs.href }, 0],
-      parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => ({ href: dom.href }) }]
     },
     code: {
       toDOM: () => ['code', 0],

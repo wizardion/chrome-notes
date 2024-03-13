@@ -50,9 +50,7 @@ export class CursorView {
   handleKeyDown(view: EditorView, event: KeyboardEvent): boolean {
     const { selection } = view.state;
 
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing ||
-        !['ArrowLeft', 'ArrowRight'].includes(event.key) || !this.isTextSelection(selection) || !selection.empty
-    ) {
+    if (this.isTextSelection(selection, event)) {
       return false;
     }
 
@@ -357,8 +355,10 @@ export class CursorView {
   }
 
   // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L176`
-  private isTextSelection(selection: ISelection): boolean {
-    return selection && typeof selection === 'object' && '$cursor' in selection;
+  private isTextSelection(selection: ISelection, event: KeyboardEvent): boolean {
+    // return selection && typeof selection === 'object' && '$cursor' in selection;
+    return event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing ||
+    !['ArrowLeft', 'ArrowRight'].includes(event.key) || !selection.empty;
   }
 
   // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L164`
@@ -383,7 +383,7 @@ export class CursorView {
     const marks = state.storedMarks || $pos.marks();
     let className = 'vr-cursor';
 
-    if ('$cursor' in selection && marksBefore && marksAfter && marks && !Mark.sameSet(marksBefore, marksAfter)) {
+    if (selection.empty && marksBefore && marksAfter && marks && !Mark.sameSet(marksBefore, marksAfter)) {
       if (Mark.sameSet(marksBefore, marks)) {
         className += ' virtual-cursor-left';
       } else if (Mark.sameSet(marksAfter, marks)) {

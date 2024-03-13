@@ -27,7 +27,7 @@ details-view {
   border-left-width: 2px;
 }
 
-.list-item .list-index, 
+.list-item .list-index,
 .list-item .list-index + div,
 .list-item .date-time,
 .details-view .head .link.back:not(.cancel) {
@@ -43,20 +43,18 @@ details-view {
   border-color: transparent;
 }
 
-.list-items .selected .list-item, 
+.list-items .selected .list-item,
 .list-items .selected .list-item:hover,
 .list-items .selected .list-item:active {
   color: var(--base-bright-color);
-  // background: var(--base-highlight-color);
-  background: var(--editor-selection-background);
-  // border-color: transparent;
+  background: var(--control-selected-background);
   cursor: default !important;
 }
 
-.list-view .drag.selected .list-item { 
-  background: var(--editor-selection-background) !important;
-  border-left-color: var(--editor-selection-background);
-  border-right-color: var(--editor-selection-background);
+.list-view .drag.selected .list-item {
+  background: var(--control-selected-background) !important;
+  border-left-color: var(--control-selected-background);
+  border-right-color: var(--control-selected-background);
 }
 
 .list-view .list-content {
@@ -144,7 +142,7 @@ details-view {
   border-width: 4px;
 }
 
-.cm-editor, 
+.cm-editor,
 .content-preview,
 .visual-editor {
   height: 100% !important;

@@ -25,6 +25,7 @@ $themes: (
     'control-disabled-background': transparent,
     'control-disabled-stroke': rgba(#EEF4F2, .6),
     'control-active-background': rgba(#07a698, .06), //#fbfeff
+    'control-selected-background': #EAF2F3,
 
     'editor-background': white,
     'editor-color-heading': gray,
@@ -77,6 +78,7 @@ $themes: (
     'control-disabled-background': transparent,
     'control-disabled-stroke': rgba(#31363C, .55),
     'control-active-background': rgba(#31363C, .45),
+    'control-selected-background': scale-color(lighten(#2a2c2d, 7%), $blue: 4%, $green: 1%),
 
     'editor-background': lighten(#28292A, 1%),
     'editor-color-heading': gray,
