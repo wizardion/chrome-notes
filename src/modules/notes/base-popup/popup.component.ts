@@ -4,7 +4,7 @@ import { ListItemElement } from '../list-item/list-item.component';
 import { DetailsBaseElement } from '../details-base/details-base.component';
 import { INote } from '../details-base/details-base.model';
 import { DbProviderService } from 'modules/db';
-import { SortHelper } from 'modules/sort-helper';
+import { SortHelper } from 'modules/effects';
 
 
 export abstract class PopupBaseElement extends BaseElement {

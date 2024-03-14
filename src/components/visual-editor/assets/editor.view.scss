@@ -34,6 +34,7 @@
   min-height: 232px;
   background: var(--editor-background);
   color: var(--base-text-color);
+  min-height: calc(100% - 5px);
 }
 
 .visual-editor .title + p {
@@ -85,7 +86,7 @@
 }
 
 .visual-editor a:visited {
-  color: var(--editor-highlight-color);
+  color: var(--editor-text-url);
 }
 
 .visual-editor ::selection {

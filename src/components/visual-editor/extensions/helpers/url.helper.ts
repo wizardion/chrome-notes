@@ -28,7 +28,7 @@ export class UrlHelper extends BaseHelper {
           }
         }
       } else {
-        return this.removeLink(state, $from.pos, $to.pos);
+        return this.removeMark(state, $from.pos, $to.pos);
       }
     }
 

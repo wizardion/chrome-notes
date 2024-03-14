@@ -23,8 +23,21 @@ details-view {
 
 .list-view .list-item,
 .list-view .hold .list-item:hover {
+  line-height: 28px;
+  height: 28px;
   border-radius: 4px;
   border-left-width: 2px;
+}
+
+.list-item .sort,
+.list-view .hold .list-item:hover .sort,
+.list-view .drag {
+  height:28px;
+}
+
+.list-view .drag .list-item {
+  line-height: 25px !important;
+  height: 25px !important;
 }
 
 .list-item .list-index,
@@ -146,12 +159,12 @@ details-view {
 .content-preview,
 .visual-editor {
   height: 100% !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
 }
 
-.ProseMirror {
-  min-height: 224px;
-}
+// .ProseMirror {
+//   min-height: 224px;
+// }
 
 details-view[data-scroll='true'] {
   .head {

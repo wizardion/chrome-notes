@@ -80,6 +80,10 @@ export const schema = new Schema({
       toDOM: (node) => ['a', { href: node.attrs.href }, 0],
       parseDOM: [{ tag: 'a', getAttrs: (dom: HTMLLinkElement) => ({ href: dom.href }) }]
     },
+    code: {
+      toDOM: () => ['code', 0],
+      parseDOM: [{ tag: 'code' }]
+    },
     strong: {
       toDOM: () => ['strong', 0],
       parseDOM: [{ tag: 'strong' }]
@@ -92,9 +96,6 @@ export const schema = new Schema({
       toDOM: () => ['del', 0],
       parseDOM: [{ tag: 'del' }]
     },
-    code: {
-      toDOM: () => ['code', 0],
-      parseDOM: [{ tag: 'code' }]
-    }
+
   }
 });

@@ -184,8 +184,8 @@ export class SortHelper {
 
   private static getPoint(pageY: number, scrollTop: number): ISortPoint {
     const y = (pageY - this.container.offsetTop) + scrollTop;
-    const min = (scrollTop + this.container.offsetTop - this.item.height) + 1;
     const max = Math.min((scrollTop + this.container.height - this.item.height) - 6, this.container.maxY);
+    const min = scrollTop + 2;
 
     return {
       top: Math.max(Math.min(y - this.item.pageY, max), min),
@@ -229,8 +229,8 @@ export class SortHelper {
     const speed = Math.max(Math.round(pressure / 100), 1);
 
     const moveAnimatedItem = () => {
-      const scrollTop = this.container.element.scrollTop - speed;
-      const topY = (scrollTop + this.container.offsetTop - this.item.height) + 1;
+      const scrollTop = Math.max(this.container.element.scrollTop - speed, 0);
+      const topY = scrollTop + 2;
 
       if (!this.item || scrollTop <= 0) {
         this.container.element.scrollTop = 0;
@@ -254,11 +254,12 @@ export class SortHelper {
     const speed = Math.max(Math.round(pressure / 100) - 1, 1);
 
     const moveAnimatedItem = () => {
-      const scrollTop = this.container.element.scrollTop + speed;
+      const scrollHeight = this.container.scrollHeight - this.container.height;
+      const scrollTop = Math.min(this.container.element.scrollTop + speed, scrollHeight);
       const topY = Math.min((scrollTop + this.container.height - this.item.height) - 6, this.container.maxY);
 
       if (!this.item || scrollTop + this.container.height >= this.container.scrollHeight) {
-        this.container.element.scrollTop = this.container.scrollHeight - this.container.height;
+        this.container.element.scrollTop = scrollHeight;
         this.moveItem(topY);
 
         return clearInterval(this.interval);

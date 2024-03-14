@@ -60,7 +60,7 @@ export class CursorLinkView {
 
     const mark = selection.empty && selection.$from.marks().find(i => i.type.name === 'link');
 
-    if (mark) { // if (!this.mark || !mark.eq(this.mark)) {
+    if (mark) {
       const { from, $from } = state.selection;
       const boundaries = this.copyRect(view.dom.getBoundingClientRect());
       const cursor = this.normalize(view.coordsAtPos(from - ($from.nodeBefore?.text.length || 0)), boundaries);
@@ -70,11 +70,11 @@ export class CursorLinkView {
       this.form.container.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
       this.form.tooltip.className = 'link-tooltip';
 
-      this.form.tooltip.style.top =  `${cursor.bottom + 2}px`;
+      this.form.tooltip.style.top =  `${cursor.bottom + 3}px`;
       this.form.tooltip.style.left = `clamp(0px, ${cursor.left}px, calc(100% - ${this.form.tooltip.offsetWidth}px))`;
 
       if (cursor.bottom + 2 + this.form.tooltip.offsetHeight > boundaries.bottom - boundaries.top) {
-        this.form.tooltip.style.top =  `${cursor.top - 2 - this.form.tooltip.offsetHeight}px`;
+        this.form.tooltip.style.top =  `${cursor.top - 3 - this.form.tooltip.offsetHeight}px`;
       }
 
       this.form.tooltip.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -92,6 +92,7 @@ export class CursorLinkView {
     const transaction = UrlHelper.removeLink(state, anchor, head);
 
     if (transaction) {
+      this.view.focus();
       this.view.dispatch(transaction);
     }
   }
@@ -102,6 +103,7 @@ export class CursorLinkView {
     const transaction = UrlHelper.removeMark(state, anchor, head);
 
     if (transaction) {
+      this.view.focus();
       this.view.dispatch(transaction);
     }
   }
