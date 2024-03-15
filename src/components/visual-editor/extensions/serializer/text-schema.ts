@@ -34,9 +34,29 @@ export const textSerializingSchema: ISerializingSchema = {
       toString() {
         return '\n';
       }
+    },
+    codeBlock: {
+      toString(content: string) {
+        return content + '\n';
+      }
+    },
+    blockquote: {
+      toString(content: string) {
+        return content + '\n';
+      }
     }
   },
   marks: {
+    link: {
+      toString(content: string) {
+        return content;
+      }
+    },
+    code: {
+      toString(content: string) {
+        return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1$2$3');
+      }
+    },
     strong: {
       toString(content: string) {
         return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1$2$3');
@@ -50,11 +70,6 @@ export const textSerializingSchema: ISerializingSchema = {
     strike: {
       toString(content: string) {
         return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1$2$3');
-      }
-    },
-    link: {
-      toString(content: string) {
-        return content;
       }
     }
   }

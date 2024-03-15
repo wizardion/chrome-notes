@@ -4,6 +4,7 @@ import { FormatHelper } from './helpers/format.helper';
 import { MarkdownSerializer } from './serializer/serializer';
 import { ListCommandHelper } from './helpers/list.helper';
 import { NodeType } from 'prosemirror-model';
+import { TextSerializer } from './serializer/text-serializer';
 
 
 export function toggleLink(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
@@ -34,6 +35,19 @@ export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => vo
   if (dispatch) {
     console.clear();
     const content = MarkdownSerializer.serialize(state);
+
+    console.log('');
+    console.log(content);
+    console.log('');
+  }
+
+  return true;
+}
+
+export function toString(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
+  if (dispatch) {
+    console.clear();
+    const content = TextSerializer.serialize(state);
 
     console.log('');
     console.log(content);

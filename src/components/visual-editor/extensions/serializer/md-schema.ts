@@ -48,9 +48,31 @@ export const serializingSchema: ISerializingSchema = {
       toString() {
         return '\n';
       }
+    },
+    codeBlock: {
+      toString(content: string) {
+        return '```\n' + content + '\n```\n';
+      }
+    },
+    blockquote: {
+      toString(content: string) {
+        return '>' + content + '\n';
+      }
     }
   },
   marks: {
+    link: {
+      toString(content: string, attrs?: ISerializingAttributes) {
+        const href = attrs?.href as string;
+
+        return `[${content}](${href})`;
+      }
+    },
+    code: {
+      toString(content: string) {
+        return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1`$2`$3');
+      }
+    },
     strong: {
       toString(content: string) {
         return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1**$2**$3');
@@ -64,13 +86,6 @@ export const serializingSchema: ISerializingSchema = {
     strike: {
       toString(content: string) {
         return content.replace(/^(\s*)(\S.+\S)(\s*)$/g, '$1~~$2~~$3');
-      }
-    },
-    link: {
-      toString(content: string, attrs?: ISerializingAttributes) {
-        const href = attrs?.href as string;
-
-        return `[${content}](${href})`;
       }
     }
   }
