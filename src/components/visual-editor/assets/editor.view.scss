@@ -76,54 +76,9 @@
   color: var(--editor-text-url);
 }
 
-.visual-editor a:hover {
-  text-decoration: underline !important;
-  color: var(--base-color-hover);
-}
-
-.visual-editor a:active {
-  color: var(--base-color-active);
-}
-
-.visual-editor a:visited {
-  color: var(--editor-text-url);
-}
-
 .visual-editor ::selection {
   background: var(--editor-selection-background);
 }
-
-// .visual-editor table {
-//   border-spacing: 0;
-//   border-collapse: collapse;
-
-//   display: block;
-//   width: 100%;
-//   width: -webkit-max-content;
-//   width: -moz-max-content;
-//   width: max-content;
-//   max-width: 100%;
-//   overflow: auto;
-// }
-
-// .visual-editor table tr {
-//   background-color: var(--editor-background);
-//   border-top: 1px solid #c6cbd1;
-// }
-
-// .visual-editor table td, .visual-editor table th {
-//   padding: 6px 13px;
-//   border: 1px solid #dfe2e5;
-// }
-
-// .visual-editor table th {
-//   font-weight: 600;
-//   text-align: left;
-// }
-
-// .visual-editor table tr:nth-child(2n) {
-//   background-color: #f6f8fa;
-// }
 
 .visual-editor p {
   margin: 0px 0 0px 0;
@@ -136,14 +91,14 @@
 }
 
 .visual-editor pre {
-  padding: 5px 10px 5px 10px;
+  padding: 2px 7px 2px 7px;
   margin: 5px 0px 5px 0px;
 }
 
 .visual-editor :not(pre) > code::after,
 .visual-editor pre::after {
   content: "";  
-  border-radius: 3px;
+  border-radius: 2px;
 
   position: absolute;
   left: 0px;
@@ -157,28 +112,12 @@
   background: var(--editor-quote-background);
 }
 
-// .visual-editor pre {
-// //   display: block;
-// //   background: ghostwhite;
-// //   background-color: #f6f8fa;
-
-//   // border: 1px solid var(--editor-quote-stroke);
-//   border-radius: 3px;
-//   color: var(--editor-quote-color);
-//   padding: 0px;
-//   margin: 0px;
-// //   padding: 2px 7px 2px 7px;
-// //   color: var(--editor-highlight-color);
-// //   margin: 3px 0px 3px 0;
-
-// //   white-space: pre-wrap;
-// //   word-break: break-word;
-// }
-
-// .visual-editor pre,
-// .visual-editor pre code {
-//   font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
-// }
+.visual-editor :not(pre) > code::after {
+  top: -1px;
+  left: -4px;
+  right: -4px;
+  bottom: -1px;
+}
 
 .visual-editor > h1 + *,
 .visual-editor > h2 + *,

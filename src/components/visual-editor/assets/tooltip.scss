@@ -51,24 +51,34 @@
   cursor: pointer;
 }
 
-.vr-cursor-link a {
-  text-decoration: none;
-}
+// .vr-cursor-link a {
+//   text-decoration: none;
+// }
 
-.vr-cursor-link a:hover {
-  text-decoration: none !important;
-  color: var(--base-color-hover);
-  // color: #ff008c;
-  cursor: pointer;
+// .vr-cursor-link a:hover {
+//   text-decoration: none !important;
+//   // color: var(--base-color-hover);
+//   // color: #ff008c;
+//   // cursor: pointer;
+// }
+
+.link-tooltip .tooltip-container a {
+  text-decoration: none;
+  color: var(--editor-text-url);
 }
 
 .link-tooltip .tooltip-container a:hover {
-  text-decoration: underline !important;
-  border-bottom: none;
+  text-decoration: underline;
+  color: var(--editor-text-url-hover);
 }
 
-.vr-cursor-link a:active {
+.link-tooltip .tooltip-container a:active {
   text-decoration: underline;
-  color: var(--base-color-active);
-  cursor: pointer;
+  color: var(--editor-text-url-active);
 }
+
+// .vr-cursor-link a:active {
+//   text-decoration: underline;
+//   color: var(--base-color-active);
+//   cursor: pointer;
+// }

@@ -163,9 +163,15 @@ details-view {
   font-size: 15px !important;
 }
 
-// .ProseMirror {
-//   min-height: 224px;
-// }
+.content-preview :not(pre) > code,
+.visual-editor :not(pre) > code {
+  font-size: 14px;
+}
+
+.visual-editor pre,
+.visual-editor pre code {
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+}
 
 .dropdown-menu > * {
   font-size: 14px;

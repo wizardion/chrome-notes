@@ -8,7 +8,7 @@ import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 
-import { mdRender } from 'modules/markdown/md-render';
+import { mdRender } from 'modules/markdown';
 import { CUSTOM_EVENTS, IExtension, INTERVALS } from 'components/models/extensions.model';
 import { IEditorData, IEditorView } from 'components/models/editor.models';
 

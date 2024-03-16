@@ -33,7 +33,7 @@ export function removeFormat(state: EditorState, dispatch: (tr: Transaction) => 
 
 export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
   if (dispatch) {
-    console.clear();
+    // console.clear();
     const content = MarkdownSerializer.serialize(state);
 
     console.log('');
@@ -46,7 +46,7 @@ export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => vo
 
 export function toString(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
   if (dispatch) {
-    console.clear();
+    // console.clear();
     const content = TextSerializer.serialize(state);
 
     console.log('');

@@ -58,7 +58,6 @@ export const schema = new Schema({
       toDOM: () => ['pre', ['code', 0]]
     },
     blockquote: {
-      // content: 'block+',
       content: 'text*',
       group: 'block',
       defining: true,

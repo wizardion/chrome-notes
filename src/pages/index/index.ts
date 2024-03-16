@@ -45,11 +45,9 @@ function addEventListeners(settings: ISettingsArea) {
 }
 
 getSettings({ sync: true, identity: true }).then(settings => {
-  if (settings.common.editor === 0) {
+  if (settings.common.editor === 0 || window.location.search.includes('t=markdown')) {
     import('./markdown').then(({ init, whenDefined }) => whenDefined().then(() => init()));
-  }
-
-  if (settings.common.editor === 1) {
+  } else if (settings.common.editor === 1) {
     import('./visual').then(({ init, whenDefined }) => whenDefined().then(() => init()));
   }
 

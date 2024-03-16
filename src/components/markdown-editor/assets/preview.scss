@@ -52,16 +52,16 @@
 
 .content-preview a:hover {
   text-decoration: underline !important;
-  color: var(--base-color-hover);
+  color: var(--editor-text-url-hover);
 }
 
 .content-preview a:active {
-  color: var(--base-color-active);
+  color: var(--editor-text-url-active);
 }
 
-.content-preview a:visited {
-  color: var(--editor-text-url);
-}
+// .content-preview a:visited {
+//   color: var(--editor-text-url);
+// }
 
 .content-preview ::selection {
   background: var(--editor-selection-background);
@@ -79,25 +79,6 @@
   max-width: 100%;
   overflow: auto;
 }
-
-// .content-preview table tr {
-//   background-color: var(--editor-background);
-//   border-top: 1px solid #c6cbd1;
-// }
-
-// .content-preview table td, .content-preview table th {
-//   padding: 6px 13px;
-//   border: 1px solid #dfe2e5;
-// }
-
-// .content-preview table th {
-//   font-weight: 600;
-//   text-align: left;
-// }
-
-// .content-preview table tr:nth-child(2n) {
-//   background-color: #f6f8fa;
-// }
 
 .content-preview p {
   margin: 0px 0 0px 0;
@@ -125,6 +106,11 @@
 
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.content-preview pre::after {
+  content: "\a";
+  white-space: pre;
 }
 
 .content-preview pre,

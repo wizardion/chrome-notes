@@ -24,6 +24,7 @@ import { buildInputRules } from './extensions/inputrules';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
 import { clipboard } from './extensions/clipboard';
 import { cursorLink } from './extensions/cursor-link';
+// import { MarkdownMDRender } from 'modules/markdown/render';
 
 
 export class VisualEditor implements IEditorView {
@@ -100,6 +101,8 @@ export class VisualEditor implements IEditorView {
   setData(data: IEditorData) {
     this.locked = true;
     this.html.innerHTML = mdRender.render(data.description);
+
+    // MarkdownMDRender.parse(data.description);
 
     this.view.updateState(
       EditorState.create({
