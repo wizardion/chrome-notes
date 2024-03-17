@@ -39,6 +39,12 @@
   padding-left: 1.5em;
 }
 
+.content-preview ol {
+  list-style-position: outside;
+  margin: 0 0;
+  padding-left: 2em;
+}
+
 .content-preview blockquote {
   border-left: 2px solid var(--editor-quote-stroke);
   padding: 0px 0px 0px 10px;
