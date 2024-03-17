@@ -1,10 +1,9 @@
 import * as MarkdownIt from 'markdown-it';
 import * as Renderer from 'markdown-it/lib/renderer';
 import * as Token from 'markdown-it/lib/token';
-
-
 // import taskLists from '@hedgedoc/markdown-it-task-lists';
-// const taskLists = require('markdown-it-task-lists');
+
+
 type IOptions = MarkdownIt.Options;
 
 // TODO temporary solution
@@ -19,6 +18,7 @@ class MarkdownRender {
       highlight: (s) => this.highlight(s)
     });
 
+    // this.md.use(taskLists, { enabled: true });
     this.md.renderer.rules['link_open'] = this.linkOpen.bind(this);
   }
 

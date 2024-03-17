@@ -30,6 +30,13 @@ export const schema = new Schema({
     text: {
       group: 'inline',
     },
+    // checkList: {
+    //   content: 'listItem+',
+    //   group: 'block',
+    //   attrs: { 'class': { default: 'contains-task-list' } },
+    //   parseDOM: [{ tag: 'ul[class="contains-task-list"]' }],
+    //   toDOM: (node) => ['ul', { class: node.attrs.class }, 0]
+    // },
     bulletList: {
       content: 'listItem+',
       group: 'block',
@@ -48,6 +55,12 @@ export const schema = new Schema({
       parseDOM: [{ tag: 'li' }],
       toDOM: () => ['li', 0]
     },
+    // listItemCheck: {
+    //   content: 'paragraph block*',
+    //   defining: true,
+    //   parseDOM: [{ tag: 'li' }],
+    //   toDOM: () => ['li', 0]
+    // },
     codeBlock: {
       content: 'text*',
       marks: '',
@@ -63,7 +76,26 @@ export const schema = new Schema({
       defining: true,
       parseDOM: [{ tag: 'blockquote' }],
       toDOM: () => ['blockquote', 0]
-    }
+    },
+    // checkbox: {
+    //   defining: true,
+    //   inline: true,
+    //   group: 'inline',
+    //   attrs: { 'checked': { default: false } },
+    //   parseDOM: [{ tag: 'input[type=checkbox]' }],
+    //   // toDOM: (node) => ['input', { type: 'checkbox', checked: node.attrs.checked }, 0],
+    //   toDOM: (node) => {
+    //     const attrs: Record<string, string> = { type: 'checkbox' };
+
+    //     console.log('node.attrs', node.attrs);
+
+    //     if (node.attrs.checked) {
+    //       attrs.checked = 'checked';
+    //     }
+
+    //     return ['input', attrs];
+    //   },
+    // }
     // break: {
     //   inline: true,
     //   group: 'inline',
@@ -94,7 +126,6 @@ export const schema = new Schema({
     strike: {
       toDOM: () => ['del', 0],
       parseDOM: [{ tag: 'del' }]
-    },
-
+    }
   }
 });
