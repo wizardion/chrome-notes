@@ -56,7 +56,7 @@ export const serializingSchema: ISerializingSchema = {
     },
     blockquote: {
       toString(content: string) {
-        return '>' + content + '\n';
+        return '> ' + content + '\n';
       }
     }
   },
