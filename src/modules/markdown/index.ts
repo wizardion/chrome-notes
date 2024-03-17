@@ -1,10 +1,10 @@
-import * as MarkdownIt from 'markdown-it';
 import * as Renderer from 'markdown-it/lib/renderer';
-import * as Token from 'markdown-it/lib/token';
+import MarkdownIt from 'markdown-it';
 // import taskLists from '@hedgedoc/markdown-it-task-lists';
 
 
 type IOptions = MarkdownIt.Options;
+type Token = MarkdownIt.Token;
 
 // TODO temporary solution
 class MarkdownRender {
@@ -15,7 +15,7 @@ class MarkdownRender {
       html: false,
       linkify: true,
       breaks: true,
-      highlight: (s) => this.highlight(s)
+      highlight: (s: string) => this.highlight(s)
     });
 
     // this.md.use(taskLists, { enabled: true });
