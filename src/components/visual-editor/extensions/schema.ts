@@ -30,6 +30,7 @@ export const schema = new Schema({
     text: {
       group: 'inline',
     },
+    // https://tiptap.dev/docs/editor/api/nodes/task-list
     // checkList: {
     //   content: 'listItem+',
     //   group: 'block',
