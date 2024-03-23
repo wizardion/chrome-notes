@@ -1,6 +1,6 @@
 import { DetailsBaseElement } from '../details-base/details-base.component';
 import { VisualEditor } from 'components/visual-editor';
-import { IVisualViewForm } from './visual-view.model';
+import { IVisualViewForm } from './models/visual-view.model';
 import { BaseElement, FormElement } from 'core/components';
 import { EditorControlsElement } from '../editor-controls/editor-controls.component';
 

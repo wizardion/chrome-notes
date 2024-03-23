@@ -1,4 +1,4 @@
-import { IDetailsViewForm } from '../details-base/details-base.model';
+import { IDetailsViewForm } from '../../details-base/models/details-base.model';
 
 
 export interface IVisualViewForm extends IDetailsViewForm {

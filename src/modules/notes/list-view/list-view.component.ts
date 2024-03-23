@@ -1,5 +1,5 @@
 import { BaseElement, FormElement } from 'core/components';
-import { IListViewForm, IEventListenerType } from './list-view.model';
+import { IListViewForm, IEventListenerType } from './models/list-view.model';
 import { ListItemElement } from '../list-item/list-item.component';
 import { Debounce, DynamicScroll } from 'modules/effects';
 

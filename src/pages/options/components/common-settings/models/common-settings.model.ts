@@ -1,4 +1,4 @@
-import { ProgressElement } from '../progress-bar/progress.component';
+import { ProgressElement } from '../../progress-bar/progress.component';
 
 
 export interface ICommonSettingsForm {

@@ -1,2 +1,2 @@
-export { ISyncInfo, ISyncStorageValue } from './sync.models';
+export { ISyncInfo, ISyncStorageValue } from './models/sync.models';
 export { SyncStorageService } from './sync.service';

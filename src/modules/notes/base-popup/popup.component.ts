@@ -2,7 +2,7 @@ import { BaseElement } from 'core/components';
 import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
 import { DetailsBaseElement } from '../details-base/details-base.component';
-import { INote } from '../details-base/details-base.model';
+import { INote } from '../details-base/models/details-base.model';
 import { DbProviderService } from 'modules/db';
 import { SortHelper } from 'modules/effects';
 

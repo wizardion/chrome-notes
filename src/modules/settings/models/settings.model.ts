@@ -1,5 +1,5 @@
 import { ISyncInfo } from 'core/services';
-import { IdentityInfo } from 'modules/sync/components/interfaces';
+import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 
 
 export interface ISettingsOptions {

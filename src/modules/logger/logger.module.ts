@@ -1,4 +1,4 @@
-import { ILog, ILogLevel, logLevel } from './logger.models';
+import { ILog, ILogLevel, logLevel } from './models/logger.models';
 
 
 let __database: IDBDatabase;

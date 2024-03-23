@@ -2,12 +2,12 @@ import * as core from 'core';
 import { ISyncStorageValue, storage } from 'core/services';
 // import {migrate} from 'modules/storage/migrate';
 import { LoggerService } from 'modules/logger';
-import { IdentityInfo } from 'modules/sync/components/interfaces';
+import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import {
   DataWorker, SyncWorker, BaseWorker, StorageChange, AreaName, eventOnSyncInfoChanged,
   openPopup, ensureOptionPage, initPopup
 } from './components';
-import { ISettingsArea, ITabInfo } from 'modules/settings/settings.model';
+import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
 
 
 const logger = new LoggerService('background.ts', 'green');

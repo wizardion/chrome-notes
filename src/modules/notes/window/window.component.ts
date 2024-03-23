@@ -2,7 +2,7 @@ import './assets/window.scss';
 import { BaseElement } from 'core/components';
 import { PopupBaseElement } from '../base-popup/popup.component';
 import { DbProviderService } from 'modules/db';
-import { INote } from '../details-base/details-base.model';
+import { INote } from '../details-base/models/details-base.model';
 
 
 const template: DocumentFragment = BaseElement.component({

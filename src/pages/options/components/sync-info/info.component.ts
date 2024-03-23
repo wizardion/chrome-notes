@@ -1,7 +1,7 @@
 import { Cloud } from 'modules/sync/cloud';
 import { BaseElement } from 'core/components';
-import { TokenSecretDenied } from 'modules/sync/components/interfaces';
-import { ISyncInfoForm, IDecorator, IResponseDetails } from './interfaces';
+import { TokenSecretDenied } from 'modules/sync/components/models/sync.models';
+import { ISyncInfoForm, IDecorator, IResponseDetails } from './models/info.models';
 
 
 const template: DocumentFragment = BaseElement.component({

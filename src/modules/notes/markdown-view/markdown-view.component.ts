@@ -1,10 +1,10 @@
 import { BaseElement, FormElement, IEventListener } from 'core/components';
 import { DetailsBaseElement } from 'modules/notes/details-base/details-base.component';
 import { MarkdownEditor } from 'components/markdown-editor';
-import { IMarkdownViewForm } from './markdown-view.model';
+import { IMarkdownViewForm } from './models/markdown-view.model';
 import { EditorControlsElement } from '../editor-controls/editor-controls.component';
 import { Debounce, DynamicScroll } from 'modules/effects';
-import { IDetailsListenerType, INote } from '../details-base/details-base.model';
+import { IDetailsListenerType, INote } from '../details-base/models/details-base.model';
 import { NodeHelper } from 'components/node-helper';
 
 

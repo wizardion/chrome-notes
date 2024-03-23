@@ -1,5 +1,5 @@
 import { LoggerService } from 'modules/logger';
-import { DriveSettings, IFileInfo, TokenError, TokenExpired, ICloudInfo } from './interfaces';
+import { DriveSettings, IFileInfo, TokenError, TokenExpired, ICloudInfo } from './models/sync.models';
 
 
 // const __delay = 1100;

@@ -1,7 +1,7 @@
 import { LocalStorageService } from 'core/services/local';
 import { SyncStorageService } from 'core/services/sync';
-import { ICommonSettings, IPageMode, ISettingsArea, ISettingsOptions } from './settings.model';
-import { IdentityInfo } from 'modules/sync/components/interfaces';
+import { ICommonSettings, IPageMode, ISettingsArea, ISettingsOptions } from './models/settings.model';
+import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 
 
 const settingsOptions: ISettingsOptions = {

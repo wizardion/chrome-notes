@@ -1,5 +1,5 @@
-import { PasswordElement } from '../passwords/password.component';
-import { ProgressElement } from '../progress-bar/progress.component';
+import { PasswordElement } from '../../passwords/password.component';
+import { ProgressElement } from '../../progress-bar/progress.component';
 
 
 export type IDecorator = () => Promise<boolean>;

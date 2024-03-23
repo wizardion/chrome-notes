@@ -1,6 +1,6 @@
 import './assets/details-view.scss';
 import { BaseElement, FormElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
-import { IDetailsViewForm, IDetailsListenerType, INote } from './details-base.model';
+import { IDetailsViewForm, IDetailsListenerType, INote } from './models/details-base.model';
 import { IDBNote } from 'modules/db';
 import { IEditorView } from 'components/models/editor.models';
 import { Debounce, DynamicScroll } from 'modules/effects';

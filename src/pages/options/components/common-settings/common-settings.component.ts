@@ -1,5 +1,5 @@
 import { BaseElement, FormElement } from 'core/components';
-import { ICommonSettingsForm } from './common-settings.model';
+import { ICommonSettingsForm } from './models/common-settings.model';
 
 
 const template: DocumentFragment = BaseElement.component({

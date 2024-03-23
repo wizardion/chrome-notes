@@ -1,4 +1,4 @@
-import { IDBNote, IDBCommand, IDBCommandType } from './db.models';
+import { IDBNote, IDBCommand, IDBCommandType } from './models/db.models';
 import { LoggerService } from 'modules/logger';
 
 

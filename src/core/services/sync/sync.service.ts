@@ -1,4 +1,4 @@
-import { ISyncStorageData, ISyncStorageValue, ISyncInfo } from './sync.models';
+import { ISyncStorageData, ISyncStorageValue, ISyncInfo } from './models/sync.models';
 import { encrypt, decrypt } from 'core';
 
 

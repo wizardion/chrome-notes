@@ -1,5 +1,5 @@
 import { EncryptorService } from 'modules/encryption';
-import { IAppConfig } from './code.models';
+import { IAppConfig } from './models/code.models';
 
 
 const configs: IAppConfig = {

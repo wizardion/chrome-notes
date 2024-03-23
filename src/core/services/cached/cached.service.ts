@@ -1,5 +1,5 @@
 import { IDBNote } from 'modules/db';
-import { ICachedItem, ICachedItems, IDataDaft } from './cached.models';
+import { ICachedItem, ICachedItems, IDataDaft } from './models/cached.models';
 
 
 export class CachedStorageService {

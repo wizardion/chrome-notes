@@ -1,17 +1,17 @@
 import { LoggerService } from 'modules/logger';
 import { SyncWorker } from './sync-worker';
-import { IdentityInfo } from 'modules/sync/components/interfaces';
+import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { removeCachedAuthToken } from 'modules/sync/components/drive';
 // import { IWindow } from './models';
 import { storage, ISyncInfo } from 'core/services';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
-import { ITabInfo } from 'modules/settings/settings.model';
+import { ITabInfo } from 'modules/settings/models/settings.model';
 
 
 export { BaseWorker } from './base-worker';
 export { DataWorker } from './data-worker';
 export { SyncWorker } from './sync-worker';
-export { IWindow, StorageChange, AreaName } from './models';
+export { IWindow, StorageChange, AreaName } from './models/models';
 
 const logger = new LoggerService('background/index.ts', 'green');
 

@@ -8,7 +8,7 @@ import { EncryptorService } from 'modules/encryption';
 import {
   ISyncPair, ICloudInfo, TokenError, TokenSecretDenied, IProcessInfo, IntegrityError,
   IPasswordRule, IdentityInfo, IFileInfo, ISyncRequest
-} from './interfaces';
+} from './models/sync.models';
 
 
 const logger = new LoggerService('sync.ts', 'blue');

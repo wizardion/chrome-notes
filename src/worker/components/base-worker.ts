@@ -1,5 +1,5 @@
 import { LoggerService } from 'modules/logger';
-import { ISettingsArea } from 'modules/settings/settings.model';
+import { ISettingsArea } from 'modules/settings/models/settings.model';
 
 
 const logger = new LoggerService('base-worker.ts', 'green');

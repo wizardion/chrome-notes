@@ -1,4 +1,4 @@
-import { IGlobalStorageItem } from './global-storage.models';
+import { IGlobalStorageItem } from './models/global-storage.models';
 
 
 export class GlobalStorageService {

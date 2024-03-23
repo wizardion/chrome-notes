@@ -1,6 +1,6 @@
 import './assets/editor-controls.scss';
 import { BaseElement, FormElement } from 'core/components';
-import { IEventListenerType, IEditorControlsFormItem } from './editor-controls.model';
+import { IEventListenerType, IEditorControlsFormItem } from './models/editor-controls.model';
 
 
 const template: DocumentFragment = BaseElement.component({

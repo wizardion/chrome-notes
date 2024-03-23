@@ -1,7 +1,7 @@
 import { LoggerService } from 'modules/logger';
 import { LocalStorageService } from 'core/services/local';
 import { Cloud } from 'modules/sync/cloud';
-import { IdentityInfo } from 'modules/sync/components/interfaces';
+import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { BaseWorker } from './base-worker';
 
 

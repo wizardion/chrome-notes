@@ -1,4 +1,4 @@
-import { IStorageValue } from './local-storage.models';
+import { IStorageValue } from './models/local-storage.models';
 import { encrypt, decrypt } from 'core';
 
 

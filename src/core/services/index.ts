@@ -4,7 +4,7 @@ import { LocalStorageService } from './local/local-storage.service';
 import { SyncStorageService } from './sync/sync.service';
 
 
-export { ISyncInfo, ISyncStorageValue } from './sync/sync.models';
+export { ISyncInfo, ISyncStorageValue } from './sync/models/sync.models';
 
 export const storage = {
   global: GlobalStorageService,

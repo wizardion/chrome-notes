@@ -1,7 +1,7 @@
 import * as core from 'core';
 import * as drive from './components/drive';
 import { EncryptorService } from 'modules/encryption';
-import { IdentityInfo, IPasswordRule, TokenError, IntegrityError } from './components/interfaces';
+import { IdentityInfo, IPasswordRule, TokenError, IntegrityError } from './components/models/sync.models';
 import * as process from './components/process';
 
 

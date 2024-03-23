@@ -1,5 +1,5 @@
 import * as db from './db.module';
-import { IDBNote } from './db.models';
+import { IDBNote } from './models/db.models';
 import { CachedStorageService } from 'core/services/cached';
 
 

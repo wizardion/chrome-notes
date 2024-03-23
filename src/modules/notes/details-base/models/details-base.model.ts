@@ -1,6 +1,6 @@
 import { IDBNote } from 'modules/db';
-import { ListItemElement } from '../list-item/list-item.component';
-import { EditorControlsElement } from '../editor-controls/editor-controls.component';
+import { ListItemElement } from '../../list-item/list-item.component';
+import { EditorControlsElement } from '../../editor-controls/editor-controls.component';
 
 
 export interface IDetailsViewForm {

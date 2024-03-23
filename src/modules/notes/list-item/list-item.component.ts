@@ -1,6 +1,6 @@
 import './assets/list-items.scss';
 import { BaseElement, FormElement, IEventListener } from 'core/components';
-import { IEventListenerType, IListFormItem } from './list-item.model';
+import { IEventListenerType, IListFormItem } from './models/list-item.model';
 
 
 const template: DocumentFragment = BaseElement.component({

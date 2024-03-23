@@ -1,7 +1,7 @@
 
 import './assets/dropdown-menu.scss';
 import { BaseElement, FormElement } from 'core/components';
-import { IEditorControlsFormItem } from './dropdown-menu.model';
+import { IEditorControlsFormItem } from './models/dropdown-menu.model';
 
 
 const template: DocumentFragment = BaseElement.component({

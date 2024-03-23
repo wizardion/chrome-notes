@@ -2,7 +2,7 @@ import {
   ISortContainer, ISortCustomEvents, ISortEventListener, ISortEventListenerType, ISortEvents,
   ISortItem,
   ISortPoint,
-} from './sort-helper.model';
+} from './models/sort-helper.model';
 
 
 const CUSTOM_EVENTS: ISortCustomEvents = {

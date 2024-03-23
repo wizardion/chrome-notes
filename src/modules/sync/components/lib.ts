@@ -1,5 +1,5 @@
 import { db, IDBNote } from 'modules/db';
-import { ISyncPair, ISyncItemInfo, IdentityInfo } from './interfaces';
+import { ISyncPair, ISyncItemInfo, IdentityInfo } from './models/sync.models';
 import { EncryptorService } from 'modules/encryption';
 import { LoggerService } from 'modules/logger';
 import { storage } from 'core/services';

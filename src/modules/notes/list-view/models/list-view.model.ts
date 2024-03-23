@@ -1,4 +1,4 @@
-import { ListItemElement } from '../list-item/list-item.component';
+import { ListItemElement } from '../../list-item/list-item.component';
 
 
 export type IEventListenerType = 'add' | 'click' | string;

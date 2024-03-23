@@ -1,4 +1,4 @@
-import { ILog, ILogLevel, ILogColor, ILogColors } from './logger.models';
+import { ILog, ILogLevel, ILogColor, ILogColors } from './models/logger.models';
 import { load, logInfo, clear, configs, print } from './logger.module';
 
 
