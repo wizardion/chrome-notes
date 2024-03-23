@@ -23,6 +23,9 @@ import { buildInputRules } from './extensions/inputrules';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
 import { clipboard } from './extensions/clipboard';
 import { cursorLink } from './extensions/cursor-link';
+import { IEventListener } from 'core/components';
+import { trackerChanges } from './extensions/changes';
+import { TextSerializer } from './extensions/serializer/text-serializer';
 
 
 export class VisualEditor implements IEditorView {
@@ -31,24 +34,27 @@ export class VisualEditor implements IEditorView {
   private plugins: Plugin[];
   private html: HTMLElement;
   private content: HTMLElement;
+  private listeners = new Map<'change' | 'save', IEventListener>();
 
   constructor(element: HTMLElement, controls?: NodeList) {
-    this.content = element;
+    const saveHandler = () => this.saveEventHandler();
 
+    this.content = element;
     this.content.id = 'editor';
     this.content.classList.add('visual-editor');
 
     this.plugins = [
       menu(controls),
       buildInputRules(schema),
-      keymap(buildKeymap(schema)),
+      keymap(buildKeymap(schema, { 'Mod-s': saveHandler, 'Mod-S': saveHandler })),
       keymap(baseKeymap),
       dropCursor({ color: 'gray', width: 1 }),
       gapCursor(),
       history(),
       virtualCursor(),
       clipboard(),
-      cursorLink()
+      cursorLink(),
+      trackerChanges(() => this.updateEventHandler())
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });
@@ -77,15 +83,14 @@ export class VisualEditor implements IEditorView {
 
   getData(): IEditorData {
     let title: string = null;
+    const text = TextSerializer.serialize(this.view.state);
     const value = MarkdownSerializer.serialize(this.view.state);
     const { anchor, head } = this.view.state.selection.toJSON();
 
-    if ((/^[#]+\s+/g).test(value)) {
-      const data: string[] = value.split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
-
-      title = (data && data.length) ? data[0] : '';
+    if ((/\n/g).test(text)) {
+      title = text.split(/\n/g).shift() || '';
     } else {
-      title = value && value.split(' ').splice(0, 6).join(' ') + ' ...';
+      title = text && text.split(' ').splice(0, 6).join(' ');
     }
 
     return { title: title, description: value, selection: [anchor, head] };
@@ -136,24 +141,30 @@ export class VisualEditor implements IEditorView {
   }
 
   addEventListener(type: 'change' | 'save', listener: EventListener): void {
-    if (type === 'change') {
-      console.log('addEventListener.type', [type]);
+    if (type === 'change' && !this.listeners.has('change')) {
+      this.listeners.set(type, listener);
     }
 
-    if (type === 'save') {
-      console.log('addEventListener.type', [type]);
+    if (type === 'save' && !this.listeners.has('save')) {
+      this.listeners.set(type, listener);
     }
   }
 
-  // private getSelection(): number[] {
-  //   const range = this.view.state.selection.main;
+  private saveEventHandler(): boolean {
+    const handler = this.listeners.get('save');
 
-  //   return [range.from, range.to];
-  // }
+    if (handler) {
+      handler(new Event('save'));
+    }
 
-  // private isDocChanged(view: ViewUpdate): boolean {
-  //   const range = this.view.state.selection.main;
+    return true;
+  }
 
-  //   return view.docChanged || (view.selectionSet && (range.from !== this.range.from || range.to !== this.range.to));
-  // }
+  private updateEventHandler() {
+    const handler = this.listeners.get('change');
+
+    if (handler) {
+      handler(new Event('change'));
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { BaseElement, FormElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
+import { BaseElement, FormElement, IEventListener } from 'core/components';
 import { DetailsBaseElement } from 'modules/notes/details-base/details-base.component';
 import { MarkdownEditor } from 'components/markdown-editor';
 import { IMarkdownViewForm } from './markdown-view.model';
@@ -8,7 +8,6 @@ import { IDetailsListenerType, INote } from '../details-base/details-base.model'
 import { NodeHelper } from 'components/node-helper';
 
 
-const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { locked: null } };
 const template: DocumentFragment = BaseElement.component({
   templateUrl: './markdown-view.component.html'
 });
@@ -117,7 +116,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   private togglePreview() {
     const value = !this._preview;
 
-    this._locked = true;
+    this.lock();
 
     if (value) {
       const scrollTop = this.editor.scrollTop;
@@ -134,11 +133,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       this.editor.scrollTop = scrollTop;
     }
 
-    clearInterval(INTERVALS.intervals.locked);
-    INTERVALS.intervals.locked = setTimeout(() => {
-      this._locked = false;
-      this.onChange(new Event('preview'));
-    }, INTERVALS.delay);
+    this.unlock().then(() => this.onChange(new Event('preview')));
   }
 
   private getPreviewState(): string | null {
@@ -150,8 +145,8 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   }
 
   private setSelection(item: INote) {
-    this._locked = true;
     this.preview = item.preview;
+    this.lock();
 
     if (item.preview) {
       if (item.pState) {
@@ -166,7 +161,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       this.dataset.scroll = (this.editor.scrollTop > 0).toString();
     }
 
-    clearInterval(INTERVALS.intervals.locked);
-    INTERVALS.intervals.locked = setTimeout(() => this._locked = false, INTERVALS.delay);
+    this.unlock();
   }
 }

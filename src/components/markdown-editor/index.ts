@@ -83,11 +83,10 @@ export class MarkdownEditor implements IEditorView {
 
     if ((/^[#]+\s+/g).test(value)) {
       const data: string[] = value.split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
-      const markdown = (data && data.length) ? data[0] : '';
 
-      title = mdRender.toString(markdown).replace(/\n$/g, '');
+      title = mdRender.toString(data.shift() || '').replace(/\n$/g, '');
     } else {
-      const markdown = value && value.split(' ').splice(0, 6).join(' ');
+      const markdown = value && value.split(' ').splice(0, 6).join(' ') || '';
 
       title = mdRender.toString(markdown).replace(/\n$/g, '');
     }

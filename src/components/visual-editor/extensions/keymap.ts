@@ -6,7 +6,7 @@ import {
 } from 'prosemirror-commands';
 import { splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
 import { undoInputRule } from 'prosemirror-inputrules';
-import { Command, EditorState } from 'prosemirror-state';
+import { Command } from 'prosemirror-state';
 import { Schema } from 'prosemirror-model';
 import { redo, undo } from 'prosemirror-history';
 import { indent, toggleLink } from './commands';
@@ -121,13 +121,13 @@ const mac = typeof navigator !== 'undefined' ? /Mac|iP(hone|[oa]d)/.test(navigat
   return keys;
 }*/
 
-export function saveChanges(state: EditorState): boolean {
-  console.log('saveChanges...', state, );
+// export function saveChanges(state: EditorState): boolean {
+//   console.log('saveChanges...', state, );
 
-  return true;
-}
+//   return true;
+// }
 
-export function buildKeymap(schema: Schema) {
+export function buildKeymap(schema: Schema, presets: Record<string, Command>) {
   const { strong, italic } = schema.marks;
   const keys: Record<string, Command> = {
     'Mod-z': undo,
@@ -139,8 +139,7 @@ export function buildKeymap(schema: Schema) {
     'Mod-I': toggleMark(italic),
     'Mod-l': toggleLink,
     'Tab': indent,
-    'Mod-s': saveChanges,
-    'Mod-S': saveChanges,
+    ...presets
   };
 
   if (schema.nodes.listItem) {

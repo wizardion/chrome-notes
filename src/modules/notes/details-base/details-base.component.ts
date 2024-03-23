@@ -11,13 +11,13 @@ const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { change
 export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsViewForm> extends BaseElement {
   static readonly selector: string;
 
-  protected editor: IEditorView;
+  protected note?: INote;
   protected _draft: boolean;
-
+  protected editor: IEditorView;
   protected form: FormElement<T>;
   protected listeners = new Map<'change' | 'selectionEvent' | 'save' | 'create', IEventListener>();
-  protected note?: INote;
-  protected _locked: boolean;
+
+  private _locked: boolean;
 
   protected eventListeners(): void {
     let dataScroll = false;
@@ -84,6 +84,25 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     return this.form.elements;
   }
 
+  get locked(): boolean {
+    return this._locked;
+  }
+
+  lock() {
+    this._locked = true;
+  }
+
+  unlock(): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      clearInterval(INTERVALS.intervals.locked);
+      INTERVALS.intervals.locked = setTimeout(() => {
+        this._locked = false;
+
+        resolve(this._locked);
+      }, INTERVALS.delay);
+    });
+  }
+
   getData(): INote {
     const data = this.editor.getData();
 
@@ -95,9 +114,11 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   }
 
   setData(item: INote) {
+    this.lock();
     this.note = item;
     this.editor.setData({ title: item.title, description: item.description, selection: item.cState });
     this.dataset.scroll = (this.editor.scrollTop > 0).toString();
+    this.unlock();
   }
 
   focus() {
