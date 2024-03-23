@@ -10,7 +10,6 @@ export class DbProviderService {
 
   public static async save(item: IDBNote): Promise<number> {
     if (item.id) {
-      // console.log('...save', { preview: item.preview });
       await db.update(item);
     } else {
       item.id = await db.add(item);
@@ -23,10 +22,10 @@ export class DbProviderService {
     for (let i = 0; i < queue.length; i++) {
       const item = queue[i];
 
-      // db.enqueue(item, 'update');
+      db.enqueue(item, 'update');
     }
 
-    // await db.dequeue();
+    await db.dequeue();
   }
 
   public static async remove(item: IDBNote) {

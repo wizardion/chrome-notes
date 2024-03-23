@@ -13,7 +13,6 @@ import { gapCursor } from 'prosemirror-gapcursor';
 import { dropCursor } from 'prosemirror-dropcursor';
 
 import { IEditorData, IEditorView } from 'components/models/editor.models';
-import { CUSTOM_EVENTS, INTERVALS } from 'components/models/extensions.model';
 import { mdRender } from 'modules/markdown';
 
 import { menu } from './extensions/menu';
@@ -24,20 +23,16 @@ import { buildInputRules } from './extensions/inputrules';
 import { MarkdownSerializer } from './extensions/serializer/serializer';
 import { clipboard } from './extensions/clipboard';
 import { cursorLink } from './extensions/cursor-link';
-// import { MarkdownMDRender } from 'modules/markdown/render';
 
 
 export class VisualEditor implements IEditorView {
   view: EditorView;
 
-  private locked: boolean;
   private plugins: Plugin[];
-
   private html: HTMLElement;
   private content: HTMLElement;
 
   constructor(element: HTMLElement, controls?: NodeList) {
-    // this.content = <HTMLElement>document.createElement('div');
     this.content = element;
 
     this.content.id = 'editor';
@@ -57,8 +52,6 @@ export class VisualEditor implements IEditorView {
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });
-
-    // this.initControls(controls);
     this.html = <HTMLElement>document.createElement('div');
   }
 
@@ -83,9 +76,9 @@ export class VisualEditor implements IEditorView {
   }
 
   getData(): IEditorData {
+    let title: string = null;
     const value = MarkdownSerializer.serialize(this.view.state);
     const { anchor, head } = this.view.state.selection.toJSON();
-    let title: string = null;
 
     if ((/^[#]+\s+/g).test(value)) {
       const data: string[] = value.split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
@@ -99,10 +92,7 @@ export class VisualEditor implements IEditorView {
   }
 
   setData(data: IEditorData) {
-    this.locked = true;
     this.html.innerHTML = mdRender.render(data.description);
-
-    // MarkdownMDRender.parse(data.description);
 
     this.view.updateState(
       EditorState.create({
@@ -115,10 +105,6 @@ export class VisualEditor implements IEditorView {
 
     this.view.focus();
     this.setSelection(data.selection);
-
-    clearInterval(INTERVALS.locked);
-    // this.range = this.view.state.selection.main;
-    INTERVALS.locked = setTimeout(() => this.locked = false, 300);
   }
 
   focus() {
@@ -150,26 +136,13 @@ export class VisualEditor implements IEditorView {
   }
 
   addEventListener(type: 'change' | 'save', listener: EventListener): void {
-    // if (type === 'change') {
-    //   CUSTOM_EVENTS.change = listener;
-    // }
+    if (type === 'change') {
+      console.log('addEventListener.type', [type]);
+    }
 
-    // if (type === 'save') {
-    //   CUSTOM_EVENTS.save = (e: Event) => this.saveEventHandler(e, listener);
-    // }
-  }
-
-  private initControls(controls: NodeList) {
-    console.log('initControls', controls);
-    // controls.forEach((item: HTMLElement) => {
-    //   const action = item.getAttribute('action');
-    //   const event = CODE_ACTIONS[action];
-
-    //   if (event) {
-    //     item.onclick = () => event(this.view);
-    //     item.onmousedown = (e: MouseEvent) => e.preventDefault();
-    //   }
-    // });
+    if (type === 'save') {
+      console.log('addEventListener.type', [type]);
+    }
   }
 
   // private getSelection(): number[] {
@@ -182,22 +155,5 @@ export class VisualEditor implements IEditorView {
   //   const range = this.view.state.selection.main;
 
   //   return view.docChanged || (view.selectionSet && (range.from !== this.range.from || range.to !== this.range.to));
-  // }
-
-  private saveEventHandler(e: Event, listener: EventListener) {
-    clearInterval(INTERVALS.changed);
-    listener(e);
-  }
-
-  // private changeEventHandler() {
-  //   this.range = this.view.state.selection.main;
-  //   CUSTOM_EVENTS.change(new Event('change'));
-  // }
-
-  // private updateListener(view: ViewUpdate) {
-  //   if (!this.locked && CUSTOM_EVENTS.change && this.isDocChanged(view)) {
-  //     clearInterval(INTERVALS.changed);
-  //     INTERVALS.changed = setTimeout(() => this.changeEventHandler(), 800);
-  //   }
   // }
 }

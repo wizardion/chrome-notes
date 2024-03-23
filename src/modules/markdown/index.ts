@@ -9,6 +9,7 @@ type Token = MarkdownIt.Token;
 // TODO temporary solution
 class MarkdownRender {
   private md: MarkdownIt;
+  private div: HTMLDivElement;
 
   constructor() {
     this.md = new MarkdownIt('commonmark', {
@@ -20,6 +21,7 @@ class MarkdownRender {
 
     // this.md.use(taskLists, { enabled: true });
     this.md.renderer.rules['link_open'] = this.linkOpen.bind(this);
+    this.div = document.createElement('div');
   }
 
   public render(text: string, trailingSpaces = ''): string {
@@ -54,6 +56,12 @@ class MarkdownRender {
 
   public unescapeAll(text: string): string {
     return this.md.utils.unescapeAll(text);
+  }
+
+  public toString(text: string): string {
+    this.div.innerHTML = this.render(text);
+
+    return this.div.innerText;
   }
 
   private tokenRender(tokens: Token[], id: number, options: IOptions, self: Renderer) {

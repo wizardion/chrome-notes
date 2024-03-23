@@ -1,9 +1,7 @@
 import { EditorView, KeyBinding } from '@codemirror/view';
 import { defaultKeymap, historyKeymap, indentWithTab, undo, redo } from '@codemirror/commands';
 import { markdownKeymap } from '@codemirror/lang-markdown';
-import {
-  toggleUrl, toggleBold, toggleItalic, toggleStrike, saveChanges, removeFormat, toggleList, toggleHeading
-} from './commands';
+import { toggleUrl, toggleBold, toggleItalic, toggleStrike, removeFormat, toggleList, toggleHeading } from './commands';
 
 
 export const CODE_ACTIONS: Record<string, (view: EditorView) => void> = {
@@ -51,10 +49,5 @@ export const editorKeymap: KeyBinding[] = [].concat(
     key: 'Mod-l',
     preventDefault: true,
     run: (v: EditorView) => toggleUrl(v),
-  },
-  {
-    key: 'Mod-s',
-    preventDefault: true,
-    run: () => saveChanges(),
-  },
+  }
 );

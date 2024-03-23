@@ -1,4 +1,4 @@
-import { BaseElement, FormElement, IEventListener, IIntervals } from 'core/components';
+import { BaseElement, FormElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
 import { DetailsBaseElement } from 'modules/notes/details-base/details-base.component';
 import { MarkdownEditor } from 'components/markdown-editor';
 import { IMarkdownViewForm } from './markdown-view.model';
@@ -8,7 +8,7 @@ import { IDetailsListenerType, INote } from '../details-base/details-base.model'
 import { NodeHelper } from 'components/node-helper';
 
 
-const INTERVALS: IIntervals = { changed: null, locked: null, delay: 400 };
+const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { locked: null } };
 const template: DocumentFragment = BaseElement.component({
   templateUrl: './markdown-view.component.html'
 });
@@ -17,7 +17,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   static readonly selector = 'details-view';
 
   protected _preview: boolean;
-  private listeners = new Map<string, IEventListener>();
 
   constructor() {
     super();
@@ -64,14 +63,9 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
     });
   }
 
-  addEventListener(type: IDetailsListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
+  addEventListener(type: IDetailsListenerType, listener: IEventListener, options?: boolean | AddEventListenerOptions) {
     if (type === 'change') {
-      const handler = () => this.onChange(listener);
-
-      this.listeners.set(type, handler);
-      this.listeners.set('selectionEvent', handler);
-
-      return this.editor.addEventListener('change', handler);
+      this.listeners.set('selectionEvent', (e) => this.onChange(e));
     }
 
     return super.addEventListener(type, listener, options);
@@ -121,7 +115,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   }
 
   private togglePreview() {
-    const listener = this.listeners.get('change');
     const value = !this._preview;
 
     this._locked = true;
@@ -141,10 +134,10 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       this.editor.scrollTop = scrollTop;
     }
 
-    clearInterval(INTERVALS.locked);
-    INTERVALS.locked = setTimeout(() => {
+    clearInterval(INTERVALS.intervals.locked);
+    INTERVALS.intervals.locked = setTimeout(() => {
       this._locked = false;
-      listener();
+      this.onChange(new Event('preview'));
     }, INTERVALS.delay);
   }
 
@@ -173,14 +166,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       this.dataset.scroll = (this.editor.scrollTop > 0).toString();
     }
 
-    clearInterval(INTERVALS.locked);
-    INTERVALS.locked = setTimeout(() => this._locked = false, INTERVALS.delay);
-  }
-
-  private onChange(listener: EventListener) {
-    if (!this._locked && listener) {
-      clearInterval(INTERVALS.changed);
-      INTERVALS.changed = setTimeout(() => listener(new Event('change')), INTERVALS.delay);
-    }
+    clearInterval(INTERVALS.intervals.locked);
+    INTERVALS.intervals.locked = setTimeout(() => this._locked = false, INTERVALS.delay);
   }
 }

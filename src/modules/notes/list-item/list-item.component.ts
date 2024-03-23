@@ -1,5 +1,5 @@
 import './assets/list-items.scss';
-import { BaseElement, FormElement } from 'core/components';
+import { BaseElement, FormElement, IEventListener } from 'core/components';
 import { IEventListenerType, IListFormItem } from './list-item.model';
 
 
@@ -9,12 +9,13 @@ const template: DocumentFragment = BaseElement.component({
 
 export class ListItemElement extends BaseElement {
   static readonly selector = 'list-item';
+  static locked: boolean;
 
   private form: FormElement<IListFormItem>;
   private _index: number;
   private _title: string;
   private _date: Date;
-  private _locked: boolean;
+  private listeners = new Map<'mouseup' | 'mousedown' | 'click', IEventListener>();
 
   constructor() {
     super();
@@ -77,22 +78,36 @@ export class ListItemElement extends BaseElement {
     });
   }
 
-  addEventListener(type: IEventListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
+  addEventListener(type: IEventListenerType, listener: IEventListener, options?: boolean | AddEventListenerOptions) {
     if (type === 'sort:mousedown') {
-      document.addEventListener('mouseup', () => setTimeout(() => this._locked = false));
-
-      return this.form.elements.sort.addEventListener('mousedown', (e) => {
+      this.listeners.set('mousedown', (e) => {
         e.preventDefault();
-        this._locked = true;
+        ListItemElement.locked = true;
 
         return listener(e);
       });
+
+      return this.form.elements.sort.addEventListener('mousedown', this.listeners.get('mousedown'));
     }
 
     if (type === 'click') {
-      return super.addEventListener(type, (e) => !this._locked && listener(e), options);
+      this.listeners.set('click', (e) => !ListItemElement.locked && listener(e));
+
+      return super.addEventListener('click', this.listeners.get('click'));
     }
 
     return super.addEventListener(type, listener, options);
+  }
+
+  removeEventListener(type: IEventListenerType): void {
+    if (type === 'sort:mousedown') {
+      this.form.elements.sort.removeEventListener('mousedown', this.listeners.get('mousedown'));
+      this.listeners.delete('mousedown');
+    }
+
+    if (type === 'click') {
+      super.removeEventListener('click', this.listeners.get('click'));
+      this.listeners.delete('click');
+    }
   }
 }

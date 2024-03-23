@@ -2,7 +2,6 @@ import { EditorView } from '@codemirror/view';
 import { ListHelper } from './helpers/list.helper';
 import { PrimitivesHelper } from './helpers/primitives.helper';
 import { UrlHelper } from './helpers/url.helper';
-import { CUSTOM_EVENTS } from 'components/models/extensions.model';
 import { HeadingHelper } from './helpers/heading.helper';
 
 
@@ -69,17 +68,5 @@ export function removeFormat(view: EditorView) {
       view.dispatch(view.state.replaceSelection(value));
       view.dispatch({ selection: { anchor: range.from, head: range.from + value.length } });
     });
-  }
-}
-
-export function saveChanges() {
-  const event = new Event('save', { cancelable: true });
-
-  if (CUSTOM_EVENTS.save && !event.defaultPrevented) {
-    CUSTOM_EVENTS.save(event);
-  }
-
-  if (CUSTOM_EVENTS.change && !event.defaultPrevented) {
-    CUSTOM_EVENTS.change(event);
   }
 }

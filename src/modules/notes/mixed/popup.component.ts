@@ -35,11 +35,15 @@ export class PopupMixedNotesElement extends PopupBaseElement {
   }
 
   goBack() {
+    const note = this.preserved ? this.preserved : this.items.length > 0 ? this.items[this.items.length - 1] : null;
+
     this.detailsView.draft = false;
 
     DbProviderService.cache.remove(['draft', 'selected']);
 
-    this.select(this.preserved);
+    if (note) {
+      this.select(this.preserved || this.items[this.items.length - 1]);
+    }
   }
 
   select(item: INote, rendered = true) {
@@ -75,5 +79,13 @@ export class PopupMixedNotesElement extends PopupBaseElement {
       description: description || '',
       cState: selection || [0, 0]
     });
+  }
+
+  async onCreate() {
+    super.onCreate();
+
+    this.listView.elements.add.hidden = false;
+    this.selected.item.classList.add('selected');
+    this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' });
   }
 }

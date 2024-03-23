@@ -9,21 +9,22 @@ import { syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 
 import { mdRender } from 'modules/markdown';
-import { CUSTOM_EVENTS, IExtension, INTERVALS } from 'components/models/extensions.model';
+import { IExtension } from 'components/models/extensions.model';
 import { IEditorData, IEditorView } from 'components/models/editor.models';
 
 import { markdownHighlighting } from './extensions/syntax-highlighting';
 import { editorFromTextArea } from './extensions/from-text-area';
 import { CODE_ACTIONS, editorKeymap } from './extensions/keymap';
+import { IEventListener } from 'core/components';
 
 
 export class MarkdownEditor implements IEditorView {
-  locked: boolean;
   view: EditorView;
   range: SelectionRange;
 
   private extensions: IExtension[];
   private _hidden: boolean;
+  private listeners = new Map<'change' | 'save', IEventListener>();
 
   constructor(element: HTMLElement, controls?: NodeList) {
     this.extensions = [
@@ -35,10 +36,14 @@ export class MarkdownEditor implements IEditorView {
       drawSelection(),
 
       new Compartment().of(EditorState.tabSize.of(2)),
-      keymap.of([].concat(editorKeymap)),
+      keymap.of([].concat(editorKeymap, {
+        key: 'Mod-s',
+        preventDefault: true,
+        run: () => this.saveEventHandler(),
+      })),
       EditorView.lineWrapping,
       EditorView.contentAttributes.of({ spellcheck: 'true' }),
-      EditorView.updateListener.of((v: ViewUpdate) => this.updateListener(v))
+      EditorView.updateListener.of((v: ViewUpdate) => this.updateEventHandler(v))
     ];
 
     this.view = editorFromTextArea('', <HTMLTextAreaElement>element, this.extensions);
@@ -78,26 +83,26 @@ export class MarkdownEditor implements IEditorView {
 
     if ((/^[#]+\s+/g).test(value)) {
       const data: string[] = value.split(/^([^\n]*)\r?\n/).filter((w, i) => i < 1 && w || i);
+      const markdown = (data && data.length) ? data[0] : '';
 
-      title = (data && data.length) ? data[0] : '';
+      title = mdRender.toString(markdown).replace(/\n$/g, '');
     } else {
-      title = value && value.split(' ').splice(0, 6).join(' ') + ' ...';
+      const markdown = value && value.split(' ').splice(0, 6).join(' ');
+
+      title = mdRender.toString(markdown).replace(/\n$/g, '');
     }
 
     return { title: title, description: value, selection: this.getSelection() };
   }
 
   setData(data: IEditorData) {
-    this.locked = true;
     this.view.setState(EditorState.create({ doc: data.description, extensions: this.extensions }));
 
     if (data.selection) {
       this.setSelection(data.selection);
     }
 
-    clearInterval(INTERVALS.locked);
     this.range = this.view.state.selection.main;
-    INTERVALS.locked = setTimeout(() => this.locked = false, 300);
   }
 
   focus() {
@@ -120,13 +125,13 @@ export class MarkdownEditor implements IEditorView {
     });
   }
 
-  addEventListener(type: 'change' | 'save', listener: EventListener): void {
-    if (type === 'change') {
-      CUSTOM_EVENTS.change = listener;
+  addEventListener(type: 'change' | 'save', listener: IEventListener): void {
+    if (type === 'change' && !this.listeners.has('change')) {
+      this.listeners.set(type, listener);
     }
 
-    if (type === 'save') {
-      CUSTOM_EVENTS.save = (e: Event) => this.saveEventHandler(e, listener);
+    if (type === 'save' && !this.listeners.has('save')) {
+      this.listeners.set(type, listener);
     }
   }
 
@@ -157,20 +162,19 @@ export class MarkdownEditor implements IEditorView {
     return view.docChanged || (view.selectionSet && (range.from !== this.range.from || range.to !== this.range.to));
   }
 
-  private saveEventHandler(e: Event, listener: EventListener) {
-    clearInterval(INTERVALS.changed);
-    listener(e);
+  private saveEventHandler() {
+    const handler = this.listeners.get('save');
+
+    if (handler) {
+      handler(new Event('save'));
+    }
   }
 
-  private changeEventHandler() {
-    this.range = this.view.state.selection.main;
-    CUSTOM_EVENTS.change(new Event('change'));
-  }
+  private updateEventHandler(view: ViewUpdate) {
+    const handler = this.listeners.get('change');
 
-  private updateListener(view: ViewUpdate) {
-    if (!this.locked && CUSTOM_EVENTS.change && this.isDocChanged(view)) {
-      clearInterval(INTERVALS.changed);
-      INTERVALS.changed = setTimeout(() => this.changeEventHandler(), 800);
+    if (handler && this.isDocChanged(view)) {
+      handler(new Event('change'));
     }
   }
 }
