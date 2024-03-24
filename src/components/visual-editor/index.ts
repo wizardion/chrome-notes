@@ -32,7 +32,7 @@ export class VisualEditor implements IEditorView {
   view: EditorView;
 
   private plugins: Plugin[];
-  private html: HTMLElement;
+  private html: HTMLPreElement;
   private content: HTMLElement;
   private listeners = new Map<'change' | 'save', IEventListener>();
 
@@ -58,7 +58,7 @@ export class VisualEditor implements IEditorView {
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });
-    this.html = <HTMLElement>document.createElement('div');
+    this.html = <HTMLPreElement>document.createElement('pre');
   }
 
   get element(): HTMLElement {

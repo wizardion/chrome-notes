@@ -4,12 +4,12 @@
 import {
   chainCommands, createParagraphNear, liftEmptyBlock, newlineInCode, splitBlock, toggleMark
 } from 'prosemirror-commands';
-import { splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
+import { splitListItem } from 'prosemirror-schema-list';
 import { undoInputRule } from 'prosemirror-inputrules';
 import { Command } from 'prosemirror-state';
 import { Schema } from 'prosemirror-model';
 import { redo, undo } from 'prosemirror-history';
-import { indent, toggleLink } from './commands';
+import { indent, toggleLink, unindent } from './commands';
 
 
 const mac = typeof navigator !== 'undefined' ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false;
@@ -138,7 +138,6 @@ export function buildKeymap(schema: Schema, presets: Record<string, Command>) {
     'Mod-i': toggleMark(italic),
     'Mod-I': toggleMark(italic),
     'Mod-l': toggleLink,
-    'Tab': indent,
     ...presets
   };
 
@@ -146,8 +145,8 @@ export function buildKeymap(schema: Schema, presets: Record<string, Command>) {
     const item = schema.nodes.listItem;
 
     keys['Enter'] = splitListItem(item);
-    keys['Tab'] = sinkListItem(item);
-    keys['Shift-Tab'] = liftListItem(item);
+    keys['Tab'] = indent(item);
+    keys['Shift-Tab'] = unindent(item);
   }
 
   if (schema.nodes.paragraph) {

@@ -129,8 +129,6 @@ export abstract class PopupBaseElement extends BaseElement {
 
       this.selected.id = await DbProviderService.save(draft);
       await DbProviderService.cache.set('selected', draft);
-
-      console.log('\t:saved', { preview: draft.preview });
     }
   }
 

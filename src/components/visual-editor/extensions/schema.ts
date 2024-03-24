@@ -10,7 +10,7 @@ export const schema = new Schema({
       group: 'block',
       content: 'inline*',
       toDOM: () => ['p', 0],
-      parseDOM: [{ tag: 'p' }]
+      parseDOM: [{ tag: 'p', preserveWhitespace: 'full' }]
     },
     heading: {
       attrs: { level: { default: 2 } },

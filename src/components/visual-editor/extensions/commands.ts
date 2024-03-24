@@ -3,8 +3,9 @@ import { UrlHelper } from './helpers/url.helper';
 import { FormatHelper } from './helpers/format.helper';
 import { MarkdownSerializer } from './serializer/serializer';
 import { ListCommandHelper } from './helpers/list.helper';
-import { NodeType } from 'prosemirror-model';
+import { Fragment, NodeType } from 'prosemirror-model';
 import { TextSerializer } from './serializer/text-serializer';
+import { liftListItem, sinkListItem } from 'prosemirror-schema-list';
 
 
 export function toggleLink(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
@@ -58,12 +59,45 @@ export function toString(state: EditorState, dispatch: (tr: Transaction) => void
 }
 
 // TODO to be implemented.
-export function indent(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
-  if (dispatch) {
-    console.log('state', state);
-  }
+export function indent(item: NodeType): Command {
+  const sinkCommand = sinkListItem(item);
+  const command = (state: EditorState, dispatch: (tr: Transaction) => void): boolean => {
+    if (dispatch && !sinkCommand(state, dispatch)) {
+      const transaction = state.tr;
 
-  return true;
+      dispatch(transaction.insertText('  '));
+
+      return true;
+    }
+
+    return true;
+  };
+
+  return command;
+}
+
+export function unindent(item: NodeType): Command {
+  const liftCommand = liftListItem(item);
+  const command = (state: EditorState, dispatch: (tr: Transaction) => void): boolean => {
+    if (dispatch && !liftCommand(state, dispatch)) {
+      const { from, to } = state.selection;
+
+      if (from === to) {
+        const transaction = state.tr;
+        const text = state.doc.textBetween(from - 2, to, '\n');
+
+        if (text === '  ') {
+          dispatch(transaction.replaceWith(from - 2, to, Fragment.empty));
+        }
+      }
+
+      return true;
+    }
+
+    return true;
+  };
+
+  return command;
 }
 
 export function toggleList(listType: NodeType): Command {

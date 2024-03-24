@@ -16,6 +16,7 @@ class MarkdownRender {
       html: false,
       linkify: true,
       breaks: true,
+      typographer: true,
       highlight: (s: string) => this.highlight(s)
     });
 
@@ -44,6 +45,10 @@ class MarkdownRender {
         continue;
       }
 
+      if (line.match(/^\s\s/g)) {
+        line = line.replace(/^\s\s/g, '\u00a12');
+      }
+
       if (!line.length) {
         line += '\\';
       }
@@ -51,7 +56,9 @@ class MarkdownRender {
       stack.push(line + '\n');
     }
 
-    return this.md.render(stack.join('\n')).replace(/<p>\\<\/p>/g, `<p><span>${trailingSpaces}</span></p>`);
+    return this.md.render(stack.join('\n'))
+      .replace(/<p>\\<\/p>/g, `<p><span>${trailingSpaces}</span></p>`)
+      .replace(/\u00a12/g, '  ');
   }
 
   public unescapeAll(text: string): string {
