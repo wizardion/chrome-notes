@@ -34,8 +34,9 @@ export interface ISortPoint {
  * ------------------------------------------------------------------------------------------------------------------
  */
 export type ISortEventListenerType =
-  | 'switched'
-  | 'finished';
+  | 'start'
+  | 'switch'
+  | 'finish';
 
 export interface ISortHelperEvents {
   switch: EventListener | null;
@@ -47,10 +48,5 @@ export interface ISortCollection {
 }
 
 export interface ISortEventListener {
-  (first: number, second: number): void;
-}
-
-export interface ISortCustomEvents {
-  finish: ISortEventListener | null;
-  replace?: ISortEventListener | null;
+  (first?: number, second?: number): void;
 }

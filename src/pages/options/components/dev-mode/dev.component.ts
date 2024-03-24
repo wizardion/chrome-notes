@@ -1,7 +1,7 @@
 import { BaseElement } from 'core/components';
 import { storage } from 'core/services';
 import { LoggerService } from 'modules/logger';
-// import { db } from 'modules/db';
+import { IDBNote, db } from 'modules/db';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -17,8 +17,9 @@ export class DevModeElement extends BaseElement {
   protected print: HTMLLinkElement;
   protected clean: HTMLLinkElement;
   protected cacheEmpty: HTMLLinkElement;
-  // protected cacheClear: HTMLLinkElement;
   protected cachePrint: HTMLLinkElement;
+  protected dataPrint: HTMLLinkElement;
+  protected dataEmpty: HTMLLinkElement;
   protected info: HTMLElement;
   protected event: Event;
 
@@ -32,13 +33,15 @@ export class DevModeElement extends BaseElement {
     this.print = this.template.querySelector('a[name="print-logs"]');
     this.clean = this.template.querySelector('a[name="clear-logs"]');
     this.cachePrint = this.template.querySelector('a[name="print-cache"]');
-    // this.cacheClear = this.template.querySelector('a[name="clear-cache"]');
     this.cacheEmpty = this.template.querySelector('a[name="empty-cache"]');
+    this.dataPrint = this.template.querySelector('a[name="print-db"]');
+    this.dataEmpty = this.template.querySelector('a[name="empty-db"]');
     this.info.hidden = true;
   }
 
   protected async eventListeners() {
     this.event = new Event('mode:change');
+
     this.mode.onchange = () => this.modeChanged();
 
     this.print.onclick = (e) => { e.preventDefault(); this.printLogs(); };
@@ -48,6 +51,10 @@ export class DevModeElement extends BaseElement {
     this.cacheEmpty.onclick = (e) => { e.preventDefault(); this.clearCache(); };
 
     this.cachePrint.onclick = (e) => { e.preventDefault(); this.printCache(); };
+
+    this.dataPrint.onclick = (e) => { e.preventDefault(); this.printData(); };
+
+    this.dataEmpty.onclick = (e) => { e.preventDefault(); this.clearData(); };
   }
 
   protected attributeChanged(name: string) {
@@ -66,62 +73,53 @@ export class DevModeElement extends BaseElement {
   }
 
   protected async printLogs() {
-    // const cache = await storage.cached.get();
-
     LoggerService.getAll().then((logs) => {
       console.clear();
 
       for (let i = 0; i < logs.length; i++) {
         const log = logs[i];
 
-        // if (['base.ts', 'popup.ts', 'db.note.ts'].indexOf(log.name) >= 0) {
         LoggerService.print(log);
       }
-
-      // Logger.print({
-      //   name: 'print-logs',
-      //   color: null,
-      //   time: new Date().getTime(),
-      //   type: ILogType.Info,
-      //   data: JSON.stringify(['printLogs.cache', cache])
-      // });
     });
   }
 
-  protected clearLogs() {
-    LoggerService.clear();
+  protected async clearLogs() {
+    await LoggerService.clear();
     console.clear();
   }
 
-  // protected async clearCache() {
-  //   if (window.confirm('Please confirm to clear dynamic cached values.\nThe page will be reloaded.')) {
-  //     await storage.cached.clear();
-  //     document.location.reload();
-  //   }
-  // }
-
   protected async clearCache() {
-    if (window.confirm('Please confirm the certainty of clearing all dynamic and permanent cached values.' +
+    if (window.confirm('Please confirm the certainty of clearing all cached values.' +
                        '\nThe page will be reloaded.')) {
-      // const data = await load();
-
-      // for (let i = 0; i < data.length; i++) {
-      //   const item = data[i];
-
-      //   item.cState = [0, 0];
-      //   enqueue(item, 'update');
-      // }
-
-      // await dequeue();
-
       await storage.cached.clear();
-      // await storage.cached.set('list', data);
       document.location.reload();
     }
   }
 
   protected async printCache() {
-    console.log((await storage.cached.get()));
+    console.log((await storage.cached.dump()));
+  }
+
+  protected async printData() {
+    const data = await db.dump();
+    const transformed = data.reduce((acc: Record<number, Partial<IDBNote>>, { id, ...x }) => {
+      acc[id] = {
+        ...x,
+      };
+
+      return acc;
+    }, {});
+
+    console.table(transformed, ['title', 'description', 'order', 'created', 'updated', 'cState', 'pState', 'deleted']);
+  }
+
+  protected async clearData() {
+    if (window.confirm('Please confirm the certainty of clearing all data.' +
+                       '\nAttention! This action is irreversible!' +
+                       '\nThe page will be reloaded.')) {
+      document.location.reload();
+    }
   }
 
   get enabled(): boolean {

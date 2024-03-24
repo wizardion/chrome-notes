@@ -34,7 +34,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
     this.detailsView.elements.cancel.classList.remove('back');
   }
 
-  goBack() {
+  async goBack() {
     const note = this.preserved ? this.preserved : this.items.length > 0 ? this.items[this.items.length - 1] : null;
 
     this.detailsView.draft = false;
@@ -46,7 +46,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
     }
   }
 
-  select(item: INote, rendered = true) {
+  async select(item: INote, rendered = true) {
     this.selected?.item.classList.remove('selected');
     this.detailsView.draft = false;
     this.listView.elements.add.hidden = false;
@@ -54,7 +54,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
     if (rendered) {
       this.selected = item;
       this.selected.item.classList.add('selected');
-      DbProviderService.cache.set('selected', this.selected);
+      await DbProviderService.cache.set('selected', this.selected);
     } else {
       this.preserved = item;
     }

@@ -1,6 +1,5 @@
 <fieldset>
   <label class="checkbox"><input type="checkbox" name="mode"><span>Enable development mode</span></label>
-  <!-- <span class="note">(browser <a href="https://support.google.com/chrome/answer/185277?hl=en&co=GENIE.Platform%3DDesktop" target="_blank">sync on</a> required).</span> -->
   <div name="dev-info" class="info">
     <span>In order you need to send the logs to a developer, you will need to print the logs and copy all details into a ticket.</span><br>
 
@@ -10,8 +9,12 @@
       
       <div class="margin-top">
         <span><a name="print-cache" href="#">print cache</a> - prints all values in cached storage.</span><br>
-        <!-- <span><a name="clear-cache" href="#">clear cache</a> - clears dynamic values.</span><br> -->
-        <span><a name="empty-cache" href="#">clear cache</a> - clears dynamic and permanent values including password key.</span><br>
+        <span><a name="empty-cache" href="#">clear cache</a> - clears cached values.</span><br>
+      </div>
+
+      <div class="margin-top">
+        <span><a name="print-db" href="#">print data</a> - prints all database storage.</span><br>
+        <span><a name="empty-db" class="warning" href="#">clear all data</a> - clears all data including passphrase. Attention! This action is irreversible!</span><br>
       </div>
     </div>
   </div>

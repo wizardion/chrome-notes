@@ -22,15 +22,14 @@ export abstract class PopupBaseElement extends BaseElement {
     this.detailsView.addEventListener('create', () => !this.disabled && this.onCreate());
     this.detailsView.addEventListener('delete', () => !this.disabled && this.delete());
 
-    SortHelper.addEventListener('finished', (f, s) => !this.disabled && this.onItemOrderChange(f, s));
+    SortHelper.addEventListener('start', () => ListItemElement.locked = true);
+    SortHelper.addEventListener('finish', (f, s) => !this.disabled && this.onItemOrderChange(f, s));
   }
 
   init(items: INote[]) {
     for (let i = 0; i < items.length; i++) {
       this.addItem(items[i]);
     }
-
-    document.addEventListener('mouseup', () => setTimeout(() => ListItemElement.locked = false));
   }
 
   addItem(note: INote) {
@@ -53,7 +52,7 @@ export abstract class PopupBaseElement extends BaseElement {
     }
   }
 
-  select(item: INote, rendered = true) {
+  async select(item: INote, rendered = true) {
     this.listView.hidden = true;
     this.detailsView.hidden = false;
     this.selected?.item.classList.remove('selected');
@@ -61,7 +60,7 @@ export abstract class PopupBaseElement extends BaseElement {
     if (rendered) {
       this.selected = item;
       this.selected.item.classList.add('selected');
-      DbProviderService.cache.set('selected', this.selected);
+      await DbProviderService.cache.set('selected', this.selected);
     } else {
       this.preserved = item;
     }
@@ -69,8 +68,8 @@ export abstract class PopupBaseElement extends BaseElement {
     this.detailsView.setData(item);
   }
 
-  goBack() {
-    this.onChanged();
+  async goBack() {
+    await this.onChanged();
 
     this.listView.hidden = false;
     this.detailsView.hidden = true;
@@ -79,7 +78,7 @@ export abstract class PopupBaseElement extends BaseElement {
     this.selected?.item.animateItem();
     this.selected = null;
 
-    DbProviderService.cache.remove(['draft', 'selected']);
+    await DbProviderService.cache.remove(['draft', 'selected']);
   }
 
   draft(title?: string, description?: string, selection?: number[]) {
@@ -136,29 +135,33 @@ export abstract class PopupBaseElement extends BaseElement {
   }
 
   async onItemOrderChange(first: number, second: number) {
-    const queue: INote[] = [];
-    const item = this.items[first];
+    if (first !== second) {
+      const queue: INote[] = [];
+      const item = this.items[first];
 
-    this.items.splice(first, 1);
-    this.items.splice(second, 0, item);
+      this.items.splice(first, 1);
+      this.items.splice(second, 0, item);
 
-    for (let i = Math.min(first, second); i <= Math.max(first, second); i++) {
-      const item = this.items[i];
+      for (let i = Math.min(first, second); i <= Math.max(first, second); i++) {
+        const item = this.items[i];
 
-      item.order = i;
-      item.item.index = i + 1;
+        item.order = i;
+        item.item.index = i + 1;
 
-      const draft = Object.assign({}, item);
+        const draft = Object.assign({}, item);
 
-      delete draft.item;
+        delete draft.item;
 
-      queue.push(draft);
+        queue.push(draft);
+      }
+
+      await DbProviderService.bulkSave(queue);
     }
 
-    await DbProviderService.bulkSave(queue);
+    ListItemElement.locked = false;
   }
 
-  onChanged() {
+  async onChanged() {
     const item = this.detailsView.getData();
 
     if (this.selected) {
@@ -173,9 +176,9 @@ export abstract class PopupBaseElement extends BaseElement {
       this.selected.preview = item.preview;
       this.selected.item.date = new Date(time);
 
-      this.save();
+      await this.save();
     } else {
-      DbProviderService.cache.set('draft', {
+      await DbProviderService.cache.set('draft', {
         title: item.title,
         description: item.description,
         selection: item.cState

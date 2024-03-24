@@ -82,7 +82,6 @@ export class ListItemElement extends BaseElement {
     if (type === 'sort:mousedown') {
       this.listeners.set('mousedown', (e) => {
         e.preventDefault();
-        ListItemElement.locked = true;
 
         return listener(e);
       });

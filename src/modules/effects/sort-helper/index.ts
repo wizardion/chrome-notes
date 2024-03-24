@@ -1,13 +1,12 @@
 import {
-  ISortContainer, ISortCustomEvents, ISortEventListener, ISortEventListenerType, ISortEvents,
+  ISortContainer,
+  ISortEventListener,
+  ISortEventListenerType,
+  ISortEvents,
   ISortItem,
   ISortPoint,
 } from './models/sort-helper.model';
 
-
-const CUSTOM_EVENTS: ISortCustomEvents = {
-  finish: null
-};
 
 export class SortHelper {
   private static _busy = false;
@@ -17,14 +16,15 @@ export class SortHelper {
   private static childElementCount: number;
   private static collection: HTMLElement[];
   private static interval?: NodeJS.Timeout;
+  private static listeners = new Map<ISortEventListenerType, ISortEventListener>();
 
   static get busy(): boolean {
     return this._busy;
   }
 
   static addEventListener(type: ISortEventListenerType, listener: ISortEventListener) {
-    if (type === 'finished') {
-      CUSTOM_EVENTS.finish = listener;
+    if (!this.listeners.has(type)) {
+      this.listeners.set(type, listener);
     }
   }
 
@@ -79,6 +79,10 @@ export class SortHelper {
       wheel: (e: MouseEvent) => e.preventDefault()
     };
 
+    if (this.listeners.has('start')) {
+      this.listeners.get('start')(this.item.startIndex, this.item.index);
+    }
+
     window.addEventListener('mousemove', this.movingEvent.move);
     document.addEventListener('mouseup', this.movingEvent.end);
     this.container.element.addEventListener('wheel', this.movingEvent.wheel);
@@ -97,8 +101,8 @@ export class SortHelper {
 
     clearInterval(this.interval);
 
-    if (this.item.index !== this.item.startIndex && CUSTOM_EVENTS.finish) {
-      CUSTOM_EVENTS.finish(this.item.startIndex, this.item.index);
+    if (this.listeners.has('finish')) {
+      this.listeners.get('finish')(this.item.startIndex, this.item.index);
     }
 
     document.body.classList.remove('hold');

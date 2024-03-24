@@ -142,13 +142,14 @@ list-item {
   margin-right: 4px;
   padding-right: 2px;
   border-color: transparent;
+  // border-color: rebeccapurple;
   border-left-color: var(--base-highlight-color);
   border-right-color: var(--base-highlight-second-color);
   // border-left: none;
   // box-shadow: -1px 2px 4px 0px var(--base-shadow-drag);
   box-shadow: 0px 4px 8px -4px var(--base-shadow-drag);
   border-radius: 3px;
-  line-height: 23px !important;
+  line-height: 22px !important;
   height: 23px !important;
 }
 
@@ -158,6 +159,16 @@ list-item {
   margin-top: -1px;
   color: var(--base-color-hover);
   fill: var(--base-color-hover);
+}
+
+.list-view .drag .list-item .button {
+  line-height: 23px !important;
+  height: 23px !important;
+}
+
+.list-view .drag .list-item .button.to-note {
+  line-height: 21px !important;
+  height: 21px !important;
 }
 
 .list-view list-item:last-child,

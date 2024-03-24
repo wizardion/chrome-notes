@@ -3,7 +3,7 @@ import { ICachedItem, ICachedItems, IDataDaft } from './models/cached.models';
 
 
 export class CachedStorageService {
-  protected static readonly key = 'cache2';
+  protected static readonly key = 'cache';
   public static item: ICachedItem;
 
   public static async set(key: ICachedItems, value: IDBNote | IDataDaft) {

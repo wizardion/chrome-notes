@@ -29,16 +29,23 @@ details-view {
   border-left-width: 2px;
 }
 
-.list-item .sort,
-.list-view .hold .list-item:hover .sort,
-.list-view .drag,
-.list-view .button {
+.list-view .list-item .button {
+  height:27px;
+}
+
+.list-view .drag {
   height:28px;
 }
 
+.list-view .drag .list-item .button,
 .list-view .drag .list-item {
   line-height: 25px !important;
   height: 25px !important;
+}
+
+.list-view .drag .list-item .button.to-note {
+  line-height: 23px !important;
+  height: 23px !important;
 }
 
 .list-item .list-index,
