@@ -57,7 +57,9 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
       const handler = this._draft ? this.listeners.get('create') : this.listeners.get('change');
 
       if (handler) {
+        this.lock();
         handler(e);
+        this.unlock();
       }
     }
   }
