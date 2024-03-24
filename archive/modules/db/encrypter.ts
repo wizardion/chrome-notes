@@ -15,11 +15,11 @@ export class BaseEncrypter {
   protected toBase64(buff: Uint8Array): string {
     return btoa(String.fromCharCode.apply(null, buff));
   }
-  
+
   protected fromBase64(b64: string): ArrayBuffer {
     return Uint8Array.from(atob(b64), (c) => c.charCodeAt(null));
   }
-  
+
   protected toString(buff: ArrayBuffer): string {
     return new TextDecoder().decode(buff);
   }
@@ -41,10 +41,10 @@ export class BaseEncrypter {
       iterations: 250000,
       hash: 'SHA-256',
     },
-    passwordKey,
-    {name: 'AES-CTR', length: 256},
-    false,
-    usage
+      passwordKey,
+      { name: 'AES-CTR', length: 256 },
+      false,
+      usage
     );
   }
   //#endregion
@@ -57,8 +57,8 @@ export class BaseEncrypter {
       counter: new Uint8Array(16),
       length: 128
     },
-    await this.deriveKey(await this.getPasswordKey(this.password), salt, ['encrypt']),
-    new TextEncoder().encode(value)
+      await this.deriveKey(await this.getPasswordKey(this.password), salt, ['encrypt']),
+      new TextEncoder().encode(value)
     );
 
     const encryptedContentArr = new Uint8Array(encrypted);
@@ -83,7 +83,7 @@ export class BaseEncrypter {
       await this.deriveKey(await this.getPasswordKey(this.password), salt, ['decrypt']),
       data
     );
-    
+
     return this.toString(decrypted2);
   }
 }
