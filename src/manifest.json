@@ -18,8 +18,14 @@
    "permissions": [
       "alarms",
       "storage",
-      "tabs",
-      "unlimitedStorage"
+      "unlimitedStorage",
+      "identity"
    ],
+   "oauth2": {
+    "client_id": "1061764704231-pm8qj8efbb8a4md2u4aduig6pkeikiai.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.file"
+    ]
+   },
    "version": null
 }

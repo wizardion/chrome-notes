@@ -1,0 +1,110 @@
+$themes: (
+  light: (
+    'body-background': #fbfbfd,
+    'base-color': #07a698,
+    'base-bright-color': #06736a,
+    'base-color-hover': #e33636,
+    'base-color-active': #e3363685,
+    'base-background': #fbfbfd,
+    'base-tile-background': white,
+    'base-background-stroke': #07429813, // #EEF4F2
+    'base-background-second-stroke': #EEF4F2, // #d7e9e995
+    'base-text-color': black,
+
+    'base-scrollbar': #D6D6D6,
+    'base-scrollbar-hover': #555,
+
+    'base-shadow': rgba(0, 0, 0, 0.2),
+    'base-shadow-tile': #056a6115,
+    'base-shadow-drag': #A2A1A3,
+
+    'base-highlight-color': #F1F8F7, // 347a7b
+    'base-highlight-second-color': white,
+
+    'control-disabled-color': #d7e9e9, //rgba(#07a698, .25),
+    'control-disabled-background': transparent,
+    'control-disabled-stroke': rgba(#EEF4F2, .6),
+    'control-active-background': rgba(#07a698, .06), //#fbfeff
+    'control-selected-background': #EAF2F3,
+
+    'editor-background': white,
+    'editor-color-heading': gray,
+    'editor-color-subtitle': gray,
+
+    'editor-highlight-color': #06736a,
+
+    'editor-quote-color': dimgray,
+    'editor-quote-background': #f6f8fac9,
+    'editor-quote-stroke': rgba(211, 211, 211, 0.707),
+
+    'editor-selection-cursor': #056a61,
+    'editor-selection-background': #D4E6E885,
+    // 'editor-selection-background': #EAF2F3,
+    'editor-selection-stroke': #BBDBDC,
+    'editor-inactive-selection-background': #e9e9e9,
+    'editor-inactive-selection-stroke': #d9d9d9,
+
+    'editor-menu-focus': #06736a,
+    'editor-menu-stroke': #07429813,
+    'editor-menu-stroke-dimmed': white,
+    'editor-menu-stroke-scrolled': transparent,
+
+    'editor-text-url-hover': #ff008c,
+    'editor-text-url-active': #ff008c85,
+    'editor-text-url': #0f5b99,
+  ),
+  dark: (
+    'body-background': #28292A,
+    'base-color': scale-color(#aecbfa, $saturation: -30%),
+    'base-bright-color': #e3e3e3,
+    'base-color-hover': scale-color(darken(#c6c7cF, 10%), $saturation: -30%),
+    'base-color-active': darken(#c6c7cF, 35%),
+    'base-background': #28292A,
+
+    'base-tile-background': lighten(#28292A, 1%),
+    'base-background-stroke': rgba(#31363C, .65),
+    'base-background-second-stroke': rgba(#31363C, .95),
+    'base-text-color': #B9B9BB,
+
+    'base-scrollbar': #747474,
+    'base-scrollbar-hover': #A4A8AD,
+
+    'base-shadow': rgba(0, 0, 0, 0.3),
+    'base-shadow-tile': rgba(0, 0, 0, 0.2),
+    'base-shadow-drag': rgba(20, 20, 20, 1),
+
+    'base-highlight-color': darken(#31363C, 0%),
+    'base-highlight-second-color': lighten(#28292A, 1%),
+
+    'control-disabled-color': lighten(#41464C, 15%), //#41464C,
+    'control-disabled-background': transparent,
+    'control-disabled-stroke': rgba(#31363C, .55),
+    'control-active-background': rgba(#31363C, .45),
+    'control-selected-background': scale-color(lighten(#2a2c2d, 7%), $blue: 4%, $green: 1%),
+
+    'editor-background': lighten(#28292A, 1%),
+    'editor-color-heading': gray,
+    'editor-color-subtitle': gray,
+
+    'editor-highlight-color': #e3e3e3,
+
+    'editor-quote-color': gray,
+    'editor-quote-background': darken(#31363C, 1%),
+    'editor-quote-stroke': #444a51,
+
+    'editor-selection-cursor': #EDA757,
+    'editor-selection-background': scale-color(lighten(#2a2c2d, 7%), $blue: 4%, $green: 1%),
+    'editor-selection-stroke': scale-color(lighten(#2a2c2d, 15%), $blue: 4%, $green: 1%),
+    'editor-inactive-selection-background': darken(#2a2c2d, 3%),
+    'editor-inactive-selection-stroke': darken(#2a2c2d, 3%),
+
+    'editor-menu-focus': #e3e3e3,
+    'editor-menu-stroke': rgba(#31363C, .65),
+    'editor-menu-stroke-dimmed': rgba(#31363C, .65),
+    'editor-menu-stroke-scrolled': rgba(#31363C, .65),
+
+    'editor-text-url-hover': scale-color(darken(#c6c7cF, 10%), $saturation: -30%),
+    'editor-text-url-active': rgba(scale-color(darken(#c6c7cF, 10%), $saturation: -30%), .85),
+    'editor-text-url': darken(#aecbfa, 12%),
+  )
+);

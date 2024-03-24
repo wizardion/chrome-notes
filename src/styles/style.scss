@@ -1,22 +1,15 @@
-html, body {
-  // background: white;
-  background: silver;
+[hidden],
+.hidden {
+  display: none;
+}
 
-  width: 600px;
-  height: 270px;
-  border:0;
-  margin: 0px;
-  padding: 0px;
-
-  overflow: hidden;
-  font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
+.transparent {
+  opacity: 0;
 }
 
 .notes {
-  background: white;
+  background: var(--body-background);
   box-sizing: border-box;
-  display: none;
-  opacity: 0;
 }
 
 input, button {
@@ -43,10 +36,10 @@ input, button {
   cursor: pointer;
   background-position: center;
   background-repeat: no-repeat;
-  color: #07a698;
-  fill: #07a698;
+  color: var(--base-color);
+  fill: var(--base-color);
   outline: none;
-  display: inline-block;
+  // display: inline-block;
 
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -57,31 +50,22 @@ input, button {
 
 .button:hover,
 .link:hover {
-  color: #e33636;
-  fill:#e33636;
+  color: var(--base-color-hover);
+  fill: var(--base-color-hover);
 }
 
 .button:active,
 .link:active {
-  color: #e3363685;
-  fill:#e3363685;
+  color: var(--base-color-active);
+  fill: var(--base-color-active);
 }
 
-.sync-indicator {
-  display: none; 
-  width: 4px; 
-  height: 4px; 
-  border-radius: 2px; 
-  background-color: red; 
-  position: absolute; 
-  z-index: 1; 
-  left: 35px; 
-  top: 6px;
+.button:disabled,
+.link:disabled {
+  color: var(--control-disabled-color);
+  fill: var(--control-disabled-color);
+  cursor: default;
+  pointer-events: none;
 }
-
 
 @import 'list-view';
-@import 'details-view';
-@import 'mode-mixed';
-@import 'mode-compact';
-@import 'mode-full';

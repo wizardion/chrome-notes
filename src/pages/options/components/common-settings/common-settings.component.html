@@ -1,0 +1,64 @@
+<fieldset>
+  <div class="row-flex margin-bottom">
+    <div class="row-flex-group">Style view:</div>
+    <div>
+      <ul>
+        <li><label><input type="radio" name="view" value="0"> <span>Simple</span></label></li>
+        <li><label><input type="radio" name="view" value="1"> <span>Mixed</span></label></li>
+        <!-- <li><label><input type="radio" name="view" value="2"> <span>Compact</span></label></li> -->
+        <li><label><input type="radio" name="view" value="3"> <span>Browser Tab</span></label></li>
+        <!-- <li><label><input type="radio" name="view" value="4"> Window</label></li> -->
+      </ul>
+    </div>
+  </div>
+  <div name="popup-options" class="row-flex margin-bottom" hidden>
+    <div class="row-flex-group">Popup size:</div>
+    <div>
+      <ul class="flat">
+        <li><label><input type="radio" name="popup-size" value="0"> <span>Small</span></label></li>
+        <li><label><input type="radio" name="popup-size" value="1"> <span>Big</span></label></li>
+      </ul>
+    </div>
+  </div>
+  <div class="row-flex margin-bottom">
+    <div class="row-flex-group">Editor style:</div>
+    <div>
+      <ul class="flat">
+        <li><label><input type="radio" name="editor" value="0"> <span>Markdown</span></label></li>
+        <li><label><input type="radio" name="editor" value="1"> <span>Visual (Beta)</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row-flex margin-top">
+    <div class="row-flex-group">Appearance:</div>
+    <div>
+      <ul class="flat">
+        <li><label><input type="radio" name="appearance" value="0"> <span>Auto</span></label></li>
+        <li><label><input type="radio" name="appearance" value="1"> <span>Light</span></label></li>
+        <li><label><input type="radio" name="appearance" value="2"> <span>Dark</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row-flex margin-top">
+    <div class="row-flex-group">Keep deleted notes:</div>
+    <div>
+      <select name="expirationDays">
+        <option value="3">3</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="30">30</option>
+      </select>
+      <span class="info"> days.</span>
+    </div>
+  </div>
+
+  <div class="row-flex small-space">
+    <div class="row-flex-group"></div>
+    <div class="row-flex-body">
+      <progress-bar class="sync-progress"></progress-bar>
+    </div>
+  </div>
+</fieldset>

@@ -119,10 +119,12 @@
 .list-view.mixed.compact .button.search {
   position: absolute;
   left: 30px;
+  display: none;
 }
 
 .details-view.mixed.compact .head .sync {
-  left: 38px !important;
+  // left: 38px !important;
+  left: 8px !important;
   right: inherit !important;
 }
 

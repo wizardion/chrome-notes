@@ -1,0 +1,88 @@
+/* Hide the native cursor */
+.ProseMirror.vr-selection-enabled {
+  caret-color: transparent;
+
+  position: relative;
+  z-index: 1;
+}
+
+/* Hide the native cursor */
+.ProseMirror.vr-selection-enabled ::selection {
+  background: transparent;
+}
+
+.ProseMirror.vr-selection-enabled > p:has(br) {
+  width: fit-content;
+}
+
+.ProseMirror-focused {
+  --vr-cursor-color: var(--editor-selection-cursor);
+  --vr-cursor-selection: var(--editor-selection-background);
+  --vr-cursor-selection-border: var(--editor-selection-stroke);
+}
+
+.ProseMirror .vr-selection-layer {
+  position: absolute;
+  pointer-events: none;
+  z-index: -2;
+  left: 0;
+  top: 0;
+  contain: size style;
+}
+
+.ProseMirror .vr-selection-layer .vr-cursor {
+  position: absolute;
+  cursor: text;
+  pointer-events: none;
+  transform: translate(-0.75px);
+  user-select: none;
+  -webkit-user-select: none;
+  border-left: 1.5px solid var(--vr-cursor-color);
+  z-index: 101;
+}
+
+.ProseMirror .vr-selection-layer .vr-cursor.virtual-cursor-left {
+  width: 1ch;
+  transform: translate(calc(-1ch + -1px));
+  border-bottom: 1.5px dotted var(--vr-cursor-color);
+  border-right: 1.5px solid var(--vr-cursor-color);
+  border-left: none;
+}
+
+.ProseMirror .vr-selection-layer .vr-cursor.virtual-cursor-right {
+  width: 1ch;
+  border-bottom: 1.5px dotted var(--vr-cursor-color);
+  border-left: 1.5px solid var(--vr-cursor-color);
+  border-right: none;
+}
+
+.ProseMirror .vr-selection-layer .vr-selection>* {
+  position: absolute;
+  background: var(--editor-inactive-selection-background);
+  z-index: -2;
+}
+
+.ProseMirror .vr-selection-layer svg.vr-selection {
+  position: absolute;
+  z-index: -2;
+}
+
+.ProseMirror .vr-selection-layer svg.vr-selection polygon,
+.ProseMirror .vr-selection-layer svg.vr-selection path {
+  stroke: var(--vr-cursor-selection-border, var(--editor-inactive-selection-stroke));
+  fill: var(--vr-cursor-selection, var(--editor-inactive-selection-background));
+}
+
+// .ProseMirror-focused .vr-selection-layer .vr-selection>* {
+//   background: #056a6125;
+// }
+
+.ProseMirror-focused .vr-cursor-blink {
+  animation: steps(1) vr-cursor-blink 1.2s infinite;
+}
+
+@keyframes vr-cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}

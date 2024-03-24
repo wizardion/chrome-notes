@@ -1,0 +1,89 @@
+.dropdown-menu {
+  position: absolute;
+  width: fit-content;
+  z-index: 2000;
+  box-shadow: 1px 3px 6px 0px var(--base-shadow);
+  border: 1px solid var(--editor-menu-stroke);
+  border-radius: 4px;
+  background-color: var(--base-background);
+  padding: 1px 1px 1px 1px;
+  font-size: 12px;
+}
+
+.dropdown-menu button {
+  display: block;
+  cursor: pointer;
+  text-align: left;
+  padding: 3px 10px 3px 6px;
+  min-width: 100%;
+
+  background-color: transparent;
+  border-radius: 4px !important;
+  border: 1px solid transparent !important;
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+
+  color: var(--base-bright-color);
+  user-select: none;
+}
+
+.dropdown-menu button:first-child {
+  margin-top: 6px;
+}
+
+.dropdown-menu button:hover {
+  background-color: var(--base-highlight-color);
+  border-color: var(--editor-menu-stroke);
+  color: var(--base-color-hover);
+  fill: var(--base-color-hover);
+}
+
+.dropdown-menu button:focus {
+  border: 1px solid var(--editor-menu-focus) !important;
+}
+
+.dropdown-menu button:active {
+  background-color: var(--control-active-background);
+  color: var(--base-color-active);
+  fill: var(--base-color-active);
+}
+
+.dropdown-menu button:disabled {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  cursor: inherit;
+  color: var(--control-disabled-color);
+  fill: var(--control-disabled-color);
+  pointer-events: none;
+}
+
+.dropdown-toggle {
+  width: fit-content !important;
+  align-items: center;
+  justify-content: center;
+  padding-left: 6px;
+  padding-right: 6px;
+  line-height: 19px;
+}
+
+.dropdown.opened .dropdown-toggle {
+  color: var(--base-color-active);
+  fill: var(--base-color-active);
+}
+
+.dropdown-toggle svg {
+  display: inline-block;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+}
+
+.dropdown-toggle svg .up {
+  display: none;
+}
+
+.dropdown.opened .dropdown-toggle svg .down {
+  display: none;
+}
+
+.dropdown.opened .dropdown-toggle svg .up {
+  display: inherit;
+}

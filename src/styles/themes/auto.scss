@@ -1,0 +1,23 @@
+@use 'colors';
+
+@each $name, $map in colors.$themes {
+  @if $name == 'light' {
+    @media (prefers-color-scheme: light) {
+      :root {
+        @each $key, $value in $map {
+          --#{$key}: #{$value};
+        }
+      }
+    }
+  }
+
+  @if $name == 'dark' {
+    @media (prefers-color-scheme: dark) {
+      :root {
+        @each $key, $value in $map {
+          --#{$key}: #{$value};
+        }
+      }
+    }
+  }
+}

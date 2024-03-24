@@ -2,20 +2,35 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const htmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
+const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
+const processHtmlLoader = require('./html-preprocessor');
+const htmlWebpackConfig = require('./html-webpack.config');
+const htmlPlugins = require('./html-plugins');
 const __root__ = path.resolve(__dirname, '..');
 const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
 
+
 module.exports = {
   entry: {
-    index: path.resolve(__root__, 'src/index.ts'),
-    background: path.resolve(__root__, 'src/background.ts'),
-    settings: path.resolve(__root__, 'src/settings.ts'),
+    autoTheme: path.resolve(__root__, 'src/styles/themes/auto.scss'),
+    lightTheme: path.resolve(__root__, 'src/styles/themes/light.scss'),
+    darkTheme: path.resolve(__root__, 'src/styles/themes/dark.scss'),
+
+    index: path.resolve(__root__, 'src/pages/index/index.ts'),
+
+    popupMarkdown: path.resolve(__root__, 'src/pages/popup/markdown/index.ts'),
+    popupVisual: path.resolve(__root__, 'src/pages/popup/visual/index.ts'),
+    popupMarkdownMixed: path.resolve(__root__, 'src/pages/popup/mixed-markdown/index.ts'),
+    popupVisualMixed: path.resolve(__root__, 'src/pages/popup/mixed-visual/index.ts'),
+
+    background: path.resolve(__root__, 'src/worker/background.ts'),
+    settings: path.resolve(__root__, 'src/pages/options/options.ts'),
+    migration: path.resolve(__root__, 'src/pages/migration/migration.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -37,62 +52,109 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
+        test: /\.html$/,
+        loader: 'html-loader',
+        options: {
+          minimize: {
+            // collapseInlineTagWhitespace: true,
+            // conservativeCollapse: true,
+            collapseWhitespace: true,
+            keepClosingSlash: true,
+            minifyCSS: true,
+            minifyJS: true,
+            removeComments: true,
+            removeRedundantAttributes: true,
+            removeScriptTypeAttributes: true,
+            removeStyleLinkTypeAttributes: true
+          },
+          preprocessor: processHtmlLoader
+        },
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.ts?$/,
+        include: [
+          path.join(__root__, 'src'),
+        ],
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              experimentalFileCaching: true
+            }
+          },
+          {
+            loader: path.resolve('configs/template-loader')
+          }
+        ],
         exclude: /node_modules/,
       },
       {
         test: /\.(sc|c)ss$/i,
-        use: [{
-          loader: MiniCssExtractPlugin.loader,
-          options: {
-            // publicPath: ''
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // publicPath: ''
+            }
+          }, 
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: false,
+              implementation: require('dart-sass'),
+            }
           }
-        }, 
-        'css-loader',
-        {
-          loader: 'sass-loader',
-          options: {
-            sourceMap: false,
-            implementation: require("dart-sass"),
-          }
-        }
-      ],
+        ],
       },
       {
-        test: /\.(png|jp(e*)g|gif|ico)$/,
+        test: /\.(png|jp(e*)g|gif|ico)$/i,
         include: [
           path.resolve(__root__, 'src/images'),
         ],
-        use: [{
-          loader: 'url-loader',
-        }]
-      },
-      { // https://v4.webpack.js.org/loaders/url-loader/#svg
-        test: /\.svg$/i,
-        exclude: [path.resolve(__root__, 'src/popup.html')],
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              generator: (content) => svgToMiniDataURI(content.toString()),
-            },
-          },
-        ],
+        loader: 'file-loader',
+        options: {
+          esModule: false,
+        },
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
-      {test: /\.(hbs|html|xml)$/, loader: 'handlebars-loader'}
+      {
+        test: /\.svg/,
+        type: 'asset/inline',
+        generator: {
+          dataUrl: content => svgToMiniDataURI(content.toString())
+        }
+      },
+      {
+        test: /\.svg/,
+        type: 'asset/source',
+        resourceQuery: /inline/,
+        generator: {
+          dataUrl: content => svgToMiniDataURI(content.toString())
+        }
+      },
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.component.ts', '.js', '.svg'],
+    alias: {
+      core: path.resolve(__root__, 'src/core'),
+      modules: path.resolve(__root__, 'src/modules'),
+      components: path.resolve(__root__, 'src/components'),
+      pages: path.resolve(__root__, 'src/pages'),
+      styles: path.resolve(__root__, 'src/styles'),
+      images: path.resolve(__root__, 'src/images'),
+    }
   },
   plugins: [
-    new CleanWebpackPlugin({
+    new CleanWebpackPlugin(process.__version__? {
       cleanAfterEveryBuildPatterns: ['**/*']
+    } : {
+      // cleanStaleWebpackAssets: false,
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -103,44 +165,42 @@ module.exports = {
       filename: '[name].[chunkhash].css',
     }),
     new HtmlWebpackPlugin({
-      title: 'My Notes',
-      filename: 'popup.html',
-      template: './src/popup.html',
-      scriptLoading: 'blocking',
-      // inject: 'head',
-      inject: "body",
-      // minify: true,
+      ...htmlWebpackConfig,
+
+      filename: 'index.html',
+      template: './src/pages/index/index.html',
       chunks: [
         'vendors',
         'index'
       ],
-      attributes: {
-        'async': function (tag, compilation, index, a, b) {
-          if (tag.tagName === 'script' && tag.attributes.src.match(/^index/gi)) {
-            return true;
-          }
-          return false;
-        }
-      },
     }),
-    new htmlWebpackInjectAttributesPlugin(),
+
+    ...htmlPlugins('popupMarkdown', 'popup'),
+    ...htmlPlugins('popupVisual', 'popup-visual'),
+    ...htmlPlugins('popupMarkdownMixed', 'mixed-popup'),
+    ...htmlPlugins('popupVisualMixed', 'mixed-popup-visual'),
+
+    new HtmlWebpackInjectAttributesPlugin(),
     new HtmlWebpackPlugin({
-      title: 'My Options',
+      ...htmlWebpackConfig,
+
       filename: 'options.html',
-      template: './src/options.html',
-      scriptLoading: 'blocking',
-      inject: "body",
+      template: './src/pages/options/options.html',
       chunks: [
         'settings'
       ],
     }),
-    // new htmlWebpackInjectAttributesPlugin({
-    //   // inject: "true",
-    //   async: true,
-    //   // test: {}
-    // }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+      
+      filename: 'migration.html',
+      template: './src/pages/migration/migration.html',
+      chunks: [
+        'migration'
+      ],
+    }),
     new StatsWriterPlugin({
-      filename: "manifest.json",
+      filename: 'manifest.json',
       transform({ assetsByChunkName }) {
         let manifest = require(path.resolve(__root__, 'src/manifest.json'));
 
@@ -150,14 +210,14 @@ module.exports = {
         if (!manifest.version) {
           delete manifest.key;
 
-          manifest.version = "0"
+          manifest.version = '0';
           manifest.name = 'My-Notes-Testers (Dev)';
           manifest.action.default_title = 'My-Notes-Testers (Dev)';
         }
         
         return JSON.stringify(manifest, null, 2);
       }
-    })
+    }),
   ],
   stats: {
     errorDetails: true,

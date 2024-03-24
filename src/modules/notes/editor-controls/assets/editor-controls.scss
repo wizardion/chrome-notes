@@ -1,0 +1,255 @@
+.editor-controls {
+  height: 100%;
+  display: inline-flex;
+}
+
+.editor-controls .button {
+  width: 30px;
+  height: 19px;
+  margin: 3px 0px 0 0;
+
+  background-color: transparent;
+  filter: brightness(0.95);
+  border: 1px solid var(--base-background-stroke);
+  border-color: var(--base-background-second-stroke);
+  border-radius: 4px;
+}
+
+.editor-controls .button:hover {
+  background-color: var(--base-highlight-color);
+  border-color: var(--base-background-second-stroke);
+
+  color: var(--base-color-hover);
+  fill:var(--base-color-hover);
+}
+
+.editor-controls .button:active {
+  background-color: var(--control-active-background);
+  border-color: var(--base-background-stroke);
+
+  color: var(--base-color-active);
+  fill:var(--base-color-active);
+}
+
+.editor-controls .button[disabled],
+fieldset:disabled button {
+  cursor: inherit;
+  color: var(--control-disabled-color) !important;
+  fill:var(--control-disabled-color) !important;
+  border-color: var(--control-disabled-stroke) !important;
+  pointer-events: none;
+}
+
+.editor-controls fieldset {
+  border: none;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.editor-controls fieldset input:first-child,
+.editor-controls fieldset button:first-child,
+.editor-controls fieldset div:first-child {
+  border-top-left-radius: 4px; 
+  border-bottom-left-radius: 4px; 
+  border-top-right-radius: 0; 
+  border-bottom-right-radius: 0; 
+}
+
+.editor-controls fieldset input:nth-child(2),
+.editor-controls fieldset button:nth-child(2),
+.editor-controls fieldset input:nth-child(3),
+.editor-controls fieldset button:nth-child(3),
+.editor-controls fieldset input:nth-child(4),
+.editor-controls fieldset button:nth-child(4) {
+  border-left: none;
+  border-radius: 0;
+}
+
+.editor-controls fieldset input:last-child,
+.editor-controls fieldset button:last-child,
+.editor-controls fieldset div:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.editor-controls fieldset button:only-child,
+.editor-controls fieldset :only-child button {
+  border-radius: 4px;
+}
+
+.checkbox {
+  cursor: pointer;
+  position: relative;
+  
+  width: 28px;
+  height: 17px;
+  margin: 3px 1px 0 0;
+  border: 1px solid transparent;
+
+  color: var(--control-disabled-color);
+  fill:var(--control-disabled-color);
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.checkbox.edit {
+  position: absolute;
+  right: 33px;
+}
+
+.checkbox.sync {
+  position: absolute;
+  right: 60px;
+}
+
+.checkbox.sync.short {
+  right: 33px;
+}
+
+.checkbox input {
+  cursor: pointer;
+  position: absolute;
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+.checkbox span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 17px;
+}
+
+.checkbox input ~ .checkmark .active {
+  display: none;
+}
+
+.checkbox input ~ .checkmark .inactive {
+  display: block;
+}
+
+.checkbox input:checked ~ .checkmark,
+.checkbox[data-checked='true'] {
+  color: var(--base-color);
+  fill:var(--base-color);
+}
+
+.checkbox input:disabled ~ .checkmark {
+  color: var(--control-disabled-color);
+  fill: var(--control-disabled-color);
+  cursor: default;
+}
+
+.checkbox input:checked ~ .checkmark .active {
+  display: block;
+}
+
+.checkbox input:checked ~ .checkmark .inactive {
+  display: none;
+}
+
+.dropdown .dropdown-toggle,
+.dropdown .dropdown-toggle:disabled {
+  background: transparent;
+  border-color: transparent !important;
+}
+
+.dropdown .dropdown-toggle:hover {
+  background: var(--base-highlight-color);
+  border-color: transparent;
+
+  border-radius: 4px !important;
+}
+
+.dropdown .dropdown-toggle:active,
+.dropdown.opened .dropdown-toggle {
+  background: var(--control-active-background);
+  border-color: transparent;
+
+  color: var(--base-color-active);
+  fill: var(--base-color-active);
+}
+
+.dropdown-menu {
+  transform: translate(-8px);
+  box-shadow: 0px 7px 8px -4px var(--base-shadow) !important;
+
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+
+  background-color: var(--base-background) !important;
+  border-top: 1px solid var(--base-background) !important;
+  border-left: 1px solid var(--editor-menu-stroke) !important;
+  border-bottom: 1px solid var(--editor-menu-stroke-dimmed) !important;
+  border-right: 1px solid var(--editor-menu-stroke-dimmed) !important;
+
+  font-size: 13px !important;
+  z-index: -2 !important;
+
+  transition: box-shadow .25s linear, border-top-color .25s linear;
+  padding: 1px 2px 2px 2px !important;
+}
+
+.dropdown-menu > * {
+  font-size: 13px;
+  border-color: var(--base-background) !important;
+  padding: 1px 10px 1px 6px !important;
+}
+
+.dropdown-menu button:hover {
+  background-color: var(--editor-selection-background) !important;
+  color: var(--base-bright-color) !important;
+  border-radius: 3px !important;
+}
+
+.dropdown-menu .normal-text {
+  color: var(--base-text-color);
+}
+
+.dropdown-menu .title {
+  color: var(--editor-highlight-color);
+  font-size: large;
+  font-weight: bold;
+}
+
+.dropdown-menu .title:hover {
+  color: var(--editor-highlight-color) !important;
+}
+
+.dropdown-menu .subtitle {
+  font-size: larger;
+  color: var(--editor-color-subtitle);
+}
+
+.dropdown-menu .heading-1 {
+  font-weight: bold;
+  color: var(--base-text-color);
+}
+
+.dropdown-menu .heading-2 {
+  color: var(--editor-color-heading);
+}
+
+.dropdown-menu .heading-3 {
+  color: var(--editor-color-heading);
+  font-style: italic;
+}
+
+details-view[data-scroll='true'] {
+  .dropdown-menu {
+    border-color: var(--editor-menu-stroke-scrolled) !important;
+    background-color: var(--base-background) !important;
+  }
+}

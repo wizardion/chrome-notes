@@ -1,0 +1,134 @@
+.cm-editor {
+  font-size: 14px !important;
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+  position: relative !important;
+  cursor: text;
+  background: var(--editor-background);
+  color: var(--base-text-color);
+}
+
+.cm-scroller {
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+  padding-top: 5px;
+}
+
+.cm-editor[hidden] {
+  display: none !important;
+}
+
+.cm-gutters {
+  background-color: transparent !important;
+  border-right: 1px solid transparent !important;
+  font-size: 10px !important;
+  width: 12px;
+}
+
+.cm-gutterElement {
+  width: 14px;
+  color: var(--editor-highlight-color);
+  text-align: center;
+}
+
+.cm-heading-2.cm-meta,
+.cm-heading-3.cm-meta,
+.cm-heading-4.cm-meta,
+.cm-heading-5.cm-meta,
+.cm-heading-6.cm-meta,
+.cm-bold.cm-meta,
+.cm-italic.cm-meta {
+  font-size: smaller;
+}
+
+.cm-line .cm-heading-1.cm-meta:first-child {
+  opacity: 0.3;
+  font-size: smaller;
+}
+
+.cm-line:has(> .cm-meta:only-child) {
+  text-align: left;
+}
+
+.cm-line .cm-meta:only-child {
+  opacity: 0.3 !important;
+  display: inline !important;
+  float: none !important;
+  margin-top: 0 !important;
+}
+
+.cm-heading-1 {
+  color: var(--editor-highlight-color);
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.cm-heading-2 {
+  font-size: larger;
+  color: var(--editor-color-heading);
+}
+
+.cm-heading-3 {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.cm-heading-4 {
+  color: var(--editor-color-heading);
+}
+
+.cm-heading-5, .cm-heading-6 {
+  color: var(--editor-color-heading);
+  font-style: italic;
+}
+
+.cm-bold {
+  font-weight: bold;
+}
+
+.cm-italic {
+  font-style: italic;
+}
+
+.cm-strikethrough {
+  text-decoration: line-through;
+}
+
+.cm-link {
+  color: var(--editor-highlight-color);
+}
+
+// not supported
+.ͼx,
+.cm-list.ͼq {
+  color: var(--base-text-color);
+}
+
+.visual-editor li::marker {
+  color: var(--editor-highlight-color);
+}
+
+.cm-link.cm-url {
+  color: var(--editor-text-url);
+  text-decoration: underline;
+}
+
+.cm-monospace,
+.cm-quote {
+  color: var(--editor-quote-color);
+}
+
+.cm-meta {
+  opacity: 0.4;
+}
+
+.cm-selectionBackground {
+  background: var(--editor-inactive-selection-background) !important;
+}
+
+.cm-focused .cm-selectionBackground {
+  background: var(--editor-selection-background) !important;
+}
+
+.cm-cursor {
+  border-color: var(--editor-selection-cursor) !important;
+  border-left-width: 1.5px !important;
+}

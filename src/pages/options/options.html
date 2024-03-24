@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Notes' settings</title>
+  </head>
+  <body class="theme-light">
+    <div id="message", name="message" class="hidden"></div>
+    <h4 class="title">Notes' settings</h4>
+
+    <div id="content" hidden>
+      <alert-message hidden></alert-message>
+
+      <div class="row">
+        <div class="left">Common:</div>
+        <div class="right">
+          <common-settings></common-settings>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="left">Synchronize:</div>
+        <div class="right">
+          <sync-info></sync-info>
+        </div>
+      </div>
+
+      <div id="develop" class="row" hidden>
+        <div>
+          <div class="left">Development:</div>
+          <div class="right">
+            <dev-mode-info></dev-mode-info>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

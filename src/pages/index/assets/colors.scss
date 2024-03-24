@@ -1,0 +1,20 @@
+@use 'styles/themes/colors';
+
+
+@each $name, $map in colors.$themes {
+  @if $name =='light' {
+    :root {
+      @each $key, $value in $map {
+        --#{$key}: #{$value};
+      }
+    }
+  }
+
+  @if $name =='dark' {
+    .theme-#{$name} {
+      @each $key, $value in $map {
+        --#{$key}: #{$value};
+      }
+    }
+  }
+}

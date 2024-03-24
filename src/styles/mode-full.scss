@@ -1,12 +1,14 @@
 html.full-size,
 body.full-size {
-  background: red !important;
+  // background: red !important;
 
   width: 100%;
   height: 100%;
 
-  min-width: 400px;
-  min-height: 150px;
+  // min-width: 400px;
+  // min-height: 150px;
+  min-width: 600px;
+  min-height: 270px;
   font-size: 18px;
 }
 
@@ -130,7 +132,7 @@ body.full-size {
 }
 
 .list-view.mixed.full-screen .sync-indicator {
-  left: 27px; 
+  left: 8px;
 }
 
 // ----------------------------------------------------------------------------------------------------
