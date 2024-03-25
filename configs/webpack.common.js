@@ -103,7 +103,7 @@ module.exports = {
             loader: 'sass-loader',
             options: {
               sourceMap: false,
-              implementation: require('dart-sass'),
+              implementation: require('sass'),
             }
           }
         ],
