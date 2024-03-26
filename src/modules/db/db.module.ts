@@ -219,6 +219,17 @@ export async function remove(item: (IDBNote | number), objectStore?: IDBObjectSt
   }
 }
 
+export async function clear(): Promise<void> {
+  try {
+    const store = await initObjectStore('readwrite');
+
+    return execute<void>(store.clear());
+  } catch (error) {
+    logError(error);
+    throw new Error(ERROR_MESSAGES.initiate);
+  }
+}
+
 export function enqueue(item: IDBNote, command: IDBCommandType) {
   __queueList.push({
     item: item,

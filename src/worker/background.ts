@@ -97,8 +97,8 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
   }
 
   if (namespace === 'local' && changes.identityInfo) {
-    const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue);
-    const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue);
+    const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue.value);
+    const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue.value);
 
     logger.info('storage.onChanged', newInfo, oldInfo);
     // return await eventOnIdentityInfoChanged(oldInfo, newInfo);

@@ -90,7 +90,7 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
 
 export async function eventOnSyncInfoChanged(info: ISyncInfo) {
   logger.info('eventOnSyncInfoChanged', { i: info });
-  const identity: IdentityInfo = <IdentityInfo> await storage.local.get('identityInfo') || {
+  const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
     id: null,
     enabled: false,
     token: null,
@@ -100,12 +100,10 @@ export async function eventOnSyncInfoChanged(info: ISyncInfo) {
 
   if (identity.locked && info.enabled && info.token && !info.encrypted && identity.encrypted) {
     identity.locked = false;
-    // await storage.cached.permanent('locked', false);
   }
 
   if (!identity.locked && info.enabled && info.token && info.encrypted && !identity.passphrase) {
     identity.locked = true;
-    // await storage.cached.permanent('locked', true);
   }
 
   if (!info.encrypted) {
@@ -120,8 +118,6 @@ export async function eventOnSyncInfoChanged(info: ISyncInfo) {
 }
 
 export async function eventOnIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
-  logger.info('eventOnIdentityInfoChanged', { i: newInfo });
-
   if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
     await SyncWorker.deregister();
 
