@@ -107,6 +107,8 @@ export class DevModeElement extends BaseElement {
     if (window.confirm('Please confirm the certainty of clearing all data.' +
                        '\nAttention! This action is irreversible!' +
                        '\nThe page will be reloaded.')) {
+      await db.clear();
+      await storage.global.clear();
       document.location.reload();
     }
   }
