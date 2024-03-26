@@ -2,7 +2,7 @@ import { BaseElement, FormElement } from 'core/components';
 import { storage } from 'core/services';
 import { LoggerService } from 'modules/logger';
 import { IDBNote, db } from 'modules/db';
-import { IDevSettingsForm } from './models/dev.models';
+import { IDBLogNote, IDevSettingsForm } from './models/dev.models';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -92,15 +92,22 @@ export class DevModeElement extends BaseElement {
 
   protected async printData() {
     const data = await db.dump();
-    const transformed = data.reduce((acc: Record<number, Partial<IDBNote>>, { id, ...x }) => {
+    const global = await storage.global.get();
+    const transformed = data.reduce((acc: Record<number, Partial<IDBLogNote>>, { id, ...x }) => {
       acc[id] = {
         ...x,
+        cState: x.cState.join(','),
+        pState: x.pState
       };
 
       return acc;
     }, {});
 
+    console.clear();
     console.table(transformed, ['title', 'description', 'order', 'created', 'updated', 'cState', 'pState', 'deleted']);
+    console.log('Local data:', global.local);
+    console.log('Session data:', global.session);
+    console.log('Sync data:', global.sync);
   }
 
   protected async clearData() {

@@ -1,3 +1,6 @@
+import { IDBNote } from 'modules/db';
+
+
 export interface IDevSettingsForm {
   fieldset: HTMLFieldSetElement;
   mode: HTMLInputElement;
@@ -8,4 +11,9 @@ export interface IDevSettingsForm {
   dataPrint: HTMLLinkElement;
   dataEmpty: HTMLLinkElement;
   info: HTMLElement;
+}
+
+export interface IDBLogNote extends Omit<IDBNote, 'cState' | 'pState'> {
+  cState: string;
+  pState: string;
 }
