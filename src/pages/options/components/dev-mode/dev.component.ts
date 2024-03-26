@@ -1,7 +1,8 @@
-import { BaseElement } from 'core/components';
+import { BaseElement, FormElement } from 'core/components';
 import { storage } from 'core/services';
 import { LoggerService } from 'modules/logger';
 import { IDBNote, db } from 'modules/db';
+import { IDevSettingsForm } from './models/dev.models';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -12,63 +13,51 @@ export class DevModeElement extends BaseElement {
   static readonly selector = 'dev-mode-info';
   static observedAttributes = ['disabled', 'default-index'];
 
-  protected fieldset: HTMLFieldSetElement;
-  protected mode: HTMLInputElement;
-  protected print: HTMLLinkElement;
-  protected clean: HTMLLinkElement;
-  protected cacheEmpty: HTMLLinkElement;
-  protected cachePrint: HTMLLinkElement;
-  protected dataPrint: HTMLLinkElement;
-  protected dataEmpty: HTMLLinkElement;
-  protected info: HTMLElement;
   protected event: Event;
-
+  private form: FormElement<IDevSettingsForm>;
 
   constructor() {
     super();
     this.template = <HTMLElement>template.cloneNode(true);
-    this.fieldset = this.template.querySelector('fieldset');
-    this.mode = this.template.querySelector('input[name="mode"]');
-    this.info = this.template.querySelector('div[name="dev-info"]');
-    this.print = this.template.querySelector('a[name="print-logs"]');
-    this.clean = this.template.querySelector('a[name="clear-logs"]');
-    this.cachePrint = this.template.querySelector('a[name="print-cache"]');
-    this.cacheEmpty = this.template.querySelector('a[name="empty-cache"]');
-    this.dataPrint = this.template.querySelector('a[name="print-db"]');
-    this.dataEmpty = this.template.querySelector('a[name="empty-db"]');
-    this.info.hidden = true;
+    this.form = new FormElement<IDevSettingsForm>({
+      fieldset: this.template.querySelector('fieldset'),
+      mode: this.template.querySelector('input[name="mode"]'),
+      info: this.template.querySelector('div[name="dev-info"]'),
+      print: this.template.querySelector('a[name="print-logs"]'),
+      clean: this.template.querySelector('a[name="clear-logs"]'),
+      cachePrint: this.template.querySelector('a[name="print-cache"]'),
+      cacheEmpty: this.template.querySelector('a[name="empty-cache"]'),
+      dataPrint: this.template.querySelector('a[name="print-db"]'),
+      dataEmpty: this.template.querySelector('a[name="empty-db"]'),
+    });
+
+    this.form.elements.info.hidden = true;
   }
 
   protected async eventListeners() {
     this.event = new Event('mode:change');
 
-    this.mode.onchange = () => this.modeChanged();
-
-    this.print.onclick = (e) => { e.preventDefault(); this.printLogs(); };
-
-    this.clean.onclick = (e) => { e.preventDefault(); this.clearLogs(); };
-
-    this.cacheEmpty.onclick = (e) => { e.preventDefault(); this.clearCache(); };
-
-    this.cachePrint.onclick = (e) => { e.preventDefault(); this.printCache(); };
-
-    this.dataPrint.onclick = (e) => { e.preventDefault(); this.printData(); };
-
-    this.dataEmpty.onclick = (e) => { e.preventDefault(); this.clearData(); };
+    this.form.elements.mode.addEventListener('change', () => this.modeChanged());
+    this.form.elements.print.addEventListener('click', (e) => { e.preventDefault(); this.printLogs(); });
+    this.form.elements.clean.addEventListener('click',  (e) => { e.preventDefault(); this.clearLogs(); });
+    this.form.elements.cacheEmpty.addEventListener('click',  (e) => { e.preventDefault(); this.clearCache(); });
+    this.form.elements.cachePrint.addEventListener('click',  (e) => { e.preventDefault(); this.printCache(); });
+    this.form.elements.dataPrint.addEventListener('click',  (e) => { e.preventDefault(); this.printData(); });
+    this.form.elements.dataEmpty.addEventListener('click',  (e) => { e.preventDefault(); this.clearData(); });
   }
 
   protected attributeChanged(name: string) {
     if (name === 'disabled') {
       if (this.disabled) {
-        this.fieldset.setAttribute('disabled', 'disabled');
+        this.form.elements.fieldset.setAttribute('disabled', 'disabled');
       } else {
-        this.fieldset.removeAttribute('disabled');
+        this.form.elements.fieldset.removeAttribute('disabled');
       }
     }
   }
 
   protected modeChanged() {
-    this.info.hidden = !this.mode.checked;
+    this.form.elements.info.hidden = !this.form.elements.mode.checked;
     this.dispatchEvent(this.event);
   }
 
@@ -123,11 +112,11 @@ export class DevModeElement extends BaseElement {
   }
 
   get enabled(): boolean {
-    return this.mode.checked;
+    return this.form.elements.mode.checked;
   }
 
   set enabled(value: boolean) {
-    this.mode.checked = value;
-    this.info.hidden = !value;
+    this.form.elements.mode.checked = value;
+    this.form.elements.info.hidden = !value;
   }
 }
