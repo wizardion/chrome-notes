@@ -190,7 +190,7 @@ export async function add(item: IDBNote): Promise<number> {
   try {
     const store = await initObjectStore('readwrite');
 
-    return execute<number>(store.add({ ...item, id: (!item.id || item.id < 1) ? generateId() : item.id }));
+    return execute<number>(store.add({ ...item, id: !item.id ? generateId() : item.id }));
   } catch (error) {
     logError(error);
     throw new Error(ERROR_MESSAGES.initiate);

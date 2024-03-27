@@ -24,10 +24,10 @@ export function delay(milliseconds: number = configs.delay): Promise<void> {
   return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
 }
 
-export async function encrypt(data: any): Promise<string> {
-  return encryptor.encrypt(JSON.stringify(data));
+export async function encrypt(data?: any): Promise<string | null> {
+  return data ? encryptor.encrypt(JSON.stringify(data)) : null;
 }
 
-export async function decrypt(data: string): Promise<object> {
-  return JSON.parse(await encryptor.decrypt(data));
+export async function decrypt(data?: string): Promise<object | null> {
+  return data ? JSON.parse(await encryptor.decrypt(data)) : null;
 }

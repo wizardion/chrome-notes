@@ -45,7 +45,7 @@ export class CachedStorageService {
   }
 
   public static async dump(): Promise<ICachedItem> {
-    this.item = ((await chrome.storage.session.get(this.key) || {})[this.key] || {}) as ICachedItem;
+    this.item = ((await chrome.storage.local.get(this.key) || {})[this.key] || {}) as ICachedItem;
 
     return this.item;
   }

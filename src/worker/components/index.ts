@@ -38,7 +38,7 @@ export async function ensureOptionPage() {
     }
   }
 
-  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') + '?develop=true' });
 }
 
 export async function initPopup() {
