@@ -33,7 +33,7 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   window.matchMedia(mediaColorScheme).addEventListener('change', (e) => eventOnColorChanged(settings, e));
   controls.syncInfo.addEventListener('sync-info:change', () => syncInfoChanged(controls.syncInfo, settings));
   controls.devModeInfo.addEventListener('mode:change', () => devModeChanged(controls.devModeInfo, settings));
-  controls.common.addEventListener('settings:change', () => settingsChanged(controls.common, settings));
+  controls.common.addEventListener('settings:change', () => settingsChanged(settings, controls.common));
   chrome.storage.onChanged.addListener((c, n) => eventOnStorageChanged(c, n, controls));
 
   if (settings.sync) {

@@ -4,6 +4,7 @@ import { LoggerService } from 'modules/logger';
 import { IDBNote, db } from 'modules/db';
 import { Cloud } from 'modules/sync/cloud';
 import { IDBLogNote, IDBParsedData, IDevSettingsForm } from './models/dev.models';
+import { resetDefaults } from 'modules/settings';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -160,6 +161,8 @@ export class DevModeElement extends BaseElement {
       await Cloud.remove();
       await db.clear();
       await storage.global.clear();
+      await resetDefaults();
+
       document.location.reload();
     }
   }
