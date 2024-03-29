@@ -127,16 +127,16 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     this.editor.focus();
   }
 
-  default(): IDBNote {
-    const { title, description, selection } = this.editor.getData();
+  default(title?: string, description?: string, selection?: number[]): IDBNote {
+    // const { title, description, selection } = this.editor.getData();
     const time = new Date().getTime();
 
     return {
       id: 0,
-      title: title,
-      description: description,
+      title: title || '',
+      description: description || '',
       order: 0,
-      cState: selection,
+      cState: selection || [0, 0],
       updated: time,
       created: time,
       deleted: 0

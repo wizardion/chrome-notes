@@ -12,7 +12,9 @@ export abstract class PopupBaseElement extends BaseElement {
   protected detailsView: DetailsBaseElement;
   protected selected?: INote;
   protected preserved?: INote;
+  protected drafted?: INote;
   protected items: INote[];
+  protected initialized = false;
 
   protected async eventListeners() {
     this.listView.addEventListener('add', () => !this.disabled && this.draft());
@@ -26,9 +28,12 @@ export abstract class PopupBaseElement extends BaseElement {
     SortHelper.addEventListener('finish', (f, s) => !this.disabled && this.onItemOrderChange(f, s));
   }
 
-  init(items: INote[]) {
-    for (let i = 0; i < items.length; i++) {
-      this.addItem(items[i]);
+  init() {
+    this.disabled = false;
+    this.initialized = true;
+
+    if (this.drafted) {
+      this.listView.add(this.drafted.item);
     }
   }
 
@@ -52,12 +57,12 @@ export abstract class PopupBaseElement extends BaseElement {
     }
   }
 
-  async select(item: INote, rendered = true) {
+  async select(item: INote) {
     this.listView.hidden = true;
     this.detailsView.hidden = false;
     this.selected?.item.classList.remove('selected');
 
-    if (rendered) {
+    if (this.initialized) {
       this.selected = item;
       this.selected.item.classList.add('selected');
       await DbProviderService.cache.set('selected', this.selected);
@@ -69,6 +74,11 @@ export abstract class PopupBaseElement extends BaseElement {
   }
 
   async goBack() {
+    if (this.drafted) {
+      this.drafted.item.remove();
+      this.drafted = null;
+    }
+
     await this.onChanged();
 
     this.listView.hidden = false;
@@ -82,21 +92,26 @@ export abstract class PopupBaseElement extends BaseElement {
   }
 
   draft(title?: string, description?: string, selection?: number[]) {
+    const item = document.createElement('list-item') as ListItemElement;
+    const note = this.detailsView.default(title, description, selection) as INote;
+
     this.listView.hidden = true;
     this.detailsView.draft = true;
     this.detailsView.hidden = false;
     this.selected = null;
 
-    this.detailsView.setData({
-      id: null,
-      order: null,
-      updated: null,
-      created: null,
-      deleted: null,
-      title: title || '',
-      description: description || '',
-      cState: selection || [0, 0]
-    });
+    note.item = item;
+    item.index = this.items.length + 1;
+    item.title = note.title;
+    item.draft = true;
+    item.date = new Date(note.updated);
+
+    this.drafted = note;
+    this.detailsView.setData(note);
+
+    if (this.initialized) {
+      this.listView.add(item);
+    }
   }
 
   async delete() {
@@ -176,6 +191,7 @@ export abstract class PopupBaseElement extends BaseElement {
 
       await this.save();
     } else {
+      this.drafted.item.title = item.title;
       await DbProviderService.cache.set('draft', {
         title: item.title,
         description: item.description,
@@ -185,19 +201,22 @@ export abstract class PopupBaseElement extends BaseElement {
   }
 
   async onCreate() {
-    const item = document.createElement('list-item') as ListItemElement;
-    const note: INote = this.detailsView.default();
+    const draft = this.detailsView.getData();
+    const note = this.drafted;
+    const item = note.item;
 
-    note.item = item;
+    // note.item = item;
     note.order = this.items.length;
     item.index = this.items.length + 1;
-    item.title = note.title;
+    item.title = draft.title;
+    item.draft = false;
     item.date = new Date(note.updated);
+
+    this.drafted = null;
 
     item.addEventListener('click', () => this.select(note));
     item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.start(e, this.listView.scrollable, item));
 
-    this.listView.add(item);
     this.items.push(note);
 
     this.selected = note;

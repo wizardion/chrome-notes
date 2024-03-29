@@ -83,7 +83,9 @@
   background: var(--base-tile-background);
 }
 
-// .list-view .list-items .list list-item
+.list-scroll:has(.list-items:empty) {
+  display: none;
+}
 
 .list-view .list-items .no-items {
   display: none;

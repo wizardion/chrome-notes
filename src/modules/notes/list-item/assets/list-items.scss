@@ -130,7 +130,9 @@ list-item {
   cursor: grabbing;
 }
 
-.list-view .drag:hover, .list-view .drag:hover .list-item:hover, .list-view .drag:hover .list-item .sort {
+.list-view .drag:hover, 
+.list-view .drag:hover .list-item:hover, 
+.list-view .drag:hover .list-item .sort {
   cursor: grabbing !important;
 }
 
@@ -179,7 +181,6 @@ list-item {
 .list-view .list-items .placeholder {
   border-bottom: 1px dashed var(--base-background-stroke);
   box-sizing: border-box;
-  // background: rgba(102, 51, 153, 0.109);
   z-index: 0;
 }
 
@@ -188,6 +189,10 @@ list-item {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-// .hold {
-//   // cursor: pointer;
-// }
+.list-item.new-note,
+.list-item.new-note .to-note,
+.list-item.new-note .sort {
+  pointer-events: none;
+  // background: var(--control-selected-background);
+  fill: var(--base-inactive-color);
+}

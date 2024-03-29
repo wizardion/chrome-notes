@@ -3,6 +3,7 @@ import { BaseElement } from 'core/components';
 import { PopupBaseElement } from '../base-popup/popup.component';
 import { DbProviderService } from 'modules/db';
 import { INote } from '../details-base/models/details-base.model';
+// import { ListItemElement } from '../list-item/list-item.component';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -34,8 +35,25 @@ export class PopupMixedNotesElement extends PopupBaseElement {
     this.detailsView.elements.cancel.classList.remove('back');
   }
 
+  init(): void {
+    super.init();
+
+    if (!this.items.length) {
+      this.draft();
+      this.onCreate();
+      this.select(this.items[0]);
+    } else {
+      console.log('this.items.length', [this.items.length]);
+    }
+  }
+
   async goBack() {
-    const note = this.preserved ? this.preserved : this.items.length > 0 ? this.items[this.items.length - 1] : null;
+    const note = this.items.length > 0 ? this.preserved || this.items[this.items.length - 1] : null;
+
+    if (this.drafted) {
+      this.drafted.item.remove();
+      this.drafted = null;
+    }
 
     this.detailsView.draft = false;
 
@@ -43,15 +61,23 @@ export class PopupMixedNotesElement extends PopupBaseElement {
 
     if (note) {
       this.select(this.preserved || this.items[this.items.length - 1]);
+    } else {
+      this.draft();
+      this.onCreate();
+      this.select(this.items[0]);
     }
   }
 
-  async select(item: INote, rendered = true) {
+  async select(item: INote) {
     this.selected?.item.classList.remove('selected');
     this.detailsView.draft = false;
     this.listView.elements.add.hidden = false;
 
-    if (rendered) {
+    if (this.drafted) {
+      this.goBack();
+    }
+
+    if (this.initialized) {
       this.selected = item;
       this.selected.item.classList.add('selected');
       await DbProviderService.cache.set('selected', this.selected);
@@ -63,22 +89,16 @@ export class PopupMixedNotesElement extends PopupBaseElement {
   }
 
   draft(title?: string, description?: string, selection?: number[]) {
-    this.detailsView.draft = true;
-    this.preserved = this.selected;
-    this.listView.elements.add.hidden = true;
     this.selected?.item.classList.remove('selected');
-    this.selected = null;
+    this.preserved = this.selected;
 
-    this.detailsView.setData({
-      id: null,
-      order: null,
-      updated: null,
-      created: null,
-      deleted: null,
-      title: title || '',
-      description: description || '',
-      cState: selection || [0, 0]
-    });
+    super.draft(title, description, selection);
+
+    this.detailsView.draft = true;
+    this.listView.elements.add.hidden = true;
+    this.detailsView.hidden = false;
+    this.listView.hidden = false;
+    this.selected = null;
   }
 
   async onCreate() {

@@ -34,7 +34,7 @@ export async function init() {
 
   if (configs.selected) {
     notes.hidden = false;
-    notes.select(configs.selected, false);
+    notes.select(configs.selected);
   }
 
   if (configs.draft) {
@@ -44,11 +44,11 @@ export async function init() {
 
   db.iterate(item => {
     if (!selected) {
-      notes.select(item, false);
+      notes.select(item);
       selected = true;
     }
 
     notes.addItem(item);
-  }).then(() => notes.disabled = false);
+  }).then(() => notes.init());
   notes.hidden = false;
 }
