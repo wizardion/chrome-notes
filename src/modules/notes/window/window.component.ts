@@ -63,6 +63,8 @@ export class WindowNotesElement extends PopupBaseElement {
       return index;
     }
 
+    this.select(this.items[index > 0 ? index - 1 : 0]);
+
     return index;
   }
 }
