@@ -37,11 +37,6 @@ export async function init() {
     notes.select(configs.selected);
   }
 
-  if (configs.draft) {
-    notes.hidden = false;
-    notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
-  }
-
   db.iterate(item => {
     if (!selected) {
       notes.select(item);

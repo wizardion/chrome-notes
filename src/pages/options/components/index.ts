@@ -29,12 +29,6 @@ async function resetTextSelection() {
     await CachedStorageService.set('selected', cache.selected);
   }
 
-  if (cache.draft) {
-    cache.draft.selection = [0, 0];
-
-    await CachedStorageService.set('draft', cache.draft);
-  }
-
   await db.dequeue();
 }
 

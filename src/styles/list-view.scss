@@ -110,4 +110,15 @@
   display: none;
 }
 
+.placeholder {
+  color: var(--base-inactive-color);
+  position: relative;
+  margin-left: 10px;
+  text-align: center;
+  font-style: italic;
+  font-size: small;
+  top: calc(50% - 30px);
+  opacity: 0.3;
+}
+
 @import 'scroll-bar';

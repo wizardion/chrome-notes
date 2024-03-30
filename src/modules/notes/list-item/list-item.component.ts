@@ -53,17 +53,6 @@ export class ListItemElement extends BaseElement {
     }
   }
 
-  set draft(value: boolean) {
-    if (value) {
-      this.form.elements.title.innerHTML = '<span class="empty">new note ...</span>';
-      this.form.elements.item.classList.add('new-note');
-
-      return;
-    }
-
-    this.form.elements.item.classList.remove('new-note');
-  }
-
   get date(): Date {
     return this._date;
   }
@@ -119,5 +108,14 @@ export class ListItemElement extends BaseElement {
       super.removeEventListener('click', this.listeners.get('click'));
       this.listeners.delete('click');
     }
+  }
+
+  remove(): void {
+    if (this.listeners.size) {
+      this.removeEventListener('sort:mousedown');
+      this.removeEventListener('click');
+    }
+
+    super.remove();
   }
 }

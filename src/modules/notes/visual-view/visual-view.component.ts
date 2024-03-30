@@ -19,8 +19,6 @@ export class VisualViewElement extends DetailsBaseElement<IVisualViewForm> {
     this.form = new FormElement<IVisualViewForm>({
       head: this.template.querySelector('[name="details-controls"]'),
       back: this.template.querySelector('[name="back"]'),
-      cancel: this.template.querySelector('[name="cancel"]'),
-      create: this.template.querySelector('[name="create"]'),
       delete: this.template.querySelector('[name="delete"]'),
       menu: (this.template.querySelector('[name="controls"]') as EditorControlsElement),
       menuGroup: this.template.querySelector('[name="controls-group"]'),

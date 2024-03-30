@@ -12,7 +12,6 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   static readonly selector: string;
 
   protected note?: INote;
-  protected _draft: boolean;
   protected editor: IEditorView;
   protected form: FormElement<T>;
   protected listeners = new Map<'change' | 'selectionEvent' | 'save' | 'create', IEventListener>();
@@ -54,7 +53,7 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     clearInterval(INTERVALS.intervals.changed);
 
     if (!this._locked) {
-      const handler = this._draft ? this.listeners.get('create') : this.listeners.get('change');
+      const handler = this.listeners.get('change');
 
       if (handler) {
         this.lock();
@@ -62,19 +61,6 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
         this.unlock();
       }
     }
-  }
-
-  get draft(): boolean {
-    return this._draft;
-  }
-
-  set draft(value: boolean) {
-    this._draft = value;
-
-    this.form.elements.delete.hidden = value;
-    this.form.elements.create.hidden = !value;
-    this.form.elements.cancel.hidden = !value;
-    this.form.elements.back.hidden = value;
   }
 
   set hidden(value: boolean) {
@@ -127,16 +113,15 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     this.editor.focus();
   }
 
-  default(title?: string, description?: string, selection?: number[]): IDBNote {
-    // const { title, description, selection } = this.editor.getData();
+  default(): IDBNote {
     const time = new Date().getTime();
 
     return {
       id: 0,
-      title: title || '',
-      description: description || '',
+      title: '',
+      description: '',
       order: 0,
-      cState: selection || [0, 0],
+      cState: [0, 0],
       updated: time,
       created: time,
       deleted: 0
@@ -144,16 +129,10 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   }
 
   addEventListener(type: IDetailsListenerType, listener: IEventListener, options?: boolean | AddEventListenerOptions) {
-    if (type === 'back') {
+    if (type === 'cancel') {
       this.form.elements.back.addEventListener('mousedown', (e) => e.preventDefault());
 
       return this.form.elements.back.addEventListener('click', listener);
-    }
-
-    if (type === 'cancel') {
-      this.form.elements.cancel.addEventListener('mousedown', (e) => e.preventDefault());
-
-      return this.form.elements.cancel.addEventListener('click', listener);
     }
 
     if (type === 'delete') {
@@ -162,17 +141,20 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
       return this.form.elements.delete.addEventListener('click', listener);
     }
 
-    if (type === 'create') {
-      const handler: IEventListener = (e) => this.onSave(e);
+    // if (type === 'create') {
+    //   console.log('create', this.form.elements.create);
+    //   // const handler: IEventListener = (e) => this.onSave(e);
 
-      this.listeners.set('create', listener);
-      this.form.elements.create.addEventListener('mousedown', (e) => e.preventDefault());
-      this.form.elements.create.addEventListener('click', handler);
+    //   // this.listeners.set('create', listener);
+    //   this.form.elements.create.addEventListener('mousedown', (e) => e.preventDefault());
 
-      return this.editor.addEventListener('save', handler);
-    }
+    //   return this.form.elements.create.addEventListener('click', listener);
+    //   // this.form.elements.create.addEventListener('click', handler);
 
-    if (type === 'change') {
+    //   // return this.editor.addEventListener('save', handler);
+    // }
+
+    if (type === 'changed') {
       this.listeners.set('change', listener);
       this.editor.addEventListener('change', (e) => this.onChange(e));
 

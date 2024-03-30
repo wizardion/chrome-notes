@@ -124,6 +124,10 @@ details-view {
   min-height: 224px;
 }
 
+.placeholder {
+  display: none !important;
+}
+
 details-view[data-scroll='true'] {
   .head {
     box-shadow: none;

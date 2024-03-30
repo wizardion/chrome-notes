@@ -30,6 +30,23 @@ function generateId(): number {
   return new Date().getTime();
 }
 
+function copyItem(item: IDBNote): IDBNote {
+  return {
+    id: !item.id ? generateId() : item.id,
+    title: item.title,
+    description: item.description,
+    order: item.order,
+    updated: item.updated,
+    created: item.created,
+    deleted: item.deleted,
+    locked: item.locked,
+    synced: item.synced,
+    preview: item.preview,
+    cState: item.cState,
+    pState: item.pState,
+  };
+}
+
 function upgradeNeeded(db:IDBDatabase, request:IDBOpenDBRequest) {
   let objectStore:IDBObjectStore = null;
 
@@ -190,7 +207,7 @@ export async function add(item: IDBNote): Promise<number> {
   try {
     const store = await initObjectStore('readwrite');
 
-    return execute<number>(store.add({ ...item, id: !item.id ? generateId() : item.id }));
+    return execute<number>(store.add(copyItem(item)));
   } catch (error) {
     logError(error);
     throw new Error(ERROR_MESSAGES.initiate);
@@ -201,7 +218,7 @@ export async function update(item: IDBNote, objectStore?: IDBObjectStore): Promi
   try {
     const store = objectStore || await initObjectStore('readwrite');
 
-    return execute<void>(store.put(item));
+    return execute<void>(store.put(copyItem(item)));
   } catch (error) {
     logError(error);
     throw new Error(ERROR_MESSAGES.initiate);

@@ -1,5 +1,5 @@
 import { BaseElement, FormElement } from 'core/components';
-import { IListViewForm, IEventListenerType } from './models/list-view.model';
+import { IListViewForm, IListListenerType } from './models/list-view.model';
 import { ListItemElement } from '../list-item/list-item.component';
 import { Debounce, DynamicScroll } from 'modules/effects';
 
@@ -18,9 +18,10 @@ export class ListViewElement extends BaseElement {
 
     this.template = <HTMLElement>template.cloneNode(true);
     this.form = new FormElement<IListViewForm>({
-      add: this.template.querySelector('[name="add-note"]'),
+      create: this.template.querySelector('[name="create-note"]'),
       list: this.template.querySelector('[name="list-items"]'),
       scrollable: this.template.querySelector('[name="scrollable"]'),
+      placeholder: this.template.querySelector('[name="placeholder"]'),
       items: []
     });
   }
@@ -51,13 +52,14 @@ export class ListViewElement extends BaseElement {
   add(item: ListItemElement) {
     this.form.elements.items.push(item);
     this.form.elements.list.appendChild(item);
+    this.form.elements.placeholder.hidden = true;
   }
 
-  addEventListener(type: IEventListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
-    if (type === 'add') {
-      this.form.elements.add.addEventListener('mousedown', (e) => e.preventDefault());
+  addEventListener(type: IListListenerType, listener: EventListener, options?: boolean | AddEventListenerOptions) {
+    if (type === 'create') {
+      this.form.elements.create.addEventListener('mousedown', (e) => e.preventDefault());
 
-      return this.form.elements.add.addEventListener('click', listener);
+      return this.form.elements.create.addEventListener('click', listener);
     }
 
     return super.addEventListener(type, listener, options);
