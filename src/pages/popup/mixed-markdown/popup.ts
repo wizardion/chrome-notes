@@ -34,21 +34,16 @@ export async function init() {
 
   if (configs.selected) {
     notes.hidden = false;
-    notes.select(configs.selected, false);
-  }
-
-  if (configs.draft) {
-    notes.hidden = false;
-    notes.draft(configs.draft.title, configs.draft.description, configs.draft.selection);
+    notes.select(configs.selected);
   }
 
   db.iterate(item => {
     if (!selected) {
-      notes.select(item, false);
+      notes.select(item);
       selected = true;
     }
 
     notes.addItem(item);
-  }).then(() => notes.disabled = false);
+  }).then(() => notes.init());
   notes.hidden = false;
 }

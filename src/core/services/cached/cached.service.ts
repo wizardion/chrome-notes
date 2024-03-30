@@ -1,20 +1,16 @@
 import { IDBNote } from 'modules/db';
-import { ICachedItem, ICachedItems, IDataDaft } from './models/cached.models';
+import { ICachedItem, ICachedItems } from './models/cached.models';
 
 
 export class CachedStorageService {
   protected static readonly key = 'cache';
   public static item: ICachedItem;
 
-  public static async set(key: ICachedItems, value: IDBNote | IDataDaft) {
+  public static async set(key: ICachedItems, value: IDBNote) {
     this.item = this.item || ((await chrome.storage.session.get(this.key) || {})[this.key] || {}) as ICachedItem;
 
     if (key === 'selected') {
-      this.item.selected = <IDBNote> value;
-    }
-
-    if (key === 'draft') {
-      this.item.draft = <IDataDaft> value;
+      this.item.selected = this.copy(value);
     }
 
     await chrome.storage.local.set({ [this.key]: this.item });
@@ -24,14 +20,8 @@ export class CachedStorageService {
   public static async get<T = ICachedItem>(key?: ICachedItems): Promise<T> {
     this.item = this.item || await this.dump();
 
-    if (key) {
-      if (key === 'selected') {
-        return this.item.selected as T;
-      }
-
-      if (key === 'draft') {
-        return this.item.draft as T;
-      }
+    if (key === 'selected') {
+      return this.item.selected as T;
     }
 
     return this.item as T;
@@ -59,10 +49,6 @@ export class CachedStorageService {
       if (key === 'selected') {
         delete this.item.selected;
       }
-
-      if (key === 'draft') {
-        delete this.item.draft;
-      }
     }
 
     await chrome.storage.local.set({ [this.key]: this.item });
@@ -72,5 +58,22 @@ export class CachedStorageService {
   public static async clear() {
     await chrome.storage.session.remove(this.key);
     await chrome.storage.local.remove(this.key);
+  }
+
+  private static copy(item: IDBNote): IDBNote {
+    return {
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      order: item.order,
+      updated: item.updated,
+      created: item.created,
+      deleted: item.deleted,
+      locked: item.locked,
+      synced: item.synced,
+      preview: item.preview,
+      cState: item.cState,
+      pState: item.pState,
+    };
   }
 }

@@ -109,4 +109,13 @@ export class ListItemElement extends BaseElement {
       this.listeners.delete('click');
     }
   }
+
+  remove(): void {
+    if (this.listeners.size) {
+      this.removeEventListener('sort:mousedown');
+      this.removeEventListener('click');
+    }
+
+    super.remove();
+  }
 }

@@ -3,19 +3,15 @@ export interface IDBNote {
   id: number;
   title: string;
   description: string;
-
   order: number;
   updated: number;
   created: number;
-
   deleted: number;
-
   locked?: boolean;
   synced?: number;
   preview?: boolean;
   cState?: number[] | null;
   pState?: string | null;
-  html?: boolean;
 }
 
 export type IDBCommandType = 'update' | 'add' | 'remove';

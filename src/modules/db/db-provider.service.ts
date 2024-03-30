@@ -28,8 +28,12 @@ export class DbProviderService {
     await db.dequeue();
   }
 
-  public static async remove(item: IDBNote) {
+  public static async delete(item: IDBNote) {
     item.deleted = 1;
     await db.update(item);
+  }
+
+  public static async remove(id: number) {
+    await db.remove(id);
   }
 }

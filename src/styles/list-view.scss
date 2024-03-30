@@ -83,7 +83,9 @@
   background: var(--base-tile-background);
 }
 
-// .list-view .list-items .list list-item
+.list-scroll:has(.list-items:empty) {
+  display: none;
+}
 
 .list-view .list-items .no-items {
   display: none;
@@ -106,6 +108,17 @@
 
 .list-view .template {
   display: none;
+}
+
+.placeholder {
+  color: var(--base-inactive-color);
+  position: relative;
+  margin-left: 10px;
+  text-align: center;
+  font-style: italic;
+  font-size: small;
+  top: calc(50% - 30px);
+  opacity: 0.3;
 }
 
 @import 'scroll-bar';
