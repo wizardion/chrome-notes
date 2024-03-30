@@ -112,13 +112,13 @@ export class DevModeElement extends BaseElement {
       }, {});
 
       console.table(table, ['title', 'description', 'order', 'created', 'updated', 'cState', 'pState', 'deleted']);
+      console.log('Data in JSON:', data || 'None');
       console.log('');
     }
 
     console.log('Local data:', global.local);
     console.log('Session data:', global.session);
     console.log('Sync data:', global.sync);
-    console.log('Data in JSON:', data || 'None');
   }
 
   protected async restoreData() {
