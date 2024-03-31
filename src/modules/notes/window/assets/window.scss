@@ -26,7 +26,7 @@ details-view {
   line-height: 28px;
   height: 28px;
   border-radius: 4px;
-  border-left-width: 2px;
+  // border-left-width: 2px;
 }
 
 .list-view .list-item .button {
@@ -80,16 +80,16 @@ details-view {
 
 .list-view .list-content {
   margin-left: 4px;
-  margin-right: 3px;
+  margin-right: 1px;
   height: calc(100% - 25px);
 }
 
 .list-view .list-scroll {
   box-shadow: none;
   border-width: 1px;
-  border-color: var(--base-background-stroke);
+  // border-color: var(--base-background-stroke);
   max-height: calc(100% - 8px);
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .list-scroll::-webkit-scrollbar {
@@ -100,6 +100,7 @@ details-view {
   border-radius: 8px !important;
   margin-top: 4px;
   margin-bottom: 4px;
+  background: transparent;
 }
 
 // .list-view .list-scroll .list-items {

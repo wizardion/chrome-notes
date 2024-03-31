@@ -15,12 +15,13 @@ list-item {
   border-top: 1px solid var(--base-tile-background);
   border-left: 1px solid var(--base-tile-background);
   border-bottom: 1px solid var(--base-tile-background);
-  border-right: 2px solid var(--base-tile-background);
+  border-right: 1px solid var(--base-tile-background);
   white-space: nowrap;
   overflow: hidden;
   display: flex;
   color: var(--base-text-color);
   background: var(--base-tile-background);
+  // background: rebeccapurple;
 }
 
 .list-view .list-item > div {
@@ -140,8 +141,8 @@ list-item {
   background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-second-color)) !important;
   opacity: 1 !important;
   // margin-left: 24px;
-  margin-left: 4px;
-  margin-right: 4px;
+  margin-left: 2px;
+  margin-right: 2px;
   padding-right: 2px;
   border-color: transparent;
   // border-color: rebeccapurple;
