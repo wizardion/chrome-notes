@@ -2,7 +2,7 @@ import { SyncInfoElement } from './sync-info/info.component';
 import { IAreaName, IOptionControls, IStorageChange } from './options.model';
 import { DevModeElement } from './dev-mode/dev.component';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
-import { ISettingsArea, getPopupPage } from 'modules/settings';
+import { ISettingsArea, getPopupPage, setColors } from 'modules/settings';
 import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
 import { CachedStorageService } from 'core/services/cached';
 import { db } from 'modules/db';
@@ -29,27 +29,15 @@ async function resetTextSelection() {
     await CachedStorageService.set('selected', cache.selected);
   }
 
-  if (cache.draft) {
-    cache.draft.selection = [0, 0];
-
-    await CachedStorageService.set('draft', cache.draft);
-  }
-
   await db.dequeue();
 }
 
 export function eventOnColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
-  const dark = e ? e.matches : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  if (settings.common?.appearance === 2 || settings.common?.appearance === 0 && dark) {
-    document.body.classList.add('theme-dark');
-  } else {
-    document.body.classList.remove('theme-dark');
-  }
+  return setColors(settings, e);
 }
 
-export async function settingsChanged(element: CommonSettingsElement, settings: ISettingsArea) {
-  if (settings.common.editor !== element.editor) {
+export async function settingsChanged(settings: ISettingsArea, element?: CommonSettingsElement) {
+  if (settings.common.editor !== element?.editor) {
     await resetTextSelection();
   }
 

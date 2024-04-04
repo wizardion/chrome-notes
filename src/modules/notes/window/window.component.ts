@@ -1,7 +1,6 @@
 import './assets/window.scss';
 import { BaseElement } from 'core/components';
 import { PopupBaseElement } from '../base-popup/popup.component';
-import { DbProviderService } from 'modules/db';
 import { INote } from '../details-base/models/details-base.model';
 
 
@@ -22,79 +21,59 @@ export class WindowNotesElement extends PopupBaseElement {
   }
 
   protected render(): void {
-    const svg = this.template.querySelector('[name="cancel-svg"]');
-
     super.render();
-    const addNote = this.listView.elements.add;
-    const head = this.detailsView.elements.cancel.parentNode;
+
+    const addNote = this.listView.elements.create;
+    const head = this.detailsView.elements.head;
 
     head.insertBefore(addNote, head.firstChild);
-
-    this.detailsView.elements.cancel.innerText = '';
-    this.detailsView.elements.cancel.appendChild(svg);
-    this.detailsView.elements.cancel.classList.remove('back');
   }
 
   protected async eventListeners() {
-    super.eventListeners();
-
     const tabInfo = await chrome.tabs.getCurrent();
 
+    this.listView.addEventListener('create', () => !this.disabled && this.create());
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
+    this.detailsView.addEventListener('delete', async () => !this.disabled && await this.delete());
+
+    super.eventListeners();
     chrome.storage.local.set({ tabInfo: { id: tabInfo.id, window: tabInfo.windowId } });
   }
 
-  async goBack() {
-    const note = this.preserved ? this.preserved : this.items.length > 0 ? this.items[this.items.length - 1] : null;
+  init(): void {
+    super.init();
 
-    this.detailsView.draft = false;
-
-    DbProviderService.cache.remove(['draft', 'selected']);
-
-    if (note) {
-      this.select(this.preserved || this.items[this.items.length - 1]);
+    if (!this.items.length) {
+      this.create();
     }
   }
 
-  async select(item: INote, rendered = true) {
-    this.selected?.item.classList.remove('selected');
-    this.detailsView.draft = false;
-    this.listView.elements.add.hidden = false;
-
-    if (rendered) {
-      this.selected = item;
-      this.selected.item.classList.add('selected');
-      await DbProviderService.cache.set('selected', this.selected);
-    } else {
-      this.preserved = item;
+  async select(item: INote) {
+    if (this.selected && !this.selected.description) {
+      await super.delete(100);
     }
 
-    this.detailsView.setData(item);
+    return super.select(item);
   }
 
-  draft(title?: string, description?: string, selection?: number[]) {
-    this.preserved = this.selected;
-    this.detailsView.draft = true;
-    this.listView.elements.add.hidden = true;
-    this.selected?.item.classList.remove('selected');
-    this.selected = null;
+  async delete(delay?: number): Promise<number> {
+    const index = await super.delete(delay);
 
-    this.detailsView.setData({
-      id: null,
-      order: null,
-      updated: null,
-      created: null,
-      deleted: null,
-      title: title || '',
-      description: description || '',
-      cState: selection || [0, 0]
-    });
+    if (!this.items.length) {
+      await this.create();
+
+      return index;
+    }
+
+    if (!delay) {
+      await this.select(this.items[index > 0 ? index - 1 : 0]);
+    }
+
+    return index;
   }
 
-  async onCreate() {
-    super.onCreate();
-
-    this.listView.elements.add.hidden = false;
-    this.selected.item.classList.add('selected');
+  async create() {
+    await super.create();
     this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' });
   }
 }

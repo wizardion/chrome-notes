@@ -5,9 +5,10 @@ import { LoggerService } from 'modules/logger';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import {
   DataWorker, SyncWorker, BaseWorker, StorageChange, AreaName, eventOnSyncInfoChanged,
-  openPopup, ensureOptionPage, initPopup
+  openPopup, ensureOptionPage, initPopup, eventOnIdentityInfoChanged
 } from './components';
 import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
+import { CachedStorageService } from 'core/services/cached';
 
 
 const logger = new LoggerService('background.ts', 'green');
@@ -30,7 +31,8 @@ async function initApp(handler: string) {
   await logger.addLine();
   await logger.info('initApp is fired: ', [handler]);
 
-  // await CachedStorage.init();
+  // TODO restore all sessions.
+  await CachedStorageService.init();
   await chrome.alarms.clearAll();
 
   if (await SyncWorker.validate()) {
@@ -97,10 +99,9 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
   }
 
   if (namespace === 'local' && changes.identityInfo) {
-    const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue.value);
-    const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue.value);
+    const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue?.value);
+    const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue?.value);
 
-    logger.info('storage.onChanged', newInfo, oldInfo);
-    // return await eventOnIdentityInfoChanged(oldInfo, newInfo);
+    return await eventOnIdentityInfoChanged(oldInfo, newInfo);
   }
 });

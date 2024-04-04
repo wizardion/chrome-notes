@@ -89,4 +89,8 @@ export class Cloud {
 
     return rules.valid;
   }
+
+  static async remove() {
+    console.log('remove');
+  }
 }

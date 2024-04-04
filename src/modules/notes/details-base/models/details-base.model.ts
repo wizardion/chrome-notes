@@ -6,21 +6,15 @@ import { EditorControlsElement } from '../../editor-controls/editor-controls.com
 export interface IDetailsViewForm {
   head: HTMLElement;
   back: HTMLButtonElement;
-  cancel: HTMLButtonElement;
-  create: HTMLButtonElement;
   delete: HTMLButtonElement;
   menu: EditorControlsElement;
   menuGroup: HTMLFieldSetElement;
 }
 
 export type IDetailsListenerType =
-  | 'back'
-  | 'delete'
   | 'cancel'
-  | 'change'
-  | 'create'
-  | 'save'
-  | 'selectionchange';
+  | 'delete'
+  | 'changed';
 
 export interface IDetailsIntervals {
   changed: NodeJS.Timeout | null;

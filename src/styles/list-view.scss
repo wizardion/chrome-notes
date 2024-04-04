@@ -58,7 +58,7 @@
 }
 
 .list-view .list-content {
-  border-radius: 6px;
+  border-radius: 8px;
   box-sizing: border-box;
   margin: 0px 5px 0px 5px;
   height: 244px;
@@ -71,19 +71,24 @@
   overflow-y: scroll;
   overflow-x: hidden;
   z-index: 100;
-  border-radius: 5px;
+  border-radius: 6px;
+  // border-top-right-radius: 16px;
+  // border-bottom-right-radius: 16px;
   box-sizing: border-box;
-  border: 1px solid var(--base-tile-background);
-  box-shadow: 0px 0px 4px 0px var(--base-shadow-tile);
+  // border: 1px solid var(--base-tile-background);
+  // box-shadow: 0px 0px 4px 0px var(--base-shadow-tile);
+  // box-shadow: 0px 4px 4px -4px var(--base-shadow-tile);
 }
 
 .list-view .list-items {
   border-radius: 3px;
   box-sizing: border-box;
-  background: var(--base-tile-background);
+  // background: var(--base-tile-background);
 }
 
-// .list-view .list-items .list list-item
+.list-scroll:has(.list-items:empty) {
+  display: none;
+}
 
 .list-view .list-items .no-items {
   display: none;
@@ -106,6 +111,18 @@
 
 .list-view .template {
   display: none;
+}
+
+.notes-placeholder {
+  color: var(--base-inactive-color);
+  position: relative;
+  margin-right: 5px;
+  text-align: right;
+  font-style: italic;
+  font-size: small;
+  top: calc(100% - 30px);
+  opacity: 0.3;
+  letter-spacing: 0.3px;
 }
 
 @import 'scroll-bar';

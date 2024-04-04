@@ -20,7 +20,6 @@ export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Pr
     preview: null,
     cState: item.s.split(',').map(v => Number(v)),
     pState: null,
-    html: null,
     updated: item.u,
     created: item.c,
     deleted: 0

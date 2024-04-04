@@ -1,8 +1,13 @@
 list-item {
-  // position: relative;
-  border-bottom: 1px dashed var(--base-background-stroke);
+  border-bottom: 1px dotted var(--base-background-stroke);
   display: block;
   z-index: 1;
+  overflow: hidden;
+}
+
+.list-view .list-item {
+  transform-origin: top center;
+  transition: height 0.25s ease-in;
 }
 
 .list-view .list-item,
@@ -15,12 +20,13 @@ list-item {
   border-top: 1px solid var(--base-tile-background);
   border-left: 1px solid var(--base-tile-background);
   border-bottom: 1px solid var(--base-tile-background);
-  border-right: 2px solid var(--base-tile-background);
+  border-right: 1px solid var(--base-tile-background);
   white-space: nowrap;
   overflow: hidden;
   display: flex;
   color: var(--base-text-color);
   background: var(--base-tile-background);
+  // background: rebeccapurple;
 }
 
 .list-view .list-item > div {
@@ -120,37 +126,32 @@ list-item {
 
 .list-view .drag {
   position: absolute;
-  width: 100%;
-  border-color: transparent;
+  width: calc(100% - 4px);
+  border-width: 0;
   height: 25px;
   box-sizing: border-box;
   margin-top: 1px;
   z-index: 1000;
-  // cursor: pointer;
   cursor: grabbing;
-}
-
-.list-view .drag:hover, .list-view .drag:hover .list-item:hover, .list-view .drag:hover .list-item .sort {
-  cursor: grabbing !important;
+  box-shadow: 0px 4px 8px -4px var(--base-shadow-drag);
+  margin-left: 2px;
+  margin-right: 2px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-second-color)) !important;
 }
 
 .list-view .drag .list-item {
-  background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-second-color)) !important;
   opacity: 1 !important;
-  // margin-left: 24px;
-  margin-left: 4px;
-  margin-right: 4px;
   padding-right: 2px;
-  border-color: transparent;
-  // border-color: rebeccapurple;
-  border-left-color: var(--base-highlight-color);
-  border-right-color: var(--base-highlight-second-color);
-  // border-left: none;
-  // box-shadow: -1px 2px 4px 0px var(--base-shadow-drag);
-  box-shadow: 0px 4px 8px -4px var(--base-shadow-drag);
-  border-radius: 3px;
-  line-height: 22px !important;
-  height: 23px !important;
+  border-width: 0;
+  line-height: 23px !important;
+  height: 25px !important;
+}
+
+.list-view .drag:hover, 
+.list-view .drag:hover .list-item:hover, 
+.list-view .drag:hover .list-item .sort {
+  cursor: grabbing !important;
 }
 
 .list-view .drag .list-item .sort {
@@ -161,33 +162,17 @@ list-item {
   fill: var(--base-color-hover);
 }
 
-.list-view .drag .list-item .button {
-  line-height: 23px !important;
-  height: 23px !important;
-}
-
-.list-view .drag .list-item .button.to-note {
-  line-height: 21px !important;
-  height: 21px !important;
-}
-
-.list-view list-item:last-child,
-.list-view .placeholder:last-child {
-  border-color: transparent !important;
-}
+// .list-view list-item:last-child,
+// .list-view .placeholder:last-child {
+//   border-color: transparent !important;
+// }
 
 .list-view .list-items .placeholder {
-  border-bottom: 1px dashed var(--base-background-stroke);
+  // border-bottom: 1px dashed var(--base-background-stroke);
   box-sizing: border-box;
-  // background: rgba(102, 51, 153, 0.109);
   z-index: 0;
 }
 
-// .list-view .list-items .placeholder,
 .hold list-item {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
-
-// .hold {
-//   // cursor: pointer;
-// }

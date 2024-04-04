@@ -16,10 +16,14 @@ details-view {
   flex: 1 1 130px;
 }
 
+.list-view .list-items {
+  background: transparent;
+}
+
 .list-view .list-item,
 .list-view .hold .list-item:hover {
   border-radius: 4px;
-  border-left-width: 2px;
+  // border-left-width: 2px;
 }
 
 .list-item .list-index,
@@ -53,16 +57,16 @@ details-view {
 
 .list-view .list-content {
   margin-left: 4px;
-  margin-right: 3px;
+  margin-right: 1px;
   height: 242px;
 }
 
 .list-view .list-scroll {
   box-shadow: none;
   border-width: 1px;
-  border-color: var(--base-background-stroke);
-  max-height: 237px;
-  border-radius: 8px;
+  // border-color: var(--base-background-stroke);
+  max-height: calc(100% - 8px);
+  border-radius: 6px;
 }
 
 .list-view .list-controls .cancel {
@@ -82,6 +86,7 @@ details-view {
   border-radius: 8px !important;
   margin-top: 4px;
   margin-bottom: 4px;
+  background: transparent;
 }
 
 // .list-view .list-scroll .list-items {
@@ -122,6 +127,10 @@ details-view {
 
 .ProseMirror {
   min-height: 224px;
+}
+
+.notes-placeholder {
+  display: none !important;
 }
 
 details-view[data-scroll='true'] {

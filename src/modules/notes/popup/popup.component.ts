@@ -1,5 +1,7 @@
 import { BaseElement } from 'core/components';
 import { PopupBaseElement } from '../base-popup/popup.component';
+import { INote } from '../details-base/models/details-base.model';
+import { DbProviderService } from 'modules/db';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -22,5 +24,36 @@ export class PopupNotesElement extends PopupBaseElement {
     super.render();
 
     this.listView.hidden = false;
+  }
+
+  protected async eventListeners() {
+    this.listView.addEventListener('create', () => !this.disabled && this.create());
+    this.detailsView.addEventListener('cancel', () => !this.disabled && this.goBack());
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
+    this.detailsView.addEventListener('delete', () => !this.disabled && this.goBack(true));
+
+    super.eventListeners();
+  }
+
+  async select(item: INote) {
+    this.listView.hidden = true;
+    this.detailsView.hidden = false;
+
+    super.select(item);
+  }
+
+  async goBack(remove?: boolean) {
+    this.listView.hidden = false;
+    this.detailsView.hidden = true;
+    this.selected?.item.highlightItem();
+
+    if (remove || this.selected && !this.selected.description) {
+      await super.delete(100);
+    } else {
+      await this.onChanged(new Event('change'));
+    }
+
+    this.selected = null;
+    await DbProviderService.cache.remove(['selected']);
   }
 }

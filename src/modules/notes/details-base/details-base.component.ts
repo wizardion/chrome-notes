@@ -6,13 +6,12 @@ import { IEditorView } from 'components/models/editor.models';
 import { Debounce, DynamicScroll } from 'modules/effects';
 
 
-const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { changed: null, locked: null } };
+const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { locked: null } };
 
 export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsViewForm> extends BaseElement {
   static readonly selector: string;
 
   protected note?: INote;
-  protected _draft: boolean;
   protected editor: IEditorView;
   protected form: FormElement<T>;
   protected listeners = new Map<'change' | 'selectionEvent' | 'save' | 'create', IEventListener>();
@@ -37,24 +36,16 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   }
 
   protected onChange(e: Event) {
-    clearInterval(INTERVALS.intervals.changed);
+    const handler = this.listeners.get('change');
 
-    if (!this._locked) {
-      INTERVALS.intervals.changed = setTimeout(() => {
-        const handler = this.listeners.get('change');
-
-        if (handler) {
-          handler(e);
-        }
-      }, INTERVALS.delay);
+    if (!this._locked && handler) {
+      handler(e);
     }
   }
 
   protected onSave(e: Event) {
-    clearInterval(INTERVALS.intervals.changed);
-
     if (!this._locked) {
-      const handler = this._draft ? this.listeners.get('create') : this.listeners.get('change');
+      const handler = this.listeners.get('change');
 
       if (handler) {
         this.lock();
@@ -62,19 +53,6 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
         this.unlock();
       }
     }
-  }
-
-  get draft(): boolean {
-    return this._draft;
-  }
-
-  set draft(value: boolean) {
-    this._draft = value;
-
-    this.form.elements.delete.hidden = value;
-    this.form.elements.create.hidden = !value;
-    this.form.elements.cancel.hidden = !value;
-    this.form.elements.back.hidden = value;
   }
 
   set hidden(value: boolean) {
@@ -128,15 +106,14 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   }
 
   default(): IDBNote {
-    const { title, description, selection } = this.editor.getData();
     const time = new Date().getTime();
 
     return {
       id: 0,
-      title: title,
-      description: description,
+      title: '',
+      description: '',
       order: 0,
-      cState: selection,
+      cState: [0, 0],
       updated: time,
       created: time,
       deleted: 0
@@ -144,16 +121,10 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   }
 
   addEventListener(type: IDetailsListenerType, listener: IEventListener, options?: boolean | AddEventListenerOptions) {
-    if (type === 'back') {
+    if (type === 'cancel') {
       this.form.elements.back.addEventListener('mousedown', (e) => e.preventDefault());
 
       return this.form.elements.back.addEventListener('click', listener);
-    }
-
-    if (type === 'cancel') {
-      this.form.elements.cancel.addEventListener('mousedown', (e) => e.preventDefault());
-
-      return this.form.elements.cancel.addEventListener('click', listener);
     }
 
     if (type === 'delete') {
@@ -162,17 +133,7 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
       return this.form.elements.delete.addEventListener('click', listener);
     }
 
-    if (type === 'create') {
-      const handler: IEventListener = (e) => this.onSave(e);
-
-      this.listeners.set('create', listener);
-      this.form.elements.create.addEventListener('mousedown', (e) => e.preventDefault());
-      this.form.elements.create.addEventListener('click', handler);
-
-      return this.editor.addEventListener('save', handler);
-    }
-
-    if (type === 'change') {
+    if (type === 'changed') {
       this.listeners.set('change', listener);
       this.editor.addEventListener('change', (e) => this.onChange(e));
 

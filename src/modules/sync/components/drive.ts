@@ -173,7 +173,6 @@ export async function authorize(): Promise<string> {
   }
 }
 
-
 export function renewToken(): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     chrome.identity.getAuthToken({ 'interactive': false }, async (token: string) => {

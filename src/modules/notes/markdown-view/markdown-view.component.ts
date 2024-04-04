@@ -24,8 +24,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
     this.form = new FormElement<IMarkdownViewForm>({
       head: this.template.querySelector('[name="details-controls"]'),
       back: this.template.querySelector('[name="back"]'),
-      cancel: this.template.querySelector('[name="cancel"]'),
-      create: this.template.querySelector('[name="create"]'),
       delete: this.template.querySelector('[name="delete"]'),
       menu: (this.template.querySelector('[name="controls"]') as EditorControlsElement),
       menuGroup: this.template.querySelector('[name="controls-group"]'),
@@ -63,7 +61,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   }
 
   addEventListener(type: IDetailsListenerType, listener: IEventListener, options?: boolean | AddEventListenerOptions) {
-    if (type === 'change') {
+    if (type === 'changed') {
       this.listeners.set('selectionEvent', (e) => this.onChange(e));
     }
 
@@ -91,11 +89,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
     this.dataset.scroll = 'false';
     super.hidden = value;
     this.preview = false;
-  }
-
-  set draft(value: boolean) {
-    super.draft = value;
-    this.form.elements.preview.hidden = value;
   }
 
   set preview(value: boolean) {
