@@ -76,6 +76,7 @@ export class ListItemElement extends BaseElement {
       direction: 'reverse',
       duration: 1000,
       iterations: 1,
+      easing: 'cubic-bezier(0, 0, 0.2, 1)'
     });
   }
 
