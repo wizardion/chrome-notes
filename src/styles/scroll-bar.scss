@@ -36,9 +36,9 @@
 }
 
 .list-scroll::-webkit-scrollbar-track {
-  background: var(--base-tile-background);
-  margin-top: 8px;
-  margin-bottom: 8px;
+  // background: var(--base-tile-background);
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .list-scroll::-webkit-scrollbar-thumb {

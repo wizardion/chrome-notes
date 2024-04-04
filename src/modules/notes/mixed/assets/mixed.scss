@@ -16,6 +16,10 @@ details-view {
   flex: 1 1 130px;
 }
 
+.list-view .list-items {
+  background: transparent;
+}
+
 .list-view .list-item,
 .list-view .hold .list-item:hover {
   border-radius: 4px;

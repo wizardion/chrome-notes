@@ -1,6 +1,3 @@
-import { ListItemElement } from '../../list-item/list-item.component';
-
-
 export type IListListenerType = 'create' | 'click';
 
 export interface IListViewForm {
@@ -8,5 +5,4 @@ export interface IListViewForm {
   scrollable: HTMLDivElement;
   list: HTMLDivElement;
   placeholder: HTMLDivElement | null;
-  items: ListItemElement[];
 }

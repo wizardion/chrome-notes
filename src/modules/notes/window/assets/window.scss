@@ -17,8 +17,13 @@ details-view {
   height: 100vh;
 }
 
+
 .details-view {
   height: 100%;
+}
+
+.list-view .list-items {
+  background: transparent;
 }
 
 .list-view .list-item,
@@ -37,16 +42,25 @@ details-view {
   height:28px;
 }
 
-.list-view .drag .list-item .button,
 .list-view .drag .list-item {
-  line-height: 25px !important;
-  height: 25px !important;
+  line-height: 26px !important;
+  height: 28px !important;
 }
 
-.list-view .drag .list-item .button.to-note {
-  line-height: 23px !important;
-  height: 23px !important;
+.list-view .drag .list-item .sort {
+  margin-top: 0px;
 }
+
+// .list-view .drag .list-item .button,
+// .list-view .drag .list-item {
+//   line-height: 25px !important;
+//   height: 25px !important;
+// }
+
+// .list-view .drag .list-item .button.to-note {
+//   line-height: 23px !important;
+//   height: 23px !important;
+// }
 
 .list-item .list-index,
 .list-item .list-index + div,

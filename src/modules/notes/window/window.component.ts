@@ -30,10 +30,13 @@ export class WindowNotesElement extends PopupBaseElement {
   }
 
   protected async eventListeners() {
-    super.eventListeners();
-
     const tabInfo = await chrome.tabs.getCurrent();
 
+    this.listView.addEventListener('create', () => !this.disabled && this.create());
+    this.detailsView.addEventListener('changed', () => !this.disabled && this.onChanged());
+    this.detailsView.addEventListener('delete', async () => !this.disabled && await this.delete());
+
+    super.eventListeners();
     chrome.storage.local.set({ tabInfo: { id: tabInfo.id, window: tabInfo.windowId } });
   }
 
@@ -47,24 +50,30 @@ export class WindowNotesElement extends PopupBaseElement {
 
   async select(item: INote) {
     if (this.selected && !this.selected.description) {
-      await this.delete();
-      this.selected = null;
+      await super.delete(100);
     }
 
-    super.select(item);
+    return super.select(item);
   }
 
-  async delete(): Promise<number> {
-    const index = await super.delete();
+  async delete(delay?: number): Promise<number> {
+    const index = await super.delete(delay);
 
     if (!this.items.length) {
-      this.create();
+      await this.create();
 
       return index;
     }
 
-    this.select(this.items[index > 0 ? index - 1 : 0]);
+    if (!delay) {
+      await this.select(this.items[index > 0 ? index - 1 : 0]);
+    }
 
     return index;
+  }
+
+  async create() {
+    await super.create();
+    this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' });
   }
 }

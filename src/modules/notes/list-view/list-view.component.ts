@@ -21,8 +21,7 @@ export class ListViewElement extends BaseElement {
       create: this.template.querySelector('[name="create-note"]'),
       list: this.template.querySelector('[name="list-items"]'),
       scrollable: this.template.querySelector('[name="scrollable"]'),
-      placeholder: this.template.querySelector('[name="placeholder"]'),
-      items: []
+      placeholder: this.template.querySelector('[name="placeholder"]')
     });
   }
 
@@ -41,16 +40,11 @@ export class ListViewElement extends BaseElement {
     return this.form.elements.list;
   }
 
-  get items(): ListItemElement[] {
-    return this.form.elements.items;
-  }
-
   get elements(): IListViewForm {
     return this.form.elements;
   }
 
   add(item: ListItemElement) {
-    this.form.elements.items.push(item);
     this.form.elements.list.appendChild(item);
     this.form.elements.placeholder.hidden = true;
   }

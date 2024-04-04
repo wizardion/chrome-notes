@@ -76,7 +76,8 @@
   // border-bottom-right-radius: 16px;
   box-sizing: border-box;
   // border: 1px solid var(--base-tile-background);
-  box-shadow: 0px 0px 4px 0px var(--base-shadow-tile);
+  // box-shadow: 0px 0px 4px 0px var(--base-shadow-tile);
+  // box-shadow: 0px 4px 4px -4px var(--base-shadow-tile);
 }
 
 .list-view .list-items {

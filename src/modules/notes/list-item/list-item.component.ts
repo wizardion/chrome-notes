@@ -1,6 +1,7 @@
 import './assets/list-items.scss';
 import { BaseElement, FormElement, IEventListener } from 'core/components';
 import { IEventListenerType, IListFormItem } from './models/list-item.model';
+import { delay } from 'core/index';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -62,7 +63,7 @@ export class ListItemElement extends BaseElement {
     this.form.elements.date.innerText = value.toDateString();
   }
 
-  animateItem() {
+  highlightItem() {
     const element = this.form.elements.item;
 
     element.scrollIntoView({ behavior: 'instant', block: 'center' });
@@ -110,12 +111,24 @@ export class ListItemElement extends BaseElement {
     }
   }
 
-  remove(): void {
+  async removeItem(ms: number = 0): Promise<void> {
+    const element = this.form.elements.item;
+
     if (this.listeners.size) {
       this.removeEventListener('sort:mousedown');
       this.removeEventListener('click');
     }
 
-    super.remove();
+    await delay(ms);
+
+    element.style.height = `0px`;
+    const animation = element.getAnimations().shift();
+
+    if (animation) {
+      await animation.finished;
+      super.remove();
+    } else {
+      super.remove();
+    }
   }
 }

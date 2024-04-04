@@ -14,13 +14,9 @@ export abstract class PopupBaseElement extends BaseElement {
   protected initialized = false;
   protected listView: ListViewElement;
   protected detailsView: DetailsBaseElement;
+  protected index = 0;
 
   protected async eventListeners() {
-    this.listView.addEventListener('create', () => !this.disabled && this.create());
-    this.detailsView.addEventListener('cancel', () => !this.disabled && this.goBack());
-    this.detailsView.addEventListener('delete', () => !this.disabled && this.delete());
-    this.detailsView.addEventListener('changed', () => !this.disabled && this.onChanged());
-
     SortHelper.addEventListener('start', () => ListItemElement.locked = true);
     SortHelper.addEventListener('finish', (f, s) => !this.disabled && this.onOrderChange(f, s));
   }
@@ -33,13 +29,15 @@ export abstract class PopupBaseElement extends BaseElement {
   addItem(note: INote) {
     const item = document.createElement('list-item') as ListItemElement;
 
-    item.index = this.items.length + 1;
-    item.title = note.title;
-    item.date = new Date(note.updated);
     note.item = item;
+    item.title = note.title;
+    item.index = this.items.length + 1;
+    item.date = new Date(note.updated);
+    this.index = Math.max(note.order, this.index);
 
     item.addEventListener('click', () => this.selected?.id !== note.id && this.select(note));
     item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.start(e, this.listView.scrollable, item));
+
     this.listView.add(item);
     this.items.push(note);
 
@@ -65,18 +63,38 @@ export abstract class PopupBaseElement extends BaseElement {
     this.detailsView.setData(item);
   }
 
-  async goBack() {
-    await DbProviderService.cache.remove(['selected']);
+  async delete(delay?: number): Promise<number> {
+    const index = this.items.findIndex(i => i.id === this.selected.id);
+
+    for (let i = index + 1; i < this.items.length; i++) {
+      this.items[i].item.index = i;
+    }
+
+    this.items.splice(index, 1);
+    this.listView.elements.placeholder.hidden = !!this.items.length;
+    await DbProviderService.delete(this.selected);
+
+    if (delay) {
+      this.selected.item.removeItem(delay);
+    } else {
+      await this.selected.item.removeItem(delay);
+    }
+
+    delete this.selected.item;
+    this.selected = null;
+
+    return index;
   }
 
   async create() {
     const item = document.createElement('list-item') as ListItemElement;
     const note = this.detailsView.default() as INote;
 
+    this.index++;
     note.item = item;
-    item.index = this.items.length + 1;
-    note.order = this.items.length;
     item.title = note.title;
+    note.order = this.index;
+    item.index = this.items.length + 1;
     item.date = new Date(note.updated);
 
     this.selected?.item.classList.remove('selected');
@@ -86,28 +104,8 @@ export abstract class PopupBaseElement extends BaseElement {
 
     this.items.push(note);
     this.listView.add(item);
-    this.select(note);
-  }
 
-  async delete(): Promise<number> {
-    const index = this.items.findIndex(i => i.id === this.selected.id);
-
-    for (let i = index + 1; i < this.listView.items.length; i++) {
-      this.listView.items[i].index = i - 1;
-    }
-
-    this.items.splice(index, 1);
-    this.listView.items.splice(index, 1);
-    this.listView.elements.placeholder.hidden = !!this.items.length;
-    await DbProviderService.delete(this.selected);
-
-    this.selected.item.remove();
-    delete this.selected.item;
-    this.selected = null;
-
-    this.goBack();
-
-    return index;
+    return this.select(note);
   }
 
   async onOrderChange(first: number, second: number) {

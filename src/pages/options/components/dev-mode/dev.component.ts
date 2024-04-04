@@ -181,6 +181,7 @@ export class DevModeElement extends BaseElement {
     const data = JSON.parse(value);
     const notes: IDBNote[] = [];
     const invalid = [];
+    let order = 0;
 
     for (let i = 0; i < data.length; i++) {
       const item = data[i] as IDBNote;
@@ -195,7 +196,7 @@ export class DevModeElement extends BaseElement {
           id: item.id,
           title: item.title,
           description: item.description,
-          order: item.order,
+          order: order,
           updated: item.updated,
           created: item.created,
           deleted: item.deleted,
@@ -209,6 +210,7 @@ export class DevModeElement extends BaseElement {
           note.locked = item.locked;
         }
 
+        order++;
         notes.push(note);
       } else {
         invalid.push(item);
