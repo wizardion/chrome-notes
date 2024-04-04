@@ -20,6 +20,6 @@ export interface IDBLogNote extends Omit<IDBNote, 'cState' | 'pState'> {
 }
 
 export interface IDBParsedData {
-  valid: IDBNote[];
+  valid: Partial<IDBNote>[];
   invalid: Partial<IDBNote>[];
 }

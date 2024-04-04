@@ -116,12 +116,13 @@
 .notes-placeholder {
   color: var(--base-inactive-color);
   position: relative;
-  margin-left: 10px;
-  text-align: center;
+  margin-right: 5px;
+  text-align: right;
   font-style: italic;
   font-size: small;
-  top: calc(50% - 30px);
+  top: calc(100% - 30px);
   opacity: 0.3;
+  letter-spacing: 0.3px;
 }
 
 @import 'scroll-bar';

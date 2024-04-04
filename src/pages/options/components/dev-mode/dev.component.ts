@@ -128,13 +128,15 @@ export class DevModeElement extends BaseElement {
 
     if (value) {
       try {
-        const data = this.parseData(value);
+        const data = this.parseData(JSON.parse(value));
 
         if (this.validateData(data)) {
+          const items = this.representNotes(data.valid);
+
           await this.clearData(true);
 
-          for (let i = 0; i < data.valid.length; i++) {
-            const item = data.valid[i];
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
 
             await db.add(item);
           }
@@ -164,7 +166,9 @@ export class DevModeElement extends BaseElement {
       await storage.global.clear();
       await resetDefaults();
 
-      document.location.reload();
+      if (!force) {
+        document.location.reload();
+      }
     }
   }
 
@@ -177,47 +181,26 @@ export class DevModeElement extends BaseElement {
     this.form.elements.info.hidden = !value;
   }
 
-  private parseData(value: string): IDBParsedData {
-    const data = JSON.parse(value);
-    const notes: IDBNote[] = [];
+  private parseData(data: object[]): IDBParsedData {
+    const valid: Partial<IDBNote>[] = [];
     const invalid = [];
-    let order = 0;
 
     for (let i = 0; i < data.length; i++) {
-      const item = data[i] as IDBNote;
+      const item = data[i] as Partial<IDBNote>;
 
       if (typeof (item.id) === 'number' && !Number.isNaN(item.id) && Number.isInteger(item.id)
         && typeof (item.title) === 'string' && typeof (item.description) === 'string'
         && typeof (item.order) === 'number' && !Number.isNaN(item.order) && Number.isInteger(item.order)
         && typeof (item.updated) === 'number' && !Number.isNaN(item.updated) && Number.isInteger(item.updated)
         && typeof (item.created) === 'number' && !Number.isNaN(item.created) && Number.isInteger(item.created)
-        && typeof (item.deleted) === 'number' && (item.deleted === 0 || item.deleted === 1)) {
-        const note: IDBNote = {
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          order: order,
-          updated: item.updated,
-          created: item.created,
-          deleted: item.deleted,
-          synced: typeof (item.synced) === 'number' ? item.synced : 0,
-          preview: typeof (item.preview) === 'boolean' ? item.preview : false,
-          cState: [0, 0],
-          pState: null
-        };
-
-        if (typeof (item.locked) === 'boolean') {
-          note.locked = item.locked;
-        }
-
-        order++;
-        notes.push(note);
+        && typeof (item.deleted) === 'number' && item.deleted === 0) {
+        valid.push(item);
       } else {
         invalid.push(item);
       }
     }
 
-    return { valid: notes, invalid: invalid };
+    return { valid: valid.sort((a, b) => a.order - b.order), invalid: invalid };
   }
 
   private validateData(data: IDBParsedData): boolean {
@@ -229,5 +212,35 @@ export class DevModeElement extends BaseElement {
     }
 
     return data.invalid.length === 0;
+  }
+
+  private representNotes(data: Partial<IDBNote>[]): IDBNote[] {
+    const notes: IDBNote[] = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+
+      const note: IDBNote = {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        order: i,
+        updated: item.updated,
+        created: item.created,
+        deleted: item.deleted,
+        synced: typeof (item.synced) === 'number' ? item.synced : 0,
+        preview: typeof (item.preview) === 'boolean' ? item.preview : false,
+        cState: [0, 0],
+        pState: null
+      };
+
+      if (typeof (item.locked) === 'boolean') {
+        note.locked = item.locked;
+      }
+
+      notes.push(note);
+    }
+
+    return notes;
   }
 }
