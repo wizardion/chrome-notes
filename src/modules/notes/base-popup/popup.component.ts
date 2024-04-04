@@ -1,4 +1,4 @@
-import { BaseElement } from 'core/components';
+import { BaseElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
 import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
 import { DetailsBaseElement } from '../details-base/details-base.component';
@@ -6,6 +6,8 @@ import { INote } from '../details-base/models/details-base.model';
 import { DbProviderService } from 'modules/db';
 import { SortHelper } from 'modules/effects';
 
+
+const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { changed: null, locked: null } };
 
 export abstract class PopupBaseElement extends BaseElement {
   protected items: INote[];
@@ -15,6 +17,8 @@ export abstract class PopupBaseElement extends BaseElement {
   protected listView: ListViewElement;
   protected detailsView: DetailsBaseElement;
   protected index = 0;
+
+  protected listeners = new Map<'change' | 'selectionEvent' | 'save' | 'create', IEventListener>();
 
   protected async eventListeners() {
     SortHelper.addEventListener('start', () => ListItemElement.locked = true);
@@ -71,6 +75,7 @@ export abstract class PopupBaseElement extends BaseElement {
     }
 
     this.items.splice(index, 1);
+    this.listView.elements.create.disabled = false;
     this.listView.elements.placeholder.hidden = !!this.items.length;
     await DbProviderService.delete(this.selected);
 
@@ -97,6 +102,7 @@ export abstract class PopupBaseElement extends BaseElement {
     item.index = this.items.length + 1;
     item.date = new Date(note.updated);
 
+    this.listView.elements.create.disabled = true;
     this.selected?.item.classList.remove('selected');
     item.addEventListener('click', () => this.select(note));
     item.addEventListener('sort:mousedown', (e: MouseEvent) => SortHelper.start(e, this.listView.scrollable, item));
@@ -135,7 +141,7 @@ export abstract class PopupBaseElement extends BaseElement {
     ListItemElement.locked = false;
   }
 
-  async onChanged() {
+  async onChanged(e: Event) {
     if (this.selected) {
       const item = this.detailsView.getData();
       const time = new Date().getTime();
@@ -148,9 +154,19 @@ export abstract class PopupBaseElement extends BaseElement {
       this.selected.updated = time;
       this.selected.preview = item.preview;
       this.selected.item.date = new Date(time);
+      this.listView.elements.create.disabled = !item.description;
 
-      await DbProviderService.save(item);
-      await DbProviderService.cache.set('selected', this.selected);
+      if (e.type === 'change') {
+        clearInterval(INTERVALS.intervals.changed);
+        INTERVALS.intervals.changed = setTimeout(async () => await this.save(item), INTERVALS.delay);
+      } else {
+        await this.save(item);
+      }
     }
+  }
+
+  private async save(item: INote) {
+    await DbProviderService.save(item);
+    await DbProviderService.cache.set('selected', item);
   }
 }

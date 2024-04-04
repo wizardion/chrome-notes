@@ -6,7 +6,7 @@ import { IEditorView } from 'components/models/editor.models';
 import { Debounce, DynamicScroll } from 'modules/effects';
 
 
-const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { changed: null, locked: null } };
+const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { locked: null } };
 
 export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsViewForm> extends BaseElement {
   static readonly selector: string;
@@ -36,22 +36,14 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
   }
 
   protected onChange(e: Event) {
-    clearInterval(INTERVALS.intervals.changed);
+    const handler = this.listeners.get('change');
 
-    if (!this._locked) {
-      INTERVALS.intervals.changed = setTimeout(() => {
-        const handler = this.listeners.get('change');
-
-        if (handler) {
-          handler(e);
-        }
-      }, INTERVALS.delay);
+    if (!this._locked && handler) {
+      handler(e);
     }
   }
 
   protected onSave(e: Event) {
-    clearInterval(INTERVALS.intervals.changed);
-
     if (!this._locked) {
       const handler = this.listeners.get('change');
 
@@ -140,19 +132,6 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
 
       return this.form.elements.delete.addEventListener('click', listener);
     }
-
-    // if (type === 'create') {
-    //   console.log('create', this.form.elements.create);
-    //   // const handler: IEventListener = (e) => this.onSave(e);
-
-    //   // this.listeners.set('create', listener);
-    //   this.form.elements.create.addEventListener('mousedown', (e) => e.preventDefault());
-
-    //   return this.form.elements.create.addEventListener('click', listener);
-    //   // this.form.elements.create.addEventListener('click', handler);
-
-    //   // return this.editor.addEventListener('save', handler);
-    // }
 
     if (type === 'changed') {
       this.listeners.set('change', listener);

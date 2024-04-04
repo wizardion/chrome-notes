@@ -22,7 +22,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
 
   protected async eventListeners() {
     this.listView.addEventListener('create', () => !this.disabled && this.create());
-    this.detailsView.addEventListener('changed', () => !this.disabled && this.onChanged());
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
     this.detailsView.addEventListener('delete', async () => !this.disabled && await this.delete());
 
     super.eventListeners();

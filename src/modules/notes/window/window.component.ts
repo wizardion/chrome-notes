@@ -33,7 +33,7 @@ export class WindowNotesElement extends PopupBaseElement {
     const tabInfo = await chrome.tabs.getCurrent();
 
     this.listView.addEventListener('create', () => !this.disabled && this.create());
-    this.detailsView.addEventListener('changed', () => !this.disabled && this.onChanged());
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
     this.detailsView.addEventListener('delete', async () => !this.disabled && await this.delete());
 
     super.eventListeners();

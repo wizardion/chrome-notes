@@ -29,7 +29,7 @@ export class PopupNotesElement extends PopupBaseElement {
   protected async eventListeners() {
     this.listView.addEventListener('create', () => !this.disabled && this.create());
     this.detailsView.addEventListener('cancel', () => !this.disabled && this.goBack());
-    this.detailsView.addEventListener('changed', () => !this.disabled && this.onChanged());
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
     this.detailsView.addEventListener('delete', () => !this.disabled && this.goBack(true));
 
     super.eventListeners();
@@ -50,7 +50,7 @@ export class PopupNotesElement extends PopupBaseElement {
     if (remove || this.selected && !this.selected.description) {
       await super.delete(100);
     } else {
-      await this.onChanged();
+      await this.onChanged(new Event('change'));
     }
 
     this.selected = null;
