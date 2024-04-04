@@ -15,8 +15,6 @@ export class DbProviderService {
       item.id = await db.add(item);
     }
 
-    console.log('item save...', [item.id]);
-
     return item.id;
   }
 
