@@ -62,6 +62,7 @@ export abstract class PopupBaseElement extends BaseElement {
       await DbProviderService.cache.set('selected', this.selected);
     } else {
       this.preserved = item.id;
+      this.listView.elements.create.disabled = !item.description;
     }
 
     this.detailsView.setData(item);
