@@ -75,7 +75,6 @@ export abstract class PopupBaseElement extends BaseElement {
     }
 
     this.items.splice(index, 1);
-    this.listView.elements.create.disabled = false;
     await DbProviderService.delete(this.selected);
 
     if (delay) {
@@ -86,6 +85,7 @@ export abstract class PopupBaseElement extends BaseElement {
       this.listView.elements.placeholder.hidden = !!this.items.length;
     }
 
+    this.listView.elements.create.disabled = false;
     delete this.selected.item;
     this.selected = null;
 
