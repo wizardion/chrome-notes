@@ -88,7 +88,7 @@ export class MarkdownEditor implements IEditorView {
     } else {
       const markdown = value && value.split(' ').splice(0, 6).join(' ') || '';
 
-      title = mdRender.toString(markdown).replace(/\n$/g, '');
+      title = mdRender.toString(markdown).replace(/\n/g, '');
     }
 
     return { title: title, description: value, selection: this.getSelection() };
