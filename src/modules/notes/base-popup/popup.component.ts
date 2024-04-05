@@ -156,8 +156,9 @@ export abstract class PopupBaseElement extends BaseElement {
       this.selected.item.date = new Date(time);
       this.listView.elements.create.disabled = !item.description;
 
+      clearInterval(INTERVALS.intervals.changed);
+
       if (e.type === 'change') {
-        clearInterval(INTERVALS.intervals.changed);
         INTERVALS.intervals.changed = setTimeout(async () => await this.save(item), INTERVALS.delay);
       } else {
         await this.save(item);
