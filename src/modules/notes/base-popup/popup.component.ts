@@ -54,6 +54,7 @@ export abstract class PopupBaseElement extends BaseElement {
   }
 
   async select(item: INote) {
+    this.detailsView.setData(item);
     this.selected?.item.classList.remove('selected');
 
     if (this.initialized) {
@@ -64,8 +65,6 @@ export abstract class PopupBaseElement extends BaseElement {
       this.preserved = item.id;
       this.listView.elements.create.disabled = !item.description;
     }
-
-    this.detailsView.setData(item);
   }
 
   async delete(delay?: number): Promise<number> {
