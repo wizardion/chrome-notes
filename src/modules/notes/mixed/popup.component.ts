@@ -34,6 +34,8 @@ export class PopupMixedNotesElement extends PopupBaseElement {
     if (!this.items.length) {
       this.create();
     }
+
+    this.detailsView.elements.delete.disabled = this.items.length < 2;
   }
 
   async select(item: INote) {
@@ -47,11 +49,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
   async delete(delay?: number): Promise<number> {
     const index = await super.delete(delay);
 
-    if (!this.items.length) {
-      await this.create();
-
-      return index;
-    }
+    this.detailsView.elements.delete.disabled = this.items.length < 2;
 
     if (!delay) {
       await this.select(this.items[index > 0 ? index - 1 : 0]);
@@ -63,5 +61,6 @@ export class PopupMixedNotesElement extends PopupBaseElement {
   async create() {
     await super.create();
     this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' });
+    this.detailsView.elements.delete.disabled = this.items.length < 2;
   }
 }

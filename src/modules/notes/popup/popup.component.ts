@@ -47,7 +47,7 @@ export class PopupNotesElement extends PopupBaseElement {
     this.detailsView.hidden = true;
     this.selected?.item.highlightItem();
 
-    if (remove || this.selected && !this.selected.description) {
+    if (remove || this.selected && !this.selected.description && this.items.length > 1) {
       await super.delete(100);
     } else {
       await this.onChanged(new Event('change'));
