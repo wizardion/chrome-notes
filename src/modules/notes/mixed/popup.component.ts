@@ -41,6 +41,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
   async select(item: INote) {
     if (this.selected && !this.selected.description) {
       await super.delete(100);
+      this.detailsView.elements.delete.disabled = this.items.length < 2;
     }
 
     return super.select(item);
