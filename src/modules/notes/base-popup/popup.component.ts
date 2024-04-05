@@ -76,13 +76,14 @@ export abstract class PopupBaseElement extends BaseElement {
 
     this.items.splice(index, 1);
     this.listView.elements.create.disabled = false;
-    this.listView.elements.placeholder.hidden = !!this.items.length;
     await DbProviderService.delete(this.selected);
 
     if (delay) {
-      this.selected.item.removeItem(delay);
+      this.selected.item.removeItem(delay)
+        .then(() => this.listView.elements.placeholder.hidden = !!this.items.length);
     } else {
       await this.selected.item.removeItem(delay);
+      this.listView.elements.placeholder.hidden = !!this.items.length;
     }
 
     delete this.selected.item;
