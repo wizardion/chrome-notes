@@ -70,6 +70,8 @@ export abstract class PopupBaseElement extends BaseElement {
   async delete(delay?: number): Promise<number> {
     const index = this.items.findIndex(i => i.id === this.selected.id);
 
+    this.detailsView.elements.delete.disabled = true;
+
     for (let i = index + 1; i < this.items.length; i++) {
       this.items[i].item.index = i;
     }
@@ -85,6 +87,7 @@ export abstract class PopupBaseElement extends BaseElement {
       this.listView.elements.placeholder.hidden = !!this.items.length;
     }
 
+    this.detailsView.elements.delete.disabled = false;
     this.listView.elements.create.disabled = false;
     delete this.selected.item;
     this.selected = null;
