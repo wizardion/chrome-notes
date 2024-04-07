@@ -148,16 +148,21 @@ export abstract class PopupBaseElement extends BaseElement {
   async onChanged(e: Event) {
     if (this.selected) {
       const data = this.detailsView.getData();
-      const time = new Date().getTime();
+
+      if (data.description !== this.selected.description || data.preview !== this.selected.preview) {
+        const date = new Date();
+        const time = date.getTime();
+
+        this.selected.updated = time;
+        this.selected.item.date = date;
+      }
 
       this.selected.title = data.title;
       this.selected.description = data.description;
       this.selected.cState = data.selection;
       this.selected.pState = data.previewSelection;
       this.selected.item.title = data.title;
-      this.selected.updated = time;
       this.selected.preview = data.preview;
-      this.selected.item.date = new Date(time);
       this.listView.elements.create.disabled = !data.description;
 
       console.log('onChanged', Object.assign({}, this.selected));

@@ -9,7 +9,7 @@ const logger = new LoggerService('sync-worker.ts', 'green');
 
 export class SyncWorker extends BaseWorker {
   static readonly worker = 'sync-worker';
-  static readonly period = 0.5;
+  static readonly period = 2;
 
   async process() {
     if (!(await Cloud.busy())) {
