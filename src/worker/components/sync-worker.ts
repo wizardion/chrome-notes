@@ -5,11 +5,11 @@ import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { BaseWorker } from './base-worker';
 
 
-const logger = new LoggerService('alarm-worker.ts', 'green');
+const logger = new LoggerService('sync-worker.ts', 'green');
 
 export class SyncWorker extends BaseWorker {
   static readonly worker = 'sync-worker';
-  static readonly period = 5;
+  static readonly period = 0.5;
 
   async process() {
     if (!(await Cloud.busy())) {

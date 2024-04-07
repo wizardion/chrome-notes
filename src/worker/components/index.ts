@@ -1,4 +1,3 @@
-import { LoggerService } from 'modules/logger';
 import { SyncWorker } from './sync-worker';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { removeCachedAuthToken } from 'modules/sync/components/drive';
@@ -13,7 +12,6 @@ export { DataWorker } from './data-worker';
 export { SyncWorker } from './sync-worker';
 export { IWindow, StorageChange, AreaName } from './models/models';
 
-const logger = new LoggerService('background/index.ts', 'green');
 
 export async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
   const tabs = await chrome.tabs.query({});
@@ -89,7 +87,6 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
 }
 
 export async function eventOnSyncInfoChanged(info: ISyncInfo) {
-  logger.info('eventOnSyncInfoChanged', { i: info });
   const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
     id: null,
     enabled: false,

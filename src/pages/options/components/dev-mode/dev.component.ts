@@ -111,7 +111,9 @@ export class DevModeElement extends BaseElement {
         return acc;
       }, {});
 
-      console.table(table, ['title', 'description', 'order', 'created', 'updated', 'cState', 'pState', 'deleted']);
+      console.table(table, [
+        'title', 'description', 'order', 'created', 'updated', 'preview', 'pState', 'pState', 'deleted'
+      ]);
       console.log('Data in JSON:', data || 'None');
       console.log('');
     }
@@ -160,14 +162,20 @@ export class DevModeElement extends BaseElement {
       'Please confirm the certainty of clearing all data.\nAttention! This action is irreversible!' +
       '\nThe page will be reloaded.'
     )) {
-      await LoggerService.clear();
-      await Cloud.remove();
-      await db.clear();
-      await storage.global.clear();
-      await resetDefaults();
+      try {
+        await LoggerService.clear();
+        await Cloud.remove();
+        // await LoggerService.clear();
+        await db.clear();
+        await storage.global.clear();
+        await resetDefaults();
 
-      if (!force) {
-        document.location.reload();
+        if (!force) {
+          document.location.reload();
+        }
+      } catch (error) {
+        window.alert('Oops! Something is wrong!\n' + error.message + '\n\nPlease see logs for more details.');
+        console.log(error);
       }
     }
   }

@@ -17,9 +17,9 @@ export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Pr
     title: title,
     description: description,
     order: item.o,
-    preview: null,
+    preview: item.p,
     cState: item.s.split(',').map(v => Number(v)),
-    pState: null,
+    pState: item.e,
     updated: item.u,
     created: item.c,
     deleted: 0
@@ -39,7 +39,9 @@ export async function zip(item: IDBNote, cryptor?: EncryptorService): Promise<IS
     o: item.order,
     s: item.cState.join(','),
     u: item.updated,
-    c: item.created
+    c: item.created,
+    p: item.preview,
+    e: item.pState
   };
 
   return data;
@@ -85,8 +87,8 @@ export async function lock(reason: string) {
 
   if (!identityInfo.locked) {
     identityInfo.locked = true;
+
     await storage.local.sensitive('identityInfo', identityInfo);
-    // await storage.cached.permanent('locked', true);
     await logger.warn(reason);
   }
 }

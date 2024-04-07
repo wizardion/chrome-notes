@@ -15,8 +15,13 @@ const logger = new LoggerService('sync.ts', 'blue');
 
 //#region testing
 LoggerService.tracing = true;
-
 //#endregion
+
+export async function getSyncInfo(): Promise<ISyncInfo> {
+  const syncInfo: ISyncInfo = await storage.sync.get();
+
+  return syncInfo;
+}
 
 export async function startProcess(): Promise<void> {
   const processId: number = new Date().getTime();
@@ -32,19 +37,25 @@ export async function setProcessInfo(info: IdentityInfo): Promise<void> {
   return storage.local.sensitive('processInfo', { id: info.id, token: info.token });
 }
 
-export async function getIdentity(): Promise<IdentityInfo> {
+export async function getIdentity(): Promise<IdentityInfo | null> {
   const identityInfo: IdentityInfo = <IdentityInfo> await storage.local.get('identityInfo');
   const processInfo: IProcessInfo = <IProcessInfo> await storage.local.get('processInfo');
 
-  identityInfo.id = processInfo && processInfo.id;
+  if (identityInfo) {
+    identityInfo.id = processInfo?.id;
+  }
 
-  return identityInfo;
+  return identityInfo || null;
 }
 
 export async function validate(identityInfo: IdentityInfo): Promise<IdentityInfo> {
-  const syncInfo: ISyncInfo = await storage.sync.get();
+  const syncInfo: ISyncInfo = await getSyncInfo();
 
-  if (!syncInfo.enabled || !syncInfo.token || !identityInfo.token) {
+  if (!identityInfo && syncInfo.enabled && syncInfo.token) {
+    throw new IntegrityError('It looks like we have lost your file identity info.\nPlease remove it manually!');
+  }
+
+  if (identityInfo && (!syncInfo.enabled || !syncInfo.token || !identityInfo.token)) {
     throw new IntegrityError('Sync is not allowed at this time!');
   }
 
@@ -87,12 +98,27 @@ export async function ensureFile(identity: IdentityInfo, cryptor?: EncryptorServ
   return file;
 }
 
+async function updateCache() {
+  const cache = await storage.cached.dump();
+
+  if (cache.selected) {
+    const item = await db.get(cache.selected.id);
+
+    if (item) {
+      await logger.info(' - updating cache:', item.id, item.title);
+      await storage.cached.set('selected', item);
+    } else {
+      await storage.cached.remove(['selected']);
+    }
+  }
+}
+
 async function syncItems(
   file: IFileInfo,
   oldCryptor?: EncryptorService,
   newCryptor?: EncryptorService
 ): Promise<ICloudInfo> {
-  const cloud: ICloudInfo = { modified: file.data.modified, items: [], rules: file.data.rules };
+  const cloud: ICloudInfo = { modified: file.data.modified, items: [], rules: file.data.rules, changed: false };
   const pairInfo: ISyncPair[] = await lib.getDBPair(file.data.items);
   const modified: number = new Date().getTime();
 
@@ -100,15 +126,16 @@ async function syncItems(
     const info = pairInfo[i];
 
     // remove deleted
-    if (info.db && info.db.deleted && !info.cloud) {
+    if (info.db && (info.db.deleted || !info.db.description) && !info.cloud) {
       continue;
     }
 
     // mark deleted
     if (info.db && !info.cloud && info.db.synced && !file.isNew && !info.db.deleted) {
       info.db.deleted = 1;
+      cloud.changed = true;
       await db.update(info.db);
-      logger.info(i, ' - mark deleted local item: ', info.db.id);
+      logger.info(i, ' - marked deleted local item: ', info.db.id, info.db.title);
       continue;
     }
 
@@ -116,18 +143,20 @@ async function syncItems(
     if (info.cloud && (!info.db || info.db.updated < info.cloud.u)) {
       const decorator = info.db ? db.update : db.add;
 
+      cloud.changed = true;
       cloud.items.push(info.cloud);
       await decorator({ synced: modified, ...(await lib.unzip(info.cloud, oldCryptor)) });
-      await logger.info(i, ' - received new item: ', info.cloud.i);
+      await logger.info(i, ' - received new item: ', info.cloud.i, info.cloud.t);
       continue;
     }
 
     // put updated on cloud
     if (info.db && !info.db.deleted && (!info.cloud || info.db.updated > info.cloud.u)) {
+      cloud.changed = true;
       cloud.modified = modified;
       await db.update({ synced: modified, ...info.db });
       cloud.items.push(await lib.zip(info.db, (newCryptor || oldCryptor)));
-      await logger.info(i, ' - pushed new/updated item to cloud: ', info.db.id);
+      await logger.info(i, ' - pushed item to cloud: ', info.db.id, info.db.title);
       continue;
     }
 
@@ -158,6 +187,10 @@ export async function sync(identity: IdentityInfo, oldCryptor?: EncryptorService
     cloud.rules = cloud.rules ? await encrypt(await decrypt(cloud.rules)) : cloud.rules;
     await drive.update(identity.token, identity.id, cloud);
   }
+
+  if (cloud.changed) {
+    await updateCache();
+  }
 }
 
 export async function getProcess(level?: number): Promise<number> {
@@ -185,11 +218,13 @@ export async function exec(name: string, request: ISyncRequest, lock: boolean = 
   if (!processId) {
     try {
       await startProcess();
-      logger.info(`${name} process started...`);
+      await logger.info(`${name} process started...`);
 
       await request();
       successful = true;
-    } catch (error) {
+    } catch (er) {
+      const error = (typeof er === 'string') ? new Error(er) : er;
+
       await logger.error(error.message);
 
       if (lock && error instanceof TokenSecretDenied) {
@@ -203,7 +238,7 @@ export async function exec(name: string, request: ISyncRequest, lock: boolean = 
       throw error;
     } finally {
       await finishProcess();
-      logger.info(`${name} process finished.`);
+      await logger.info(`${name} process finished.`);
     }
   } else {
     throw Error('Sync process is busy');

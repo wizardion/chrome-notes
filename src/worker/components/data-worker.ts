@@ -1,30 +1,42 @@
 import { db } from 'modules/db';
 import { LoggerService } from 'modules/logger';
 import { BaseWorker } from './base-worker';
+import { Cloud } from 'modules/sync/cloud';
+import { finishProcess, startProcess } from 'modules/sync/components/process';
 
 
 const logger = new LoggerService('data-worker.ts', 'green');
 
 export class DataWorker extends BaseWorker {
   static readonly worker = 'data-worker';
-  static readonly period = 60;
+  static readonly period = 1;
 
   async process() {
-    const items = await db.deleted();
-    const today = new Date().getTime();
+    logger.info(`${DataWorker.worker} process started...`);
 
-    logger.info('deleted items:', items);
+    if (!(await Cloud.busy())) {
+      await startProcess();
 
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+      const items = await db.deleted();
+      const today = new Date().getTime();
 
-      if (item.deleted && this.days(item.updated, today) > this.settings.common.expirationDays) {
-        logger.info('enqueue(item', [item.title, item.created, item.updated]);
-        db.enqueue(item, 'remove');
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+
+        if (item.deleted &&
+          (this.days(item.updated, today) > this.settings.common.expirationDays || !item.description)) {
+          logger.info('enqueue.item', [item.title, item.created, item.updated]);
+          db.enqueue(item, 'remove');
+        }
       }
+
+      await db.dequeue();
+      await finishProcess();
+    } else {
+      await logger.info(`${DataWorker.worker} is busy`);
     }
 
-    await db.dequeue();
+    logger.info(`${DataWorker.worker} process finished.`);
   }
 
   private days(updated: number, today: number) {

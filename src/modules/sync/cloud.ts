@@ -36,6 +36,8 @@ export class Cloud {
       identity.token = await drive.renewToken();
       await process.sync(identity, identity.passphrase && new EncryptorService(identity.passphrase));
       await process.setProcessInfo(identity);
+
+
       await core.delay();
     });
   }
@@ -91,6 +93,26 @@ export class Cloud {
   }
 
   static async remove() {
-    console.log('remove');
+    await this.wait();
+
+    return process.exec('sync', async () => {
+      const identity = await process.getIdentity();
+      let token: string;
+
+      try {
+        token = await drive.renewToken();
+      } catch {
+        return;
+      }
+
+      await drive.remove(token, identity?.id);
+      await this.deauthorize(identity.token);
+
+      delete identity.token;
+      delete identity.id;
+
+      await process.setProcessInfo(identity);
+      await core.delay();
+    });
   }
 }

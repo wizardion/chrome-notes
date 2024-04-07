@@ -29,7 +29,7 @@ async function initApp(handler: string) {
   //#endregion
 
   await logger.addLine();
-  await logger.info('initApp is fired: ', [handler]);
+  await logger.info('initApp is fired: ', handler);
 
   // TODO restore all sessions.
   await CachedStorageService.init();
@@ -39,7 +39,7 @@ async function initApp(handler: string) {
     await SyncWorker.register();
   }
 
-  DataWorker.register();
+  // DataWorker.register();
   await initPopup();
 }
 
@@ -59,17 +59,12 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
     if (alarm.name === Base.worker) {
       const worker = new Base(settings);
 
-      await logger.addLine();
-      await logger.info(`${Base.worker} started`);
-
       try {
         await worker.process();
       } catch (error) {
         settings.error = { message: `Oops, something's wrong... ${error.message || String(error)}` };
         await logger.warn('An error occurred during the process: ', settings.error.message);
         await Base.deregister();
-      } finally {
-        await logger.info(`${Base.worker} finished`);
       }
     }
   }
@@ -92,7 +87,9 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
     const id = await core.applicationId();
 
     if ((data && data.id !== id) || !data) {
-      console.log('storage.syncInfo.onChanged.data', { v: data });
+      const info = await storage.sync.decrypt(data);
+
+      await logger.info('syncInfo.changed', { info });
 
       return await eventOnSyncInfoChanged(await storage.sync.decrypt(data));
     }
@@ -101,6 +98,8 @@ chrome.storage.onChanged.addListener(async (changes: StorageChange, namespace: A
   if (namespace === 'local' && changes.identityInfo) {
     const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue?.value);
     const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue?.value);
+
+    await logger.info('identityInfo.changed', { newInfo, oldInfo });
 
     return await eventOnIdentityInfoChanged(oldInfo, newInfo);
   }

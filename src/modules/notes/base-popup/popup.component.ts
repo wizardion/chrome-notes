@@ -147,25 +147,26 @@ export abstract class PopupBaseElement extends BaseElement {
 
   async onChanged(e: Event) {
     if (this.selected) {
-      const item = this.detailsView.getData();
+      const data = this.detailsView.getData();
       const time = new Date().getTime();
 
-      this.selected.title = item.title;
-      this.selected.description = item.description;
-      this.selected.cState = item.cState;
-      this.selected.pState = item.pState;
-      this.selected.item.title = item.title;
+      this.selected.title = data.title;
+      this.selected.description = data.description;
+      this.selected.cState = data.selection;
+      this.selected.pState = data.previewSelection;
+      this.selected.item.title = data.title;
       this.selected.updated = time;
-      this.selected.preview = item.preview;
+      this.selected.preview = data.preview;
       this.selected.item.date = new Date(time);
-      this.listView.elements.create.disabled = !item.description;
+      this.listView.elements.create.disabled = !data.description;
 
+      console.log('onChanged', Object.assign({}, this.selected));
       clearInterval(INTERVALS.intervals.changed);
 
       if (e.type === 'change') {
-        INTERVALS.intervals.changed = setTimeout(async () => await this.save(item), INTERVALS.delay);
+        INTERVALS.intervals.changed = setTimeout(async () => await this.save(this.selected), INTERVALS.delay);
       } else {
-        await this.save(item);
+        await this.save(this.selected);
       }
     }
   }

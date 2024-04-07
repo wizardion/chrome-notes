@@ -60,6 +60,14 @@ export interface ISyncItemInfo {
   * @field created
   */
   c?: number;
+  /**
+  * @field preview
+  */
+  p?: boolean;
+  /**
+  * @field pState
+  */
+  e?: string | null;
 }
 
 export interface ICloudInfo {
@@ -67,6 +75,7 @@ export interface ICloudInfo {
   secret?: string;
   rules: string;
   items: ISyncItemInfo[];
+  changed?: boolean;
 }
 
 export interface IFileInfo {
@@ -79,7 +88,7 @@ export interface IFileInfo {
 
 export enum DriveSettings {
   FOLDER_NAME = 'My-Work-Notes',
-  FILE_NAME = 'MyWorkNotesData.json',
+  FILE_NAME = 'my-notes.data.json',
   FILE_GET_API = 'https://www.googleapis.com/drive/v3/files',
   FILE_UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3/files',
   FILE_FIELDS = 'id,name,modifiedTime,trashed',

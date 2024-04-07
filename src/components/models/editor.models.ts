@@ -2,6 +2,8 @@ export interface IEditorData {
   title: string;
   description: string;
   selection?: number[] | null;
+  preview?: boolean;
+  previewSelection?: string;
 }
 
 export interface IEditorView {

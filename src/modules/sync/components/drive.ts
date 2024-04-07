@@ -44,27 +44,26 @@ async function patch(id: string, token: string, blob: Blob): Promise<string> {
   return file.id;
 }
 
-async function mkdir(token: string): Promise<string> {
-  const form = new FormData();
-  const metadata = {
-    name: DriveSettings.FOLDER_NAME,
-    mimeType: 'application/vnd.google-apps.folder',
-  };
+// async function mkdir(token: string): Promise<string> {
+//   const form = new FormData();
+//   const metadata = {
+//     name: DriveSettings.FOLDER_NAME,
+//     mimeType: 'application/vnd.google-apps.folder',
+//   };
 
-  form.append('metadata', getBlobs(metadata));
+//   form.append('metadata', getBlobs(metadata));
 
-  const url = `${DriveSettings.FILE_UPLOAD_API}?uploadType=multipart&fields=${DriveSettings.FILE_FIELDS}`;
-  const response = await request(token, url, 'POST', form);
-  const file: IFileInfo = await response.json();
+//   const url = `${DriveSettings.FILE_UPLOAD_API}?uploadType=multipart&fields=${DriveSettings.FILE_FIELDS}`;
+//   const response = await request(token, url, 'POST', form);
+//   const file: IFileInfo = await response.json();
 
-  return file.id;
-}
+//   return file.id;
+// }
 
-async function post(token: string, blob: Blob, folderId: string): Promise<string> {
+async function post(token: string, blob: Blob): Promise<string> {
   const form = new FormData();
   const metadataBlob = getBlobs({
     name: DriveSettings.FILE_NAME,
-    parents: [folderId],
     mimeType: 'application/json',
     modifiedTime: getCurrentTime(),
   });
@@ -77,6 +76,19 @@ async function post(token: string, blob: Blob, folderId: string): Promise<string
   const file: IFileInfo = await response.json();
 
   return file.id;
+}
+
+async function trash(id: string, token: string): Promise<boolean> {
+  const form = new FormData();
+  const metadataBlob = getBlobs({ trashed: true });
+
+  form.append('metadata', metadataBlob);
+
+  const url = `${DriveSettings.FILE_UPLOAD_API}/${id}?uploadType=multipart&fields=${DriveSettings.FILE_FIELDS}`;
+  const response = await request(token, url, 'PATCH', form);
+  const file: IFileInfo = await response.json();
+
+  return file.trashed;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,25 +104,25 @@ async function getFileMetadata(token: string, id: string): Promise<IFileInfo> {
   }
 }
 
-async function findDir(token: string): Promise<string> {
-  const query = `	mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
-  const url = `${DriveSettings.FILE_GET_API}?q=${encodeURIComponent(query)}&fields=files/id,files/name`;
-  const response = await request(token, url);
+// async function findDir(token: string): Promise<string> {
+//   const query = `	mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+//   const url = `${DriveSettings.FILE_GET_API}?q=${encodeURIComponent(query)}&fields=files/id,files/name`;
+//   const response = await request(token, url);
 
-  if (response.ok) {
-    const { files } = await response.json();
+//   if (response.ok) {
+//     const { files } = await response.json();
 
-    if (!files || files.length === 0 || files[0].name !== DriveSettings.FOLDER_NAME) {
-      return null;
-    }
+//     if (!files || files.length === 0 || files[0].name !== DriveSettings.FOLDER_NAME) {
+//       return null;
+//     }
 
-    return files[0].id;
-  } else if (response.status === 401) {
-    throw new TokenExpired('Token expired');
-  } else {
-    throw new Error('Unexpected error');
-  }
-}
+//     return files[0].id;
+//   } else if (response.status === 401) {
+//     throw new TokenExpired('Token expired');
+//   } else {
+//     throw new Error('Unexpected error');
+//   }
+// }
 
 export async function find(token: string): Promise<string> {
   const query = `	mimeType = 'application/json' and trashed = false`;
@@ -205,29 +217,45 @@ export async function get(token: string, id: string): Promise<IFileInfo> {
   return null;
 }
 
-export async function create(token: string, data: ICloudInfo): Promise<string> {
+export async function create(token: string, info: ICloudInfo): Promise<string> {
   if (!token) {
     throw new TokenError();
   }
 
-  const blob = getBlobs(data);
-  let directoryId = await findDir(token);
+  const blob = getBlobs(info);
+  // let directoryId = await findDir(token);
 
-  if (!directoryId) {
-    directoryId = await mkdir(token);
-  }
+  // if (!directoryId) {
+  //   directoryId = await mkdir(token);
+  // }
 
-  return await post(token, blob, directoryId);
+  return await post(token, blob);
 }
 
-export async function update(token: string, id: string, data: ICloudInfo): Promise<string> {
+export async function update(token: string, id: string, info: ICloudInfo): Promise<string> {
   if (!token) {
     throw new TokenError();
   }
 
-  const blob = getBlobs(data);
+  const blob = getBlobs(info);
 
   return await patch(id, token, blob);
+}
+
+export async function remove(token: string, id: string | null): Promise<boolean> {
+  if (!token) {
+    throw new TokenError();
+  }
+
+  if (!id) {
+    id = await find(token);
+  }
+
+  if (!id) {
+    return false;
+  }
+
+  return await trash(id, token);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
