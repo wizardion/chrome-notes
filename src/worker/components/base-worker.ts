@@ -32,7 +32,7 @@ export class BaseWorker {
     if (process) {
       const hours = Math.abs(new Date().getTime() - process.id) / 36e5;
 
-      await logger.info(`- process '${process.worker}' is busy now ...`);
+      await logger.info(`- ${this.worker}: the process '${process.worker}' is busy ...`);
 
       if (hours > 16) {
         throw new TerminateProcess(
