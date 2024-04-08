@@ -14,12 +14,6 @@ export class Cloud {
     return drive.deauthorize(token);
   }
 
-  static async busy() {
-    const processId: number = (await chrome.storage.session.get('syncProcessing')).syncProcessing;
-
-    return !!processId;
-  }
-
   static async wait() {
     let busy: boolean = true;
 
@@ -30,7 +24,7 @@ export class Cloud {
   }
 
   static async sync(): Promise<boolean> {
-    return process.exec('sync', async () => {
+    return process.exec(async () => {
       const identity = await process.validate(await process.getIdentity());
 
       identity.token = await drive.renewToken();
@@ -43,7 +37,7 @@ export class Cloud {
   }
 
   static async encrypt(oldSecret: string, newSecret: string): Promise<boolean> {
-    return process.exec('encrypt', async () => {
+    return process.exec( async () => {
       const identity = await process.validate(await process.getIdentity());
 
       identity.token = await drive.renewToken();
@@ -61,7 +55,7 @@ export class Cloud {
     }
 
     identity.token = await drive.renewToken();
-    await process.exec('verifyIdentity', async () => {
+    await process.exec(async () => {
       const file = await process.ensureFile(identity);
       const rule = <IPasswordRule> await core.decrypt(file.data.rules);
       const hours = Math.abs(rules.modified - rule.modified) / 36e5;
@@ -95,7 +89,7 @@ export class Cloud {
   static async remove() {
     await this.wait();
 
-    return process.exec('sync', async () => {
+    return process.exec(async () => {
       const identity = await process.getIdentity();
       let token: string;
 

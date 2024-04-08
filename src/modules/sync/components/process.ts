@@ -23,16 +23,6 @@ export async function getSyncInfo(): Promise<ISyncInfo> {
   return syncInfo;
 }
 
-export async function startProcess(): Promise<void> {
-  const processId: number = new Date().getTime();
-
-  return chrome.storage.session.set({ syncProcessing: processId });
-}
-
-export async function finishProcess(): Promise<void> {
-  return chrome.storage.session.set({ syncProcessing: null });
-}
-
 export async function setProcessInfo(info: IdentityInfo): Promise<void> {
   return storage.local.sensitive('processInfo', { id: info.id, token: info.token });
 }
@@ -193,55 +183,26 @@ export async function sync(identity: IdentityInfo, oldCryptor?: EncryptorService
   }
 }
 
-export async function getProcess(level?: number): Promise<number> {
-  const processId: number = (await chrome.storage.session.get('syncProcessing')).syncProcessing;
-
-  if (processId) {
-    logger.info(`process is busy...`);
-    const hours = Math.abs(new Date().getTime() - processId) / 36e5;
-
-    if (!level && hours > 2) {
-      logger.error(`process is hanging for ${hours} hours, terminate.`);
-      await finishProcess();
-
-      return getProcess(level + 1);
-    }
-  }
-
-  return processId;
-}
-
-export async function exec(name: string, request: ISyncRequest, lock: boolean = true): Promise<boolean> {
-  const processId: number = await getProcess();
+export async function exec(request: ISyncRequest, lock: boolean = true): Promise<boolean> {
   let successful = false;
 
-  if (!processId) {
-    try {
-      await startProcess();
-      await logger.info(`${name} process started...`);
+  try {
+    await request();
+    successful = true;
+  } catch (er) {
+    const error = (typeof er === 'string') ? new Error(er) : er;
 
-      await request();
-      successful = true;
-    } catch (er) {
-      const error = (typeof er === 'string') ? new Error(er) : er;
+    await logger.error(error.message);
 
-      await logger.error(error.message);
-
-      if (lock && error instanceof TokenSecretDenied) {
-        await lib.lock(error.message);
-      }
-
-      if (!(error instanceof TokenError)) {
-        error.message = 'Unexpected error occurred during the sync process.';
-      }
-
-      throw error;
-    } finally {
-      await finishProcess();
-      await logger.info(`${name} process finished.`);
+    if (lock && error instanceof TokenSecretDenied) {
+      await lib.lock(error.message);
     }
-  } else {
-    throw Error('Sync process is busy');
+
+    if (!(error instanceof TokenError)) {
+      error.message = 'Unexpected error occurred during the sync process.';
+    }
+
+    throw error;
   }
 
   return successful;

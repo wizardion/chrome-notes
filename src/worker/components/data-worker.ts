@@ -1,8 +1,6 @@
 import { db } from 'modules/db';
 import { LoggerService } from 'modules/logger';
 import { BaseWorker } from './base-worker';
-import { Cloud } from 'modules/sync/cloud';
-import { finishProcess, startProcess } from 'modules/sync/components/process';
 
 
 const logger = new LoggerService('data-worker.ts', 'green');
@@ -11,11 +9,13 @@ export class DataWorker extends BaseWorker {
   static readonly worker = 'data-worker';
   static readonly period = 1;
 
-  async process() {
-    logger.info(`${DataWorker.worker} process started...`);
+  protected readonly worker = DataWorker.worker;
 
-    if (!(await Cloud.busy())) {
-      await startProcess();
+  async process() {
+    await logger.info(`${DataWorker.worker} process started...`);
+
+    if (!(await this.busy())) {
+      await this.start();
 
       const items = await db.deleted();
       const today = new Date().getTime();
@@ -23,23 +23,20 @@ export class DataWorker extends BaseWorker {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
 
-        if (item.deleted &&
-          (this.days(item.updated, today) > this.settings.common.expirationDays || !item.description)) {
-          logger.info('enqueue.item', [item.title, item.created, item.updated]);
+        if (item.deleted && (!item.description || this.isOutdated(item.updated, today))) {
+          logger.info('remove.item', item.title, item.created, item.updated);
           db.enqueue(item, 'remove');
         }
       }
 
       await db.dequeue();
-      await finishProcess();
-    } else {
-      await logger.info(`${DataWorker.worker} is busy`);
+      await this.finish();
     }
 
-    logger.info(`${DataWorker.worker} process finished.`);
+    await logger.info(`${DataWorker.worker} process finished.`);
   }
 
-  private days(updated: number, today: number) {
+  private isOutdated(updated: number, today: number): boolean {
     const start = new Date(updated);
     const end = new Date(today);
 
@@ -50,6 +47,6 @@ export class DataWorker extends BaseWorker {
     const millisecondsBetween = second.getTime() - first.getTime();
     const days = millisecondsBetween / millisecondsPerDay;
 
-    return Math.floor(days);
+    return Math.floor(days) > this.settings.common.expirationDays;
   }
 }

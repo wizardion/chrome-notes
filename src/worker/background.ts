@@ -9,6 +9,7 @@ import {
 } from './components';
 import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
 import { CachedStorageService } from 'core/services/cached';
+import { TerminateProcess } from './components/models/models';
 
 
 const logger = new LoggerService('background.ts', 'green');
@@ -39,7 +40,7 @@ async function initApp(handler: string) {
     await SyncWorker.register();
   }
 
-  // DataWorker.register();
+  DataWorker.register();
   await initPopup();
 }
 
@@ -62,17 +63,20 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
       try {
         await worker.process();
       } catch (error) {
-        settings.error = { message: `Oops, something's wrong... ${error.message || String(error)}` };
-        await logger.warn('An error occurred during the process: ', settings.error.message);
-        await Base.deregister();
+        const message = error.message || String(error);
+
+        settings.error = { message: `Oops, something's wrong... ${message}` };
+        await logger.warn('An error occurred during the process: ', message);
+
+        if (error instanceof TerminateProcess) {
+          workers.find(i => i.worker === error.worker)?.deregister();
+          await ensureOptionPage();
+        }
       }
     }
   }
 
-  if (settings.error) {
-    await storage.local.set('settings', settings);
-    await ensureOptionPage();
-  }
+  await storage.local.set('settings', settings);
 });
 
 chrome.action.onClicked.addListener(async () => {
