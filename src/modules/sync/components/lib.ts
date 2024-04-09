@@ -89,6 +89,6 @@ export async function lock(reason: string) {
     identityInfo.locked = true;
 
     await storage.local.sensitive('identityInfo', identityInfo);
-    await logger.warn(reason);
+    await logger.warn(`locking notes, the reason: ${reason}`);
   }
 }

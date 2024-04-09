@@ -52,24 +52,26 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
   const settings = <ISettingsArea> await storage.local.get('settings');
   const workers: (typeof BaseWorker)[] = [DataWorker, SyncWorker];
 
-  settings.error = null;
-
   for (let i = 0; i < workers.length; i++) {
     const Base = workers[i];
 
-    if (alarm.name === Base.worker) {
+    if (alarm.name === Base.name) {
       const worker = new Base(settings);
 
       try {
         await worker.process();
+
+        if (settings.error?.worker === worker.name) {
+          settings.error = null;
+        }
       } catch (error) {
         const message = error.message || String(error);
 
-        settings.error = { message: `Oops, something's wrong... ${message}` };
         await logger.warn('An error occurred during the process: ', message);
+        settings.error = { message: `${message}`, worker: worker.name };
 
         if (error instanceof TerminateProcess) {
-          workers.find(i => i.worker === error.worker)?.deregister();
+          await workers.find(i => i.name === error.worker)?.deregister();
           await ensureOptionPage();
         }
       }

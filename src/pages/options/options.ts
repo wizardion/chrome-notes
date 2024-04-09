@@ -9,7 +9,8 @@ import { CommonSettingsElement } from './components/common-settings/common-setti
 import { AlertElement } from './components/alert/alert.component';
 import { getSettings, ISettingsArea } from 'modules/settings';
 import {
-  devModeChanged, eventOnStorageChanged, eventOnColorChanged, settingsChanged, syncInfoChanged
+  devModeChanged, eventOnColorChanged, settingsChanged, syncInfoChanged,
+  onLocalStorageChanged, onSyncStorageChanged
 } from './components';
 
 
@@ -34,7 +35,8 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   controls.syncInfo.addEventListener('sync-info:change', () => syncInfoChanged(controls.syncInfo, settings));
   controls.devModeInfo.addEventListener('mode:change', () => devModeChanged(controls.devModeInfo, settings));
   controls.common.addEventListener('settings:change', () => settingsChanged(settings, controls.common));
-  chrome.storage.onChanged.addListener((c, n) => eventOnStorageChanged(c, n, controls));
+  chrome.storage.sync.onChanged.addListener((c) => onSyncStorageChanged(c, controls));
+  chrome.storage.local.onChanged.addListener((c) => onLocalStorageChanged(c, controls));
 
   if (settings.sync) {
     controls.syncInfo.enabled = settings.sync.enabled;

@@ -6,11 +6,11 @@ import { IWorkerInfo, TerminateProcess } from './models/models';
 const logger = new LoggerService('base-worker.ts', 'green');
 
 export class BaseWorker {
-  static readonly worker: string;
+  static readonly name: string;
   static readonly period: number;
 
+  readonly name: string;
   protected settings: ISettingsArea;
-  protected readonly worker: string;
 
   constructor(settings: ISettingsArea) {
     this.settings = settings;
@@ -19,10 +19,14 @@ export class BaseWorker {
   protected async start(): Promise<void> {
     const processId: number = new Date().getTime();
 
-    return chrome.storage.session.set({ syncProcessing: { id: processId, worker: this.worker } });
+    await logger.info(`${this.name} process started...`);
+
+    return chrome.storage.session.set({ syncProcessing: { id: processId, worker: this.name } });
   }
 
   protected async finish(): Promise<void> {
+    await logger.info(`${this.name} process finished.`);
+
     return chrome.storage.session.set({ syncProcessing: null });
   }
 
@@ -32,7 +36,7 @@ export class BaseWorker {
     if (process) {
       const hours = Math.abs(new Date().getTime() - process.id) / 36e5;
 
-      await logger.info(`- ${this.worker}: the process '${process.worker}' is busy ...`);
+      await logger.info(`- ${this.name}: the process '${process.worker}' is busy ...`);
 
       if (hours > 16) {
         throw new TerminateProcess(
@@ -52,18 +56,18 @@ export class BaseWorker {
   }
 
   static async register(): Promise<void> {
-    const process = await chrome.alarms.get(this.worker);
+    const process = await chrome.alarms.get(this.name);
 
     if (process) {
-      await chrome.alarms.clear(this.worker);
+      await chrome.alarms.clear(this.name);
     }
 
-    await chrome.alarms.create(this.worker, { periodInMinutes: this.period });
-    logger.warn(`registered '${this.worker}' with period: ${this.period}`);
+    await chrome.alarms.create(this.name, { periodInMinutes: this.period });
+    logger.warn(`registered '${this.name}' with period: ${this.period}`);
   }
 
   static async deregister(): Promise<void> {
-    await chrome.alarms.clear(this.worker);
-    logger.warn(`terminated '${this.worker}'`);
+    await chrome.alarms.clear(this.name);
+    logger.warn(`terminated '${this.name}'`);
   }
 }

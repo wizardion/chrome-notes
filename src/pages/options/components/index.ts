@@ -1,5 +1,5 @@
 import { SyncInfoElement } from './sync-info/info.component';
-import { IAreaName, IOptionControls, IStorageChange } from './options.model';
+import { IOptionControls, IStorageChange } from './options.model';
 import { DevModeElement } from './dev-mode/dev.component';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
 import { ISettingsArea, getPopupPage, setColors } from 'modules/settings';
@@ -102,8 +102,8 @@ export async function devModeChanged(element: DevModeElement, current: ISettings
   await storage.local.set('settings', current);
 }
 
-export async function eventOnStorageChanged(changes: IStorageChange, namespace: IAreaName, controls: IOptionControls) {
-  if (namespace === 'sync' && !controls.syncInfo.promise && changes.syncInfo) {
+export async function onSyncStorageChanged(changes: IStorageChange, controls: IOptionControls) {
+  if (!controls.syncInfo.promise && changes.syncInfo) {
     const data = <ISyncStorageValue>changes.syncInfo.newValue;
 
     if ((data && data.id !== (await core.applicationId())) || !data) {
@@ -126,9 +126,11 @@ export async function eventOnStorageChanged(changes: IStorageChange, namespace: 
       controls.syncInfo.token = info.token;
     }
   }
+}
 
-  if (namespace === 'local' && changes.settings && changes.settings.newValue) {
-    const settings = <ISettingsArea> changes.settings.newValue;
+export async function onLocalStorageChanged(changes: IStorageChange, controls: IOptionControls) {
+  if (changes.settings?.newValue?.value) {
+    const settings = <ISettingsArea>changes.settings.newValue.value;
 
     if (settings.error) {
       controls.alert.error = settings.error.message;

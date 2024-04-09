@@ -2,21 +2,16 @@ import { LocalStorageService } from 'core/services/local';
 import { Cloud } from 'modules/sync/cloud';
 import { IdentityInfo, TokenError } from 'modules/sync/components/models/sync.models';
 import { BaseWorker } from './base-worker';
-import { LoggerService } from 'modules/logger';
 import { TerminateProcess } from './models/models';
 
 
-const logger = new LoggerService('data-worker.ts', 'blue');
-
 export class SyncWorker extends BaseWorker {
-  static readonly worker = 'sync-worker';
+  static readonly name = 'sync-worker';
   static readonly period = 0.5;
 
-  protected readonly worker = SyncWorker.worker;
+  readonly name = SyncWorker.name;
 
   async process() {
-    await logger.info(`${SyncWorker.worker} process started...`);
-
     if (!(await this.busy())) {
       await this.start();
 
@@ -24,14 +19,13 @@ export class SyncWorker extends BaseWorker {
         await Cloud.sync();
       } catch (error) {
         if (error instanceof TokenError) {
-          throw new TerminateProcess(this.worker, error.message);
+          await this.finish();
+          throw new TerminateProcess(this.name, error.message);
         }
       }
 
       await this.finish();
     }
-
-    await logger.info(`${SyncWorker.worker} process finished.`);
   }
 
   static async validate(identity?: IdentityInfo): Promise<boolean> {

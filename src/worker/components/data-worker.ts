@@ -6,14 +6,12 @@ import { BaseWorker } from './base-worker';
 const logger = new LoggerService('data-worker.ts', 'green');
 
 export class DataWorker extends BaseWorker {
-  static readonly worker = 'data-worker';
+  static readonly name = 'data-worker';
   static readonly period = 1;
 
-  protected readonly worker = DataWorker.worker;
+  readonly name = DataWorker.name;
 
   async process() {
-    await logger.info(`${DataWorker.worker} process started...`);
-
     if (!(await this.busy())) {
       await this.start();
 
@@ -32,8 +30,6 @@ export class DataWorker extends BaseWorker {
       await db.dequeue();
       await this.finish();
     }
-
-    await logger.info(`${DataWorker.worker} process finished.`);
   }
 
   private isOutdated(updated: number, today: number): boolean {
