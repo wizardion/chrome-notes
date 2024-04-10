@@ -50,8 +50,9 @@ export class DataWorker extends BaseWorker {
 
     const millisecondsPerDay = 1000 * 60 * 60 * 24;
     const millisecondsBetween = second.getTime() - first.getTime();
-    const days = millisecondsBetween / millisecondsPerDay;
+    const days = Math.floor(millisecondsBetween / millisecondsPerDay);
+    const expirationDays = this.settings.common.expirationDays;
 
-    return Math.floor(days) > this.settings.common.expirationDays;
+    return expirationDays === 0 ? days >= expirationDays : days > expirationDays;
   }
 }
