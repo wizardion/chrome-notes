@@ -125,6 +125,17 @@ export async function load(): Promise<ILog[]> {
   }
 }
 
+export async function remove(id: number): Promise<void> {
+  try {
+    const store = await initObjectStore('readwrite');
+
+    return (await execute<void>(store.delete(id)));
+  } catch (error) {
+    logError(error);
+    throw new Error(ERROR_MESSAGES.initiate);
+  }
+}
+
 export async function clear(): Promise<void> {
   try {
     const store = await initObjectStore('readwrite');

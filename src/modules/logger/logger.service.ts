@@ -1,5 +1,5 @@
 import { ILog, ILogLevel, ILogColor, ILogColors } from './models/logger.models';
-import { load, logInfo, clear, configs, print } from './logger.module';
+import { load, logInfo, clear, remove, configs, print } from './logger.module';
 
 
 export class LoggerService {
@@ -56,6 +56,10 @@ export class LoggerService {
 
   public static clear(): Promise<void> {
     return clear();
+  }
+
+  public static delete(id: number): Promise<void> {
+    return remove(id);
   }
 
   public static print(log: ILog): void {

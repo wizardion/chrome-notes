@@ -14,7 +14,6 @@ export class DataWorker extends BaseWorker {
   async process() {
     if (!(await this.busy())) {
       await this.start();
-
       const items = await db.deleted();
       const today = new Date().getTime();
 
@@ -28,6 +27,16 @@ export class DataWorker extends BaseWorker {
       }
 
       await db.dequeue();
+      const logs = await LoggerService.getAll();
+
+      for (let i = 0; i < logs.length; i++) {
+        const log = logs[i];
+
+        if (this.isOutdated(log.time, today)) {
+          await LoggerService.delete(log.id);
+        }
+      }
+
       await this.finish();
     }
   }
