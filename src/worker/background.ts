@@ -10,6 +10,7 @@ import {
 import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
 import { CachedStorageService } from 'core/services/cached';
 import { TerminateProcess } from './components/models/models';
+import { getSettings } from 'modules/settings';
 
 
 const logger = new LoggerService('background.ts', 'green');
@@ -49,8 +50,8 @@ chrome.runtime.onInstalled.addListener(async () => initApp('onInstalled'));
 chrome.runtime.onStartup.addListener(async () => initApp('onStartup'));
 
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
-  const settings = <ISettingsArea> await storage.local.get('settings');
   const workers: (typeof BaseWorker)[] = [DataWorker, SyncWorker];
+  const settings = await getSettings();
 
   for (let i = 0; i < workers.length; i++) {
     const Base = workers[i];
@@ -63,6 +64,7 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
 
         if (settings.error?.worker === worker.name) {
           settings.error = null;
+          await storage.local.set('settings', settings);
         }
       } catch (error) {
         const message = error.message || String(error);
@@ -72,13 +74,12 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
 
         if (error instanceof TerminateProcess) {
           await workers.find(i => i.name === error.worker)?.deregister();
+          await storage.local.set('settings', settings);
           await ensureOptionPage();
         }
       }
     }
   }
-
-  await storage.local.set('settings', settings);
 });
 
 chrome.action.onClicked.addListener(async () => {
