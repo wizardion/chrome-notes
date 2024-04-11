@@ -9,5 +9,5 @@ export interface ICommonSettingsForm {
   appearance: NodeList;
   popupOptions: HTMLElement;
   expirationDays: HTMLSelectElement;
-  progressBar: ProgressElement;
+  // progressBar: ProgressElement;
 }
