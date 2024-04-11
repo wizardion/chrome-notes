@@ -11,4 +11,5 @@ export interface IEventIntervals {
 }
 
 // Delayed Interval in ms when the save trigger will be performed.
+// export const delayedInterval = 1400;
 export const delayedInterval = 400;

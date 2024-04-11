@@ -32,6 +32,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       description: this.template.querySelector('[name="description"]'),
       preview: this.template.querySelector('[name="preview"]'),
       htmlViewer: this.template.querySelector('[name="html-viewer"]'),
+      // indicator: this.template.querySelector('[name="indicator"]'),
     });
   }
 

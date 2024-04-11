@@ -9,6 +9,7 @@ export interface IDetailsViewForm {
   delete: HTMLButtonElement;
   menu: EditorControlsElement;
   menuGroup: HTMLFieldSetElement;
+  indicator?: HTMLElement;
 }
 
 export type IDetailsListenerType =
