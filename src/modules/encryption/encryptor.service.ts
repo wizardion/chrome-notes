@@ -15,7 +15,10 @@ export class EncryptorService {
       throw Error('The encryption passphrase is not set properly.');
     }
 
-    this.password = useSecret ? password : password + _secretKey_;
+    if (password) {
+      this.password = useSecret ? password : password + _secretKey_;
+    }
+
     this.encoder = new TextEncoder();
     this.decoder = new TextDecoder();
   }
@@ -106,7 +109,7 @@ export class EncryptorService {
   }
 
   get transparent(): boolean {
-    return !(this.password && this.password.length);
+    return !this.password || !this.password.length;
   }
 
   static async generateKey(): Promise<string> {
