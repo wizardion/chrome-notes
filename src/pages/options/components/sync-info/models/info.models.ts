@@ -2,7 +2,7 @@ import { PasswordElement } from '../../passwords/password.component';
 import { ProgressElement } from '../../progress-bar/progress.component';
 
 
-export type IDecorator = () => Promise<boolean>;
+export type IDecorator<T = boolean> = () => Promise<T>;
 
 
 export interface ISyncInfoForm {

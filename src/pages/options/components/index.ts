@@ -73,6 +73,7 @@ export async function syncInfoChanged(element: SyncInfoElement, current: ISettin
   }
 
   if (identityInfo) {
+    identityInfo.id = element.identityId;
     identityInfo.enabled = syncInfo.enabled;
     identityInfo.token = element.token;
     identityInfo.passphrase = element.passphrase;
@@ -80,7 +81,7 @@ export async function syncInfoChanged(element: SyncInfoElement, current: ISettin
     identityInfo.locked = element.locked;
   } else {
     identityInfo = {
-      id: null,
+      id: element.identityId,
       enabled: syncInfo.enabled,
       token: element.token,
       passphrase: element.passphrase,

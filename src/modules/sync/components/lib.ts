@@ -1,6 +1,6 @@
 import { db, IDBNote } from 'modules/db';
 import { ISyncPair, ISyncItemInfo, IdentityInfo } from './models/sync.models';
-import { EncryptorService } from 'modules/encryption';
+import { CryptoService } from 'modules/encryption';
 import { LoggerService } from 'modules/logger';
 import { storage } from 'core/services';
 
@@ -8,7 +8,7 @@ import { storage } from 'core/services';
 const logger = new LoggerService('lib.ts');
 
 
-export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Promise<IDBNote> {
+export async function unzip(item: ISyncItemInfo, cryptor?: CryptoService): Promise<IDBNote> {
   const title = cryptor ? await cryptor.decrypt(item.t) : item.t;
   const description = cryptor ? await cryptor.decrypt(item.d) : item.d;
 
@@ -28,7 +28,7 @@ export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Pr
   return data;
 }
 
-export async function zip(item: IDBNote, cryptor?: EncryptorService): Promise<ISyncItemInfo> {
+export async function zip(item: IDBNote, cryptor?: CryptoService): Promise<ISyncItemInfo> {
   const title = cryptor ? await cryptor.encrypt(item.title) : item.title;
   const description = cryptor ? await cryptor.encrypt(item.description) : item.description;
 

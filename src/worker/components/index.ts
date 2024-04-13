@@ -1,6 +1,6 @@
 import { SyncWorker } from './sync-worker';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
-import { removeCachedAuthToken } from 'modules/sync/components/drive';
+// import { GoogleDrive } from 'modules/sync/components/drive';
 // import { IWindow } from './models';
 import { storage, ISyncInfo } from 'core/services';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
@@ -111,23 +111,55 @@ export async function eventOnSyncInfoChanged(info: ISyncInfo) {
   identity.encrypted = info.encrypted;
   identity.token = info.token;
 
+  console.log('- eventOnSyncInfoChanged.processed');
+
   await storage.local.sensitive('identityInfo', identity);
 }
 
 export async function eventOnIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
-  if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
-    await SyncWorker.deregister();
+  console.log('- eventOnIdentityInfoChanged');
 
-    return await removeCachedAuthToken(oldInfo.token);
+  if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
+    console.log('- eventOnIdentityInfoChanged.removeCachedAuthToken.deregister');
+
+    return await SyncWorker.deregister();
+
+    // console.log('- eventOnIdentityInfoChanged.removeCachedAuthToken');
+
+    // return await GoogleDrive.deauthorize(oldInfo.token);
   }
 
   if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
+    // if (!oldInfo?.token) {
+    //   try {
+    //     console.log('\tnew token -> sync...');
+    //     await Cloud.wait();
+    //     await Cloud.sync();
+
+    //     return await SyncWorker.register();
+    //   } catch (error) {
+    //     const settings = await getSettings();
+    //     const message = error.message || String(error);
+
+    //     settings.error = { message: `${message}`, worker: SyncWorker.name };
+
+    //     await storage.local.set('settings', settings);
+    //     await ensureOptionPage();
+
+    //     return await SyncWorker.register();
+    //   }
+    // }
+
+    console.log('- eventOnIdentityInfoChanged.register');
+
     return await SyncWorker.register();
   }
 
   if (newInfo && newInfo.locked) {
     await ensureOptionPage();
   }
+
+  console.log('- eventOnIdentityInfoChanged.deregister');
 
   return await SyncWorker.deregister();
 }

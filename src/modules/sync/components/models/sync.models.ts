@@ -1,7 +1,7 @@
 import { IDBNote } from 'modules/db';
 
 
-export type ISyncRequest = (identityInfo?: IdentityInfo) => Promise<void>;
+export type ISyncRequest<T> = (identityInfo?: IdentityInfo) => Promise<T>;
 
 
 //#region local-storage: sensitive
@@ -92,7 +92,7 @@ export enum DriveSettings {
   FILE_GET_API = 'https://www.googleapis.com/drive/v3/files',
   FILE_UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3/files',
   FILE_FIELDS = 'id,name,modifiedTime,trashed',
-  QUERY_FILE_FIELDS = 'files/id,files/name,files/modifiedTime,files/trashed'
+  QUERY_FIELDS = 'files/id,files/name,files/modifiedTime,files/trashed'
 }
 //#endregion
 

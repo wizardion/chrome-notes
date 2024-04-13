@@ -1,4 +1,4 @@
-import { EncryptorService } from 'modules/encryption';
+import { CryptoService } from 'modules/encryption';
 import { IAppConfig } from './models/code.models';
 
 
@@ -6,7 +6,7 @@ const configs: IAppConfig = {
   delay: 500
 };
 
-const encryptor = new EncryptorService(chrome.runtime.id.toString(), true);
+const encryptor = new CryptoService(chrome.runtime.id.toString(), true);
 
 export async function applicationId(): Promise<number> {
   configs.applicationId = configs.applicationId ||

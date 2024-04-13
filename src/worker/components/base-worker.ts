@@ -8,6 +8,8 @@ const logger = new LoggerService('base-worker.ts', 'green');
 export class BaseWorker {
   static readonly name: string;
   static readonly period: number;
+  static readonly minGap = 3;
+  static readonly maxGap = 25;
 
   readonly name: string;
   protected settings: ISettingsArea;
@@ -56,14 +58,16 @@ export class BaseWorker {
   }
 
   static async register(): Promise<void> {
+    // const period = this.period + Math.floor(Math.random() * (this.maxGap - this.minGap) + this.minGap);
+    const period = this.period + 0;
     const process = await chrome.alarms.get(this.name);
 
     if (process) {
       await chrome.alarms.clear(this.name);
     }
 
-    await chrome.alarms.create(this.name, { periodInMinutes: this.period });
-    logger.warn(`registered '${this.name}' with period: ${this.period}`);
+    await chrome.alarms.create(this.name, { periodInMinutes: period });
+    logger.warn(`registered '${this.name}' with period: ${period}`);
   }
 
   static async deregister(): Promise<void> {

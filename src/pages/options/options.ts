@@ -43,6 +43,7 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   }
 
   if (settings.identity) {
+    controls.syncInfo.identityId = settings.identity.id;
     controls.syncInfo.passphrase = settings.identity.passphrase;
     controls.syncInfo.locked = settings.identity.locked;
     controls.syncInfo.encrypted = settings.identity.encrypted;
