@@ -20,7 +20,7 @@ export class SyncInfoElement extends BaseElement {
   private _token: string;
   private _enabled: boolean;
   private _promise: boolean;
-  private _identityId: string;
+  private _fileId: string;
   private _encrypted: boolean;
   private _passphrase: string;
   private _locked: boolean;
@@ -31,18 +31,18 @@ export class SyncInfoElement extends BaseElement {
 
     this.template = <HTMLElement>template.cloneNode(true);
     this.form = {
-      info: this.template.querySelector('fieldset[name="sync-info"]'),
-      error: this.template.querySelector('div[name="error"]'),
-      passphrase: this.template.querySelector('user-password[name="encryption-key"]'),
+      info: this.template.querySelector('[name="sync-info"]'),
+      error: this.template.querySelector('[name="error"]'),
+      passphrase: this.template.querySelector('user-password'),
       progressBar: this.template.querySelector('progress-bar'),
       checkboxes: {
-        sync: this.template.querySelector('input[name="sync-enabled"]'),
-        encrypt: this.template.querySelector('input[name="encryption-enabled"]'),
+        sync: this.template.querySelector('[name="sync-enabled"]'),
+        encrypt: this.template.querySelector('[name="encryption-enabled"]'),
       },
       buttons: {
-        authorize: this.template.querySelector('button[name="authorize"]'),
-        deauthorize: this.template.querySelector('button[name="deauthorize"]'),
-        submit: this.template.querySelector('button[name="submit"]'),
+        authorize: this.template.querySelector('[name="authorize"]'),
+        deauthorize: this.template.querySelector('[name="deauthorize"]'),
+        submit: this.template.querySelector('[name="submit"]'),
       },
       sections: {
         auth: this.template.querySelector('fieldset[name="drive-info"]'),
@@ -171,7 +171,7 @@ export class SyncInfoElement extends BaseElement {
       await Cloud.wait();
 
       const info = await Cloud.sync({
-        id: this._identityId,
+        fileId: this._fileId,
         token: this._token,
         enabled: this._enabled,
         passphrase: this._passphrase,
@@ -196,7 +196,7 @@ export class SyncInfoElement extends BaseElement {
       await Cloud.wait();
 
       return Cloud.verifyIdentity({
-        id: this._identityId,
+        fileId: this._fileId,
         token: this._token,
         passphrase: passphrase,
         enabled: this._enabled,
@@ -215,7 +215,7 @@ export class SyncInfoElement extends BaseElement {
         this.token = await Cloud.authorize();
         const info = await this.submit(this.verifyIdentity(this._passphrase));
 
-        if (!info?.id) {
+        if (!info?.fileId) {
           if (!this._response.error || this._response.locked) {
             this.locked = true;
             this.form.passphrase.focus();
@@ -295,12 +295,12 @@ export class SyncInfoElement extends BaseElement {
     this.form.checkboxes.sync.checked = value;
   }
 
-  get identityId(): string {
-    return this._identityId;
+  get fileId(): string {
+    return this._fileId;
   }
 
-  set identityId(value: string) {
-    this._identityId = value;
+  set fileId(value: string) {
+    this._fileId = value;
   }
 
   get token(): string {
@@ -376,7 +376,7 @@ export class SyncInfoElement extends BaseElement {
   }
 
   private updateInfo(info: IdentityInfo): boolean {
-    this.identityId = info.id;
+    this.fileId = info.fileId;
     this.token = info.token;
     this.passphrase = info.passphrase;
     this.enabled = info.enabled;

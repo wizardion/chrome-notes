@@ -1,3 +1,4 @@
+import './assets/passwords.scss';
 import { BaseElement } from 'core/components';
 import { CryptoService } from 'modules/encryption';
 

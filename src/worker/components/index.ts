@@ -5,6 +5,7 @@ import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { storage, ISyncInfo } from 'core/services';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
 import { ITabInfo } from 'modules/settings/models/settings.model';
+import { applicationId } from 'core/index';
 
 
 export { BaseWorker } from './base-worker';
@@ -86,9 +87,10 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
   // }
 }
 
-export async function eventOnSyncInfoChanged(info: ISyncInfo) {
+export async function onSyncInfoChanged(info: ISyncInfo) {
   const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
     id: null,
+    fileId: null,
     enabled: false,
     token: null,
     passphrase: null,
@@ -107,50 +109,54 @@ export async function eventOnSyncInfoChanged(info: ISyncInfo) {
     identity.passphrase = null;
   }
 
+  identity.id = info.id;
   identity.enabled = info.enabled;
   identity.encrypted = info.encrypted;
   identity.token = info.token;
 
-  console.log('- eventOnSyncInfoChanged.processed');
+  console.log('- onSyncInfoChanged.processed', { identity, info });
 
   await storage.local.sensitive('identityInfo', identity);
 }
 
-export async function eventOnIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
-  console.log('- eventOnIdentityInfoChanged');
+export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
+  console.log('- onIdentityInfoChanged', { oldInfo, newInfo });
 
   if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
-    console.log('- eventOnIdentityInfoChanged.removeCachedAuthToken.deregister');
+    console.log('- onIdentityInfoChanged.deregister.removeCachedAuthToken');
 
     return await SyncWorker.deregister();
 
-    // console.log('- eventOnIdentityInfoChanged.removeCachedAuthToken');
+    // console.log('- onIdentityInfoChanged.removeCachedAuthToken');
 
     // return await GoogleDrive.deauthorize(oldInfo.token);
   }
 
   if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
-    // if (!oldInfo?.token) {
-    //   try {
-    //     console.log('\tnew token -> sync...');
-    //     await Cloud.wait();
-    //     await Cloud.sync();
+    const id = await applicationId();
 
-    //     return await SyncWorker.register();
-    //   } catch (error) {
-    //     const settings = await getSettings();
-    //     const message = error.message || String(error);
+    if (!oldInfo?.token && newInfo.id && newInfo.id !== id) {
+      //   try {
+      //     console.log('\tnew token -> sync...');
+      //     await Cloud.wait();
+      //     await Cloud.sync();
 
-    //     settings.error = { message: `${message}`, worker: SyncWorker.name };
+      //     return await SyncWorker.register();
+      //   } catch (error) {
+      //     const settings = await getSettings();
+      //     const message = error.message || String(error);
 
-    //     await storage.local.set('settings', settings);
-    //     await ensureOptionPage();
+      //     settings.error = { message: `${message}`, worker: SyncWorker.name };
 
-    //     return await SyncWorker.register();
-    //   }
-    // }
+      //     await storage.local.set('settings', settings);
+      //     await ensureOptionPage();
 
-    console.log('- eventOnIdentityInfoChanged.register');
+      //     return await SyncWorker.register();
+      //   }
+      console.log('\t- onIdentityInfoChanged.sync', [id, newInfo.id]);
+    }
+
+    console.log('- onIdentityInfoChanged.register');
 
     return await SyncWorker.register();
   }
@@ -159,7 +165,7 @@ export async function eventOnIdentityInfoChanged(oldInfo: IdentityInfo, newInfo:
     await ensureOptionPage();
   }
 
-  console.log('- eventOnIdentityInfoChanged.deregister');
+  console.log('- onIdentityInfoChanged.processed.deregister');
 
   return await SyncWorker.deregister();
 }

@@ -4,8 +4,8 @@ import { ISyncStorageValue, storage } from 'core/services';
 import { LoggerService } from 'modules/logger';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import {
-  DataWorker, SyncWorker, BaseWorker, StorageChange, eventOnSyncInfoChanged,
-  openPopup, ensureOptionPage, initPopup, eventOnIdentityInfoChanged
+  DataWorker, SyncWorker, BaseWorker, StorageChange, onSyncInfoChanged,
+  openPopup, ensureOptionPage, initPopup, onIdentityInfoChanged
 } from './components';
 import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
 import { CachedStorageService } from 'core/services/cached';
@@ -93,14 +93,8 @@ chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {
     const data = <ISyncStorageValue>changes.syncInfo.newValue;
     const id = await core.applicationId();
 
-    console.log('- syncInfo.changed');
-
     if ((data && data.id !== id) || !data) {
-      const info = await storage.sync.decrypt(data);
-
-      await logger.info('syncInfo.changed', { info });
-
-      return await eventOnSyncInfoChanged(await storage.sync.decrypt(data));
+      return await onSyncInfoChanged(await storage.sync.decrypt(data));
     }
   }
 });
@@ -110,10 +104,6 @@ chrome.storage.local.onChanged.addListener(async (changes: StorageChange) => {
     const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue?.value);
     const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue?.value);
 
-    console.log('- IdentityInfo.changed');
-
-    await logger.info('identityInfo.changed', { newInfo, oldInfo });
-
-    return await eventOnIdentityInfoChanged(oldInfo, newInfo);
+    return await onIdentityInfoChanged(oldInfo, newInfo);
   }
 });

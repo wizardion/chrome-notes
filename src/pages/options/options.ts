@@ -7,7 +7,7 @@ import { ProgressElement } from './components/progress-bar/progress';
 import { IOptionControls } from './components/options.model';
 import { CommonSettingsElement } from './components/common-settings/common-settings.component';
 import { AlertElement } from './components/alert/alert.component';
-import { getSettings, ISettingsArea } from 'modules/settings';
+import { getSettings } from 'modules/settings';
 import {
   devModeChanged, eventOnColorChanged, settingsChanged, syncInfoChanged,
   onLocalStorageChanged, onSyncStorageChanged
@@ -17,14 +17,27 @@ import {
 const controls: IOptionControls = {};
 const mediaColorScheme = '(prefers-color-scheme: dark)';
 
-customElements.define(AlertElement.selector, AlertElement);
-customElements.define(ProgressElement.selector, ProgressElement);
-customElements.define(PasswordElement.selector, PasswordElement);
-customElements.define(CommonSettingsElement.selector, CommonSettingsElement);
-customElements.define(SyncInfoElement.selector, SyncInfoElement);
-customElements.define(DevModeElement.selector, DevModeElement);
+function whenDefined(): Promise<CustomElementConstructor[]> {
+  customElements.define(AlertElement.selector, AlertElement);
+  customElements.define(ProgressElement.selector, ProgressElement);
+  customElements.define(PasswordElement.selector, PasswordElement);
+  customElements.define(CommonSettingsElement.selector, CommonSettingsElement);
+  customElements.define(SyncInfoElement.selector, SyncInfoElement);
+  customElements.define(DevModeElement.selector, DevModeElement);
 
-getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea) => {
+  return Promise.all([
+    customElements.whenDefined(AlertElement.selector),
+    customElements.whenDefined(ProgressElement.selector),
+    customElements.whenDefined(PasswordElement.selector),
+    customElements.whenDefined(CommonSettingsElement.selector),
+    customElements.whenDefined(SyncInfoElement.selector),
+    customElements.whenDefined(DevModeElement.selector)
+  ]);
+}
+
+whenDefined().then(async () => {
+  const settings = await getSettings({ sync: true, identity: true });
+
   controls.content = <HTMLDivElement>document.getElementById('content');
   controls.syncInfo = <SyncInfoElement>document.querySelector('sync-info');
   controls.devModeInfo = <DevModeElement>document.querySelector('dev-mode-info');
@@ -43,7 +56,7 @@ getSettings({ sync: true, identity: true }).then(async (settings: ISettingsArea)
   }
 
   if (settings.identity) {
-    controls.syncInfo.identityId = settings.identity.id;
+    controls.syncInfo.fileId = settings.identity.fileId;
     controls.syncInfo.passphrase = settings.identity.passphrase;
     controls.syncInfo.locked = settings.identity.locked;
     controls.syncInfo.encrypted = settings.identity.encrypted;

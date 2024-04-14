@@ -57,15 +57,16 @@ export async function settingsChanged(settings: ISettingsArea, element?: CommonS
 export async function syncInfoChanged(element: SyncInfoElement, current: ISettingsArea) {
   let syncInfo = current.sync;
   let identityInfo = current.identity;
+  const applicationId = await core.applicationId();
 
   if (syncInfo) {
-    syncInfo.id = await core.applicationId();
+    syncInfo.id = applicationId;
     syncInfo.enabled = element.enabled;
     syncInfo.token = element.token;
     syncInfo.encrypted = element.encrypted;
   } else {
     syncInfo = {
-      id: await core.applicationId(),
+      id: applicationId,
       enabled: element.enabled,
       token: element.token,
       encrypted: element.encrypted,
@@ -73,7 +74,8 @@ export async function syncInfoChanged(element: SyncInfoElement, current: ISettin
   }
 
   if (identityInfo) {
-    identityInfo.id = element.identityId;
+    identityInfo.id = applicationId;
+    identityInfo.fileId = element.fileId;
     identityInfo.enabled = syncInfo.enabled;
     identityInfo.token = element.token;
     identityInfo.passphrase = element.passphrase;
@@ -81,7 +83,8 @@ export async function syncInfoChanged(element: SyncInfoElement, current: ISettin
     identityInfo.locked = element.locked;
   } else {
     identityInfo = {
-      id: element.identityId,
+      id: applicationId,
+      fileId: element.fileId,
       enabled: syncInfo.enabled,
       token: element.token,
       passphrase: element.passphrase,

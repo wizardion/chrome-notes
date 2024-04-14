@@ -6,7 +6,8 @@ export type ISyncRequest<T> = (identityInfo?: IdentityInfo) => Promise<T>;
 
 //#region local-storage: sensitive
 export interface IdentityInfo {
-  id: string;
+  id?: number;
+  fileId: string;
   token: string;
   passphrase: string;
   encrypted: boolean;

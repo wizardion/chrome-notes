@@ -74,4 +74,8 @@ export class BaseWorker {
     await chrome.alarms.clear(this.name);
     logger.warn(`terminated '${this.name}'`);
   }
+
+  // static async run() {
+  //   const process = await chrome.alarms.get(this.name);
+  // }
 }

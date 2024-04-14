@@ -26,7 +26,7 @@ export async function getIdentity(): Promise<IdentityInfo | null> {
   const processInfo = await storage.local.get<IProcessInfo>('processInfo');
 
   if (identityInfo) {
-    identityInfo.id = processInfo?.id;
+    identityInfo.fileId = processInfo?.id;
   }
 
   return identityInfo || null;
@@ -69,7 +69,7 @@ export async function ensureFile(identity: IdentityInfo, cryptor?: CryptoService
   }
 
   if (!file && identity.id) {
-    file = await GoogleDrive.get(identity.token, identity.id);
+    file = await GoogleDrive.get(identity.token, identity.fileId);
   }
 
   if (!file) {
@@ -176,14 +176,14 @@ export async function sync(info: IdentityInfo, first?: CryptoService, second?: C
     }
 
     cloud.rules = cloud.rules ? await encrypt(await decrypt(cloud.rules)) : cloud.rules;
-    await GoogleDrive.update(info.token, info.id, cloud);
+    await GoogleDrive.update(info.token, info.fileId, cloud);
   }
 
   if (cloud.changed) {
     await updateCache();
   }
 
-  info.id = file.id;
+  info.fileId = file.id;
 
   return info;
 }

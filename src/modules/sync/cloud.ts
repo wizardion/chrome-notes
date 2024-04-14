@@ -77,7 +77,7 @@ export class Cloud {
 
         rule.modified = rules.modified;
         rule.count = !rules.valid ? rule.count + 1 : rule.count;
-        identity.id = rules.valid ? file.id : null;
+        identity.fileId = rules.valid ? file.id : null;
         file.data.rules = await core.encrypt(rule);
 
         await GoogleDrive.update(identity.token, file.id, file.data);
@@ -112,7 +112,7 @@ export class Cloud {
 
       console.log('Cloud.remove.token', [token]);
 
-      await GoogleDrive.remove(token, identity?.id);
+      await GoogleDrive.remove(token, identity?.fileId);
       await this.deauthorize(token);
 
       delete identity.token;
