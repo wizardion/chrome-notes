@@ -18,7 +18,7 @@ LoggerService.tracing = true;
 //#endregion
 
 export async function setProcessInfo(info: IdentityInfo): Promise<void> {
-  return storage.local.sensitive('processInfo', { id: info.id, token: info.token });
+  return storage.local.sensitive('processInfo', { id: info.fileId, token: info.token });
 }
 
 export async function getIdentity(): Promise<IdentityInfo | null> {
@@ -54,12 +54,12 @@ export async function ensureFile(identity: IdentityInfo, cryptor?: CryptoService
   let isNew: boolean = false;
   let file: IFileInfo;
 
-  if (!identity.id) {
+  if (!identity.fileId) {
     file = await GoogleDrive.find(identity.token);
     await delay();
   }
 
-  if (!identity.id && !file) {
+  if (!identity.fileId && !file) {
     const rules: IPasswordRule = { count: 0, modified: 0 };
     const cloud: ICloudInfo = { modified: new Date().getTime(), items: [], rules: await encrypt(rules) };
 
@@ -68,7 +68,7 @@ export async function ensureFile(identity: IdentityInfo, cryptor?: CryptoService
     await delay();
   }
 
-  if (!file && identity.id) {
+  if (!file && identity.fileId) {
     file = await GoogleDrive.get(identity.token, identity.fileId);
   }
 

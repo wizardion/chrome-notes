@@ -6,13 +6,13 @@ export type ISyncRequest<T> = (identityInfo?: IdentityInfo) => Promise<T>;
 
 //#region local-storage: sensitive
 export interface IdentityInfo {
-  id?: number;
   fileId: string;
   token: string;
   passphrase: string;
   encrypted: boolean;
   enabled: boolean;
   locked?: boolean;
+  applicationId?: number;
 }
 
 export interface IProcessInfo {

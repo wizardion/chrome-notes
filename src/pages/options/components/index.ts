@@ -60,33 +60,33 @@ export async function syncInfoChanged(element: SyncInfoElement, current: ISettin
   const applicationId = await core.applicationId();
 
   if (syncInfo) {
-    syncInfo.id = applicationId;
-    syncInfo.enabled = element.enabled;
     syncInfo.token = element.token;
+    syncInfo.enabled = element.enabled;
     syncInfo.encrypted = element.encrypted;
+    syncInfo.applicationId = applicationId;
   } else {
     syncInfo = {
-      id: applicationId,
-      enabled: element.enabled,
       token: element.token,
+      enabled: element.enabled,
       encrypted: element.encrypted,
+      applicationId: applicationId,
     };
   }
 
   if (identityInfo) {
-    identityInfo.id = applicationId;
     identityInfo.fileId = element.fileId;
     identityInfo.enabled = syncInfo.enabled;
     identityInfo.token = element.token;
     identityInfo.passphrase = element.passphrase;
     identityInfo.encrypted = syncInfo.encrypted;
+    identityInfo.applicationId = applicationId;
     identityInfo.locked = element.locked;
   } else {
     identityInfo = {
-      id: applicationId,
       fileId: element.fileId,
       enabled: syncInfo.enabled,
       token: element.token,
+      applicationId: applicationId,
       passphrase: element.passphrase,
       encrypted: element.encrypted,
       locked: element.locked,

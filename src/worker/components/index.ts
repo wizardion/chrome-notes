@@ -89,12 +89,12 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
 
 export async function onSyncInfoChanged(info: ISyncInfo) {
   const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
-    id: null,
     fileId: null,
     enabled: false,
     token: null,
     passphrase: null,
     encrypted: false,
+    applicationId: null
   };
 
   if (identity.locked && info.enabled && info.token && !info.encrypted && identity.encrypted) {
@@ -109,8 +109,8 @@ export async function onSyncInfoChanged(info: ISyncInfo) {
     identity.passphrase = null;
   }
 
-  identity.id = info.id;
   identity.enabled = info.enabled;
+  identity.applicationId = info.applicationId;
   identity.encrypted = info.encrypted;
   identity.token = info.token;
 
@@ -133,9 +133,7 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
   }
 
   if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
-    const id = await applicationId();
-
-    if (!oldInfo?.token && newInfo.id && newInfo.id !== id) {
+    if (!oldInfo?.token && newInfo.applicationId && newInfo.applicationId !== await applicationId()) {
       //   try {
       //     console.log('\tnew token -> sync...');
       //     await Cloud.wait();
@@ -153,7 +151,7 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
 
       //     return await SyncWorker.register();
       //   }
-      console.log('\t- onIdentityInfoChanged.sync', [id, newInfo.id]);
+      console.log('\t- onIdentityInfoChanged.sync');
     }
 
     console.log('- onIdentityInfoChanged.register');

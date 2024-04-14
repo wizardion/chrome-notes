@@ -116,7 +116,7 @@ export class Cloud {
       await this.deauthorize(token);
 
       delete identity.token;
-      delete identity.id;
+      delete identity.fileId;
 
       await process.setProcessInfo(identity);
       await core.delay();

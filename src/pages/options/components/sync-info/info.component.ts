@@ -383,7 +383,7 @@ export class SyncInfoElement extends BaseElement {
     this.encrypted = info.encrypted;
     this.locked = info.locked;
 
-    return !!info.id;
+    return !!info.fileId;
   }
 
   private async submit<T>(decorator: IDecorator<T>): Promise<T | null> {
