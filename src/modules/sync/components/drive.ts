@@ -197,7 +197,7 @@ export class GoogleDrive {
     }
   }
 
-  private static async removeCachedAuthToken(token: string): Promise<void> {
+  public static async removeCachedAuthToken(token: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       chrome.identity.clearAllCachedAuthTokens(async () => {
         if (!token || chrome.runtime.lastError && chrome.runtime.lastError.message) {

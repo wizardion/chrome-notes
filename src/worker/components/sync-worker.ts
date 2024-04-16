@@ -7,7 +7,7 @@ import { TerminateProcess } from './models/models';
 
 export class SyncWorker extends BaseWorker {
   static readonly name = 'sync-worker';
-  static readonly period = 2; // 120
+  static readonly period = 3;
 
   readonly name = SyncWorker.name;
 
@@ -33,5 +33,9 @@ export class SyncWorker extends BaseWorker {
 
     return !!((identityInfo && identityInfo.enabled) &&
       (identityInfo.token && (!identityInfo.encrypted || identityInfo.passphrase) && !identityInfo.locked));
+  }
+
+  static async removeCache(token: string) {
+    return Cloud.removeCache(token);
   }
 }

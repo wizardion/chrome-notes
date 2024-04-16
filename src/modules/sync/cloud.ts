@@ -16,6 +16,12 @@ export class Cloud {
     return GoogleDrive.deauthorize(token);
   }
 
+  static async removeCache(token: string) {
+    console.log('Cloud.removeCache', [token]);
+
+    return GoogleDrive.removeCachedAuthToken(token);
+  }
+
   static async wait() {
     let busy: boolean = true;
 
@@ -26,7 +32,7 @@ export class Cloud {
   }
 
   static async sync(info?: IdentityInfo): Promise<IdentityInfo> {
-    console.log('Cloud.sync...', { info });
+    console.log('Cloud.sync...');
 
     return process.exec<IdentityInfo>(async () => {
       const identity = info || await process.validate(await process.getIdentity());

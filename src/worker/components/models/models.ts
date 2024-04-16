@@ -10,6 +10,9 @@ export interface IWorkerInfo {
   worker: string;
 }
 
+export type StorageChange = { [key: string]: chrome.storage.StorageChange };
+export type AreaName = chrome.storage.AreaName;
+
 export class TerminateProcess extends Error {
   message: string;
   worker: string;
@@ -20,6 +23,3 @@ export class TerminateProcess extends Error {
     this.worker = worker;
   }
 }
-
-export type StorageChange = { [key: string]: chrome.storage.StorageChange };
-export type AreaName = chrome.storage.AreaName;

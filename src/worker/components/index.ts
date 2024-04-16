@@ -1,17 +1,21 @@
 import { SyncWorker } from './sync-worker';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
-// import { GoogleDrive } from 'modules/sync/components/drive';
-// import { IWindow } from './models';
 import { storage, ISyncInfo } from 'core/services';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
 import { ITabInfo } from 'modules/settings/models/settings.model';
 import { applicationId } from 'core/index';
+import { TerminateProcess } from './models/models';
+import { BaseWorker } from './base-worker';
+import { DataWorker } from './data-worker';
+import { LoggerService } from 'modules/logger';
+import { CachedStorageService } from 'core/services/cached';
+import * as core from 'core';
 
 
-export { BaseWorker } from './base-worker';
-export { DataWorker } from './data-worker';
-export { SyncWorker } from './sync-worker';
-export { IWindow, StorageChange, AreaName } from './models/models';
+export { StorageChange } from './models/models';
+
+
+const logger = new LoggerService('background.ts', 'green');
 
 
 export async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
@@ -87,6 +91,69 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
   // }
 }
 
+export async function startServiceWorker(alarm: chrome.alarms.Alarm) {
+  const workers: (typeof BaseWorker)[] = [DataWorker, SyncWorker];
+  const settings = await getSettings();
+
+  for (let i = 0; i < workers.length; i++) {
+    const Base = workers[i];
+
+    if (alarm.name === Base.name) {
+      const worker = new Base(settings);
+
+      try {
+        await worker.process();
+
+        if (settings.error?.worker === worker.name) {
+          settings.error = null;
+          await storage.local.set('settings', settings);
+        }
+      } catch (error) {
+        const message = error.message || String(error);
+
+        await logger.warn('An error occurred during the process: ', message);
+        settings.error = { message: `${message}`, worker: worker.name };
+
+        if (error instanceof TerminateProcess) {
+          await workers.find(i => i.name === error.worker)?.deregister();
+          await storage.local.set('settings', settings);
+          await ensureOptionPage();
+        }
+      }
+    }
+  }
+}
+
+export async function initApplication(handler: string) {
+  //#region testing
+  const settings = <ISettingsArea> await storage.local.get('settings');
+
+  if (settings) {
+    settings.error = null;
+  }
+
+  await core.delay(100);
+  LoggerService.tracing = true;
+  await LoggerService.clear();
+  await storage.local.set('settings', settings);
+  ensureOptionPage();
+  //#endregion
+
+  await logger.addLine();
+  await logger.info('initApp is fired: ', handler);
+
+  // TODO restore all sessions.
+  await CachedStorageService.init();
+  await chrome.alarms.clearAll();
+
+  if (await SyncWorker.validate()) {
+    await SyncWorker.register();
+  }
+
+  DataWorker.register();
+  await initPopup();
+}
+
 export async function onSyncInfoChanged(info: ISyncInfo) {
   const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
     fileId: null,
@@ -123,40 +190,25 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
   console.log('- onIdentityInfoChanged', { oldInfo, newInfo });
 
   if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
-    console.log('- onIdentityInfoChanged.deregister.removeCachedAuthToken');
+    await SyncWorker.deregister();
 
-    return await SyncWorker.deregister();
+    console.log('- onIdentityInfoChanged.deregister.removeCache');
 
-    // console.log('- onIdentityInfoChanged.removeCachedAuthToken');
-
-    // return await GoogleDrive.deauthorize(oldInfo.token);
+    return SyncWorker.removeCache(oldInfo.token);
   }
 
   if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
     if (!oldInfo?.token && newInfo.applicationId && newInfo.applicationId !== await applicationId()) {
-      //   try {
-      //     console.log('\tnew token -> sync...');
-      //     await Cloud.wait();
-      //     await Cloud.sync();
-
-      //     return await SyncWorker.register();
-      //   } catch (error) {
-      //     const settings = await getSettings();
-      //     const message = error.message || String(error);
-
-      //     settings.error = { message: `${message}`, worker: SyncWorker.name };
-
-      //     await storage.local.set('settings', settings);
-      //     await ensureOptionPage();
-
-      //     return await SyncWorker.register();
-      //   }
       console.log('\t- onIdentityInfoChanged.sync');
+
+      await SyncWorker.register();
+
+      return startServiceWorker({ name: SyncWorker.name, scheduledTime: null });
     }
 
     console.log('- onIdentityInfoChanged.register');
 
-    return await SyncWorker.register();
+    return SyncWorker.register();
   }
 
   if (newInfo && newInfo.locked) {

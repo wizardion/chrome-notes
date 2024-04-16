@@ -1,6 +1,6 @@
 import { LoggerService } from 'modules/logger';
 import { ISettingsArea } from 'modules/settings/models/settings.model';
-import { IWorkerInfo, TerminateProcess } from './models/models';
+import { TerminateProcess, IWorkerInfo } from './models/models';
 
 
 const logger = new LoggerService('base-worker.ts', 'green');
@@ -40,7 +40,7 @@ export class BaseWorker {
 
       await logger.info(`- ${this.name}: the process '${process.worker}' is busy ...`);
 
-      if (hours > 16) {
+      if (hours >= 24) {
         throw new TerminateProcess(
           process.worker,
           `the process '${process.worker}' is hanging for ${hours} hours, terminate!`
@@ -74,8 +74,4 @@ export class BaseWorker {
     await chrome.alarms.clear(this.name);
     logger.warn(`terminated '${this.name}'`);
   }
-
-  // static async run() {
-  //   const process = await chrome.alarms.get(this.name);
-  // }
 }
