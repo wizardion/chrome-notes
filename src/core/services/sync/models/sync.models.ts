@@ -14,3 +14,8 @@ export interface ISyncStorageValue {
 export interface ISyncStorageData {
   [key: string]: ISyncStorageValue;
 }
+
+export interface ISyncTimeInfo {
+  time: number;
+  applicationId: number;
+}

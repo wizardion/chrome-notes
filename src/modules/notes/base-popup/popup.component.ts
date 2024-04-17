@@ -155,10 +155,6 @@ export abstract class PopupBaseElement extends BaseElement {
 
         this.selected.updated = time;
         this.selected.item.date = date;
-
-        // if (this.detailsView.elements.indicator) {
-        //   this.detailsView.elements.indicator.hidden = false;
-        // }
       }
 
       this.selected.title = data.title;
@@ -182,9 +178,5 @@ export abstract class PopupBaseElement extends BaseElement {
   private async save(item: INote) {
     await DbProviderService.save(item);
     await DbProviderService.cache.set('selected', item);
-
-    // if (this.detailsView.elements.indicator) {
-    //   this.detailsView.elements.indicator.hidden = true;
-    // }
   }
 }

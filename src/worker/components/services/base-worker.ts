@@ -1,6 +1,6 @@
 import { LoggerService } from 'modules/logger';
 import { ISettingsArea } from 'modules/settings/models/settings.model';
-import { TerminateProcess, IWorkerInfo } from './models/models';
+import { TerminateProcess, IWorkerInfo } from '../models/models';
 
 
 const logger = new LoggerService('base-worker.ts', 'green');
@@ -58,8 +58,7 @@ export class BaseWorker {
   }
 
   static async register(): Promise<void> {
-    // const period = this.period + Math.floor(Math.random() * (this.maxGap - this.minGap) + this.minGap);
-    const period = this.period + 0;
+    const period = this.period + Math.floor(Math.random() * (this.maxGap - this.minGap) + this.minGap);
     const process = await chrome.alarms.get(this.name);
 
     if (process) {

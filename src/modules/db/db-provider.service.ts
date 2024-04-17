@@ -1,7 +1,10 @@
+import { IEventIntervals } from 'core/components';
 import * as db from './db.module';
 import { IDBNote } from './models/db.models';
 import { CachedStorageService } from 'core/services/cached';
 
+
+const INTERVALS: IEventIntervals = { delay: 5000, intervals: { changed: null } };
 
 export class DbProviderService {
   public static get cache(): typeof CachedStorageService {
@@ -14,6 +17,8 @@ export class DbProviderService {
     } else {
       item.id = await db.add(item);
     }
+
+    await this.registerTime();
 
     return item.id;
   }
@@ -31,9 +36,11 @@ export class DbProviderService {
   public static async delete(item: IDBNote) {
     item.deleted = 1;
     await db.update(item);
+    await this.registerTime();
   }
 
-  public static async remove(id: number) {
-    await db.remove(id);
+  private static async registerTime() {
+    clearInterval(INTERVALS.intervals.changed);
+    INTERVALS.intervals.changed = setTimeout(async () => await CachedStorageService.registerTime(), INTERVALS.delay);
   }
 }

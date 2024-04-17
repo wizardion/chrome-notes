@@ -1,10 +1,11 @@
 import * as core from 'core';
-import { ISyncStorageValue, storage } from 'core/services';
 // import {migrate} from 'modules/storage/migrate';
+import { ISyncStorageValue, storage } from 'core/services';
+import { startServiceWorker } from './components/services';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
 import {
-  StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, startServiceWorker, initApplication
+  StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initApplication, onNoteInfoChanged
 } from './components';
 
 
@@ -12,7 +13,7 @@ chrome.runtime.onInstalled.addListener(async () => initApplication('onInstalled'
 
 chrome.runtime.onStartup.addListener(async () => initApplication('onStartup'));
 
-chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => startServiceWorker(alarm));
+chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => startServiceWorker(alarm.name));
 
 chrome.action.onClicked.addListener(async () => {
   const local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'settings']);
@@ -23,12 +24,19 @@ chrome.action.onClicked.addListener(async () => {
 chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {
   if (changes.syncInfo) {
     const data = <ISyncStorageValue>changes.syncInfo.newValue;
-    const id = await core.applicationId();
 
-    if ((data && data.id !== id) || !data) {
-      return await onSyncInfoChanged(await storage.sync.decrypt(data));
+    if (!data || (data && data.id !== await core.applicationId())) {
+      return onSyncInfoChanged(await storage.sync.decrypt(data));
     }
   }
+
+  // if (changes.changedTime?.newValue) {
+  //   const data = <ISyncTimeInfo>changes.changedTime.newValue;
+
+  //   if (data && data.applicationId !== await core.applicationId()) {
+  //     return start-Sync-Worker();
+  //   }
+  // }
 });
 
 chrome.storage.local.onChanged.addListener(async (changes: StorageChange) => {
@@ -36,6 +44,12 @@ chrome.storage.local.onChanged.addListener(async (changes: StorageChange) => {
     const newInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue?.value);
     const oldInfo: IdentityInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue?.value);
 
-    return await onIdentityInfoChanged(oldInfo, newInfo);
+    return onIdentityInfoChanged(oldInfo, newInfo);
+  }
+});
+
+chrome.storage.session.onChanged.addListener(async (changes: StorageChange) => {
+  if (changes.changedTime?.newValue) {
+    return onNoteInfoChanged();
   }
 });

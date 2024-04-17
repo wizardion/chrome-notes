@@ -1,5 +1,5 @@
-import { ISyncStorageData, ISyncStorageValue, ISyncInfo } from './models/sync.models';
-import { encrypt, decrypt } from 'core';
+import { ISyncStorageData, ISyncStorageValue, ISyncInfo, ISyncTimeInfo } from './models/sync.models';
+import { encrypt, decrypt, applicationId } from 'core';
 
 
 export class SyncStorageService {
@@ -48,5 +48,15 @@ export class SyncStorageService {
 
   public static async remove() {
     return chrome.storage.sync.remove(this.key);
+  }
+
+  public static async registerTime() {
+    const date = new Date();
+
+    await chrome.storage.sync.set({
+      changedTime: <ISyncTimeInfo>{
+        time: date.getTime(), applicationId: await applicationId()
+      }
+    });
   }
 }

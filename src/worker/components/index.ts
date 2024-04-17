@@ -1,15 +1,15 @@
-import { SyncWorker } from './sync-worker';
-import { IdentityInfo } from 'modules/sync/components/models/sync.models';
+import * as core from 'core';
+import { applicationId } from 'core/index';
+import { LoggerService } from 'modules/logger';
 import { storage, ISyncInfo } from 'core/services';
+import { SyncWorker } from './services/sync-worker';
+import { PushWorker } from './services/push-worker';
+import { DataWorker } from './services/data-worker';
+import { CachedStorageService } from 'core/services/cached';
+import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
 import { ITabInfo } from 'modules/settings/models/settings.model';
-import { applicationId } from 'core/index';
-import { TerminateProcess } from './models/models';
-import { BaseWorker } from './base-worker';
-import { DataWorker } from './data-worker';
-import { LoggerService } from 'modules/logger';
-import { CachedStorageService } from 'core/services/cached';
-import * as core from 'core';
+import { ensureOptionPage, findTab, startServiceWorker } from './services';
 
 
 export { StorageChange } from './models/models';
@@ -18,110 +18,10 @@ export { StorageChange } from './models/models';
 const logger = new LoggerService('background.ts', 'green');
 
 
-export async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
-  const tabs = await chrome.tabs.query({});
-
-  for (let i = 0; i < tabs.length; i++) {
-    if (tabs[i].id === tabId) {
-      return tabs[i];
-    }
-  }
-
-  return null;
-}
-
-export async function ensureOptionPage() {
-  const data = await chrome.storage.session.get('optionPageId');
-
-  if (data && data.optionPageId) {
-    const tab = await findTab(<number>data.optionPageId);
-
-    if (tab) {
-      return chrome.tabs.update(tab.id, { active: true });
-    }
-  }
-
-  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') + '?develop=true' });
-}
-
 export async function initPopup() {
   const settings = await getSettings();
 
   await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
-}
-
-// export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {
-export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
-  const mode = PAGE_MODES[settings.common.mode];
-
-  if (tabInfo) {
-    const tab = await findTab(tabInfo.id);
-
-    if (tab) {
-      await chrome.windows.update(tab.windowId, { focused: true });
-
-      return chrome.tabs.update(tab.id, { active: true });
-    }
-  }
-
-  return chrome.tabs.create({ url: mode.page || 'option.html' });
-
-  // if (mode === 0) {
-  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  // }
-
-  // if (mode === 3) {
-  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  // }
-
-  // if (mode === 4) {
-  //   if (window) {
-  //     chrome.windows.create({
-  //       focused: true,
-  //       url: chrome.runtime.getURL('index.html'),
-  //       type: 'popup',
-  //       left: window.left,
-  //       top: window.top,
-  //       width: window.width,
-  //       height: window.height,
-  //     });
-  //   } else {
-  //     chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
-  //   }
-  // }
-}
-
-export async function startServiceWorker(alarm: chrome.alarms.Alarm) {
-  const workers: (typeof BaseWorker)[] = [DataWorker, SyncWorker];
-  const settings = await getSettings();
-
-  for (let i = 0; i < workers.length; i++) {
-    const Base = workers[i];
-
-    if (alarm.name === Base.name) {
-      const worker = new Base(settings);
-
-      try {
-        await worker.process();
-
-        if (settings.error?.worker === worker.name) {
-          settings.error = null;
-          await storage.local.set('settings', settings);
-        }
-      } catch (error) {
-        const message = error.message || String(error);
-
-        await logger.warn('An error occurred during the process: ', message);
-        settings.error = { message: `${message}`, worker: worker.name };
-
-        if (error instanceof TerminateProcess) {
-          await workers.find(i => i.name === error.worker)?.deregister();
-          await storage.local.set('settings', settings);
-          await ensureOptionPage();
-        }
-      }
-    }
-  }
 }
 
 export async function initApplication(handler: string) {
@@ -154,6 +54,58 @@ export async function initApplication(handler: string) {
   await initPopup();
 }
 
+export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
+  const mode = PAGE_MODES[settings.common.mode];
+
+  if (tabInfo) {
+    const tab = await findTab(tabInfo.id);
+
+    if (tab) {
+      await chrome.windows.update(tab.windowId, { focused: true });
+
+      return chrome.tabs.update(tab.id, { active: true });
+    }
+  }
+
+  return chrome.tabs.create({ url: mode.page || 'option.html' });
+
+  // export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {
+  // if (mode === 0) {
+  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+  // }
+
+  // if (mode === 3) {
+  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+  // }
+
+  // if (mode === 4) {
+  //   if (window) {
+  //     chrome.windows.create({
+  //       focused: true,
+  //       url: chrome.runtime.getURL('index.html'),
+  //       type: 'popup',
+  //       left: window.left,
+  //       top: window.top,
+  //       width: window.width,
+  //       height: window.height,
+  //     });
+  //   } else {
+  //     chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
+  //   }
+  // }
+}
+
+export async function onNoteInfoChanged() {
+  const process = await chrome.alarms.get(PushWorker.name);
+
+  if (process) {
+    await chrome.alarms.clear(PushWorker.name);
+  }
+
+  await chrome.alarms.create(PushWorker.name, { delayInMinutes: PushWorker.period });
+  logger.warn(`registered '${PushWorker.name}' with delay: ${PushWorker.period}`);
+}
+
 export async function onSyncInfoChanged(info: ISyncInfo) {
   const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
     fileId: null,
@@ -181,32 +133,22 @@ export async function onSyncInfoChanged(info: ISyncInfo) {
   identity.encrypted = info.encrypted;
   identity.token = info.token;
 
-  console.log('- onSyncInfoChanged.processed', { identity, info });
-
   await storage.local.sensitive('identityInfo', identity);
 }
 
 export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
-  console.log('- onIdentityInfoChanged', { oldInfo, newInfo });
-
   if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
     await SyncWorker.deregister();
-
-    console.log('- onIdentityInfoChanged.deregister.removeCache');
 
     return SyncWorker.removeCache(oldInfo.token);
   }
 
   if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
     if (!oldInfo?.token && newInfo.applicationId && newInfo.applicationId !== await applicationId()) {
-      console.log('\t- onIdentityInfoChanged.sync');
-
       await SyncWorker.register();
 
-      return startServiceWorker({ name: SyncWorker.name, scheduledTime: null });
+      return startServiceWorker(SyncWorker.name);
     }
-
-    console.log('- onIdentityInfoChanged.register');
 
     return SyncWorker.register();
   }
@@ -214,8 +156,6 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
   if (newInfo && newInfo.locked) {
     await ensureOptionPage();
   }
-
-  console.log('- onIdentityInfoChanged.processed.deregister');
 
   return await SyncWorker.deregister();
 }

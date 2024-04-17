@@ -2,12 +2,12 @@ import { LocalStorageService } from 'core/services/local';
 import { Cloud } from 'modules/sync/cloud';
 import { IdentityInfo, TokenError } from 'modules/sync/components/models/sync.models';
 import { BaseWorker } from './base-worker';
-import { TerminateProcess } from './models/models';
+import { TerminateProcess } from '../models/models';
 
 
 export class SyncWorker extends BaseWorker {
   static readonly name = 'sync-worker';
-  static readonly period = 3;
+  static readonly period = 240;
 
   readonly name = SyncWorker.name;
 
