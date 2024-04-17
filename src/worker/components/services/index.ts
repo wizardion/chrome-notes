@@ -1,5 +1,5 @@
 import { SyncWorker } from './sync-worker';
-import { BaseWorker } from './base-worker';
+import { BaseWorker, workerLogger } from './base-worker';
 import { DataWorker } from './data-worker';
 import { PushWorker } from './push-worker';
 import { TerminateProcess } from '../models/models';
@@ -54,7 +54,7 @@ export async function startServiceWorker(name: string) {
       } catch (error) {
         const message = error.message || String(error);
 
-        // await logger.warn('An error occurred during the process: ', message);
+        await workerLogger.warn('An error occurred during the process: ', message);
         settings.error = { message: `${message}`, worker: worker.name };
 
         if (error instanceof TerminateProcess) {

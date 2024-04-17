@@ -3,7 +3,7 @@ import { ISettingsArea } from 'modules/settings/models/settings.model';
 import { TerminateProcess, IWorkerInfo } from '../models/models';
 
 
-const logger = new LoggerService('base-worker.ts', 'green');
+export const workerLogger = new LoggerService('base-worker.ts', 'green');
 
 export class BaseWorker {
   static readonly name: string;
@@ -21,13 +21,13 @@ export class BaseWorker {
   protected async start(): Promise<void> {
     const processId: number = new Date().getTime();
 
-    await logger.info(`${this.name} process started...`);
+    await workerLogger.info(`${this.name} process started...`);
 
     return chrome.storage.session.set({ syncProcessing: { id: processId, worker: this.name } });
   }
 
   protected async finish(): Promise<void> {
-    await logger.info(`${this.name} process finished.`);
+    await workerLogger.info(`${this.name} process finished.`);
 
     return chrome.storage.session.set({ syncProcessing: null });
   }
@@ -38,7 +38,7 @@ export class BaseWorker {
     if (process) {
       const hours = Math.abs(new Date().getTime() - process.id) / 36e5;
 
-      await logger.info(`- ${this.name}: the process '${process.worker}' is busy ...`);
+      await workerLogger.info(`- ${this.name}: the process '${process.worker}' is busy ...`);
 
       if (hours >= 24) {
         throw new TerminateProcess(
@@ -66,11 +66,11 @@ export class BaseWorker {
     }
 
     await chrome.alarms.create(this.name, { periodInMinutes: period });
-    logger.warn(`registered '${this.name}' with period: ${period}`);
+    workerLogger.warn(`registered '${this.name}' with period: ${period}`);
   }
 
   static async deregister(): Promise<void> {
     await chrome.alarms.clear(this.name);
-    logger.warn(`terminated '${this.name}'`);
+    workerLogger.warn(`terminated '${this.name}'`);
   }
 }
