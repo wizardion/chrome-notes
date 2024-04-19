@@ -4,9 +4,7 @@ import { ISyncStorageValue, storage } from 'core/services';
 import { startServiceWorker } from './components/services';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
-import {
-  StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initApplication, onNoteInfoChanged
-} from './components';
+import { StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initApplication } from './components';
 
 
 chrome.runtime.onInstalled.addListener(async () => initApplication('onInstalled'));
@@ -30,12 +28,8 @@ chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {
     }
   }
 
-  // if (changes.changedTime?.newValue) {
-  //   const data = <ISyncTimeInfo>changes.changedTime.newValue;
-
-  //   if (data && data.applicationId !== await core.applicationId()) {
-  //     return start-Sync-Worker();
-  //   }
+  // if (changes.pushChanged?.newValue) {
+  //   onSyncPushInfoChanged(changes.pushChanged.oldValue, changes.pushChanged.newValue);
   // }
 });
 
@@ -46,10 +40,8 @@ chrome.storage.local.onChanged.addListener(async (changes: StorageChange) => {
 
     return onIdentityInfoChanged(oldInfo, newInfo);
   }
-});
 
-chrome.storage.session.onChanged.addListener(async (changes: StorageChange) => {
-  if (changes.changedTime?.newValue) {
-    return onNoteInfoChanged();
-  }
+  // if (changes.pushedTime) {
+  //   onLocalPushInfoChanged(changes.pushedTime.oldValue, changes.pushedTime.newValue);
+  // }
 });

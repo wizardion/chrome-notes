@@ -1,7 +1,7 @@
 import { LocalStorageService } from 'core/services/local';
 import { Cloud } from 'modules/sync/cloud';
 import { IdentityInfo, TokenError } from 'modules/sync/components/models/sync.models';
-import { BaseWorker } from './base-worker';
+import { BaseWorker, workerLogger } from './base-worker';
 import { TerminateProcess } from '../models/models';
 
 
@@ -37,5 +37,17 @@ export class SyncWorker extends BaseWorker {
 
   static async removeCache(token: string) {
     return Cloud.removeCache(token);
+  }
+
+  static async register(minutes?: number): Promise<void> {
+    const period = this.period + Math.floor(Math.random() * (this.maxGap - this.minGap) + this.minGap);
+    const process = await chrome.alarms.get(this.name);
+
+    if (process) {
+      await chrome.alarms.clear(this.name);
+    }
+
+    await chrome.alarms.create(this.name, { periodInMinutes: period, delayInMinutes: minutes });
+    workerLogger.warn(`registered '${this.name}' with period: ${period} and delay: ${minutes}`);
   }
 }

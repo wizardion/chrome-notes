@@ -12,6 +12,7 @@ export interface IDBNote {
   preview?: boolean;
   cState?: number[] | null;
   pState?: string | null;
+  push?: boolean;
 }
 
 export type IDBCommandType = 'update' | 'add' | 'remove';

@@ -1,10 +1,11 @@
 import { Cloud } from 'modules/sync/cloud';
 import { BaseElement } from 'core/components';
 import { IdentityInfo, TokenSecretDenied } from 'modules/sync/components/models/sync.models';
-import { ISyncInfoForm, IDecorator, IResponseDetails } from './models/info.models';
+import { ISyncInfoForm, IResponseDetails } from './models/info.models';
 import { LoggerService } from 'modules/logger';
 import { SyncStorageService } from 'core/services/sync';
 import { LocalStorageService } from 'core/services/local';
+import { IDecorator } from 'core/models/code.models';
 
 
 const template: DocumentFragment = BaseElement.component({

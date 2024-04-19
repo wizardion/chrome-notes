@@ -1,15 +1,13 @@
 import * as core from 'core';
-import { applicationId } from 'core/index';
 import { LoggerService } from 'modules/logger';
 import { storage, ISyncInfo } from 'core/services';
 import { SyncWorker } from './services/sync-worker';
-import { PushWorker } from './services/push-worker';
 import { DataWorker } from './services/data-worker';
 import { CachedStorageService } from 'core/services/cached';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
 import { ITabInfo } from 'modules/settings/models/settings.model';
-import { ensureOptionPage, findTab, startServiceWorker } from './services';
+import { ensureOptionPage, findTab } from './services';
 
 
 export { StorageChange } from './models/models';
@@ -47,7 +45,7 @@ export async function initApplication(handler: string) {
   await chrome.alarms.clearAll();
 
   if (await SyncWorker.validate()) {
-    await SyncWorker.register();
+    await SyncWorker.register(1);
   }
 
   DataWorker.register();
@@ -95,16 +93,26 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
   // }
 }
 
-export async function onNoteInfoChanged() {
-  const process = await chrome.alarms.get(PushWorker.name);
+// export async function onLocalPushInfoChanged(oldValue: number, newValue: number) {
+//   await logger.info('onLocalPushInfoChanged...', oldValue, newValue);
 
-  if (process) {
-    await chrome.alarms.clear(PushWorker.name);
-  }
+//   if (oldValue !== newValue && newValue > 1) {
+//     const alarm = await chrome.alarms.get(PushWorker.name);
 
-  await chrome.alarms.create(PushWorker.name, { delayInMinutes: PushWorker.period });
-  logger.warn(`registered '${PushWorker.name}' with delay: ${PushWorker.period}`);
-}
+//     if (!alarm) {
+//       await chrome.alarms.create(PushWorker.name, { delayInMinutes: PushWorker.period });
+//     }
+//   }
+// }
+
+// export async function onSyncPushInfoChanged(oldValue: ISyncPushInfo, newValue: ISyncPushInfo) {
+//   await logger.info('onSyncPushInfoChanged...', newValue.applicationId !== oldValue?.applicationId);
+
+//   if (newValue && newValue.applicationId !== oldValue?.applicationId
+//       && newValue.applicationId !== await core.applicationId()) {
+//     await PushWorker.push(1);
+//   }
+// }
 
 export async function onSyncInfoChanged(info: ISyncInfo) {
   const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
@@ -144,10 +152,8 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
   }
 
   if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
-    if (!oldInfo?.token && newInfo.applicationId && newInfo.applicationId !== await applicationId()) {
-      await SyncWorker.register();
-
-      return startServiceWorker(SyncWorker.name);
+    if (!oldInfo?.token && newInfo.applicationId && newInfo.applicationId !== await core.applicationId()) {
+      await SyncWorker.register(1);
     }
 
     return SyncWorker.register();

@@ -10,6 +10,11 @@ export interface IWorkerInfo {
   worker: string;
 }
 
+export interface ISyncPushInfo {
+  time: number;
+  applicationId: number;
+}
+
 export type StorageChange = { [key: string]: chrome.storage.StorageChange };
 export type AreaName = chrome.storage.AreaName;
 

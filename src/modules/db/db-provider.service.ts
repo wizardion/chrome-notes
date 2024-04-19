@@ -1,10 +1,10 @@
-import { IEventIntervals } from 'core/components';
+// import { IEventIntervals } from 'core/components';
 import * as db from './db.module';
 import { IDBNote } from './models/db.models';
 import { CachedStorageService } from 'core/services/cached';
 
 
-const INTERVALS: IEventIntervals = { delay: 5000, intervals: { changed: null } };
+// const INTERVALS: IEventIntervals = { delay: 2000, intervals: { changed: null } };
 
 export class DbProviderService {
   public static get cache(): typeof CachedStorageService {
@@ -18,7 +18,9 @@ export class DbProviderService {
       item.id = await db.add(item);
     }
 
-    await this.registerTime();
+    if (item.push) {
+      this.registerPush();
+    }
 
     return item.id;
   }
@@ -36,11 +38,14 @@ export class DbProviderService {
   public static async delete(item: IDBNote) {
     item.deleted = 1;
     await db.update(item);
-    await this.registerTime();
+
+    if (item.description) {
+      this.registerPush();
+    }
   }
 
-  private static async registerTime() {
-    clearInterval(INTERVALS.intervals.changed);
-    INTERVALS.intervals.changed = setTimeout(async () => await CachedStorageService.registerTime(), INTERVALS.delay);
+  private static registerPush() {
+    // clearInterval(INTERVALS.intervals.changed);
+    // INTERVALS.intervals.changed = setTimeout(async () => CachedStorageService.registerPush(), INTERVALS.delay);
   }
 }

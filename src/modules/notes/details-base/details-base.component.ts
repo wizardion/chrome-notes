@@ -1,12 +1,14 @@
 import './assets/details-view.scss';
-import { BaseElement, FormElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
-import { IDetailsViewForm, IDetailsListenerType, INote } from './models/details-base.model';
+
 import { IDBNote } from 'modules/db';
+import { applicationConfigs } from 'core';
+import { BaseElement, FormElement, IEventIntervals, IEventListener } from 'core/components';
+import { IDetailsViewForm, IDetailsListenerType, INote } from './models/details-base.model';
 import { IEditorData, IEditorView } from 'components/models/editor.models';
 import { Debounce, DynamicScroll } from 'modules/effects';
 
 
-const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { locked: null } };
+const INTERVALS: IEventIntervals = { delay: applicationConfigs.delayedInterval, intervals: { locked: null } };
 
 export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsViewForm> extends BaseElement {
   static readonly selector: string;

@@ -7,7 +7,7 @@ enum ERROR_MESSAGES {
   initiate= 'Failed to initiate the Logger.'
 }
 
-export const configs = {
+export const loggerConfigs = {
   tracing: false
 };
 
@@ -158,7 +158,7 @@ export async function logInfo(level: ILogLevel, color: string, name: string, arg
       data: (args && args[0] !== '' && args[0] !== null) ? JSON.stringify(args) : null
     };
 
-    if (configs.tracing) {
+    if (loggerConfigs.tracing) {
       print(log);
     }
 

@@ -1,4 +1,5 @@
-import { BaseElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
+import { applicationConfigs } from 'core';
+import { BaseElement, IEventIntervals, IEventListener } from 'core/components';
 import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
 import { DetailsBaseElement } from '../details-base/details-base.component';
@@ -7,7 +8,9 @@ import { DbProviderService } from 'modules/db';
 import { SortHelper } from 'modules/effects';
 
 
-const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { changed: null, locked: null } };
+const INTERVALS: IEventIntervals = {
+  delay: applicationConfigs.delayedInterval, intervals: { changed: null, locked: null }
+};
 
 export abstract class PopupBaseElement extends BaseElement {
   protected items: INote[];
@@ -153,6 +156,7 @@ export abstract class PopupBaseElement extends BaseElement {
         const date = new Date();
         const time = date.getTime();
 
+        this.selected.push = true;
         this.selected.updated = time;
         this.selected.item.date = date;
       }
