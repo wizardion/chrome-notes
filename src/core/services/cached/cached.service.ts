@@ -55,12 +55,6 @@ export class CachedStorageService {
     await chrome.storage.session.set({ [this.key]: this.item });
   }
 
-  public static async registerTime() {
-    const date = new Date();
-
-    await chrome.storage.session.set({ changedTime: date.getTime() });
-  }
-
   public static async clear() {
     await chrome.storage.session.remove(this.key);
     await chrome.storage.local.remove(this.key);

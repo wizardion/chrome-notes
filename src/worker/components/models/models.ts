@@ -10,6 +10,10 @@ export interface IWorkerInfo {
   worker: string;
 }
 
+export interface IPushInfo {
+  pushInfo: number;
+}
+
 export interface ISyncPushInfo {
   time: number;
   applicationId: number;

@@ -48,6 +48,6 @@ export class SyncWorker extends BaseWorker {
     }
 
     await chrome.alarms.create(this.name, { periodInMinutes: period, delayInMinutes: minutes });
-    workerLogger.warn(`registered '${this.name}' with period: ${period} and delay: ${minutes}`);
+    await workerLogger.warn(`registered '${this.name}' with period: ${period} and delay: ${minutes || 0}.`);
   }
 }

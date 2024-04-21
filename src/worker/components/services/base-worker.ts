@@ -4,6 +4,7 @@ import { TerminateProcess, IWorkerInfo } from '../models/models';
 
 
 export const workerLogger = new LoggerService('base-worker.ts', 'green');
+LoggerService.tracing = true;
 
 export class BaseWorker {
   static readonly name: string;
@@ -70,7 +71,11 @@ export class BaseWorker {
   }
 
   static async deregister(): Promise<void> {
-    await chrome.alarms.clear(this.name);
-    workerLogger.warn(`terminated '${this.name}'`);
+    const process = await chrome.alarms.get(this.name);
+
+    if (process) {
+      await chrome.alarms.clear(this.name);
+      workerLogger.warn(`terminated '${this.name}'`);
+    }
   }
 }

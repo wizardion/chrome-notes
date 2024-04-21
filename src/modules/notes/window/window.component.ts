@@ -2,6 +2,7 @@ import './assets/window.scss';
 import { BaseElement } from 'core/components';
 import { PopupBaseElement } from '../base-popup/popup.component';
 import { INote } from '../details-base/models/details-base.model';
+import { DbProviderService } from 'modules/db/db-provider.service';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -41,7 +42,9 @@ export class WindowNotesElement extends PopupBaseElement {
   }
 
   init(): void {
-    super.init();
+    this.disabled = false;
+    this.initialized = true;
+    DbProviderService.init(true);
 
     if (!this.items.length) {
       this.create();

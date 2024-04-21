@@ -57,7 +57,7 @@ export async function settingsChanged(settings: ISettingsArea, element?: CommonS
 export async function syncInfoChanged(element: SyncInfoElement, current: ISettingsArea) {
   let syncInfo = current.sync;
   let identityInfo = current.identity;
-  const applicationId = await core.applicationId();
+  const applicationId = await core.getApplicationId();
 
   if (syncInfo) {
     syncInfo.token = element.token;
@@ -110,7 +110,7 @@ export async function onSyncStorageChanged(changes: IStorageChange, controls: IO
   if (!controls.syncInfo.promise && changes.syncInfo) {
     const data = <ISyncStorageValue>changes.syncInfo.newValue;
 
-    if ((data && data.id !== (await core.applicationId())) || !data) {
+    if ((data && data.id !== (await core.getApplicationId())) || !data) {
       const info: ISyncInfo = await storage.sync.decrypt(data);
 
       if (controls.syncInfo.locked && info.enabled && info.token && !info.encrypted && controls.syncInfo.encrypted) {

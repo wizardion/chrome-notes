@@ -9,7 +9,7 @@ export const applicationConfigs: IAppConfig = {
 
 const encryptor = new CryptoService(chrome.runtime.id.toString(), true);
 
-export async function applicationId(): Promise<number> {
+export async function getApplicationId(): Promise<number> {
   applicationConfigs.applicationId = applicationConfigs.applicationId ||
     <number>(await chrome.storage.local.get('applicationId')).applicationId;
 

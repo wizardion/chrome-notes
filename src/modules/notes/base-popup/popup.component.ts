@@ -31,6 +31,7 @@ export abstract class PopupBaseElement extends BaseElement {
   init() {
     this.disabled = false;
     this.initialized = true;
+    DbProviderService.init();
   }
 
   addItem(note: INote) {

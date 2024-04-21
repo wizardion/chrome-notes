@@ -114,7 +114,9 @@ export class GoogleDrive {
       throw new TokenError();
     }
 
-    return await post(token, getBlobs(info));
+    const file = await await post(token, getBlobs(info));
+
+    return this.get(token, null, file);
   }
 
   public static async find(token: string): Promise<IFileInfo | null> {

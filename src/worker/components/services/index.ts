@@ -4,9 +4,10 @@ import { DataWorker } from './data-worker';
 import { TerminateProcess } from '../models/models';
 import { getSettings } from 'modules/settings';
 import { LocalStorageService } from 'core/services/local';
+import { PushWorker } from './push-worker';
 
 
-export const serviceWorkers: (typeof BaseWorker)[] = [DataWorker, SyncWorker];
+export const serviceWorkers: (typeof BaseWorker)[] = [PushWorker, DataWorker, SyncWorker];
 
 export async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
   const tabs = await chrome.tabs.query({});

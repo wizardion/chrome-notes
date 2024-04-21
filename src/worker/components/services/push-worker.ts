@@ -1,59 +1,58 @@
-// import { applicationId } from 'core';
-// import { BaseWorker, workerLogger } from './base-worker';
-// import { SyncWorker } from './sync-worker';
-// import { ISyncPushInfo } from '../models/models';
+import { getApplicationId } from 'core';
+import { IPushInfo, ISyncPushInfo } from '../models/models';
+import { BaseWorker, workerLogger } from './base-worker';
+import { SyncWorker } from './sync-worker';
 
 
-// export class PushWorker extends BaseWorker {
-//   static readonly name = 'pusher-worker';
-//   static readonly period = 1;
+export class PushWorker extends BaseWorker {
+  static readonly name = 'pusher-worker';
+  static readonly period = 1;
 
-//   readonly name = PushWorker.name;
+  readonly name = PushWorker.name;
 
-//   async process() {
-//     if (!(await this.busy()) && await SyncWorker.validate()) {
-//       const process = await chrome.alarms.get(SyncWorker.name);
+  private infoKey = 'pushInfo';
 
-//       if (process?.name) {
-//         const { pushedTime } = await chrome.storage.local.get('pushedTime');
-//         const worker = new SyncWorker(this.settings);
+  async process() {
+    await workerLogger.info(`${PushWorker.name} - started...`);
 
-//         await worker.process();
-//         await chrome.storage.local.remove('pushedTime');
+    if (!(await this.busy()) && await SyncWorker.validate()) {
+      const process = await chrome.alarms.get(SyncWorker.name);
 
-//         if (pushedTime > 1) {
-//           await workerLogger.info('register to sync.');
+      if (process?.name) {
+        const { pushInfo } = await chrome.storage.local.get(this.infoKey) as IPushInfo;
+        const worker = new SyncWorker(this.settings);
 
-//           return this.registerSync();
-//         }
-//       } else {
-//         await workerLogger.info(`${SyncWorker.name} is not registered.`);
-//       }
-//     }
-//   }
+        await worker.process();
+        await chrome.storage.local.remove(this.infoKey);
 
-//   static async push(minutes: number, sync?: boolean): Promise<void> {
-//     const alarm = await chrome.alarms.get(this.name);
+        if (pushInfo > 1) {
+          await workerLogger.info('register to sync.');
 
-//     if (!alarm) {
-//       await workerLogger.info(`registered pushWorker with delayInMinutes: ${minutes || this.period}`);
-//       // await chrome.storage.session.set({ pushedTime: sync ? new Date().getTime() : -1 });
+          await chrome.storage.sync.set({
+            pushInfo: {
+              time: new Date().getTime(), applicationId: await getApplicationId()
+            } as ISyncPushInfo
+          });
+        }
+      } else {
+        await workerLogger.info(`${SyncWorker.name} is not registered.`);
+      }
+    }
 
-//       return chrome.alarms.create(this.name, { delayInMinutes: minutes || this.period });
-//     }
-//   }
+    await workerLogger.info(`${PushWorker.name} - finished.`);
+  }
 
-//   static async register(): Promise<void> {
-//     throw new Error('PushWorker should not be part of the scheduled services.');
-//   }
+  static async register(): Promise<void> {
+    throw new Error('PushWorker should not be part of the scheduled services.');
+  }
 
-//   private async registerSync() {
-//     const date = new Date();
+  // private async registerSync() {
+  //   const date = new Date();
 
-//     await chrome.storage.sync.set({
-//       pushChanged: <ISyncPushInfo> {
-//         time: date.getTime(), applicationId: await applicationId()
-//       }
-//     });
-//   }
-// }
+  //   await chrome.storage.sync.set({
+  //     pushChanged: <ISyncPushInfo> {
+  //       time: date.getTime(), applicationId: await getApplicationId()
+  //     }
+  //   });
+  // }
+}
