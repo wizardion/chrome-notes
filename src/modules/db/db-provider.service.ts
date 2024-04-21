@@ -5,7 +5,7 @@ import { CachedStorageService } from 'core/services/cached';
 import { LoggerService } from 'modules/logger';
 
 
-const delayInMinutes = 1;
+const delayInMinutes = 15;
 const INTERVALS: IEventIntervals = { delay: (delayInMinutes * 60) * 1000, intervals: { push: null } };
 const logger = new LoggerService('db-provider.service.ts', 'green');
 
@@ -24,8 +24,6 @@ export class DbProviderService {
   public static async init(force?: boolean) {
     this.syncEnabled = force || await this.isSyncEnabled();
     this.checkSync = !!force;
-
-    console.log('INTERVALS', [INTERVALS.delay]);
   }
 
   public static async save(item: IDBNote): Promise<number> {

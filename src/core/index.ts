@@ -3,8 +3,7 @@ import { IAppConfig } from './models/code.models';
 
 
 export const applicationConfigs: IAppConfig = {
-  delayedInterval: 400,
-  // pushWorker: 'pusher-worker'
+  delayedInterval: 400
 };
 
 const encryptor = new CryptoService(chrome.runtime.id.toString(), true);

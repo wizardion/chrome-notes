@@ -9,7 +9,7 @@ import { SortHelper } from 'modules/effects';
 
 
 const INTERVALS: IEventIntervals = {
-  delay: applicationConfigs.delayedInterval, intervals: { changed: null, locked: null }
+  delay: null, intervals: { changed: null, locked: null }
 };
 
 export abstract class PopupBaseElement extends BaseElement {
@@ -19,6 +19,7 @@ export abstract class PopupBaseElement extends BaseElement {
   protected initialized = false;
   protected listView: ListViewElement;
   protected detailsView: DetailsBaseElement;
+  protected triggerDelay = applicationConfigs.delayedInterval;
   protected index = 0;
 
   protected listeners = new Map<'change' | 'selectionEvent' | 'save' | 'create', IEventListener>();
@@ -173,7 +174,7 @@ export abstract class PopupBaseElement extends BaseElement {
       clearInterval(INTERVALS.intervals.changed);
 
       if (e.type === 'change') {
-        INTERVALS.intervals.changed = setTimeout(async () => await this.save(this.selected), INTERVALS.delay);
+        INTERVALS.intervals.changed = setTimeout(async () => await this.save(this.selected), this.triggerDelay);
       } else {
         await this.save(this.selected);
       }

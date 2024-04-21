@@ -11,6 +11,7 @@ const template: DocumentFragment = BaseElement.component({
 
 export class WindowNotesElement extends PopupBaseElement {
   static readonly selector = 'popup-notes';
+  protected triggerDelay = 1400;
 
   constructor() {
     super();

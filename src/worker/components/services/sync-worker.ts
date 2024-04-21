@@ -7,7 +7,7 @@ import { TerminateProcess } from '../models/models';
 
 export class SyncWorker extends BaseWorker {
   static readonly name = 'sync-worker';
-  static readonly period = 240;
+  static readonly period = 6e+2;
 
   readonly name = SyncWorker.name;
 

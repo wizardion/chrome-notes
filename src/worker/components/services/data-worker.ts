@@ -7,7 +7,7 @@ const logger = new LoggerService('data-worker.ts', 'green');
 
 export class DataWorker extends BaseWorker {
   static readonly name = 'data-worker';
-  static readonly period = 180;
+  static readonly period = 5e+2;
 
   readonly name = DataWorker.name;
 
