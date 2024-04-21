@@ -37,6 +37,8 @@ export class PushWorker extends BaseWorker {
       } else {
         await workerLogger.info(`${SyncWorker.name} is not registered.`);
       }
+    } else if (this.busyWorker && this.busyWorker !== this.name && this.busyWorker !== SyncWorker.name) {
+      await this.reRegister();
     }
 
     await workerLogger.info(`${PushWorker.name} - finished.`);
@@ -46,13 +48,16 @@ export class PushWorker extends BaseWorker {
     throw new Error('PushWorker should not be part of the scheduled services.');
   }
 
-  // private async registerSync() {
-  //   const date = new Date();
+  private async reRegister() {
+    const alarm = await chrome.alarms.get(PushWorker.name);
 
-  //   await chrome.storage.sync.set({
-  //     pushChanged: <ISyncPushInfo> {
-  //       time: date.getTime(), applicationId: await getApplicationId()
-  //     }
-  //   });
-  // }
+    if (!alarm) {
+      const { pushInfo } = await chrome.storage.local.get(this.infoKey) as IPushInfo;
+
+      await chrome.storage.local.set({ pushInfo: pushInfo });
+      await workerLogger.info(`The process is taken by '${this.busyWorker}'. Re-register to sync...`);
+
+      return chrome.alarms.create(PushWorker.name, { delayInMinutes: 2 });
+    }
+  }
 }

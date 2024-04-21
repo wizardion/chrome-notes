@@ -14,6 +14,7 @@ export class BaseWorker {
 
   readonly name: string;
   protected settings: ISettingsArea;
+  protected busyWorker: string;
 
   constructor(settings: ISettingsArea) {
     this.settings = settings;
@@ -39,6 +40,7 @@ export class BaseWorker {
     if (process) {
       const hours = Math.abs(new Date().getTime() - process.id) / 36e5;
 
+      this.busyWorker = process.worker;
       await workerLogger.info(`- ${this.name}: the process '${process.worker}' is busy ...`);
 
       if (hours >= 24) {
