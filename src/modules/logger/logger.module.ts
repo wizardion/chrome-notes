@@ -7,7 +7,7 @@ enum ERROR_MESSAGES {
   initiate= 'Failed to initiate the Logger.'
 }
 
-export const configs = {
+export const loggerConfigs = {
   tracing: false
 };
 
@@ -125,6 +125,17 @@ export async function load(): Promise<ILog[]> {
   }
 }
 
+export async function remove(id: number): Promise<void> {
+  try {
+    const store = await initObjectStore('readwrite');
+
+    return (await execute<void>(store.delete(id)));
+  } catch (error) {
+    logError(error);
+    throw new Error(ERROR_MESSAGES.initiate);
+  }
+}
+
 export async function clear(): Promise<void> {
   try {
     const store = await initObjectStore('readwrite');
@@ -147,7 +158,7 @@ export async function logInfo(level: ILogLevel, color: string, name: string, arg
       data: (args && args[0] !== '' && args[0] !== null) ? JSON.stringify(args) : null
     };
 
-    if (configs.tracing) {
+    if (loggerConfigs.tracing) {
       print(log);
     }
 

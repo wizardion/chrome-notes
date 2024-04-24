@@ -10,10 +10,10 @@ export class SyncStorageService {
 
     return (
       (data && this.decrypt(data)) || {
-        id: null,
-        enabled: false,
         token: null,
+        enabled: false,
         encrypted: false,
+        applicationId: null,
       }
     );
   }
@@ -23,20 +23,20 @@ export class SyncStorageService {
       const value: ISyncInfo = <ISyncInfo> await decrypt(data.value);
 
       return {
-        id: data.id,
-        enabled: value.enabled,
         token: value.token,
+        enabled: value.enabled,
         encrypted: value.encrypted,
+        applicationId: data.id,
       };
     }
 
-    return { id: null, enabled: false, token: null, encrypted: false };
+    return { applicationId: null, enabled: false, token: null, encrypted: false };
   }
 
   public static async set(value: ISyncInfo): Promise<void> {
     return chrome.storage.sync.set(<ISyncStorageData>{
       [this.key]: {
-        id: value.id,
+        id: value.applicationId,
         value: await encrypt({
           enabled: value.enabled,
           token: value.token,

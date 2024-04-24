@@ -1,1 +1,1 @@
-export { EncryptorService } from './encryptor.service';
+export { CryptoService } from './encryptor.service';

@@ -8,6 +8,7 @@ export interface IDevSettingsForm {
   clean: HTMLLinkElement;
   cacheEmpty: HTMLLinkElement;
   cachePrint: HTMLLinkElement;
+  workersPrint: HTMLLinkElement;
   dataPrint: HTMLLinkElement;
   dataRestore: HTMLLinkElement;
   dataEmpty: HTMLLinkElement;

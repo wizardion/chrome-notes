@@ -120,3 +120,15 @@ details-view[data-scroll='true'] {
   margin: 0;
   height: 25px;
 }
+
+.changed-indicator {
+  // background-color: rebeccapurple;
+  position: absolute;
+  top: 5px;
+  left: 90px;
+  width: 16px;
+  height: 16px;
+  border: 0px;
+  color: var(--editor-text-url-hover);
+  fill: var(--editor-text-url-hover);
+}

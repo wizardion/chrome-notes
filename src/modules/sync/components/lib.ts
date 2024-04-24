@@ -1,6 +1,6 @@
 import { db, IDBNote } from 'modules/db';
 import { ISyncPair, ISyncItemInfo, IdentityInfo } from './models/sync.models';
-import { EncryptorService } from 'modules/encryption';
+import { CryptoService } from 'modules/encryption';
 import { LoggerService } from 'modules/logger';
 import { storage } from 'core/services';
 
@@ -8,7 +8,7 @@ import { storage } from 'core/services';
 const logger = new LoggerService('lib.ts');
 
 
-export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Promise<IDBNote> {
+export async function unzip(item: ISyncItemInfo, cryptor?: CryptoService): Promise<IDBNote> {
   const title = cryptor ? await cryptor.decrypt(item.t) : item.t;
   const description = cryptor ? await cryptor.decrypt(item.d) : item.d;
 
@@ -17,9 +17,9 @@ export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Pr
     title: title,
     description: description,
     order: item.o,
-    preview: null,
+    preview: item.p,
     cState: item.s.split(',').map(v => Number(v)),
-    pState: null,
+    pState: item.e,
     updated: item.u,
     created: item.c,
     deleted: 0
@@ -28,7 +28,7 @@ export async function unzip(item: ISyncItemInfo, cryptor?: EncryptorService): Pr
   return data;
 }
 
-export async function zip(item: IDBNote, cryptor?: EncryptorService): Promise<ISyncItemInfo> {
+export async function zip(item: IDBNote, cryptor?: CryptoService): Promise<ISyncItemInfo> {
   const title = cryptor ? await cryptor.encrypt(item.title) : item.title;
   const description = cryptor ? await cryptor.encrypt(item.description) : item.description;
 
@@ -39,7 +39,9 @@ export async function zip(item: IDBNote, cryptor?: EncryptorService): Promise<IS
     o: item.order,
     s: item.cState.join(','),
     u: item.updated,
-    c: item.created
+    c: item.created,
+    p: item.preview,
+    e: item.pState
   };
 
   return data;
@@ -85,8 +87,8 @@ export async function lock(reason: string) {
 
   if (!identityInfo.locked) {
     identityInfo.locked = true;
+
     await storage.local.sensitive('identityInfo', identityInfo);
-    // await storage.cached.permanent('locked', true);
-    await logger.warn(reason);
+    await logger.warn(`locking notes, the reason: ${reason}`);
   }
 }

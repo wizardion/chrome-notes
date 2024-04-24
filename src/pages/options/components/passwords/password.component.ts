@@ -1,5 +1,6 @@
+import './assets/passwords.scss';
 import { BaseElement } from 'core/components';
-import { EncryptorService } from 'modules/encryption';
+import { CryptoService } from 'modules/encryption';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -77,7 +78,7 @@ export class PasswordElement extends BaseElement {
   }
 
   protected async generatePassword() {
-    const key: string = await EncryptorService.generateKey();
+    const key: string = await CryptoService.generateKey();
     const index = Math.floor(Math.random() * key.length - 1);
 
     this.input.value = [key.slice(0, index), '-', key.slice(index)].join('');
@@ -98,7 +99,7 @@ export class PasswordElement extends BaseElement {
   }
 
   protected async saveChanges() {
-    if (this.checkValidity() && await EncryptorService.validate(this.input.value)) {
+    if (this.checkValidity() && await CryptoService.validate(this.input.value)) {
       this.initial = this.input.value;
 
       this.save.disabled = true;

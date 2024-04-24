@@ -1,9 +1,6 @@
+export type IDecorator<T = boolean> = () => Promise<T>;
+
 export interface IAppConfig {
   applicationId?: number;
-  delay: number;
+  delayedInterval: number;
 }
-
-// export interface IBaseElement {
-//   eventListeners?(): void;
-//   attributeChanged?(name: string, oldValue: string, newValue: string): void;
-// }

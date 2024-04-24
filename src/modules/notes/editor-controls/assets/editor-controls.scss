@@ -86,12 +86,17 @@ fieldset:disabled button {
   position: relative;
   
   width: 28px;
-  height: 17px;
+  height: 19px;
   margin: 3px 1px 0 0;
   border: 1px solid transparent;
 
-  color: var(--control-disabled-color);
-  fill:var(--control-disabled-color);
+  color: var(--base-color);
+  fill:var(--base-color);
+  background-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 1;
+  padding-bottom: 1;
 
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -103,6 +108,10 @@ fieldset:disabled button {
 .checkbox.edit {
   position: absolute;
   right: 33px;
+}
+
+.details-view .head .checkbox.edit svg {
+  margin-left: -2px;
 }
 
 .checkbox.sync {
@@ -122,14 +131,6 @@ fieldset:disabled button {
   visibility: hidden;
 }
 
-.checkbox span {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 28px;
-  height: 17px;
-}
-
 .checkbox input ~ .checkmark .active {
   display: none;
 }
@@ -140,8 +141,10 @@ fieldset:disabled button {
 
 .checkbox input:checked ~ .checkmark,
 .checkbox[data-checked='true'] {
-  color: var(--base-color);
-  fill:var(--base-color);
+  // color: var(--base-color-hover);
+  // fill:var(--base-color-hover);
+  background-color: var(--control-active-background);
+  border-color: var(--base-background-stroke);
 }
 
 .checkbox input:disabled ~ .checkmark {
@@ -208,10 +211,15 @@ fieldset:disabled button {
   padding: 1px 10px 1px 6px !important;
 }
 
-.dropdown-menu button:hover {
-  background-color: var(--editor-selection-background) !important;
+.dropdown-menu button:hover, 
+.dropdown-menu button:focus {
+  background-color: var(--editor-menu-highlight-color) !important;
   color: var(--base-bright-color) !important;
   border-radius: 3px !important;
+}
+
+.dropdown-menu button:focus {
+  border: 1px solid var(--editor-menu-focus) !important;
 }
 
 .dropdown-menu .normal-text {

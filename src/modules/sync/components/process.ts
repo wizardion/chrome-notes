@@ -1,10 +1,10 @@
 import * as lib from './lib';
 import { db } from 'modules/db';
 import { delay, encrypt, decrypt } from 'core';
-import * as drive from './drive';
+import { GoogleDrive } from './drive';
 import { storage, ISyncInfo } from 'core/services';
 import { LoggerService } from 'modules/logger';
-import { EncryptorService } from 'modules/encryption';
+import { CryptoService } from 'modules/encryption';
 import {
   ISyncPair, ICloudInfo, TokenError, TokenSecretDenied, IProcessInfo, IntegrityError,
   IPasswordRule, IdentityInfo, IFileInfo, ISyncRequest
@@ -15,67 +15,69 @@ const logger = new LoggerService('sync.ts', 'blue');
 
 //#region testing
 LoggerService.tracing = true;
-
 //#endregion
 
-export async function startProcess(): Promise<void> {
-  const processId: number = new Date().getTime();
-
-  return chrome.storage.session.set({ syncProcessing: processId });
-}
-
-export async function finishProcess(): Promise<void> {
-  return chrome.storage.session.set({ syncProcessing: null });
-}
-
 export async function setProcessInfo(info: IdentityInfo): Promise<void> {
-  return storage.local.sensitive('processInfo', { id: info.id, token: info.token });
+  return storage.local.sensitive('processInfo', { id: info.fileId, token: info.token });
 }
 
-export async function getIdentity(): Promise<IdentityInfo> {
-  const identityInfo: IdentityInfo = <IdentityInfo> await storage.local.get('identityInfo');
-  const processInfo: IProcessInfo = <IProcessInfo> await storage.local.get('processInfo');
+export async function getIdentity(): Promise<IdentityInfo | null> {
+  const identityInfo = await storage.local.get<IdentityInfo>('identityInfo');
+  const processInfo = await storage.local.get<IProcessInfo>('processInfo');
 
-  identityInfo.id = processInfo && processInfo.id;
+  if (identityInfo) {
+    identityInfo.fileId = processInfo?.id;
+  }
 
-  return identityInfo;
+  return identityInfo || null;
 }
 
 export async function validate(identityInfo: IdentityInfo): Promise<IdentityInfo> {
   const syncInfo: ISyncInfo = await storage.sync.get();
 
-  if (!syncInfo.enabled || !syncInfo.token || !identityInfo.token) {
+  if (!identityInfo && syncInfo.enabled && syncInfo.token) {
+    throw new IntegrityError('It looks like we have lost your file identity info.\nPlease remove it manually!');
+  }
+
+  if (identityInfo && (!syncInfo.enabled || (!syncInfo.token && !identityInfo.token))) {
     throw new IntegrityError('Sync is not allowed at this time!');
   }
 
   return identityInfo;
 }
 
-export async function checkFileSecret(file: IFileInfo, cryptor?: EncryptorService): Promise<boolean> {
+export async function checkFileSecret(file: IFileInfo, cryptor?: CryptoService): Promise<boolean> {
   return !file.data.secret || (cryptor && (await cryptor.verify(file.data.secret)));
 }
 
-export async function ensureFile(identity: IdentityInfo, cryptor?: EncryptorService): Promise<IFileInfo> {
+export async function ensureFile(identity: IdentityInfo, cryptor?: CryptoService): Promise<IFileInfo> {
   let isNew: boolean = false;
+  let file: IFileInfo;
 
-  if (!identity.id) {
-    identity.id = await drive.find(identity.token);
+  if (!identity.fileId) {
+    file = await GoogleDrive.find(identity.token);
     await delay();
   }
 
-  if (!identity.id) {
+  if (!identity.fileId && !file) {
     const rules: IPasswordRule = { count: 0, modified: 0 };
     const cloud: ICloudInfo = { modified: new Date().getTime(), items: [], rules: await encrypt(rules) };
 
     isNew = true;
-    identity.id = await drive.create(identity.token, cloud);
+    file = await GoogleDrive.create(identity.token, cloud);
     await delay();
   }
 
-  const file: IFileInfo = await drive.get(identity.token, identity.id);
+  if (!file && identity.fileId) {
+    file = await GoogleDrive.get(identity.token, identity.fileId);
+  }
 
-  if (!file.data.rules) {
-    throw new IntegrityError('Error: Cloud data Integrity is corrupted.');
+  if (!file) {
+    throw new TokenError('Cannot find data in cloud.');
+  }
+
+  if (!file.data?.rules) {
+    throw new IntegrityError('Cloud data Integrity is corrupted.');
   }
 
   if (cryptor && !(await checkFileSecret(file, cryptor))) {
@@ -87,12 +89,27 @@ export async function ensureFile(identity: IdentityInfo, cryptor?: EncryptorServ
   return file;
 }
 
+async function updateCache() {
+  const cache = await storage.cached.dump();
+
+  if (cache.selected) {
+    const item = await db.get(cache.selected.id);
+
+    if (item) {
+      await logger.info(' - updating cache:', item.id, item.title);
+      await storage.cached.set('selected', item);
+    } else {
+      await storage.cached.remove(['selected']);
+    }
+  }
+}
+
 async function syncItems(
   file: IFileInfo,
-  oldCryptor?: EncryptorService,
-  newCryptor?: EncryptorService
+  oldCryptor?: CryptoService,
+  newCryptor?: CryptoService
 ): Promise<ICloudInfo> {
-  const cloud: ICloudInfo = { modified: file.data.modified, items: [], rules: file.data.rules };
+  const cloud: ICloudInfo = { modified: file.data.modified, items: [], rules: file.data.rules, changed: false };
   const pairInfo: ISyncPair[] = await lib.getDBPair(file.data.items);
   const modified: number = new Date().getTime();
 
@@ -100,15 +117,16 @@ async function syncItems(
     const info = pairInfo[i];
 
     // remove deleted
-    if (info.db && info.db.deleted && !info.cloud) {
+    if (info.db && (info.db.deleted || !info.db.description) && !info.cloud) {
       continue;
     }
 
     // mark deleted
     if (info.db && !info.cloud && info.db.synced && !file.isNew && !info.db.deleted) {
       info.db.deleted = 1;
+      cloud.changed = true;
       await db.update(info.db);
-      logger.info(i, ' - mark deleted local item: ', info.db.id);
+      logger.info(i, ' - marked deleted local item: ', info.db.id, info.db.title);
       continue;
     }
 
@@ -116,18 +134,20 @@ async function syncItems(
     if (info.cloud && (!info.db || info.db.updated < info.cloud.u)) {
       const decorator = info.db ? db.update : db.add;
 
+      cloud.changed = true;
       cloud.items.push(info.cloud);
       await decorator({ synced: modified, ...(await lib.unzip(info.cloud, oldCryptor)) });
-      await logger.info(i, ' - received new item: ', info.cloud.i);
+      await logger.info(i, ' - received new item: ', info.cloud.i, info.cloud.t);
       continue;
     }
 
     // put updated on cloud
     if (info.db && !info.db.deleted && (!info.cloud || info.db.updated > info.cloud.u)) {
+      cloud.changed = true;
       cloud.modified = modified;
       await db.update({ synced: modified, ...info.db });
       cloud.items.push(await lib.zip(info.db, (newCryptor || oldCryptor)));
-      await logger.info(i, ' - pushed new/updated item to cloud: ', info.db.id);
+      await logger.info(i, ' - pushed item to cloud: ', info.db.id, info.db.title);
       continue;
     }
 
@@ -141,73 +161,49 @@ async function syncItems(
   return cloud;
 }
 
-export async function sync(identity: IdentityInfo, oldCryptor?: EncryptorService, newCryptor?: EncryptorService) {
-  const file: IFileInfo = await ensureFile(identity, oldCryptor);
-  const cloud: ICloudInfo = await syncItems(file, oldCryptor, newCryptor);
+export async function sync(info: IdentityInfo, first?: CryptoService, second?: CryptoService): Promise<IdentityInfo> {
+  const file: IFileInfo = await ensureFile(info, first);
+  const cloud: ICloudInfo = await syncItems(file, first, second);
 
-  if (cloud.modified !== file.data.modified || newCryptor) {
-    const EncryptorService = newCryptor || oldCryptor;
+  if (cloud.modified !== file.data.modified || second) {
+    const CryptoService = second || first;
 
     await logger.info(' - new version will be updated.');
 
-    if (EncryptorService && !EncryptorService.transparent) {
-      cloud.secret = await EncryptorService.generateSecret();
+    if (CryptoService && !CryptoService.transparent) {
+      cloud.secret = await CryptoService.generateSecret();
       await logger.info(' - generated new secret:', cloud.secret);
     }
 
     cloud.rules = cloud.rules ? await encrypt(await decrypt(cloud.rules)) : cloud.rules;
-    await drive.update(identity.token, identity.id, cloud);
+    await GoogleDrive.update(info.token, info.fileId, cloud);
   }
+
+  if (cloud.changed) {
+    await updateCache();
+  }
+
+  info.fileId = file.id;
+
+  return info;
 }
 
-export async function getProcess(level?: number): Promise<number> {
-  const processId: number = (await chrome.storage.session.get('syncProcessing')).syncProcessing;
+export async function exec<T>(request: ISyncRequest<T>, lock: boolean = true): Promise<T> {
+  try {
+    return await request();
+  } catch (er) {
+    const error = (typeof er === 'string') ? new Error(er) : er;
 
-  if (processId) {
-    logger.info(`process is busy...`);
-    const hours = Math.abs(new Date().getTime() - processId) / 36e5;
+    await logger.error(error.message);
 
-    if (!level && hours > 2) {
-      logger.error(`process is hanging for ${hours} hours, terminate.`);
-      await finishProcess();
-
-      return getProcess(level + 1);
+    if (lock && error instanceof TokenSecretDenied) {
+      await lib.lock(error.message);
     }
-  }
 
-  return processId;
-}
-
-export async function exec(name: string, request: ISyncRequest, lock: boolean = true): Promise<boolean> {
-  const processId: number = await getProcess();
-  let successful = false;
-
-  if (!processId) {
-    try {
-      await startProcess();
-      logger.info(`${name} process started...`);
-
-      await request();
-      successful = true;
-    } catch (error) {
-      await logger.error(error.message);
-
-      if (lock && error instanceof TokenSecretDenied) {
-        await lib.lock(error.message);
-      }
-
-      if (!(error instanceof TokenError)) {
-        error.message = 'Unexpected error occurred during the sync process.';
-      }
-
-      throw error;
-    } finally {
-      await finishProcess();
-      logger.info(`${name} process finished.`);
+    if (!(error instanceof TokenError)) {
+      error.message = 'Unexpected error occurred during the sync process.';
     }
-  } else {
-    throw Error('Sync process is busy');
-  }
 
-  return successful;
+    throw error;
+  }
 }

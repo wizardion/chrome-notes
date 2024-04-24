@@ -26,4 +26,8 @@ export class LocalStorageService {
   public static async remove(key: string) {
     return chrome.storage.local.remove(key);
   }
+
+  public static async clear() {
+    return chrome.storage.local.clear();
+  }
 }

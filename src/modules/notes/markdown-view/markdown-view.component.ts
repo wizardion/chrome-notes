@@ -6,6 +6,7 @@ import { EditorControlsElement } from '../editor-controls/editor-controls.compon
 import { Debounce, DynamicScroll } from 'modules/effects';
 import { IDetailsListenerType, INote } from '../details-base/models/details-base.model';
 import { NodeHelper } from 'components/node-helper';
+import { IEditorData } from 'components/models/editor.models';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -16,6 +17,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   static readonly selector = 'details-view';
 
   protected _preview: boolean;
+  protected selection: number[];
 
   constructor() {
     super();
@@ -30,6 +32,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       description: this.template.querySelector('[name="description"]'),
       preview: this.template.querySelector('[name="preview"]'),
       htmlViewer: this.template.querySelector('[name="html-viewer"]'),
+      // indicator: this.template.querySelector('[name="indicator"]'),
     });
   }
 
@@ -68,19 +71,18 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
     return super.addEventListener(type, listener, options);
   }
 
-  getData(): INote {
+  getData(): IEditorData {
     const data = super.getData();
 
     if (this._preview) {
       data.preview = true;
-      data.pState = this.getPreviewState();
+      data.previewSelection = this.getPreviewState();
     }
 
     return data;
   }
 
   setData(item: INote) {
-    this.note = item;
     this.editor.setData({ title: item.title, description: item.description });
     this.setSelection(item);
   }
@@ -88,9 +90,9 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   set hidden(value: boolean) {
     this.dataset.scroll = 'false';
     super.hidden = value;
-    this.preview = false;
   }
 
+  // TODO remove.
   set preview(value: boolean) {
     this._preview = value;
     this.editor.hidden = value;
@@ -115,14 +117,12 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       const scrollTop = this.editor.scrollTop;
 
       this.preview = value;
-      this.note.preview = value;
       this.form.elements.htmlViewer.scrollTop = scrollTop;
     } else {
       const scrollTop = this.form.elements.htmlViewer.scrollTop;
 
       this.preview = value;
-      this.note.preview = value;
-      this.editor.setSelection(this.note.cState);
+      this.editor.setSelection(this.selection);
       this.editor.scrollTop = scrollTop;
     }
 
@@ -139,6 +139,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
 
   private setSelection(item: INote) {
     this.preview = item.preview;
+    this.selection = item.cState || [0, 0];
     this.lock();
 
     if (item.preview) {
@@ -150,7 +151,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
 
       this.dataset.scroll = (this.form.elements.htmlViewer.scrollTop > 0).toString();
     } else {
-      this.editor.setSelection(item.cState || [0, 0]);
+      this.editor.setSelection(this.selection);
       this.dataset.scroll = (this.editor.scrollTop > 0).toString();
     }
 

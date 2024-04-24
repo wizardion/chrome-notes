@@ -1,17 +1,18 @@
 import './assets/details-view.scss';
-import { BaseElement, FormElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
-import { IDetailsViewForm, IDetailsListenerType, INote } from './models/details-base.model';
+
 import { IDBNote } from 'modules/db';
-import { IEditorView } from 'components/models/editor.models';
+import { applicationConfigs } from 'core';
+import { BaseElement, FormElement, IEventIntervals, IEventListener } from 'core/components';
+import { IDetailsViewForm, IDetailsListenerType, INote } from './models/details-base.model';
+import { IEditorData, IEditorView } from 'components/models/editor.models';
 import { Debounce, DynamicScroll } from 'modules/effects';
 
 
-const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { locked: null } };
+const INTERVALS: IEventIntervals = { delay: applicationConfigs.delayedInterval, intervals: { locked: null } };
 
 export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsViewForm> extends BaseElement {
   static readonly selector: string;
 
-  protected note?: INote;
   protected editor: IEditorView;
   protected form: FormElement<T>;
   protected listeners = new Map<'change' | 'selectionEvent' | 'save' | 'create', IEventListener>();
@@ -83,19 +84,12 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     });
   }
 
-  getData(): INote {
-    const data = this.editor.getData();
-
-    this.note.title = data.title;
-    this.note.description = data.description;
-    this.note.cState = data.selection;
-
-    return this.note;
+  getData(): IEditorData {
+    return this.editor.getData();
   }
 
   setData(item: INote) {
     this.lock();
-    this.note = item;
     this.editor.setData({ title: item.title, description: item.description, selection: item.cState });
     this.dataset.scroll = (this.editor.scrollTop > 0).toString();
     this.unlock();

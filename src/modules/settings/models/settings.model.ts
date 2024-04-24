@@ -22,7 +22,7 @@ export interface ICommonSettings {
 
 export interface ISettingsError {
   message: string;
-  promise?: boolean | null;
+  worker: string;
 }
 
 export interface ISettingsArea {

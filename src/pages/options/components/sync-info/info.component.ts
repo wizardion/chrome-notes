@@ -1,7 +1,11 @@
 import { Cloud } from 'modules/sync/cloud';
 import { BaseElement } from 'core/components';
-import { TokenSecretDenied } from 'modules/sync/components/models/sync.models';
-import { ISyncInfoForm, IDecorator, IResponseDetails } from './models/info.models';
+import { IdentityInfo, TokenSecretDenied } from 'modules/sync/components/models/sync.models';
+import { ISyncInfoForm, IResponseDetails } from './models/info.models';
+import { LoggerService } from 'modules/logger';
+import { SyncStorageService } from 'core/services/sync';
+import { LocalStorageService } from 'core/services/local';
+import { IDecorator } from 'core/models/code.models';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -17,6 +21,7 @@ export class SyncInfoElement extends BaseElement {
   private _token: string;
   private _enabled: boolean;
   private _promise: boolean;
+  private _fileId: string;
   private _encrypted: boolean;
   private _passphrase: string;
   private _locked: boolean;
@@ -27,18 +32,18 @@ export class SyncInfoElement extends BaseElement {
 
     this.template = <HTMLElement>template.cloneNode(true);
     this.form = {
-      info: this.template.querySelector('fieldset[name="sync-info"]'),
-      error: this.template.querySelector('div[name="error"]'),
-      passphrase: this.template.querySelector('user-password[name="encryption-key"]'),
+      info: this.template.querySelector('[name="sync-info"]'),
+      error: this.template.querySelector('[name="error"]'),
+      passphrase: this.template.querySelector('user-password'),
       progressBar: this.template.querySelector('progress-bar'),
       checkboxes: {
-        sync: this.template.querySelector('input[name="sync-enabled"]'),
-        encrypt: this.template.querySelector('input[name="encryption-enabled"]'),
+        sync: this.template.querySelector('[name="sync-enabled"]'),
+        encrypt: this.template.querySelector('[name="encryption-enabled"]'),
       },
       buttons: {
-        authorize: this.template.querySelector('button[name="authorize"]'),
-        deauthorize: this.template.querySelector('button[name="deauthorize"]'),
-        submit: this.template.querySelector('button[name="submit"]'),
+        authorize: this.template.querySelector('[name="authorize"]'),
+        deauthorize: this.template.querySelector('[name="deauthorize"]'),
+        submit: this.template.querySelector('[name="submit"]'),
       },
       sections: {
         auth: this.template.querySelector('fieldset[name="drive-info"]'),
@@ -71,10 +76,6 @@ export class SyncInfoElement extends BaseElement {
     this.form.checkboxes.encrypt.onchange = () => this.encryptedChanged();
 
     this.form.passphrase.addEventListener('password:change', () => this.passphraseChanged());
-    // this.form.passphrase.addEventListener('password:dirtiness', () => this.passwordDirtinessChanged());
-
-    // this.promise = true;
-    // this.form.progressBar.spinning = true;
   }
 
   protected attributeChanged() {
@@ -83,9 +84,20 @@ export class SyncInfoElement extends BaseElement {
     this.form.info.disabled = disabled;
   }
 
-  protected enabledChanged() {
-    this.enabled = this.form.checkboxes.sync.checked;
+  protected async enabledChanged() {
+    const enabled = this.form.checkboxes.sync.checked;
 
+    if (this.token && !enabled) {
+      const value = window.confirm('Would you like to remove data from cloud?\n');
+
+      if (value) {
+        await this.submit(this.removeCloudDecorator());
+      } else {
+        this.deauthorize();
+      }
+    }
+
+    this.enabled = enabled;
     this.dispatchEvent(this.event);
   }
 
@@ -93,6 +105,14 @@ export class SyncInfoElement extends BaseElement {
     const encrypted: boolean = this.form.checkboxes.encrypt.checked;
 
     if (!encrypted && !this._locked && this._token && this._passphrase) {
+      const value = window.prompt('Please enter your secret key to confirm disabling data encryption.\n');
+
+      if (value !== this._passphrase) {
+        this.form.checkboxes.encrypt.checked = true;
+
+        return;
+      }
+
       this.form.checkboxes.encrypt.checked = true;
 
       if (!(await this.submit(this.encryptDecorator('')))) {
@@ -142,8 +162,8 @@ export class SyncInfoElement extends BaseElement {
 
       this.passphrase = passphrase;
       this.locked = false;
-      this.dispatchEvent(this.event);
       await this.submit(this.syncDecorator());
+      this.dispatchEvent(this.event);
     }
   }
 
@@ -151,7 +171,16 @@ export class SyncInfoElement extends BaseElement {
     return async () => {
       await Cloud.wait();
 
-      return Cloud.sync();
+      const info = await Cloud.sync({
+        fileId: this._fileId,
+        token: this._token,
+        enabled: this._enabled,
+        passphrase: this._passphrase,
+        encrypted: this._encrypted,
+        locked: this._locked,
+      });
+
+      return this.updateInfo(info);
     };
   }
 
@@ -163,15 +192,15 @@ export class SyncInfoElement extends BaseElement {
     };
   }
 
-  protected verifyIdentity(passphrase: string): IDecorator {
+  protected verifyIdentity(passphrase: string): IDecorator<IdentityInfo> {
     return async () => {
       await Cloud.wait();
 
       return Cloud.verifyIdentity({
-        id: null,
-        enabled: this._enabled,
+        fileId: this._fileId,
         token: this._token,
         passphrase: passphrase,
+        enabled: this._enabled,
         encrypted: this._encrypted,
         locked: this._locked,
       });
@@ -183,9 +212,11 @@ export class SyncInfoElement extends BaseElement {
 
     try {
       if (this.checkValidity()) {
+        console.log('authorizing...');
         this.token = await Cloud.authorize();
+        const info = await this.submit(this.verifyIdentity(this._passphrase));
 
-        if (!(await this.submit(this.verifyIdentity(this._passphrase)))) {
+        if (!info?.fileId) {
           if (!this._response.error || this._response.locked) {
             this.locked = true;
             this.form.passphrase.focus();
@@ -199,8 +230,10 @@ export class SyncInfoElement extends BaseElement {
           return;
         }
 
-        this.dispatchEvent(this.event);
+        this.updateInfo(info);
+        console.log('authorized!');
         await this.submit(this.syncDecorator());
+        this.dispatchEvent(this.event);
       } else {
         this.message = 'Form is not valid.';
       }
@@ -215,14 +248,28 @@ export class SyncInfoElement extends BaseElement {
     this.promise = true;
 
     try {
+      console.log('deauthorizing...');
       await Cloud.deauthorize(this.token);
       this.token = null;
+      console.log('deauthorized!');
       this.dispatchEvent(this.event);
     } catch (error) {
       this.message = error;
     } finally {
       this.promise = false;
     }
+  }
+
+  protected removeCloudDecorator(): IDecorator {
+    return async () => {
+      console.log('removeCloudDecorator...');
+      await Cloud.remove();
+      await LoggerService.clear();
+      await SyncStorageService.remove();
+      await LocalStorageService.remove('identityInfo');
+
+      return true;
+    };
   }
 
   public get promise(): boolean {
@@ -247,6 +294,14 @@ export class SyncInfoElement extends BaseElement {
     this._enabled = value;
     this.form.info.hidden = !value;
     this.form.checkboxes.sync.checked = value;
+  }
+
+  get fileId(): string {
+    return this._fileId;
+  }
+
+  set fileId(value: string) {
+    this._fileId = value;
   }
 
   get token(): string {
@@ -321,15 +376,28 @@ export class SyncInfoElement extends BaseElement {
     this.form.buttons.submit.disabled = this._locked || !this._token || (this._encrypted && !this._passphrase);
   }
 
-  private async submit(decorator: IDecorator): Promise<boolean> {
-    let successful = false;
+  private updateInfo(info: IdentityInfo): boolean {
+    this.fileId = info.fileId;
+    this.token = info.token;
+    this.passphrase = info.passphrase;
+    this.enabled = info.enabled;
+    this.encrypted = info.encrypted;
+    this.locked = info.locked;
 
+    return !!info.fileId;
+  }
+
+  private async submit<T>(decorator: IDecorator<T>): Promise<T | null> {
     try {
       this.promise = true;
+      this.form.checkboxes.sync.disabled = true;
       this.form.progressBar.spinning = true;
 
-      successful = await decorator();
+      const result = await decorator();
+
       this._response = { message: null, locked: false, error: false };
+
+      return result;
     } catch (error) {
       this._response = {
         error: true,
@@ -341,8 +409,9 @@ export class SyncInfoElement extends BaseElement {
       this.promise = false;
       this.message = this._response.message;
       this.locked = this._response.locked || this.locked;
+      this.form.checkboxes.sync.disabled = false;
     }
 
-    return successful;
+    return null;
   }
 }

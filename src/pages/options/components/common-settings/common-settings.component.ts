@@ -29,7 +29,7 @@ export class CommonSettingsElement extends BaseElement {
       popupSize: <NodeList> this.template.querySelectorAll('input[name="popup-size"]'),
       appearance: <NodeList> this.template.querySelectorAll('input[name="appearance"]'),
       expirationDays: this.template.querySelector('select[name="expirationDays"]'),
-      progressBar: this.template.querySelector('progress-bar')
+      // progressBar: this.template.querySelector('progress-bar')
     });
   }
 
@@ -64,7 +64,7 @@ export class CommonSettingsElement extends BaseElement {
       item.addEventListener('change', () => this.onAppearanceChange(item));
     }
 
-    this.form.elements.progressBar.addEventListener('progress:animation-complete', () => this.onAnimationComplete());
+    // this.form.elements.progressBar.addEventListener('progress:animation-complete', () => this.onAnimationComplete());
   }
 
   protected onModeChange(item: HTMLInputElement) {
@@ -183,7 +183,7 @@ export class CommonSettingsElement extends BaseElement {
 
   set disabled(value: boolean) {
     super.disabled = value;
-    this.form.elements.progressBar.spinning = value;
+    // this.form.elements.progressBar.spinning = value;
 
     if (value) {
       this.form.elements.fieldset.disabled = true;

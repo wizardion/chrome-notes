@@ -209,24 +209,8 @@ input[type='password'] {
   letter-spacing: 2.8px;
 }
 
-input[type='text'],
-input[type='password'] {
-  border: 1px solid var(--control-border-color);
-  border-radius: 3px;
-  text-align: center;
-  color: var(--control-text-color);
-  background-color: var(--control-input-background-color);
-  cursor: text !important;
-}
-
-input[type='text']:focus,
-input[type='password']:focus {
+input:focus {
   outline: none;
-}
-
-input[type='text']:invalid,
-input[type='password']:invalid {
-  border-color: var(--validator-error-color);
 }
 
 button,
@@ -296,8 +280,6 @@ select:focus {
 
 select:disabled,
 button:disabled,
-input[type='text']:disabled,
-input[type='password']:disabled,
 input[type='button']:disabled,
 .dangerous:disabled {
   color: var(--control-inactive-text-color) !important;
@@ -305,11 +287,6 @@ input[type='button']:disabled,
   background-color: var(--control-inactive-background-color) !important;
   border: 1px solid var(--control-inactive-border-color) !important;
   cursor: default !important;
-}
-
-input[type='text']:disabled::placeholder,
-input[type='password']:disabled::placeholder {
-  color: var(--control-inactive-text-color) !important;
 }
 
 a {
@@ -369,6 +346,14 @@ div ul {
 
 .sm-margin-top {
   margin-top: 5px !important;
+}
+
+.padding-bottom {
+  padding-bottom: 15px;
+}
+
+.sm-padding-bottom {
+  padding-bottom: 5px;
 }
 
 .margin-top {
@@ -434,42 +419,6 @@ span.info {
 .note {
   font-style: italic;
   font-size: small;
-}
-
-.row-wrap {
-  width: 100%;
-  margin-bottom: 10px;
-  display: flex;
-}
-
-.row-wrap > * {
-  margin-left: 4px;
-  margin-right: 4px;
-}
-
-.row-wrap .small-space {
-  margin-left: 3px;
-  margin-right: 3px;
-}
-
-.row-wrap > *:first-child {
-  margin-left: 0px;
-}
-
-.row-wrap > *:last-child {
-  margin-right: 0px;
-}
-
-.row-wrap input[type='text'],
-.row-wrap input[type='password'] {
-  flex-grow: 1;
-}
-
-.error {
-  color: var(--validator-error-color);
-  font-size: small;
-  text-align: center;
-  margin-top: 5px;
 }
 
 .error.global {

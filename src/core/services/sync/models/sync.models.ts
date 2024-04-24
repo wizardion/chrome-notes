@@ -1,9 +1,9 @@
 
 export interface ISyncInfo {
-  id: number;
-  enabled: boolean;
   token: string;
+  enabled: boolean;
   encrypted: boolean;
+  applicationId: number;
 }
 
 export interface ISyncStorageValue {

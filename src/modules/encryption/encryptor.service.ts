@@ -1,6 +1,6 @@
 const _secretKey_ = 'te~st-Sy#nc%K*ey-B-9frItU-mlw=8@9+';
 
-export class EncryptorService {
+export class CryptoService {
   protected encoder: TextEncoder;
   protected decoder: TextDecoder;
 
@@ -15,7 +15,10 @@ export class EncryptorService {
       throw Error('The encryption passphrase is not set properly.');
     }
 
-    this.password = useSecret ? password : password + _secretKey_;
+    if (password) {
+      this.password = useSecret ? password : password + _secretKey_;
+    }
+
     this.encoder = new TextEncoder();
     this.decoder = new TextDecoder();
   }
@@ -106,7 +109,7 @@ export class EncryptorService {
   }
 
   get transparent(): boolean {
-    return !(this.password && this.password.length);
+    return !this.password || !this.password.length;
   }
 
   static async generateKey(): Promise<string> {
@@ -119,13 +122,13 @@ export class EncryptorService {
   static async validate(password: string): Promise<boolean> {
     try {
       const salt = crypto.getRandomValues(new Uint8Array(16));
-      const cryptor = new EncryptorService(password);
+      const cryptor = new CryptoService(password);
 
       const [secret]: Uint8Array[] = cryptor.getSecrets(password);
       const key = await cryptor.deriveKey(await cryptor.getSecretKey(secret), salt, ['encrypt']);
 
       if (key) {
-        const tmp = new EncryptorService(password);
+        const tmp = new CryptoService(password);
 
         return await tmp.verify(await tmp.generateSecret());
       }

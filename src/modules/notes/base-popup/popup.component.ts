@@ -1,4 +1,5 @@
-import { BaseElement, IEventIntervals, IEventListener, delayedInterval } from 'core/components';
+import { applicationConfigs } from 'core';
+import { BaseElement, IEventIntervals, IEventListener } from 'core/components';
 import { ListViewElement } from '../list-view/list-view.component';
 import { ListItemElement } from '../list-item/list-item.component';
 import { DetailsBaseElement } from '../details-base/details-base.component';
@@ -7,7 +8,9 @@ import { DbProviderService } from 'modules/db';
 import { SortHelper } from 'modules/effects';
 
 
-const INTERVALS: IEventIntervals = { delay: delayedInterval, intervals: { changed: null, locked: null } };
+const INTERVALS: IEventIntervals = {
+  delay: null, intervals: { changed: null, locked: null }
+};
 
 export abstract class PopupBaseElement extends BaseElement {
   protected items: INote[];
@@ -16,6 +19,7 @@ export abstract class PopupBaseElement extends BaseElement {
   protected initialized = false;
   protected listView: ListViewElement;
   protected detailsView: DetailsBaseElement;
+  protected triggerDelay = applicationConfigs.delayedInterval;
   protected index = 0;
 
   protected listeners = new Map<'change' | 'selectionEvent' | 'save' | 'create', IEventListener>();
@@ -28,6 +32,7 @@ export abstract class PopupBaseElement extends BaseElement {
   init() {
     this.disabled = false;
     this.initialized = true;
+    DbProviderService.init();
   }
 
   addItem(note: INote) {
@@ -54,6 +59,7 @@ export abstract class PopupBaseElement extends BaseElement {
   }
 
   async select(item: INote) {
+    this.detailsView.setData(item);
     this.selected?.item.classList.remove('selected');
 
     if (this.initialized) {
@@ -64,28 +70,30 @@ export abstract class PopupBaseElement extends BaseElement {
       this.preserved = item.id;
       this.listView.elements.create.disabled = !item.description;
     }
-
-    this.detailsView.setData(item);
   }
 
   async delete(delay?: number): Promise<number> {
     const index = this.items.findIndex(i => i.id === this.selected.id);
+
+    this.detailsView.elements.delete.disabled = true;
 
     for (let i = index + 1; i < this.items.length; i++) {
       this.items[i].item.index = i;
     }
 
     this.items.splice(index, 1);
-    this.listView.elements.create.disabled = false;
-    this.listView.elements.placeholder.hidden = !!this.items.length;
     await DbProviderService.delete(this.selected);
 
     if (delay) {
-      this.selected.item.removeItem(delay);
+      this.selected.item.removeItem(delay)
+        .then(() => this.listView.elements.placeholder.hidden = !!this.items.length);
     } else {
       await this.selected.item.removeItem(delay);
+      this.listView.elements.placeholder.hidden = !!this.items.length;
     }
 
+    this.detailsView.elements.delete.disabled = false;
+    this.listView.elements.create.disabled = false;
     delete this.selected.item;
     this.selected = null;
 
@@ -144,24 +152,31 @@ export abstract class PopupBaseElement extends BaseElement {
 
   async onChanged(e: Event) {
     if (this.selected) {
-      const item = this.detailsView.getData();
-      const time = new Date().getTime();
+      const data = this.detailsView.getData();
 
-      this.selected.title = item.title;
-      this.selected.description = item.description;
-      this.selected.cState = item.cState;
-      this.selected.pState = item.pState;
-      this.selected.item.title = item.title;
-      this.selected.updated = time;
-      this.selected.preview = item.preview;
-      this.selected.item.date = new Date(time);
-      this.listView.elements.create.disabled = !item.description;
+      if (data.description !== this.selected.description || data.preview !== this.selected.preview) {
+        const date = new Date();
+        const time = date.getTime();
+
+        this.selected.push = true;
+        this.selected.updated = time;
+        this.selected.item.date = date;
+      }
+
+      this.selected.title = data.title;
+      this.selected.description = data.description;
+      this.selected.cState = data.selection;
+      this.selected.pState = data.previewSelection;
+      this.selected.item.title = data.title;
+      this.selected.preview = data.preview;
+      this.listView.elements.create.disabled = !data.description;
+
+      clearInterval(INTERVALS.intervals.changed);
 
       if (e.type === 'change') {
-        clearInterval(INTERVALS.intervals.changed);
-        INTERVALS.intervals.changed = setTimeout(async () => await this.save(item), INTERVALS.delay);
+        INTERVALS.intervals.changed = setTimeout(async () => await this.save(this.selected), this.triggerDelay);
       } else {
-        await this.save(item);
+        await this.save(this.selected);
       }
     }
   }

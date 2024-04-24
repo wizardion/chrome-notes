@@ -74,7 +74,7 @@ export function getPopupPage(settings: ICommonSettings) {
   return mode.popup ? mode.popup[settings.editor][settings.popupSize][settings.appearance] : '';
 }
 
-export function setColors(settings: ISettingsArea, e?: MediaQueryListEvent) {
+export function setColors(settings: ISettingsArea = DEFAULT_SETTINGS, e?: MediaQueryListEvent) {
   const dark = e ? e.matches : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   if (settings.common?.appearance === 2 || settings.common?.appearance === 0 && dark) {
@@ -85,8 +85,6 @@ export function setColors(settings: ISettingsArea, e?: MediaQueryListEvent) {
 }
 
 export async function resetDefaults() {
-  setColors(DEFAULT_SETTINGS);
-
   await chrome.action.setPopup({ popup: getPopupPage(DEFAULT_SETTINGS.common) });
   await LocalStorageService.set('settings', DEFAULT_SETTINGS);
 }

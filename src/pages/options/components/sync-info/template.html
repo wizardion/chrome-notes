@@ -30,7 +30,7 @@
     </div>
   </fieldset>
 
-  <section class="margin-top">
+  <div class="margin-top">
     <div>
       <label>
         <input type="checkbox" name="encryption-enabled">
@@ -40,14 +40,14 @@
 
     <fieldset name="encryption-info" class="sm-margin-top">
       <span>
-        To protect sensitive data, if desired, a secret key must be entered, in which case the encryption will be
+        To protect sensitive data, a secret key must be entered, in which case the encryption will be
         enabled and the data will be encrypted using AES-GCM encryption.
         If this key is lost, it will be impossible to recover the data. Please remember that key and keep it secret.
       </span>
 
-      <user-password name="encryption-key"></user-password>
+      <user-password></user-password>
     </fieldset>
-  </section>
+  </div>
 
   <fieldset name="submit-info" class="margin-top">
     <div name="error" class="error global"></div>

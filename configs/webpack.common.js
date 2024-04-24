@@ -214,7 +214,7 @@ module.exports = {
           manifest.name = 'My-Notes-Testers (Dev)';
           manifest.action.default_title = 'My-Notes-Testers (Dev)';
         }
-        
+
         return JSON.stringify(manifest, null, 2);
       }
     }),

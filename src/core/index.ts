@@ -1,26 +1,38 @@
-import { EncryptorService } from 'modules/encryption';
+import { CryptoService } from 'modules/encryption';
 import { IAppConfig } from './models/code.models';
 
 
-const configs: IAppConfig = {
-  delay: 500
+export const applicationConfigs: IAppConfig = {
+  delayedInterval: 400,
+  applicationId: null
 };
 
-const encryptor = new EncryptorService(chrome.runtime.id.toString(), true);
+const encryptor = new CryptoService(chrome.runtime.id.toString(), true);
 
-export async function applicationId(): Promise<number> {
-  configs.applicationId = configs.applicationId ||
+export async function getApplicationId(): Promise<number> {
+  applicationConfigs.applicationId = applicationConfigs.applicationId ||
     <number>(await chrome.storage.local.get('applicationId')).applicationId;
 
-  if (!configs.applicationId) {
-    configs.applicationId = new Date().getTime();
-    await chrome.storage.local.set({ applicationId: configs.applicationId });
+  if (!applicationConfigs.applicationId) {
+    applicationConfigs.applicationId = new Date().getTime();
+    await chrome.storage.local.set({ applicationId: applicationConfigs.applicationId });
   }
 
-  return configs.applicationId;
+  return applicationConfigs.applicationId;
 }
 
-export function delay(milliseconds: number = configs.delay): Promise<void> {
+export async function ensureApplicationId(): Promise<void> {
+  applicationConfigs.applicationId = applicationConfigs.applicationId ||
+    <number>(await chrome.storage.local.get('applicationId')).applicationId;
+
+  if (!applicationConfigs.applicationId) {
+    applicationConfigs.applicationId = new Date().getTime();
+  }
+
+  return chrome.storage.local.set({ applicationId: applicationConfigs.applicationId });
+}
+
+export function delay(milliseconds: number = applicationConfigs.delayedInterval): Promise<void> {
   return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
 }
 

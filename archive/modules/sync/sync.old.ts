@@ -96,7 +96,7 @@ export async function resync(oldKey: string, newKey: string) {
 }
 
 export async function onMessage(message: {[key: string]: any}) {
-  if (message.applicationId && message.applicationId !== await lib.default.applicationId()) {
+  if (message.applicationId && message.applicationId !== await lib.default.getApplicationId()) {
     await logger.info('::received message:', message);
     return await processMessage(message.data);
   }
@@ -213,8 +213,8 @@ async function processSync(map: {[key: number]: ISyncPair}, force?: boolean) {
 async function sendMessage(data:{[key: string]: any}) {
   let message = {
     id: new Date().getTime(),
-    data: data,
-    applicationId: await lib.default.applicationId()
+    data: data,getApplicationId
+    applicationId: await lib.default.getApplicationId()
   };
   
   await chrome.storage.sync.set({message: message});
