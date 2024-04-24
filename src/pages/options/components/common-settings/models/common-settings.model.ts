@@ -1,6 +1,3 @@
-import { ProgressElement } from '../../progress-bar/progress.component';
-
-
 export interface ICommonSettingsForm {
   fieldset: HTMLFieldSetElement;
   views: NodeList;
@@ -9,5 +6,4 @@ export interface ICommonSettingsForm {
   appearance: NodeList;
   popupOptions: HTMLElement;
   expirationDays: HTMLSelectElement;
-  // progressBar: ProgressElement;
 }
