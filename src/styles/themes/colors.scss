@@ -8,7 +8,7 @@ $themes: (
     'base-background': #fbfbfd,
     'base-tile-background': white,
     'base-background-stroke': #07429813, // #EEF4F2
-    'base-background-second-stroke': #EEF4F2, // #d7e9e995
+    'base-background-second-stroke': #EEF4F2D5, // #d7e9e995
     'base-text-color': black,
     'base-inactive-color': gray,
 
@@ -19,7 +19,7 @@ $themes: (
     'base-shadow-tile': #056a6115,
     'base-shadow-drag': #A2A1A3,
 
-    'base-highlight-color': #F1F8F7, // 347a7b
+    'base-highlight-color': #D4E6E835,//#F1F8F7, // 347a7b
     'base-highlight-second-color': white,
 
     'control-disabled-color': #d7e9e9, //rgba(#07a698, .25),
@@ -45,7 +45,8 @@ $themes: (
     'editor-inactive-selection-background': #e9e9e9,
     'editor-inactive-selection-stroke': #d9d9d9,
 
-    'editor-menu-focus': #06736a,
+    'editor-menu-highlight-color': rgba(#07a698, .1),
+    'editor-menu-focus': rgba(#07a698, .1),
     'editor-menu-stroke': #07429813,
     'editor-menu-stroke-dimmed': white,
     'editor-menu-stroke-scrolled': transparent,
@@ -100,7 +101,8 @@ $themes: (
     'editor-inactive-selection-background': darken(#2a2c2d, 3%),
     'editor-inactive-selection-stroke': darken(#2a2c2d, 3%),
 
-    'editor-menu-focus': #e3e3e3,
+    'editor-menu-highlight-color': darken(#31363C, 1%),
+    'editor-menu-focus': rgba(#e3e3e3, .15),
     'editor-menu-stroke': rgba(#31363C, .65),
     'editor-menu-stroke-dimmed': rgba(#31363C, .65),
     'editor-menu-stroke-scrolled': rgba(#31363C, .65),

@@ -3,7 +3,6 @@ import { LoggerService } from 'modules/logger';
 import { storage, ISyncInfo } from 'core/services';
 import { SyncWorker } from './services/sync-worker';
 import { DataWorker } from './services/data-worker';
-import { CachedStorageService } from 'core/services/cached';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { ISettingsArea, PAGE_MODES, getPopupPage, getSettings } from 'modules/settings';
 import { ITabInfo } from 'modules/settings/models/settings.model';
@@ -25,32 +24,21 @@ export async function initPopup() {
 }
 
 export async function initApplication(handler: string) {
-  //#region testing
-  const settings = <ISettingsArea> await storage.local.get('settings');
-
-  if (settings) {
-    settings.error = null;
-  }
-
-  await core.delay(100);
-  LoggerService.tracing = true;
-  await LoggerService.clear();
-  await storage.local.set('settings', settings);
-  ensureOptionPage();
-  //#endregion
-
   await logger.addLine();
   await logger.info('initApp is fired: ', handler);
 
+  // if migrate needed!
+
   // TODO restore all sessions.
-  await CachedStorageService.init();
+  await core.ensureApplicationId();
+  await storage.cached.init();
   await chrome.alarms.clearAll();
 
   if (await SyncWorker.validate()) {
     await SyncWorker.register(1);
   }
 
-  DataWorker.register();
+  await DataWorker.register();
   await initPopup();
 }
 
@@ -158,4 +146,30 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
   }
 
   return await SyncWorker.deregister();
+}
+
+export async function onSyncDataRemoved(oldInfo: ISyncInfo) {
+  const bytes = await chrome.storage.sync.getBytesInUse();
+
+  if (bytes === 0 && oldInfo.applicationId > 0) {
+    const identity = await storage.local.get<IdentityInfo>('identityInfo');
+    const { db } = await import('modules/db');
+    const data = await db.dump();
+
+    if (identity?.token) {
+      await SyncWorker.removeCache(oldInfo.token);
+    }
+
+    if (data?.find(i => i.synced) || !!identity) {
+      const { resetDefaults } = await import('modules/settings');
+
+      await db.clear();
+      await storage.global.clearLocal();
+      await LoggerService.clear();
+      await resetDefaults();
+      await logger.info('data removed.');
+    }
+
+    return initApplication('reset');
+  }
 }

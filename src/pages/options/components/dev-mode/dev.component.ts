@@ -5,6 +5,7 @@ import { IDBNote, db } from 'modules/db';
 import { Cloud } from 'modules/sync/cloud';
 import { IDBLogNote, IDBParsedData, IDevSettingsForm } from './models/dev.models';
 import { resetDefaults } from 'modules/settings';
+import { delay } from 'core/index';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -29,6 +30,7 @@ export class DevModeElement extends BaseElement {
       clean: this.template.querySelector('a[name="clear-logs"]'),
       cachePrint: this.template.querySelector('a[name="print-cache"]'),
       cacheEmpty: this.template.querySelector('a[name="empty-cache"]'),
+      workersPrint: this.template.querySelector('a[name="print-workers"]'),
       dataPrint: this.template.querySelector('a[name="print-db"]'),
       dataRestore: this.template.querySelector('a[name="restore-db"]'),
       dataEmpty: this.template.querySelector('a[name="empty-db"]'),
@@ -45,6 +47,7 @@ export class DevModeElement extends BaseElement {
     this.form.elements.clean.addEventListener('click',  (e) => { e.preventDefault(); this.clearLogs(); });
     this.form.elements.cacheEmpty.addEventListener('click',  (e) => { e.preventDefault(); this.clearCache(); });
     this.form.elements.cachePrint.addEventListener('click',  (e) => { e.preventDefault(); this.printCache(); });
+    this.form.elements.workersPrint.addEventListener('click',  (e) => { e.preventDefault(); this.printWorkers(); });
     this.form.elements.dataPrint.addEventListener('click',  (e) => { e.preventDefault(); this.printData(); });
     this.form.elements.dataRestore.addEventListener('click',  (e) => { e.preventDefault(); this.restoreData(); });
     this.form.elements.dataEmpty.addEventListener('click',  (e) => { e.preventDefault(); this.clearData(); });
@@ -94,6 +97,24 @@ export class DevModeElement extends BaseElement {
     console.log((await storage.cached.dump()));
   }
 
+  protected async printWorkers() {
+    const workers = await chrome.alarms.getAll();
+    const list: Record<string, {periodInMinutes: number, scheduledTime: string}> = {};
+
+    console.clear();
+
+    for (const worker of workers) {
+      const date = new Date(worker.scheduledTime);
+
+      list[worker.name] = {
+        periodInMinutes: worker.periodInMinutes,
+        scheduledTime: date.toLocaleString()
+      };
+    }
+
+    console.table(list);
+  }
+
   protected async printData() {
     const data = await db.dump();
     const global = await storage.global.get();
@@ -136,6 +157,7 @@ export class DevModeElement extends BaseElement {
           const items = this.representNotes(data.valid);
 
           await this.clearData(true);
+          await delay(2000);
 
           for (let i = 0; i < items.length; i++) {
             const item = items[i];
@@ -163,14 +185,18 @@ export class DevModeElement extends BaseElement {
       '\nThe page will be reloaded.'
     )) {
       try {
-        await LoggerService.clear();
         await Cloud.remove();
-        // await LoggerService.clear();
         await db.clear();
         await storage.global.clear();
+        await LoggerService.clear();
         await resetDefaults();
 
         if (!force) {
+          this.form.elements.mode.nextElementSibling.innerHTML = '... Erasing data...';
+          this.form.elements.mode.hidden = true;
+          this.form.elements.info.hidden = true;
+          await delay(4000);
+
           document.location.reload();
         }
       } catch (error) {

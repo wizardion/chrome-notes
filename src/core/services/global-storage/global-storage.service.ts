@@ -10,18 +10,9 @@ export class GlobalStorageService {
     };
   }
 
-  public static async remove(namespace: 'local' | 'session' |' sync') {
-    if (namespace === 'local') {
-      await chrome.storage.local.clear();
-    }
-
-    if (namespace === 'session') {
-      await chrome.storage.session.clear();
-    }
-
-    if (namespace === ' sync') {
-      await chrome.storage.sync.clear();
-    }
+  public static async clearLocal() {
+    await chrome.storage.local.clear();
+    await chrome.storage.session.clear();
   }
 
   public static async clear() {

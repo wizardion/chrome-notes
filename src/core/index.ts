@@ -3,7 +3,8 @@ import { IAppConfig } from './models/code.models';
 
 
 export const applicationConfigs: IAppConfig = {
-  delayedInterval: 400
+  delayedInterval: 400,
+  applicationId: null
 };
 
 const encryptor = new CryptoService(chrome.runtime.id.toString(), true);
@@ -18,6 +19,17 @@ export async function getApplicationId(): Promise<number> {
   }
 
   return applicationConfigs.applicationId;
+}
+
+export async function ensureApplicationId(): Promise<void> {
+  applicationConfigs.applicationId = applicationConfigs.applicationId ||
+    <number>(await chrome.storage.local.get('applicationId')).applicationId;
+
+  if (!applicationConfigs.applicationId) {
+    applicationConfigs.applicationId = new Date().getTime();
+  }
+
+  return chrome.storage.local.set({ applicationId: applicationConfigs.applicationId });
 }
 
 export function delay(milliseconds: number = applicationConfigs.delayedInterval): Promise<void> {

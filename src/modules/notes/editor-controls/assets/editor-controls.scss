@@ -211,10 +211,15 @@ fieldset:disabled button {
   padding: 1px 10px 1px 6px !important;
 }
 
-.dropdown-menu button:hover {
-  background-color: var(--editor-selection-background) !important;
+.dropdown-menu button:hover, 
+.dropdown-menu button:focus {
+  background-color: var(--editor-menu-highlight-color) !important;
   color: var(--base-bright-color) !important;
   border-radius: 3px !important;
+}
+
+.dropdown-menu button:focus {
+  border: 1px solid var(--editor-menu-focus) !important;
 }
 
 .dropdown-menu .normal-text {

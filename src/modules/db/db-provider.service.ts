@@ -81,7 +81,7 @@ export class DbProviderService {
     if (!pushInfo) {
       const alarm = await chrome.alarms.get(this.pushWorker);
 
-      if (!alarm && (this.checkSync && await this.isSyncEnabled())) {
+      if (!alarm && (!this.checkSync || await this.isSyncEnabled())) {
         await chrome.storage.local.set({ pushInfo: new Date().getTime() });
         await logger.info('registered push-event!');
 
