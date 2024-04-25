@@ -1,79 +1,88 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-    <h4 class="title">My notes</h4>
-    <div class="title-description">data migration is in progress ...</div>
+
+<head>
+  <meta charset="utf-8" />
+  <title>
+    My notes
+  </title>
+</head>
+
+<body class="theme-light">
+  <div id="content" hidden>
+    <h4 class="title">My Notes</h4>
+
+    <div class="head">Thank you for being with us!</div>
 
     <div class="row">
+      <div class="sm-padding-bottom">
+        This is an updated version of the extension
+        <a target="blank" href="https://chrome.google.com/webstore/detail/work-note/ilonmfcpfefeelkojaclhipbfmodbfli">
+          Work-Note.
+        </a><br>
+        We moved our data structure into the
+        <a target="blank" href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API">Indexed database</a>
+        and we moved your data into this local storage.
+      </div>
       <div>
-        <div class="head">Thank you for being with us!</div>
-        <div>
-          This is an updated version of the <a target="blank" href="https://chrome.google.com/webstore/detail/work-note/ilonmfcpfefeelkojaclhipbfmodbfli">Work-Note extension.</a>
-          We moved our data usage into the Indexed database and we need to move your data into this database.
-          This data is stored locally and isn't being shared with anyone.
-        </div>
+        This page is intended to inform you that the data has been successfully moved and your data is still stored
+        locally on your private device.
       </div>
     </div>
 
     <div class="row">
-      <div class="left width-70">Migration </div>
-      <div class="right full-witch-70">
-        <div id="countdown" class="hidden">
-          <span>starts in <label id="countdown-seconds">30</label> seconds</span>
-          <input id="countdown-cancel" type="button" value="Cancel">
-        </div>
-        <div id="progress" class="progress-bar hidden">
-          <div class="progress-background ">
-            <div id="progress-thumb" class="progress-thumb hidden"></div>
-          </div>
-          
-        </div>
-        <div id="finished" class="hidden">is Done!</div>
+      <div class="sm-margin-bottom">What's new?</div>
+      <div>
+        New look and new feel
+        <div><img src="./images/titles.png" alt="new-design.png" width="600"></div>
       </div>
     </div>
 
-    <div id="whats-new" class="row hidden">
-      <div>
-        <div class="head">What's new?</div>
+    <div class="subtitle">
+      You can close this window now. <br>
+      <input id="close-window" type="button" value="Close" disabled>
+    </div>
+  </div>
 
-        <div class="left half">
-          Corrected design
-          <div><img src="./images/example-2.png" alt="new-design.png"></div>
-        </div>
+  <!-- <div id="whats-new" class="row hidden">
+    <div>
+      <div class="head">What's new?</div>
 
-        <div class="right half">
-          Able to sort a note
-          <div><img src="./images/example-3.png" alt="new-design.png"></div>
-        </div>
+      <div class="left half">
+        Corrected design
+        <div> ... </div>
       </div>
 
-      <div>
-        <div class="left half">
-          New styled by markdown editor
-          <div><img src="./images/example-4.png" alt="new-design.png"></div>
-        </div>
-
-        <div class="right half">
-          Able to sych a note Chrome
-          <div><img src="./images/example-5.png" alt="new-design.png"></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="left half">
-          To have the settings
-          <div><img src="./images/example-10.png" alt="new-design.png"></div>
-        </div>
-
-        <div class="right half">
-          And change the style
-          <div><img src="./images/example-9.png" alt="new-design.png"></div>
-        </div>
+      <div class="right half">
+        Able to sort a note
+        <div> ... </div>
       </div>
     </div>
-  </body>
+
+    <div>
+      <div class="left half">
+        New styled by markdown editor
+        <div> ... </div>
+      </div>
+
+      <div class="right half">
+        Able to sync a note Chrome
+        <div> ... </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="left half">
+        To have the settings
+        <div> ... </div>
+      </div>
+
+      <div class="right half">
+        And change the style
+        <div> ... </div>
+      </div>
+    </div>
+  </div> -->
+</body>
+
 </html>
