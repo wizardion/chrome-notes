@@ -8,7 +8,10 @@ html, body {
   padding: 0px;
 
   overflow: hidden;
-  font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
+  // font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
+  font-size: 15px;
+  font-family: "Google Sans Text", 'Roboto', 'Ubuntu', Sans-Serif;
+  font-weight: 400;
 }
 
 .list-view .list-content,

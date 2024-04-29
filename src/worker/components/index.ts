@@ -28,6 +28,9 @@ export async function initApplication(handler: string) {
   await logger.info('initApp is fired: ', handler);
 
   // if migrate needed!
+  if (await storage.local.get<boolean>('migrate')) {
+    chrome.tabs.create({ url: 'whats-new.html' });
+  }
 
   // TODO restore all sessions.
   await core.ensureApplicationId();

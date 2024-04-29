@@ -41,6 +41,7 @@ $themes: (
     'validator-error-color': #a32626,
     'validator-error-background-color': #9d232315,
     'validator-warn-color': chocolate,
+    'footer-link-svg-color': black,
   ),
   dark: (
     'body-color': #28292A,
@@ -84,6 +85,7 @@ $themes: (
     'validator-error-color': lighten(#a32626, 20%),
     'validator-error-background-color': lighten(#9d232325, 35%),
     'validator-warn-color': lighten(chocolate, 10%),
+    'footer-link-svg-color': #c7c7c7,
   )
 );
 

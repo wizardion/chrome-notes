@@ -12,7 +12,9 @@ const processHtmlLoader = require('./html-preprocessor');
 const htmlWebpackConfig = require('./html-webpack.config');
 const htmlPlugins = require('./html-plugins');
 const __root__ = path.resolve(__dirname, '..');
-const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
+// const icon = process.__version__? 'src/images/icons/check.png' : 'src/images/icons/check-dev.png';
+const icon = process.__version__? 'src/images/icons/check.png' : 'src/images/icons/check.png';
+const iconDark = process.__version__? 'src/images/icons/check-dark.png' : 'src/images/icons/check-dark.png';
 
 
 module.exports = {
@@ -30,7 +32,7 @@ module.exports = {
 
     background: path.resolve(__root__, 'src/worker/background.ts'),
     settings: path.resolve(__root__, 'src/pages/options/options.ts'),
-    migration: path.resolve(__root__, 'src/pages/migration/migration.ts'),
+    whatsNew: path.resolve(__root__, 'src/pages/whats-new/whats-new.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -159,6 +161,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {from: icon, to: 'icon-128.png'},
+        {from: iconDark, to: 'icon-128-dark.png'},
       ]
     }),
     new MiniCssExtractPlugin({
@@ -193,10 +196,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       ...htmlWebpackConfig,
       
-      filename: 'migration.html',
-      template: './src/pages/migration/migration.html',
+      filename: 'whats-new.html',
+      template: './src/pages/whats-new/whats-new.html',
       chunks: [
-        'migration'
+        'whatsNew'
       ],
     }),
     new StatsWriterPlugin({
