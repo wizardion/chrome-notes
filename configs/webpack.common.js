@@ -11,8 +11,8 @@ const svgToMiniDataURI = require('mini-svg-data-uri');
 const processHtmlLoader = require('./html-preprocessor');
 const htmlWebpackConfig = require('./html-webpack.config');
 const htmlPlugins = require('./html-plugins');
+const {merge} = require('webpack-merge');
 const __root__ = path.resolve(__dirname, '..');
-// const icon = process.__version__? 'src/images/icons/check.png' : 'src/images/icons/check-dev.png';
 const icon = process.__version__? 'src/images/icons/check.png' : 'src/images/icons/check.png';
 const iconDark = process.__version__? 'src/images/icons/check-dark.png' : 'src/images/icons/check-dark.png';
 
@@ -205,7 +205,10 @@ module.exports = {
     new StatsWriterPlugin({
       filename: 'manifest.json',
       transform({ assetsByChunkName }) {
-        let manifest = require(path.resolve(__root__, 'src/manifest.json'));
+        const manifest = merge(
+          require(path.resolve(__root__, 'src/manifest.json')),
+          require(path.resolve(__root__, '.manifest/', process.__version__ ? 'manifest.prod.json' : 'manifest.json'))
+        );
 
         manifest.background.service_worker = assetsByChunkName.background[0];
         manifest.version = process.__version__;

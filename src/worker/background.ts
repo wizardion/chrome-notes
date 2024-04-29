@@ -22,7 +22,7 @@ chrome.action.onClicked.addListener(async () => {
 });
 
 chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {
-  if (changes.syncInfo.newValue) {
+  if (changes.syncInfo?.newValue) {
     const newValue = <ISyncStorageValue>changes.syncInfo.newValue;
 
     if (newValue.id !== await getApplicationId()) {

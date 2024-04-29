@@ -59,31 +59,6 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
   }
 
   return chrome.tabs.create({ url: mode.page || 'option.html' });
-
-  // export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {
-  // if (mode === 0) {
-  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  // }
-
-  // if (mode === 3) {
-  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  // }
-
-  // if (mode === 4) {
-  //   if (window) {
-  //     chrome.windows.create({
-  //       focused: true,
-  //       url: chrome.runtime.getURL('index.html'),
-  //       type: 'popup',
-  //       left: window.left,
-  //       top: window.top,
-  //       width: window.width,
-  //       height: window.height,
-  //     });
-  //   } else {
-  //     chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
-  //   }
-  // }
 }
 
 export async function onPushInfoChanged(oldValue: ISyncPushInfo, newValue: ISyncPushInfo) {
