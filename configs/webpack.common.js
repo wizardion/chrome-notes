@@ -11,10 +11,30 @@ const svgToMiniDataURI = require('mini-svg-data-uri');
 const processHtmlLoader = require('./html-preprocessor');
 const htmlWebpackConfig = require('./html-webpack.config');
 const htmlPlugins = require('./html-plugins');
-const {merge} = require('webpack-merge');
+const { merge } = require('webpack-merge');
+
 const __root__ = path.resolve(__dirname, '..');
-const icon = process.__version__? 'src/images/icons/check.png' : 'src/images/icons/check.png';
-const iconDark = process.__version__? 'src/images/icons/check-dark.png' : 'src/images/icons/check-dark.png';
+
+const icons = {
+  production: {
+    light: [
+      { from: 'icon16.png', to: 'icon16.png'},
+      { from: 'icon32.png', to: 'icon32.png'},
+      { from: 'icon48.png', to: 'icon48.png'},
+      { from: 'icon128.png', to: 'icon128.png'},
+    ],
+    dark: [],
+  },
+  develop: {
+    light: [
+      { from: 'dev/icon16-dev.png', to: 'icon16.png'},
+      { from: 'dev/icon32-dev.png', to: 'icon32.png'},
+      { from: 'dev/icon48-dev.png', to: 'icon48.png'},
+      { from: 'dev/icon128-dev.png', to: 'icon128.png'},
+    ],
+    dark: [],
+  }
+}
 
 
 module.exports = {
@@ -159,10 +179,8 @@ module.exports = {
       // cleanStaleWebpackAssets: false,
     }),
     new CopyWebpackPlugin({
-      patterns: [
-        {from: icon, to: 'icon-128.png'},
-        {from: iconDark, to: 'icon-128-dark.png'},
-      ]
+      patterns: (process.__version__ ? icons.production : icons.develop).light
+        .map(i => ({from: path.resolve(__root__, 'src/images/icons', i.from), to: i.to}))
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[chunkhash].css',
