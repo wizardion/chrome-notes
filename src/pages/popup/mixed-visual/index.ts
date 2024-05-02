@@ -1,4 +1,6 @@
 import 'styles/body.scss';
 
 
-import('./popup').then(({ init, whenDefined }) => whenDefined().then(() => init()));
+window.addEventListener('pageshow', () => {
+  import('./popup').then(({ init, whenDefined }) => whenDefined().then(() => init()));
+});

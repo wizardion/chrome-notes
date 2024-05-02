@@ -180,7 +180,7 @@ module.exports = {
       // cleanStaleWebpackAssets: false,
     }),
     new CopyWebpackPlugin({
-      patterns: (!process.__version__ ? icons.production : icons.develop).light
+      patterns: (process.__version__ ? icons.production : icons.develop).light
         .map(i => ({from: path.resolve(__root__, 'src/images/icons', i.from), to: i.to}))
     }),
     new MiniCssExtractPlugin({
@@ -232,7 +232,7 @@ module.exports = {
         manifest.background.service_worker = assetsByChunkName.background[0];
         manifest.version = process.__version__;
 
-        if (!manifest.version) {
+        if (!manifest.version || true) {
           delete manifest.key;
 
           manifest.version = '0';
