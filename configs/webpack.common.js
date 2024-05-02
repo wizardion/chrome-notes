@@ -21,6 +21,7 @@ const icons = {
       { from: 'icon16.png', to: 'icon16.png'},
       { from: 'icon32.png', to: 'icon32.png'},
       { from: 'icon48.png', to: 'icon48.png'},
+      { from: 'icon96.png', to: 'icon96.png'},
       { from: 'icon128.png', to: 'icon128.png'},
     ],
     dark: [],
@@ -179,7 +180,7 @@ module.exports = {
       // cleanStaleWebpackAssets: false,
     }),
     new CopyWebpackPlugin({
-      patterns: (process.__version__ ? icons.production : icons.develop).light
+      patterns: (!process.__version__ ? icons.production : icons.develop).light
         .map(i => ({from: path.resolve(__root__, 'src/images/icons', i.from), to: i.to}))
     }),
     new MiniCssExtractPlugin({
