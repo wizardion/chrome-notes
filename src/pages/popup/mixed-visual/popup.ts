@@ -1,5 +1,5 @@
 import 'styles/style.scss';
-import { CachedStorageService } from 'core/services/cached';
+
 import { PopupMixedNotesElement } from 'modules/notes/mixed/popup.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
 import { ListItemElement } from 'modules/notes/list-item/list-item.component';
@@ -40,6 +40,7 @@ async function loadDBNotes(popup: PopupMixedNotesElement, selected?: boolean) {
 }
 
 export async function init() {
+  const { CachedStorageService } = await import('core/services/cached');
   const popup = document.getElementById('simple-popup-notes') as PopupMixedNotesElement;
   const configs = await CachedStorageService.get();
 

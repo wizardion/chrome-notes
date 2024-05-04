@@ -1,6 +1,5 @@
 import 'styles/style.scss';
 
-import { CachedStorageService } from 'core/services/cached';
 import { PopupNotesElement } from 'modules/notes/popup/popup.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
 import { ListItemElement } from 'modules/notes/list-item/list-item.component';
@@ -34,6 +33,7 @@ async function loadDBNotes(popup: PopupNotesElement) {
 }
 
 export async function init() {
+  const { CachedStorageService } = await import('core/services/cached');
   const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
   const configs = await CachedStorageService.get();
 
