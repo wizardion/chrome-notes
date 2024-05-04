@@ -233,7 +233,7 @@ module.exports = {
         manifest.background.service_worker = assetsByChunkName.background[0];
         manifest.version = process.__version__;
 
-        if (!manifest.version || true) {
+        if (!manifest.version || process.__development__) {
           delete manifest.key;
 
           manifest.version = '0';

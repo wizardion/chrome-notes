@@ -1,5 +1,6 @@
 module.exports = env => {
   process.__version__ = env.version;
+  process.__development__ = env.mode === 'development';
   console.log('env.version', env);
   
   var config = require(env.config);
