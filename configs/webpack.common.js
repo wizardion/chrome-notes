@@ -31,6 +31,7 @@ const icons = {
       { from: 'dev/icon16-dev.png', to: 'icon16.png'},
       { from: 'dev/icon32-dev.png', to: 'icon32.png'},
       { from: 'dev/icon48-dev.png', to: 'icon48.png'},
+      { from: 'dev/icon96-dev.png', to: 'icon96.png'},
       { from: 'dev/icon128-dev.png', to: 'icon128.png'},
     ],
     dark: [],
@@ -181,7 +182,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: (process.__version__ ? icons.production : icons.develop).light
-        .map(i => ({from: path.resolve(__root__, 'src/images/icons', i.from), to: i.to}))
+        .map(i => ({from: path.resolve(__root__, 'src/icons', i.from), to: i.to}))
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[chunkhash].css',

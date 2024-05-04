@@ -1,5 +1,4 @@
 import 'styles/style.scss';
-import { db } from 'modules/db';
 import { CachedStorageService } from 'core/services/cached';
 import { PopupMixedNotesElement } from 'modules/notes/mixed/popup.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
@@ -27,23 +26,26 @@ export function whenDefined(): Promise<CustomElementConstructor[]> {
   ]);
 }
 
-export async function init() {
-  const notes = document.getElementById('simple-popup-notes') as PopupMixedNotesElement;
-  const configs = await CachedStorageService.get();
-  let selected = !!configs.selected;
-
-  if (configs.selected) {
-    notes.hidden = false;
-    notes.select(configs.selected);
-  }
+async function loadDBNotes(popup: PopupMixedNotesElement, selected?: boolean) {
+  const { db } = await import('modules/db');
 
   db.iterate(item => {
     if (!selected) {
-      notes.select(item);
+      popup.select(item);
       selected = true;
     }
 
-    notes.addItem(item);
-  }).then(() => notes.init());
-  notes.hidden = false;
+    popup.addItem(item);
+  }).then(() => popup.init());
+}
+
+export async function init() {
+  const popup = document.getElementById('simple-popup-notes') as PopupMixedNotesElement;
+  const configs = await CachedStorageService.get();
+
+  if (configs.selected) {
+    popup.select(configs.selected);
+  }
+
+  loadDBNotes(popup, !!configs.selected);
 }
