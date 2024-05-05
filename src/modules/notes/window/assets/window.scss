@@ -160,10 +160,12 @@ details-view {
 
 .details-view .content {
   border-left-color: var(--base-background-stroke);
-  border-bottom-color: var(--base-background-stroke);
-  border-right-color: var(--base-background-stroke);
-  height: calc(100% - 33px);
-  margin-right: 5px;
+  height: calc(100% - 26px);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom: none;
+  border-right: none;
+
 }
 
 .details-view ::-webkit-scrollbar {

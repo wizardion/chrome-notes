@@ -124,6 +124,10 @@
   background: var(--editor-inactive-selection-background) !important;
 }
 
+.cm-focused {
+  outline: none !important;
+}
+
 .cm-focused .cm-selectionBackground {
   background: var(--editor-selection-background) !important;
 }
