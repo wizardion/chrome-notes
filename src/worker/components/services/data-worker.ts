@@ -1,9 +1,7 @@
 import { db } from 'modules/db';
 import { LoggerService } from 'modules/logger';
-import { BaseWorker } from './base-worker';
+import { BaseWorker, workerLogger } from './base-worker';
 
-
-const logger = new LoggerService('data-worker.ts', 'green');
 
 export class DataWorker extends BaseWorker {
   static readonly name = 'data-worker';
@@ -20,8 +18,8 @@ export class DataWorker extends BaseWorker {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
 
-        if (item.deleted && (!item.description || this.isOutdated(item.updated, today))) {
-          logger.info('remove.item', item.title, item.created, item.updated);
+        if (item.deleted && !item.synced && (!item.description || this.isOutdated(item.updated, today))) {
+          workerLogger.info('remove.item', item.title, item.created, item.updated);
           db.enqueue(item, 'remove');
         }
       }

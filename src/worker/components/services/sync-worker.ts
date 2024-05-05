@@ -3,6 +3,7 @@ import { Cloud } from 'modules/sync/cloud';
 import { IdentityInfo, TokenError } from 'modules/sync/components/models/sync.models';
 import { BaseWorker, workerLogger } from './base-worker';
 import { TerminateProcess } from '../models/models';
+import { PushWorker } from './push-worker';
 
 
 export class SyncWorker extends BaseWorker {
@@ -17,6 +18,7 @@ export class SyncWorker extends BaseWorker {
 
       try {
         await Cloud.sync();
+        await PushWorker.deregister();
       } catch (error) {
         if (error instanceof TokenError) {
           await this.finish();
