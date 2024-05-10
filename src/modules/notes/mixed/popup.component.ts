@@ -61,7 +61,8 @@ export class PopupMixedNotesElement extends PopupBaseElement {
 
   async create() {
     await super.create();
-    this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' });
     this.detailsView.elements.delete.disabled = this.items.length < 2;
+    this.listView.elements.scrollable.scrollTop =
+      this.listView.elements.scrollable.scrollHeight - this.listView.elements.scrollable.offsetHeight;
   }
 }

@@ -54,7 +54,8 @@ export abstract class PopupBaseElement extends BaseElement {
       this.selected = note;
       this.preserved = null;
       this.selected.item.classList.add('selected');
-      setTimeout(() => this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' }), 1);
+      this.listView.elements.scrollable.scrollTop =
+        this.listView.elements.scrollable.scrollHeight - this.listView.elements.scrollable.offsetHeight;
     }
   }
 
