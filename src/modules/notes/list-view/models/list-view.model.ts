@@ -5,4 +5,6 @@ export interface IListViewForm {
   scrollable: HTMLDivElement;
   list: HTMLDivElement;
   placeholder: HTMLDivElement | null;
+  controls: HTMLDivElement | null;
+  content: HTMLElement;
 }

@@ -32,6 +32,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
       description: this.template.querySelector('[name="description"]'),
       preview: this.template.querySelector('[name="preview"]'),
       htmlViewer: this.template.querySelector('[name="html-viewer"]'),
+      content: this.template.querySelector('[name="content"]'),
       // indicator: this.template.querySelector('[name="indicator"]'),
     });
   }
@@ -92,7 +93,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
     super.hidden = value;
   }
 
-  // TODO remove.
   set preview(value: boolean) {
     this._preview = value;
     this.editor.hidden = value;

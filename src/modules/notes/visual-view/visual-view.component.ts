@@ -22,7 +22,8 @@ export class VisualViewElement extends DetailsBaseElement<IVisualViewForm> {
       delete: this.template.querySelector('[name="delete"]'),
       menu: (this.template.querySelector('[name="controls"]') as EditorControlsElement),
       menuGroup: this.template.querySelector('[name="controls-group"]'),
-      editor: this.template.querySelector('[name="editor"]')
+      editor: this.template.querySelector('[name="editor"]'),
+      content: this.template.querySelector('[name="content"]')
     });
   }
 

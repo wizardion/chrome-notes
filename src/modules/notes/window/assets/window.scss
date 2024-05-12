@@ -1,3 +1,8 @@
+html, body {
+  min-width: 700px !important;
+  min-height: 600px !important;
+}
+
 .notes {
   display: flex;
   flex-wrap: wrap;
@@ -138,11 +143,6 @@ details-view {
   margin-top: 4px;
 }
 
-.head .controls-group {
-  margin-left: 50px;
-  margin-right: 50px;
-}
-
 .details-view .head .button.save {
   position: relative;
   float: none;
@@ -221,3 +221,5 @@ details-view[data-scroll='true'] {
     border-right: 1px solid var(--editor-menu-stroke-dimmed) !important;
   }
 }
+
+@import 'list-toggle'

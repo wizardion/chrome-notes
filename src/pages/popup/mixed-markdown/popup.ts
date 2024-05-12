@@ -49,4 +49,8 @@ export async function init() {
   }
 
   loadDBNotes(popup, !!configs.selected);
+
+  popup.collapsed = configs.settings?.collapsed || false;
+  popup.hidden = false;
+  popup.focus();
 }

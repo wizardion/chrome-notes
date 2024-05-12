@@ -10,6 +10,7 @@ export interface IDetailsViewForm {
   menu: EditorControlsElement;
   menuGroup: HTMLFieldSetElement;
   indicator?: HTMLElement;
+  content: HTMLElement;
 }
 
 export type IDetailsListenerType =

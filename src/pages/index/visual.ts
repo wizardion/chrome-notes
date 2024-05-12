@@ -33,7 +33,6 @@ export async function init() {
   let selected = !!configs.selected;
 
   if (configs.selected) {
-    notes.hidden = false;
     notes.select(configs.selected);
   }
 
@@ -45,5 +44,8 @@ export async function init() {
 
     notes.addItem(item);
   }).then(() => notes.init());
+
+  notes.collapsed = configs.settings?.collapsed || false;
   notes.hidden = false;
+  notes.focus();
 }

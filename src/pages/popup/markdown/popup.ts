@@ -34,14 +34,17 @@ async function loadDBNotes(popup: PopupNotesElement) {
 
 export async function init() {
   const { CachedStorageService } = await import('core/services/cached');
-  const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
+  const popup = document.getElementById('simple-popup-notes') as PopupNotesElement;
   const configs = await CachedStorageService.get();
 
   if (configs.selected) {
-    notes.select(configs.selected);
+    popup.hidden = false;
+    popup.select(configs.selected);
 
-    return setTimeout(() => loadDBNotes(notes), 150);
+    return setTimeout(() => loadDBNotes(popup), 150);
   }
 
-  loadDBNotes(notes);
+  loadDBNotes(popup);
+
+  popup.hidden = false;
 }

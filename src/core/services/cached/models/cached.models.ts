@@ -1,9 +1,13 @@
 import { IDBNote } from 'modules/db';
 
 
-export interface ICachedItem {
-  selected?: IDBNote;
-  popupSize?: number;
+export interface ICachedSettings {
+  collapsed: boolean;
 }
 
-export type ICachedItems = 'selected';
+export interface ICachedItem {
+  selected?: IDBNote;
+  settings?: ICachedSettings;
+}
+
+export type ICachedItems = 'selected' | 'settings';

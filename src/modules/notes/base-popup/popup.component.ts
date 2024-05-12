@@ -66,7 +66,7 @@ export abstract class PopupBaseElement extends BaseElement {
     if (this.initialized) {
       this.selected = item;
       this.selected.item.classList.add('selected');
-      await DbProviderService.cache.set('selected', this.selected);
+      await DbProviderService.cache.set<INote>('selected', this.selected);
     } else {
       this.preserved = item.id;
       this.listView.elements.create.disabled = !item.description;
@@ -122,6 +122,12 @@ export abstract class PopupBaseElement extends BaseElement {
     this.listView.add(item);
 
     return this.select(note);
+  }
+
+  focus(): void {
+    if (this.selected || this.preserved) {
+      this.detailsView.focus();
+    }
   }
 
   async onOrderChange(first: number, second: number) {
@@ -184,6 +190,6 @@ export abstract class PopupBaseElement extends BaseElement {
 
   private async save(item: INote) {
     await DbProviderService.save(item);
-    await DbProviderService.cache.set('selected', item);
+    await DbProviderService.cache.set<INote>('selected', item);
   }
 }
