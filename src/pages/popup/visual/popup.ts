@@ -38,13 +38,10 @@ export async function init() {
   const configs = await CachedStorageService.get();
 
   if (configs.selected) {
-    popup.hidden = false;
     popup.select(configs.selected);
 
     return setTimeout(() => loadDBNotes(popup), 150);
   }
 
   loadDBNotes(popup);
-
-  popup.hidden = false;
 }

@@ -1,5 +1,4 @@
 import 'styles/style.scss';
-import { db } from 'modules/db';
 import { CachedStorageService } from 'core/services/cached';
 import { WindowNotesElement } from 'modules/notes/window/window.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
@@ -27,14 +26,8 @@ export function whenDefined(): Promise<CustomElementConstructor[]> {
   ]);
 }
 
-export async function init() {
-  const notes = document.getElementById('simple-popup-notes') as WindowNotesElement;
-  const configs = await CachedStorageService.get();
-  let selected = !!configs.selected;
-
-  if (configs.selected) {
-    notes.select(configs.selected);
-  }
+async function loadDBNotes(notes: WindowNotesElement, selected?: boolean) {
+  const { db } = await import('modules/db');
 
   db.iterate(item => {
     if (!selected) {
@@ -44,8 +37,18 @@ export async function init() {
 
     notes.addItem(item);
   }).then(() => notes.init());
+}
+
+export async function init() {
+  const notes = document.getElementById('simple-popup-notes') as WindowNotesElement;
+  const configs = await CachedStorageService.get();
 
   notes.collapsed = configs.settings?.collapsed || false;
   notes.hidden = false;
-  notes.focus();
+
+  if (configs.selected) {
+    notes.select(configs.selected);
+  }
+
+  loadDBNotes(notes, !!configs.selected);
 }

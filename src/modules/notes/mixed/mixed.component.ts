@@ -7,7 +7,7 @@ import { ICachedSettings } from 'core/services/cached/models/cached.models';
 
 
 const template: DocumentFragment = BaseElement.component({
-  templateUrl: './popup.component.html'
+  templateUrl: './mixed.component.html'
 });
 
 const INTERVALS: IEventIntervals = {
@@ -112,16 +112,20 @@ export class PopupMixedNotesElement extends PopupBaseElement {
 
   set collapsed(value: boolean) {
     this.collapsedList = value;
+    this.listToggler.dataset.checked = value.toString();
 
     if (value) {
       this.classList.add('collapsed');
     }
 
-    this.listToggler.dataset.checked = value.toString();
-
     if (!this.classList.contains('collapsed-animating')) {
-      clearInterval(INTERVALS.intervals.collapsed);
-      INTERVALS.intervals.collapsed = setInterval(() => this.classList.add('collapsed-animating'), INTERVALS.delay);
+      setInterval(() => this.classList.add('collapsed-animating'), INTERVALS.delay);
     }
+  }
+
+  set hidden(value: boolean) {
+    super.hidden = value;
+    this.listView.hidden = value;
+    this.detailsView.hidden = value;
   }
 }

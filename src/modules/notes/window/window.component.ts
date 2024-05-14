@@ -176,4 +176,10 @@ export class WindowNotesElement extends PopupBaseElement {
       INTERVALS.intervals.collapsed = setInterval(() => this.classList.add('collapsed-animating'), 260);
     }
   }
+
+  set hidden(value: boolean) {
+    super.hidden = value;
+    this.listView.hidden = value;
+    this.detailsView.hidden = value;
+  }
 }

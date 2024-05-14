@@ -20,12 +20,6 @@ export class PopupNotesElement extends PopupBaseElement {
     this.detailsView = this.template.querySelector('[name="details-view"]');
   }
 
-  protected render() {
-    super.render();
-
-    this.listView.hidden = false;
-  }
-
   protected async eventListeners() {
     this.listView.addEventListener('create', () => !this.disabled && this.create());
     this.detailsView.addEventListener('cancel', () => !this.disabled && this.goBack());

@@ -124,12 +124,6 @@ export abstract class PopupBaseElement extends BaseElement {
     return this.select(note);
   }
 
-  focus(): void {
-    if (this.selected || this.preserved) {
-      this.detailsView.focus();
-    }
-  }
-
   async onOrderChange(first: number, second: number) {
     if (first !== second) {
       const queue: INote[] = [];
