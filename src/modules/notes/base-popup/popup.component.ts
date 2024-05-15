@@ -182,7 +182,7 @@ export abstract class PopupBaseElement extends BaseElement {
     }
   }
 
-  private async save(item: INote) {
+  async save(item: INote) {
     await DbProviderService.save(item);
     await DbProviderService.cache.set<INote>('selected', item);
   }

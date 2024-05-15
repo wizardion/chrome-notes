@@ -51,4 +51,5 @@ export async function init() {
   }
 
   loadDBNotes(notes, !!configs.selected);
+  notes.classList.add('markdown-mode');
 }

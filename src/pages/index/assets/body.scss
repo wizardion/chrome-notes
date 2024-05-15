@@ -2,7 +2,7 @@ html,
 body {
   background: var(--body-background);
 
-  min-width: 800px;
+  min-width: 520px;
   min-height: 150px;
   height: 100vh;
   border: 0;
@@ -10,7 +10,6 @@ body {
   padding: 0px;
 
   overflow: hidden;
-  // font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
   font-size: 15px;
   font-family: "Google Sans Text", 'Roboto', 'Ubuntu', Sans-Serif;
   font-weight: 400;

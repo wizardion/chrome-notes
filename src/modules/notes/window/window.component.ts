@@ -12,13 +12,14 @@ const template: DocumentFragment = BaseElement.component({
   templateUrl: './window.component.html'
 });
 const INTERVALS: IEventIntervals = {
-  delay: null, intervals: { changed: null, locked: null, collapsed: null }
+  delay: null, intervals: { changed: null, locked: null, collapsed: null, saving: null, indicator: null }
 };
 
 export class WindowNotesElement extends PopupBaseElement {
   static readonly selector = 'popup-notes';
   protected triggerDelay = 1400;
   protected tabInfo: ITabInfo;
+  protected indicator: HTMLElement;
 
   private listToggler: HTMLButtonElement;
   private collapsedList: boolean;
@@ -31,6 +32,7 @@ export class WindowNotesElement extends PopupBaseElement {
     this.listView = this.template.querySelector('[name="list-view"]');
     this.detailsView = this.template.querySelector('[name="details-view"]');
     this.listToggler = this.template.querySelector('[name="list-toggle"]');
+    this.indicator = this.template.querySelector('[name="indicator"]');
   }
 
   protected render(): void {
@@ -41,6 +43,7 @@ export class WindowNotesElement extends PopupBaseElement {
     const head = this.detailsView.elements.head;
 
     head.insertBefore(addNote, head.firstChild);
+    head.insertBefore(this.indicator, head.lastElementChild);
     listControls.insertBefore(this.listToggler, listControls.firstChild);
   }
 
@@ -64,11 +67,11 @@ export class WindowNotesElement extends PopupBaseElement {
     super.eventListeners();
 
     if (settings.common.mode === 4) {
-      window.addEventListener('resize', () => this.saveTabInfo(settings.common.mode, tab.id, tab.windowId));
-      setInterval(() => this.saveTabInfo(settings.common.mode, tab.id, tab.windowId), this.triggerDelay * 10);
+      window.addEventListener('resize', () => this.onWindowChange(tab.id, tab.windowId));
+      setInterval(() => this.onWindowChange(tab.id, tab.windowId), 1.4e+4);
     }
 
-    await this.saveTabInfo(settings.common.mode, tab.id, tab.windowId);
+    await this.saveTabInfo(tab.id, tab.windowId);
   }
 
   init(): void {
@@ -126,40 +129,48 @@ export class WindowNotesElement extends PopupBaseElement {
     await DbProviderService.cache.set<ICachedSettings>('settings', { collapsed: this.collapsedList });
   }
 
-  async saveTabInfo(mode: number, tabId: number, windowId?: number) {
-    if (mode === 4) {
-      clearInterval(INTERVALS.intervals.changed);
-      INTERVALS.intervals.changed = setTimeout(async () => this.saveWindowInfo(tabId, windowId), this.triggerDelay);
+  async onChanged(e: Event) {
+    if (this.selected) {
+      const data = this.detailsView.getData();
 
-      console.log('this.triggerDelay', [this.triggerDelay]);
+      if (data.description !== this.selected.description || data.preview !== this.selected.preview) {
+        const date = new Date();
+        const time = date.getTime();
 
-      return;
-    }
+        this.selected.push = true;
+        this.selected.updated = time;
+        this.selected.item.date = date;
 
-    if (mode === 3) {
-      this.tabInfo.id = tabId;
-      this.tabInfo.window = windowId;
+        this.indicator.hidden = false;
+        clearInterval(INTERVALS.intervals.indicator);
+      }
 
-      return chrome.storage.local.set({ tabInfo: this.tabInfo });
+      this.selected.title = data.title;
+      this.selected.description = data.description;
+      this.selected.cState = data.selection;
+      this.selected.pState = data.previewSelection;
+      this.selected.item.title = data.title;
+      this.selected.preview = data.preview;
+      this.listView.elements.create.disabled = !data.description;
+
+      clearInterval(INTERVALS.intervals.saving);
+
+      if (e.type === 'change') {
+        INTERVALS.intervals.saving = setTimeout(async () => await this.save(this.selected), this.triggerDelay);
+      } else {
+        await this.save(this.selected);
+      }
     }
   }
 
-  async saveWindowInfo(tabId: number, windowId?: number) {
-    const { screenTop, screenLeft, outerWidth, outerHeight } = window;
+  async save(item: INote) {
+    await super.save(item);
+    INTERVALS.intervals.indicator = setTimeout(() => this.indicator.hidden = true, this.triggerDelay);
+  }
 
-    if (this.tabInfo.id !== tabId || this.tabInfo.window !== windowId || this.tabInfo.top !== screenTop ||
-        this.tabInfo.left !== screenLeft || this.tabInfo.width !== outerWidth || this.tabInfo.height !== outerHeight) {
-      this.tabInfo.id = tabId;
-      this.tabInfo.window = windowId;
-      this.tabInfo.top = screenTop;
-      this.tabInfo.left = screenLeft;
-      this.tabInfo.width = outerWidth;
-      this.tabInfo.height = outerHeight;
-
-      console.log('saveWindowInfo', this.tabInfo);
-
-      return chrome.storage.local.set({ tabInfo: this.tabInfo });
-    }
+  onWindowChange(id: number, windowId?: number) {
+    clearInterval(INTERVALS.intervals.changed);
+    INTERVALS.intervals.changed = setTimeout(async () => this.saveWindowInfo(id, windowId), this.triggerDelay);
   }
 
   set collapsed(value: boolean) {
@@ -181,5 +192,28 @@ export class WindowNotesElement extends PopupBaseElement {
     super.hidden = value;
     this.listView.hidden = value;
     this.detailsView.hidden = value;
+  }
+
+  private async saveWindowInfo(id: number, windowId?: number) {
+    const { screenTop, screenLeft, outerWidth, outerHeight } = window;
+
+    if (this.tabInfo.id !== id || this.tabInfo.window !== windowId || this.tabInfo.top !== screenTop ||
+        this.tabInfo.left !== screenLeft || this.tabInfo.width !== outerWidth || this.tabInfo.height !== outerHeight) {
+      this.tabInfo.id = id;
+      this.tabInfo.window = windowId;
+      this.tabInfo.top = screenTop;
+      this.tabInfo.left = screenLeft;
+      this.tabInfo.width = outerWidth;
+      this.tabInfo.height = outerHeight;
+
+      return chrome.storage.local.set({ tabInfo: this.tabInfo });
+    }
+  }
+
+  private async saveTabInfo(tabId: number, windowId?: number) {
+    this.tabInfo.id = tabId;
+    this.tabInfo.window = windowId;
+
+    return chrome.storage.local.set({ tabInfo: this.tabInfo });
   }
 }
