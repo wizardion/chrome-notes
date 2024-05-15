@@ -1,4 +1,4 @@
-import { secretKey } from './keys'; // const secretKey = '';
+import { secretKey } from './keys';
 
 
 export class CryptoService {

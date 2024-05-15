@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -177,6 +178,10 @@ module.exports = {
     }
   },
   plugins: [
+    new webpack.NormalModuleReplacementPlugin(
+      /src\/modules\/encryption\/keys.ts/,
+      './keys.prod.ts'
+    ),
     new CleanWebpackPlugin(process.__version__? {
       cleanAfterEveryBuildPatterns: ['**/*']
     } : {

@@ -7,4 +7,4 @@ bower_components/
 node_modules/
 package-lock.json
 .manifest/
-/src/modules/encryption/keys.ts
+/src/modules/encryption/keys.prod.ts
