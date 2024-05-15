@@ -1,4 +1,4 @@
-const _secretKey_ = 'te~st-Sy#nc%K*ey-B-9frItU-mlw=8@9+';
+const _secretKey_ = '';
 
 export class CryptoService {
   protected encoder: TextEncoder;
