@@ -178,9 +178,10 @@ module.exports = {
     }
   },
   plugins: [
-    new webpack.NormalModuleReplacementPlugin(
-      /src\/modules\/encryption\/keys.ts/,
-      './keys.prod.ts'
+    ...(
+      process.__development__ || process.__version__
+        ? [new webpack.NormalModuleReplacementPlugin(/src\/modules\/encryption\/keys.ts/, './keys.prod.ts')]
+        : []
     ),
     new CleanWebpackPlugin(process.__version__? {
       cleanAfterEveryBuildPatterns: ['**/*']
