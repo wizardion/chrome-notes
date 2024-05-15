@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require("fs");
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
@@ -14,6 +15,7 @@ const htmlPlugins = require('./html-plugins');
 const { merge } = require('webpack-merge');
 
 const __root__ = path.resolve(__dirname, '..');
+const configPath = path.resolve(__root__, '.manifest/', process.__version__ ? 'manifest.prod.json' : 'manifest.json');
 
 const icons = {
   production: {
@@ -227,7 +229,7 @@ module.exports = {
       transform({ assetsByChunkName }) {
         const manifest = merge(
           require(path.resolve(__root__, 'src/manifest.json')),
-          require(path.resolve(__root__, '.manifest/', process.__version__ ? 'manifest.prod.json' : 'manifest.json'))
+          fs.existsSync(configPath)? require(configPath) : {}
         );
 
         manifest.background.service_worker = assetsByChunkName.background[0];
