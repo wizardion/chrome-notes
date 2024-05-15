@@ -133,7 +133,7 @@ export class DevModeElement extends BaseElement {
       }, {});
 
       console.table(table, [
-        'title', 'description', 'order', 'created', 'updated', 'preview', 'pState', 'pState', 'deleted'
+        'title', 'description', 'order', 'created', 'updated', 'preview', 'pState', 'pState', 'deleted', 'synced'
       ]);
       console.log('Data in JSON:', data || 'None');
       console.log('');
@@ -262,7 +262,7 @@ export class DevModeElement extends BaseElement {
         updated: item.updated,
         created: item.created,
         deleted: item.deleted,
-        synced: typeof (item.synced) === 'number' ? item.synced : 0,
+        synced: 0,
         preview: typeof (item.preview) === 'boolean' ? item.preview : false,
         cState: [0, 0],
         pState: null

@@ -1,4 +1,4 @@
 import 'styles/body.scss';
 
 
-import('./popup').then(({ init, whenDefined }) => whenDefined().then(() => init()));
+import('./mixed').then(({ init, whenDefined }) => whenDefined().then(() => init()));

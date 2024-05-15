@@ -1,5 +1,4 @@
 import { getApplicationId, decrypt } from 'core';
-// import {migrate} from 'modules/storage/migrate';
 import { ISyncStorageValue, storage } from 'core/services';
 import { startServiceWorker } from './components/services';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
@@ -17,13 +16,13 @@ chrome.runtime.onStartup.addListener(async () => initApplication('onStartup'));
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => startServiceWorker(alarm.name));
 
 chrome.action.onClicked.addListener(async () => {
-  const local = await chrome.storage.local.get(['window', 'migrate', 'tabInfo', 'settings']);
+  const local = await chrome.storage.local.get(['tabInfo', 'settings']);
 
   return openPopup(local.settings?.value as ISettingsArea, local.tabInfo as ITabInfo);
 });
 
 chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {
-  if (changes.syncInfo.newValue) {
+  if (changes.syncInfo?.newValue) {
     const newValue = <ISyncStorageValue>changes.syncInfo.newValue;
 
     if (newValue.id !== await getApplicationId()) {

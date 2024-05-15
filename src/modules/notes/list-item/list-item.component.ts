@@ -49,8 +49,10 @@ export class ListItemElement extends BaseElement {
     if (value) {
       this._title = value;
       this.form.elements.title.innerText = this._title.replace(/^\W+\s+/gi, '');
+      this.setAttribute('title', this._title);
     } else {
       this.form.elements.title.innerHTML = '<span class="empty">empty note ...</span>';
+      this.setAttribute('title', 'empty note ...');
     }
   }
 

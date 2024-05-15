@@ -51,7 +51,8 @@ export const PAGE_MODES: Record<number, IPageMode> = {
     ],
     page: null
   },
-  3: { popup: null, page: 'index.html' }
+  3: { popup: null, page: 'index.html' },
+  4: { popup: null, page: 'index.html' },
 };
 
 export { ISettingsArea };
@@ -78,9 +79,11 @@ export function setColors(settings: ISettingsArea = DEFAULT_SETTINGS, e?: MediaQ
   const dark = e ? e.matches : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   if (settings.common?.appearance === 2 || settings.common?.appearance === 0 && dark) {
+    document.body.classList.remove('theme-light');
     document.body.classList.add('theme-dark');
   } else {
     document.body.classList.remove('theme-dark');
+    document.body.classList.add('theme-light');
   }
 }
 

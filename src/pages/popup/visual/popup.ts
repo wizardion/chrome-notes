@@ -1,6 +1,5 @@
 import 'styles/style.scss';
-import { db } from 'modules/db';
-import { CachedStorageService } from 'core/services/cached';
+
 import { PopupNotesElement } from 'modules/notes/popup/popup.component';
 import { ListViewElement } from 'modules/notes/list-view/list-view.component';
 import { ListItemElement } from 'modules/notes/list-item/list-item.component';
@@ -27,20 +26,22 @@ export function whenDefined(): Promise<CustomElementConstructor[]> {
   ]);
 }
 
+async function loadDBNotes(popup: PopupNotesElement) {
+  const { db } = await import('modules/db');
+
+  db.iterate(item => popup.addItem(item)).then(() => popup.init());
+}
+
 export async function init() {
-  const notes = document.getElementById('simple-popup-notes') as PopupNotesElement;
+  const { CachedStorageService } = await import('core/services/cached');
+  const popup = document.getElementById('simple-popup-notes') as PopupNotesElement;
   const configs = await CachedStorageService.get();
 
   if (configs.selected) {
-    notes.hidden = false;
-    notes.select(configs.selected);
+    popup.select(configs.selected);
 
-    return setTimeout(() => {
-      db.iterate(item => notes.addItem(item)).then(() => notes.init());
-      notes.hidden = false;
-    }, 50);
+    return setTimeout(() => loadDBNotes(popup), 150);
   }
 
-  db.iterate(item => notes.addItem(item)).then(() => notes.init());
-  notes.hidden = false;
+  loadDBNotes(popup);
 }

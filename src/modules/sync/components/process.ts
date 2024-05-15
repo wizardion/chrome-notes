@@ -123,9 +123,8 @@ async function syncItems(
 
     // mark deleted
     if (info.db && !info.cloud && info.db.synced && !file.isNew && !info.db.deleted) {
-      info.db.deleted = 1;
       cloud.changed = true;
-      await db.update(info.db);
+      await db.update({ ...info.db, deleted: 1, synced: null });
       logger.info(i, ' - marked deleted local item: ', info.db.id, info.db.title);
       continue;
     }
@@ -136,8 +135,17 @@ async function syncItems(
 
       cloud.changed = true;
       cloud.items.push(info.cloud);
-      await decorator({ synced: modified, ...(await lib.unzip(info.cloud, oldCryptor)) });
+      await decorator({ ...(await lib.unzip(info.cloud, oldCryptor)), synced: modified });
       await logger.info(i, ' - received new item: ', info.cloud.i, info.cloud.t);
+      continue;
+    }
+
+    // remove from cloud
+    if (info.db && info.db.synced && info.cloud && (info.db.deleted || !info.db.description)) {
+      cloud.changed = true;
+      cloud.modified = modified;
+      await db.update({ ...info.db, synced: null });
+      logger.info(i, ' - marked un-sync local item: ', info.db.id, info.db.title);
       continue;
     }
 
@@ -145,7 +153,7 @@ async function syncItems(
     if (info.db && !info.db.deleted && (!info.cloud || info.db.updated > info.cloud.u)) {
       cloud.changed = true;
       cloud.modified = modified;
-      await db.update({ synced: modified, ...info.db });
+      await db.update({ ...info.db, synced: modified });
       cloud.items.push(await lib.zip(info.db, (newCryptor || oldCryptor)));
       await logger.info(i, ' - pushed item to cloud: ', info.db.id, info.db.title);
       continue;
@@ -153,7 +161,7 @@ async function syncItems(
 
     // keep the rest
     if (!info.db.deleted) {
-      await db.update({ synced: modified, ...info.db });
+      await db.update({ ...info.db, synced: modified });
       cloud.items.push(await lib.zip(info.db, (newCryptor || oldCryptor)));
     }
   }

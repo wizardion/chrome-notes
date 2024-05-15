@@ -36,4 +36,8 @@ export interface ISettingsArea {
 export interface ITabInfo {
   id: number;
   window: number;
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
 }

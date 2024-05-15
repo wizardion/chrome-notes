@@ -28,8 +28,7 @@ export class CommonSettingsElement extends BaseElement {
       popupOptions: <HTMLElement> this.template.querySelector('div[name="popup-options"]'),
       popupSize: <NodeList> this.template.querySelectorAll('input[name="popup-size"]'),
       appearance: <NodeList> this.template.querySelectorAll('input[name="appearance"]'),
-      expirationDays: this.template.querySelector('select[name="expirationDays"]'),
-      // progressBar: this.template.querySelector('progress-bar')
+      expirationDays: this.template.querySelector('select[name="expirationDays"]')
     });
   }
 
@@ -63,8 +62,6 @@ export class CommonSettingsElement extends BaseElement {
 
       item.addEventListener('change', () => this.onAppearanceChange(item));
     }
-
-    // this.form.elements.progressBar.addEventListener('progress:animation-complete', () => this.onAnimationComplete());
   }
 
   protected onModeChange(item: HTMLInputElement) {

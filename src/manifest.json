@@ -4,16 +4,20 @@
    },
    "action": {
       "default_popup": "popup.html",
-      "default_title": "My-Notes-Testers"
+      "default_title": "My-Notes"
    },
    "options_page": "options.html",
    "icons": {
-      "128": "icon-128.png"
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "96": "icon96.png",
+      "128": "icon128.png"
    },
-   "description": "My-Notes-Testers - save your notes wherever you are.",
-   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAot+j6ZF6RdKhXjiDkw1fW6zlLdyOtIjYU6hi2gDPk0kBDouqqEjA/fHtldXkmJUB9+4i6/BdfJQWYstebGr5bzYvBlmiOJEaBIblSm0ylCOTsQ7F4v0Z84RrngudA6Hg1myy/ioM+dO1yS0n3USt+V6DfaCnwapbU0euYNY8kkinhq1S2QlyOHQsHdv0G7zPA46s8JItYAts6zdisAn0Kv8meyPywVDSimSgXbUUEg1pKUf10BRBhTXtotwUqBey2ijtpf1jnBiQmfz3ozQT37fFArZztUfTMqwXQecz4x8Qt9yTBspEvwncBcQgmM8el6SkZIcuZ3qa8lsSY/aV1QIDAQAB",
+   "description": "My-Notes - Put your story into notes...",
+   "key": null,
    "manifest_version": 3,
-   "name": "My-Notes-Testers",
+   "name": "My-Notes",
    "update_url": "https://clients2.google.com/service/update2/crx",
    "permissions": [
       "alarms",
@@ -22,7 +26,7 @@
       "identity"
    ],
    "oauth2": {
-    "client_id": "1061764704231-pm8qj8efbb8a4md2u4aduig6pkeikiai.apps.googleusercontent.com",
+    "client_id": null,
     "scopes": [
       "https://www.googleapis.com/auth/drive.file"
     ]

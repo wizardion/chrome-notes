@@ -1,4 +1,5 @@
-const _secretKey_ = 'te~st-Sy#nc%K*ey-B-9frItU-mlw=8@9+';
+import { secretKey } from './keys';
+
 
 export class CryptoService {
   protected encoder: TextEncoder;
@@ -16,7 +17,7 @@ export class CryptoService {
     }
 
     if (password) {
-      this.password = useSecret ? password : password + _secretKey_;
+      this.password = useSecret ? password : password + secretKey;
     }
 
     this.encoder = new TextEncoder();
@@ -101,11 +102,11 @@ export class CryptoService {
   }
 
   async verify(encrypted: string): Promise<boolean> {
-    return encrypted !== _secretKey_ && (await this.decrypt(encrypted)) === _secretKey_;
+    return encrypted !== secretKey && (await this.decrypt(encrypted)) === secretKey;
   }
 
   async generateSecret(): Promise<string> {
-    return this.password && this.password.length ? await this.encrypt(_secretKey_) : null;
+    return this.password && this.password.length ? await this.encrypt(secretKey) : null;
   }
 
   get transparent(): boolean {

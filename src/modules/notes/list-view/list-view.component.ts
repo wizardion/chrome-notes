@@ -21,7 +21,9 @@ export class ListViewElement extends BaseElement {
       create: this.template.querySelector('[name="create-note"]'),
       list: this.template.querySelector('[name="list-items"]'),
       scrollable: this.template.querySelector('[name="scrollable"]'),
-      placeholder: this.template.querySelector('[name="placeholder"]')
+      placeholder: this.template.querySelector('[name="placeholder"]'),
+      controls: this.template.querySelector('[name="list-controls"]'),
+      content: this.template.querySelector('[name="list-content"]'),
     });
   }
 

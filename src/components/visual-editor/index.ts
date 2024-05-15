@@ -82,16 +82,11 @@ export class VisualEditor implements IEditorView {
   }
 
   getData(): IEditorData {
-    let title: string = null;
     const text = TextSerializer.serialize(this.view.state) || '';
     const value = MarkdownSerializer.serialize(this.view.state);
+    const shorten = ((/\n/g).test(text) ? text.split(/\n/g).shift() : text).split(' ').splice(0, 6).join(' ');
+    const title = mdRender.toString(shorten).replace(/\n/g, '');
     const { anchor, head } = this.view.state.selection.toJSON();
-
-    if ((/\n/g).test(text)) {
-      title = text.split(/\n/g).shift() || '';
-    } else {
-      title = text.split(' ').splice(0, 6).join(' ');
-    }
 
     return { title: title, description: value, selection: [anchor, head] };
   }

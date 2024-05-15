@@ -1,16 +1,20 @@
 import { IDBNote } from 'modules/db';
-import { ICachedItem, ICachedItems } from './models/cached.models';
+import { ICachedItem, ICachedItems, ICachedSettings } from './models/cached.models';
 
 
 export class CachedStorageService {
   protected static readonly key = 'cache';
   public static item: ICachedItem;
 
-  public static async set(key: ICachedItems, value: IDBNote) {
+  public static async set<T = IDBNote | ICachedSettings>(key: ICachedItems, value: T) {
     this.item = this.item || ((await chrome.storage.session.get(this.key) || {})[this.key] || {}) as ICachedItem;
 
     if (key === 'selected') {
-      this.item.selected = this.copy(value);
+      this.item.selected = this.copy(<IDBNote> value);
+    }
+
+    if (key === 'settings') {
+      this.item.settings = value as ICachedSettings;
     }
 
     await chrome.storage.local.set({ [this.key]: this.item });
@@ -22,6 +26,10 @@ export class CachedStorageService {
 
     if (key === 'selected') {
       return this.item.selected as T;
+    }
+
+    if (key === 'settings') {
+      return this.item.settings as T;
     }
 
     return this.item as T;

@@ -54,7 +54,8 @@ export abstract class PopupBaseElement extends BaseElement {
       this.selected = note;
       this.preserved = null;
       this.selected.item.classList.add('selected');
-      setTimeout(() => this.selected.item.scrollIntoView({ behavior: 'instant', block: 'center' }), 1);
+      this.listView.elements.scrollable.scrollTop =
+        this.listView.elements.scrollable.scrollHeight - this.listView.elements.scrollable.offsetHeight;
     }
   }
 
@@ -65,7 +66,7 @@ export abstract class PopupBaseElement extends BaseElement {
     if (this.initialized) {
       this.selected = item;
       this.selected.item.classList.add('selected');
-      await DbProviderService.cache.set('selected', this.selected);
+      await DbProviderService.cache.set<INote>('selected', this.selected);
     } else {
       this.preserved = item.id;
       this.listView.elements.create.disabled = !item.description;
@@ -181,8 +182,8 @@ export abstract class PopupBaseElement extends BaseElement {
     }
   }
 
-  private async save(item: INote) {
+  async save(item: INote) {
     await DbProviderService.save(item);
-    await DbProviderService.cache.set('selected', item);
+    await DbProviderService.cache.set<INote>('selected', item);
   }
 }

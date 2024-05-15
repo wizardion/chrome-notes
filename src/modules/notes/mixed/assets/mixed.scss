@@ -103,14 +103,15 @@ details-view {
 
 .details-view .content {
   border-left-color: var(--base-background-stroke);
-  border-bottom-color: var(--base-background-stroke);
-  border-right-color: var(--base-background-stroke);
-  height: 237px;
-  margin-right: 5px;
+  height: 242px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom: none;
+  border-right: none;
 }
 
 .middle .details-view .content {
-  height: 417px;
+  height: 424px;
 }
 
 .cm-editor,
@@ -152,3 +153,5 @@ details-view[data-scroll='true'] {
     border-right: 1px solid var(--editor-menu-stroke-dimmed) !important;
   }
 }
+
+@import 'list-toggle'

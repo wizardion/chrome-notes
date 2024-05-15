@@ -79,7 +79,7 @@ export class MarkdownEditor implements IEditorView {
 
   getData(): IEditorData {
     const value = this.view.state.doc.toString() || '';
-    const head = (/\n/g).test(value) ? value.split(/\n/g).shift() || '' : value.split(' ').splice(0, 6).join(' ');
+    const head = ((/\n/g).test(value) ? value.split(/\n/g).shift() : value).split(' ').splice(0, 6).join(' ');
     const title = mdRender.toString(head).replace(/\n/g, '');
 
     return { title: title, description: value, selection: this.getSelection() };

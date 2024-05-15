@@ -51,17 +51,6 @@ details-view {
   margin-top: 0px;
 }
 
-// .list-view .drag .list-item .button,
-// .list-view .drag .list-item {
-//   line-height: 25px !important;
-//   height: 25px !important;
-// }
-
-// .list-view .drag .list-item .button.to-note {
-//   line-height: 23px !important;
-//   height: 23px !important;
-// }
-
 .list-item .list-index,
 .list-item .list-index + div,
 .list-item .date-time,
@@ -138,11 +127,6 @@ details-view {
   margin-top: 4px;
 }
 
-.head .controls-group {
-  margin-left: 50px;
-  margin-right: 50px;
-}
-
 .details-view .head .button.save {
   position: relative;
   float: none;
@@ -160,10 +144,11 @@ details-view {
 
 .details-view .content {
   border-left-color: var(--base-background-stroke);
-  border-bottom-color: var(--base-background-stroke);
-  border-right-color: var(--base-background-stroke);
-  height: calc(100% - 33px);
-  margin-right: 5px;
+  height: calc(100% - 26px);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom: none;
+  border-right: none;
 }
 
 .details-view ::-webkit-scrollbar {
@@ -200,6 +185,27 @@ details-view {
   display: none !important;
 }
 
+.changed-indicator {
+  position: absolute;
+  top: 5px;
+  right: 50px;
+  width: 16px;
+  height: 16px;
+  border: 0px;
+  color: var(--editor-text-url-hover);
+  fill: var(--editor-text-url-hover);
+}
+
+.markdown-mode .changed-indicator {
+  right: 80px;
+}
+
+.details-view .head .controls-group {
+  position: absolute;
+  min-width: 385px;
+  transform: translateX(50px);
+}
+
 details-view[data-scroll='true'] {
   .head {
     box-shadow: none;
@@ -219,3 +225,5 @@ details-view[data-scroll='true'] {
     border-right: 1px solid var(--editor-menu-stroke-dimmed) !important;
   }
 }
+
+@import 'list-toggle';

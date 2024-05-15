@@ -9,7 +9,7 @@ function fromString(text: string): IDBNote[] {
     const values: string[] = matches[i].match(/[^\f]+/g);
 
     result.push({
-      id: 1,
+      id: new Date().getTime(),
       title: values[0],
       description: !values[1] ? '' : values[1],
       order: i,

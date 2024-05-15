@@ -1,6 +1,8 @@
 'use strict';
 
+const fs = require("fs");
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -11,8 +13,33 @@ const svgToMiniDataURI = require('mini-svg-data-uri');
 const processHtmlLoader = require('./html-preprocessor');
 const htmlWebpackConfig = require('./html-webpack.config');
 const htmlPlugins = require('./html-plugins');
+const { merge } = require('webpack-merge');
+
 const __root__ = path.resolve(__dirname, '..');
-const icon = process.__version__? 'src/images/check.png' : 'src/images/check-dev.png';
+const configPath = path.resolve(__root__, '.manifest/', process.__version__ ? 'manifest.prod.json' : 'manifest.json');
+
+const icons = {
+  production: {
+    light: [
+      { from: 'icon16.png', to: 'icon16.png'},
+      { from: 'icon32.png', to: 'icon32.png'},
+      { from: 'icon48.png', to: 'icon48.png'},
+      { from: 'icon96.png', to: 'icon96.png'},
+      { from: 'icon128.png', to: 'icon128.png'},
+    ],
+    dark: [],
+  },
+  develop: {
+    light: [
+      { from: 'dev/icon16-dev.png', to: 'icon16.png'},
+      { from: 'dev/icon32-dev.png', to: 'icon32.png'},
+      { from: 'dev/icon48-dev.png', to: 'icon48.png'},
+      { from: 'dev/icon96-dev.png', to: 'icon96.png'},
+      { from: 'dev/icon128-dev.png', to: 'icon128.png'},
+    ],
+    dark: [],
+  }
+}
 
 
 module.exports = {
@@ -30,7 +57,7 @@ module.exports = {
 
     background: path.resolve(__root__, 'src/worker/background.ts'),
     settings: path.resolve(__root__, 'src/pages/options/options.ts'),
-    migration: path.resolve(__root__, 'src/pages/migration/migration.ts'),
+    whatsNew: path.resolve(__root__, 'src/pages/whats-new/whats-new.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -151,15 +178,19 @@ module.exports = {
     }
   },
   plugins: [
+    ...(
+      process.__development__ || process.__version__
+        ? [new webpack.NormalModuleReplacementPlugin(/src\/modules\/encryption\/keys.ts/, './keys.prod.ts')]
+        : []
+    ),
     new CleanWebpackPlugin(process.__version__? {
       cleanAfterEveryBuildPatterns: ['**/*']
     } : {
       // cleanStaleWebpackAssets: false,
     }),
     new CopyWebpackPlugin({
-      patterns: [
-        {from: icon, to: 'icon-128.png'},
-      ]
+      patterns: (process.__version__ ? icons.production : icons.develop).light
+        .map(i => ({from: path.resolve(__root__, 'src/icons', i.from), to: i.to}))
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[chunkhash].css',
@@ -193,21 +224,24 @@ module.exports = {
     new HtmlWebpackPlugin({
       ...htmlWebpackConfig,
       
-      filename: 'migration.html',
-      template: './src/pages/migration/migration.html',
+      filename: 'whats-new.html',
+      template: './src/pages/whats-new/whats-new.html',
       chunks: [
-        'migration'
+        'whatsNew'
       ],
     }),
     new StatsWriterPlugin({
       filename: 'manifest.json',
       transform({ assetsByChunkName }) {
-        let manifest = require(path.resolve(__root__, 'src/manifest.json'));
+        const manifest = merge(
+          require(path.resolve(__root__, 'src/manifest.json')),
+          fs.existsSync(configPath)? require(configPath) : {}
+        );
 
         manifest.background.service_worker = assetsByChunkName.background[0];
         manifest.version = process.__version__;
 
-        if (!manifest.version) {
+        if (!manifest.version || process.__development__) {
           delete manifest.key;
 
           manifest.version = '0';

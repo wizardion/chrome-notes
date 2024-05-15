@@ -1,0 +1,96 @@
+$themes: (
+  light: (
+    'body-color': #f1f3f4,
+    'base-text-color': black,
+    'base-bright-color': #06736a,
+
+    'base-highlight-color': #045c55,
+    'base-inactive-color': #a4a7a7,
+
+    'tile-background-color': white,
+    'tile-border-color': silver,
+    'tile-shadow-color': #056a6128,
+
+    'control-input-background-color': white,
+    'control-background-color': #06736a22,
+    'control-border-color': #06736a94,
+    'control-text-color': #045c55,
+
+    'control-bright-color': #06736a,
+    'progress-thumb-color': lighten(#06736a, 7%),
+    'control-transparent-color': white,
+
+    'control-inactive-background-color': #f7f7f7,
+    'control-inactive-border-color': #06736a22,
+    'control-inactive-text-color': #a4a7a7,
+
+    'control-hover-background-color': lighten(#06736a22, 0%),
+    'control-hover-border-color': lighten(#06736a94, 0%),
+    'control-hover-text-color': lighten(#045c55, 15%),
+
+    'control-activated-background-color': #06736a18,
+    'control-activated-border-color': #06736a44,
+    'control-activated-text-color': darken(#045c55B5, 2%),
+
+    'control-dangerous-background-color': #e336361a,
+    'control-dangerous-border-color': #e3363655,
+
+    'control-activated-dangerous-background-color': #e336362a,
+    'control-activated-dangerous-border-color': #e3363665,
+
+    'validator-error-color': #a32626,
+    'validator-error-background-color': #9d232315,
+    'validator-warn-color': chocolate,
+  ),
+  dark: (
+    'body-color': #28292A,
+    'base-text-color': #c7c7c7,
+    'base-bright-color': #e3e3e3,
+
+    'base-highlight-color': scale-color(#aecbfa, $saturation: -30%),
+    'base-inactive-color': #595f67,
+
+    'tile-background-color': #34363a,
+    'tile-border-color': rgba(#31363C, .65),
+    'tile-shadow-color': rgba(0, 0, 0, 0.3),
+
+    'control-input-background-color': #404347,
+    'control-background-color': #404347,
+    'control-border-color': #4f5862,
+    'control-text-color': #c7c7c7,
+
+    'control-bright-color': lighten(#aecbfa, 1%),
+    'progress-thumb-color': lighten(#aecbfa, 1%),
+    'control-transparent-color': #34363a,
+
+    'control-inactive-background-color': darken(#404347, 3%),
+    'control-inactive-border-color': darken(#4f5862, 10%),
+    'control-inactive-text-color': #60676f,
+
+    'control-hover-background-color': lighten(#404347, 2%),
+    'control-hover-border-color': lighten(#4f5862, 5%),
+    'control-hover-text-color': lighten(#c7c7c7, 15%),
+
+    'control-activated-background-color': darken(#404347, 2%),
+    'control-activated-border-color': darken(#4f5862, 5%),
+    'control-activated-text-color': darken(#c7c7c7, 15%),
+
+    'control-dangerous-background-color': #e336361a,
+    'control-dangerous-border-color': #e3363655,
+
+    'control-activated-dangerous-background-color': #e336362a,
+    'control-activated-dangerous-border-color': #e3363665,
+
+    'validator-error-color': lighten(#a32626, 20%),
+    'validator-error-background-color': lighten(#9d232325, 35%),
+    'validator-warn-color': lighten(chocolate, 10%),
+  )
+);
+
+@each $name, $map in $themes {
+  .theme-#{$name} {
+    @each $key, $value in $map {
+      --#{$key}: #{$value};
+    }
+  }
+}

@@ -28,6 +28,9 @@ export async function initApplication(handler: string) {
   await logger.info('initApp is fired: ', handler);
 
   // if migrate needed!
+  if (await storage.local.get<boolean>('migrate')) {
+    chrome.tabs.create({ url: 'whats-new.html' });
+  }
 
   // TODO restore all sessions.
   await core.ensureApplicationId();
@@ -53,34 +56,33 @@ export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
 
       return chrome.tabs.update(tab.id, { active: true });
     }
+
+    if (settings.common.mode === 4) {
+      await logger.info('open-window', tabInfo.top, tabInfo.left, tabInfo.width, tabInfo.height);
+
+      try {
+        await chrome.windows.create({
+          focused: true,
+          url: mode.page || 'option.html',
+          type: 'popup',
+          top: tabInfo.top || null,
+          left: tabInfo.left || null,
+          width: tabInfo.width || 800,
+          height: tabInfo.height || 600
+        });
+
+        return;
+      } catch (er) {
+        logger.warn('Error opening window', er.message);
+      }
+    }
+  }
+
+  if (settings.common.mode === 4) {
+    return chrome.windows.create({ focused: true, url: mode.page || 'option.html', type: 'popup' });
   }
 
   return chrome.tabs.create({ url: mode.page || 'option.html' });
-
-  // export function openPopup(index: number, editor: number, window?: IWindow, tabId?: number, windowId?: number) {
-  // if (mode === 0) {
-  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  // }
-
-  // if (mode === 3) {
-  //   return chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
-  // }
-
-  // if (mode === 4) {
-  //   if (window) {
-  //     chrome.windows.create({
-  //       focused: true,
-  //       url: chrome.runtime.getURL('index.html'),
-  //       type: 'popup',
-  //       left: window.left,
-  //       top: window.top,
-  //       width: window.width,
-  //       height: window.height,
-  //     });
-  //   } else {
-  //     chrome.windows.create({ focused: true, url: chrome.runtime.getURL('popup.html'), type: 'popup' });
-  //   }
-  // }
 }
 
 export async function onPushInfoChanged(oldValue: ISyncPushInfo, newValue: ISyncPushInfo) {
