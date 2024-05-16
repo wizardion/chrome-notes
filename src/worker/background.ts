@@ -9,11 +9,11 @@ import {
 } from './components';
 
 
-chrome.runtime.onInstalled.addListener(async () => initApplication('onInstalled'));
+chrome.runtime.onInstalled.addListener(async () => await initApplication('onInstalled'));
 
-chrome.runtime.onStartup.addListener(async () => initApplication('onStartup'));
+chrome.runtime.onStartup.addListener(async () => await initApplication('onStartup'));
 
-chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => startServiceWorker(alarm.name));
+chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) =>  await startServiceWorker(alarm.name));
 
 chrome.action.onClicked.addListener(async () => {
   const local = await chrome.storage.local.get(['tabInfo', 'settings']);
