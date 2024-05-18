@@ -1,3 +1,4 @@
+import './assets/progress-bar.scss';
 import { BaseElement } from 'core/components';
 
 
@@ -7,7 +8,7 @@ const template: DocumentFragment = BaseElement.component({
 
 export class ProgressElement extends BaseElement {
   static readonly selector = 'progress-bar';
-  static observedAttributes = ['disabled', 'default-index'];
+  static observedAttributes = ['disabled', 'autoplay'];
 
   protected progress: HTMLDivElement;
   protected thumb: HTMLDivElement;
@@ -30,6 +31,12 @@ export class ProgressElement extends BaseElement {
   protected async eventListeners() {
     this.animationEvent = () => this.animationIteration();
     this.event = new Event('progress:animation-complete');
+  }
+
+  protected attributeChanged(name: string, oldValue: string, newValue: string): void {
+    if (name === 'autoplay' && !oldValue && newValue === 'true') {
+      this.spinning = true;
+    }
   }
 
   protected animationIteration() {

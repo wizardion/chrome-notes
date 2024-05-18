@@ -77,6 +77,18 @@ popup-notes.collapsed .list-content .list-item {
 }
 
 @media(max-width: 805px) {
+  .details-view .head .controls-group {
+    transform: translateX(30px);
+  }
+}
+
+@media(max-width: 785px) {
+  .details-view .head .controls-group {
+    transform: translateX(0px);
+  }
+}
+
+@media(max-width: 750px) {
   popup-notes.collapsed-animating list-view,
   popup-notes.collapsed-animating .details-view .content,
   popup-notes.collapsed-animating .list-controls .list-toggle,
@@ -85,12 +97,6 @@ popup-notes.collapsed .list-content .list-item {
     transition: none;
   }
 
-  .details-view .head .controls-group {
-    transform: translateX(0px);
-  }
-}
-
-@media(max-width: 750px) {
   popup-notes .notes-title,
   popup-notes .list-content .list-item .sort,
   popup-notes .list-content .list-item .date-time,

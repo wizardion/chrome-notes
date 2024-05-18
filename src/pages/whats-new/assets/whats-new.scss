@@ -170,6 +170,7 @@ a:hover {
   margin-right: 20px;
   display: inline-block;
 }
+
 .footer a svg {
   display: inline-block;
   vertical-align: middle;
@@ -183,4 +184,34 @@ a:hover {
 
 .theme-light .visible-dark {
   display: none;
+}
+
+.error-content {
+  min-height: calc(100vh - 105px);
+}
+
+.error {
+  background-color: var(--validator-error-background-color);
+  color: var(--validator-error-color);
+  fill: var(--validator-error-color);
+  padding: 5px;
+  border: 1px solid var(--validator-error-color);
+  margin: 40px auto;
+  width: 60%;
+  text-align: center;
+}
+
+.error .error-header {
+  font-size: large;
+}
+
+[hidden],
+.hidden {
+  display: none;
+}
+
+progress-bar {
+  width: 60%;
+  display: block;
+  margin: 40px auto;
 }

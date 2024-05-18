@@ -23,7 +23,6 @@ details-view {
 .list-view .list-item,
 .list-view .hold .list-item:hover {
   border-radius: 4px;
-  // border-left-width: 2px;
 }
 
 .list-item .list-index,
@@ -31,6 +30,10 @@ details-view {
 .list-item .date-time,
 .details-view .head .link.back {
   display: none;
+}
+
+.list-view .list-item .list-title {
+  font-size: 14px;
 }
 
 .list-items .list-item:active {

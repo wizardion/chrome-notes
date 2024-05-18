@@ -125,7 +125,7 @@ export class DevModeElement extends BaseElement {
       const table = data.reduce((acc: Record<number, Partial<IDBLogNote>>, { id, ...x }) => {
         acc[id] = {
           ...x,
-          cState: x.cState.join(','),
+          cState: x.cState?.join(','),
           pState: x.pState
         };
 

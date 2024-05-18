@@ -1,16 +1,17 @@
 import './assets/whats-new.scss';
 import { migrate } from 'core/utils/migrate';
 import { ISettingsArea, getSettings, setColors } from 'modules/settings';
+import { ProgressElement } from 'pages/components/progress-bar/progress.component';
 import { IStorageChange } from 'pages/options/components/options.model';
 
 
 const mediaColorScheme = '(prefers-color-scheme: dark)';
 
-export function eventOnColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
+function eventOnColorChanged(settings: ISettingsArea, e?: MediaQueryListEvent) {
   return setColors(settings, e);
 }
 
-export async function onLocalStorageChanged(changes: IStorageChange) {
+async function onLocalStorageChanged(changes: IStorageChange) {
   if (changes.settings?.newValue?.value) {
     const settings = <ISettingsArea>changes.settings.newValue.value;
 
@@ -20,7 +21,9 @@ export async function onLocalStorageChanged(changes: IStorageChange) {
   }
 }
 
-chrome.storage.local.get(['migrate', 'oldNotes']).then(async (local) => {
+customElements.define(ProgressElement.selector, ProgressElement);
+customElements.whenDefined(ProgressElement.selector).then(async () => {
+  const local = await chrome.storage.local.get(['migrate', 'oldNotes']);
   const settings = await getSettings({ sync: true, identity: true });
   const content = document.getElementById('content') as HTMLDivElement;
   const footer = document.getElementById('footer') as HTMLDivElement;
@@ -36,7 +39,29 @@ chrome.storage.local.get(['migrate', 'oldNotes']).then(async (local) => {
   }
 
   if (local.migrate && oldNotes) {
-    await migrate(oldNotes);
+    const progress = document.createElement('progress-bar') as ProgressElement;
+
+    try {
+      document.body.insertBefore(progress, document.body.firstElementChild);
+      progress.spinning = true;
+
+      await migrate(oldNotes);
+
+      return progress.finish().then(() => {
+        progress.remove();
+        content.hidden = false;
+        footer.hidden = false;
+      });
+    } catch (error) {
+      return progress.finish().then(() => {
+        const message = document.getElementById('error') as HTMLDivElement;
+
+        progress.remove();
+        message.hidden = false;
+        footer.hidden = false;
+        console.log('error', error);
+      });
+    }
   }
 
   content.hidden = false;

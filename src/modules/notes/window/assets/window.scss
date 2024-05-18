@@ -206,6 +206,10 @@ details-view {
   transform: translateX(50px);
 }
 
+.list-view .drag .list-item {
+  line-height: 28px !important;
+}
+
 details-view[data-scroll='true'] {
   .head {
     box-shadow: none;
