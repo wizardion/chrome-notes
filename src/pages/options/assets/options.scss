@@ -528,46 +528,8 @@ span.info {
   display: inline-block;
 }
 
-.progress-bar {
-  width: calc(100% - 150px);
-  height: 4px;
-  display: inline-block;
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid transparent;
-  box-sizing: border-box;
-  margin-top: -2px;
-  vertical-align: middle;
-  top: 0px;
-}
-
 .sync-progress .progress-bar {
   width: 100%;
-}
-
-.progress-bar .progress-thumb {
-  float: left;
-  background-color: var(--progress-thumb-color);
-  border-radius: 4px;
-  height: 100%;
-  width: 0%;
-  margin-top: 0px;
-  margin-left: 0px;
-  box-sizing: border-box;
-}
-
-.progress-bar.animating {
-  background-color: var(--control-inactive-background-color);
-}
-
-.progress-bar .animate {
-  width: 15%;
-  position: absolute;
-  top: 0px;
-  animation: in-progress 2s;
-  animation-fill-mode: forwards;
-  animation-iteration-count: infinite;
 }
 
 ul.flat {
@@ -581,20 +543,6 @@ ul.flat li {
 
 ul li input[type="radio"]:checked + span {
   color: var(--base-highlight-color);
-}
-
-@keyframes in-progress {
-  0% {
-    left: -15%;
-  }
-
-  75% {
-    left: 85%;
-  }
-
-  100% {
-    left: 100%;
-  }
 }
 
 input:disabled,

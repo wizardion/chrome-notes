@@ -24,11 +24,13 @@ export async function initPopup() {
 }
 
 export async function initApplication(handler: string) {
+  const local = await chrome.storage.local.get('migrate');
+
   await logger.addLine();
   await logger.info('initApp is fired: ', handler);
 
   // if migrate needed!
-  if (await storage.local.get<boolean>('migrate')) {
+  if (local.migrate) {
     chrome.tabs.create({ url: 'whats-new.html' });
   }
 

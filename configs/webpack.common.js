@@ -16,7 +16,8 @@ const htmlPlugins = require('./html-plugins');
 const { merge } = require('webpack-merge');
 
 const __root__ = path.resolve(__dirname, '..');
-const configPath = path.resolve(__root__, '.manifest/', process.__version__ ? 'manifest.prod.json' : 'manifest.json');
+const production = process.env.NODE_ENV === 'production';
+const manifestPath = path.resolve(__root__, '.manifest/', production ? 'manifest.prod.json' : 'manifest.json');
 
 const icons = {
   production: {
@@ -179,18 +180,18 @@ module.exports = {
   },
   plugins: [
     ...(
-      process.__development__ || process.__version__
+      production
         ? [new webpack.NormalModuleReplacementPlugin(/src\/modules\/encryption\/keys.ts/, './keys.prod.ts')]
         : []
     ),
-    new CleanWebpackPlugin(process.__version__? {
-      cleanAfterEveryBuildPatterns: ['**/*']
-    } : {
-      // cleanStaleWebpackAssets: false,
-    }),
+    new CleanWebpackPlugin(production? { cleanAfterEveryBuildPatterns: ['**/*']} : {}),
     new CopyWebpackPlugin({
-      patterns: (process.__version__ ? icons.production : icons.develop).light
-        .map(i => ({from: path.resolve(__root__, 'src/icons', i.from), to: i.to}))
+      patterns: [].concat(
+        (production ? icons.production : icons.develop).light
+          .map(i => ({ from: path.resolve(__root__, 'src/icons', i.from), to: i.to })),
+        (production ? icons.production : icons.develop).dark
+          .map(i => ({from: path.resolve(__root__, 'src/icons', i.from), to: i.to}))
+      )
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[chunkhash].css',
@@ -235,19 +236,9 @@ module.exports = {
       transform({ assetsByChunkName }) {
         const manifest = merge(
           require(path.resolve(__root__, 'src/manifest.json')),
-          fs.existsSync(configPath)? require(configPath) : {}
+          fs.existsSync(manifestPath) ? require(manifestPath) : {},
+          { background: { service_worker: assetsByChunkName.background[0] }}
         );
-
-        manifest.background.service_worker = assetsByChunkName.background[0];
-        manifest.version = process.__version__;
-
-        if (!manifest.version || process.__development__) {
-          delete manifest.key;
-
-          manifest.version = '0';
-          manifest.name = 'My-Notes-Testers (Dev)';
-          manifest.action.default_title = 'My-Notes-Testers (Dev)';
-        }
 
         return JSON.stringify(manifest, null, 2);
       }

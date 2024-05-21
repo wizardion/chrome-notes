@@ -1,5 +1,5 @@
 import { PasswordElement } from '../../passwords/password.component';
-import { ProgressElement } from '../../progress-bar/progress.component';
+import { ProgressElement } from '../../../../components/progress-bar/progress.component';
 
 
 export interface ISyncInfoForm {

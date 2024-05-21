@@ -12,7 +12,7 @@ list-item {
 
 .list-view .list-item,
 .list-view .hold .list-item:hover {
-  line-height: 25px;
+  line-height: 26px;
   height: 25px;
   padding-left: 10px;
   color: inherit;
@@ -29,12 +29,13 @@ list-item {
   // background: rebeccapurple;
 }
 
-.list-view .list-item > div {
-  margin-top: 1px;
-  margin-bottom: -1px;
-}
+// .list-view .list-item > div {
+//   margin-top: 1px;
+//   margin-bottom: -1px;
+// }
 
-.list-view .list-item:hover {
+.list-view .list-item:hover, 
+.list-view .drag .list-item {
   cursor: pointer;
   color: var(--base-bright-color);
   background: linear-gradient(to right, var(--base-highlight-color), var(--base-highlight-second-color));
@@ -81,7 +82,7 @@ list-item {
 .list-item .sort,
 .list-view .hold .list-item:hover .sort {
   width: 20px;
-  height:25px;
+  height:24px;
   margin-right: 4px;
   margin-left: -5px;
   color: var(--base-color);
@@ -144,7 +145,7 @@ list-item {
   opacity: 1 !important;
   padding-right: 2px;
   border-width: 0;
-  line-height: 23px !important;
+  line-height: 26px !important;
   height: 25px !important;
 }
 
@@ -157,7 +158,6 @@ list-item {
 .list-view .drag .list-item .sort {
   margin-left: -5px;
   margin-right: 7px;
-  margin-top: -1px;
   color: var(--base-color-hover);
   fill: var(--base-color-hover);
 }
