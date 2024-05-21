@@ -24,7 +24,8 @@
       "alarms",
       "storage",
       "unlimitedStorage",
-      "identity"
+      "identity",
+      "offscreen"
    ],
    "oauth2": {
     "client_id": null,

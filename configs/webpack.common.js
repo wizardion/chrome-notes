@@ -59,6 +59,8 @@ module.exports = {
     background: path.resolve(__root__, 'src/worker/background.ts'),
     settings: path.resolve(__root__, 'src/pages/options/options.ts'),
     whatsNew: path.resolve(__root__, 'src/pages/whats-new/whats-new.ts'),
+
+    offscreen: path.resolve(__root__, 'src/pages/offscreen/offscreen.ts'),
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -224,7 +226,15 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       ...htmlWebpackConfig,
-      
+
+      filename: 'offscreen.html',
+      chunks: [
+        'offscreen'
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      ...htmlWebpackConfig,
+
       filename: 'whats-new.html',
       template: './src/pages/whats-new/whats-new.html',
       chunks: [

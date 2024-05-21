@@ -25,9 +25,18 @@ export async function initPopup() {
 
 export async function initApplication(handler: string) {
   const local = await chrome.storage.local.get('migrate');
+  const hasDocument = await chrome.offscreen.hasDocument();
 
   await logger.addLine();
-  await logger.info('initApp is fired: ', handler);
+  await logger.info('initApp is fired: ', handler, ['hasDocument', hasDocument]);
+
+  if (!hasDocument) {
+    await chrome.offscreen.createDocument({
+      url: 'offscreen.html',
+      reasons: [chrome.offscreen.Reason.MATCH_MEDIA],
+      justification: 'reason for needing the MATCH_MEDIA'
+    });
+  }
 
   // if migrate needed!
   if (local.migrate) {
