@@ -240,10 +240,6 @@ module.exports = {
           { background: { service_worker: assetsByChunkName.background[0] }}
         );
 
-        if (!manifest.version) {
-          throw new Error(`Please specify manifest.version in ${manifestPath}`);
-        }
-
         return JSON.stringify(manifest, null, 2);
       }
     }),
