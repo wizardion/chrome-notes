@@ -64,7 +64,7 @@
     "postinstall": "npm audit fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js --env config='./configs/webpack.build.js'",
-    "deploy": "webpack --config webpack.config.js --env config='./configs/webpack.deploy.js'",
+    "deploy": "webpack --node-env=production --config webpack.config.js --env config='./configs/webpack.deploy.js'",
     "start": "webpack serve --config webpack.config.js --env config='./configs/webpack.server.js'",
     "watch": "webpack --watch --config webpack.config.js --env config='./configs/webpack.build.js'",
     "lint": "eslint \"./src/**/*.ts\""
