@@ -13,10 +13,6 @@ import {
 
 const logger = new LoggerService('sync.ts', 'blue');
 
-//#region testing
-LoggerService.tracing = true;
-//#endregion
-
 export async function setProcessInfo(info: IdentityInfo): Promise<void> {
   return storage.local.sensitive('processInfo', { id: info.fileId, token: info.token });
 }

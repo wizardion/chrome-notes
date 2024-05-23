@@ -2,24 +2,19 @@ import { getApplicationId, decrypt } from 'core';
 import { ISyncStorageValue, storage } from 'core/services';
 import { startServiceWorker } from './components/services';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
-import { ISettingsArea, ITabInfo } from 'modules/settings/models/settings.model';
 import {
-  StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initApplication, onPushInfoChanged,
-  onSyncDataRemoved
+  StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initStartupApplication, onPushInfoChanged,
+  onSyncDataRemoved, initInstalledApplication
 } from './components';
 
 
-chrome.runtime.onInstalled.addListener(async () => await initApplication('onInstalled'));
+chrome.runtime.onInstalled.addListener(async () => initInstalledApplication());
 
-chrome.runtime.onStartup.addListener(async () => await initApplication('onStartup'));
+chrome.runtime.onStartup.addListener(async () => initStartupApplication());
 
-chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) =>  await startServiceWorker(alarm.name));
+chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => startServiceWorker(alarm.name));
 
-chrome.action.onClicked.addListener(async () => {
-  const local = await chrome.storage.local.get(['tabInfo', 'settings']);
-
-  return openPopup(local.settings?.value as ISettingsArea, local.tabInfo as ITabInfo);
-});
+chrome.action.onClicked.addListener(async () => openPopup());
 
 chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {
   if (changes.syncInfo?.newValue) {

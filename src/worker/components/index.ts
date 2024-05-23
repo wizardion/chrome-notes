@@ -23,12 +23,29 @@ export async function initPopup() {
   await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
 }
 
-export async function initApplication(handler: string) {
-  const local = await chrome.storage.local.get('migrate');
+export async function initStartupApplication(): Promise<void> {
+  await logger.addLine();
+  await logger.info('initStartupApplication is fired');
+
+  await core.ensureApplicationId();
+  await storage.cached.init();
+  await chrome.alarms.clearAll();
+
+  if (await SyncWorker.validate()) {
+    await SyncWorker.register(1);
+  }
+
+  await DataWorker.register();
+
+  return initPopup();
+}
+
+export async function initInstalledApplication(): Promise<void> {
   const hasDocument = await chrome.offscreen.hasDocument();
+  const local = await chrome.storage.local.get('migrate');
 
   await logger.addLine();
-  await logger.info('initApp is fired: ', handler, ['hasDocument', hasDocument]);
+  await logger.info('initInstalledApplication is fired');
 
   if (!hasDocument) {
     await chrome.offscreen.createDocument({
@@ -43,20 +60,13 @@ export async function initApplication(handler: string) {
     chrome.tabs.create({ url: 'whats-new.html' });
   }
 
-  // TODO restore all sessions.
-  await core.ensureApplicationId();
-  await storage.cached.init();
-  await chrome.alarms.clearAll();
-
-  if (await SyncWorker.validate()) {
-    await SyncWorker.register(1);
-  }
-
-  await DataWorker.register();
-  await initPopup();
+  return initStartupApplication();
 }
 
-export async function openPopup(settings: ISettingsArea, tabInfo?: ITabInfo) {
+export async function openPopup(): Promise<chrome.windows.Window | chrome.tabs.Tab | void> {
+  const local = await chrome.storage.local.get(['tabInfo', 'settings']);
+  const settings = local.settings?.value as ISettingsArea ;
+  const tabInfo = local.tabInfo as ITabInfo;
   const mode = PAGE_MODES[settings.common.mode];
 
   if (tabInfo) {
@@ -183,6 +193,6 @@ export async function onSyncDataRemoved(oldInfo: ISyncInfo) {
       await logger.info('data removed.');
     }
 
-    return initApplication('reset');
+    return initStartupApplication();
   }
 }

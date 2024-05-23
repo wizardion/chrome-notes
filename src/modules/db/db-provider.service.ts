@@ -9,8 +9,6 @@ const delayInMinutes = 15;
 const INTERVALS: IEventIntervals = { delay: (delayInMinutes * 60) * 1000, intervals: { push: null } };
 const logger = new LoggerService('db-provider.service.ts', 'green');
 
-LoggerService.tracing = true;
-
 export class DbProviderService {
   private static pushWorker = 'pusher-worker';
   private static registered: boolean;

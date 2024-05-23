@@ -5,11 +5,6 @@ import { DriveSettings, IFileInfo, TokenError, TokenExpired, ICloudInfo } from '
 // const __delay = 1100;
 const logger = new LoggerService('drive.ts', 'blue');
 
-//#region testing
-LoggerService.tracing = true;
-//#endregion
-
-
 function getCurrentTime(): string {
   return new Date().toISOString();
 }
