@@ -4,7 +4,6 @@ import { TerminateProcess, IWorkerInfo } from '../models/models';
 
 
 export const workerLogger = new LoggerService('base-worker.ts', 'green');
-LoggerService.tracing = true;
 
 export class BaseWorker {
   static readonly name: string;
