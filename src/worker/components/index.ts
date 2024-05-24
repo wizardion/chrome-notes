@@ -9,11 +9,12 @@ import { ITabInfo } from 'modules/settings/models/settings.model';
 import { ensureOptionPage, findTab } from './services';
 import { ISyncPushInfo } from './models/models';
 import { PushWorker } from './services/push-worker';
+import { OffScreenWorker } from './services/offscreen-worker';
 
 
 export { StorageChange } from './models/models';
 
-
+const globals: {offscreen: Promise<void>} = { offscreen: null };
 const logger = new LoggerService('background.ts', 'green');
 
 
@@ -23,7 +24,27 @@ export async function initPopup() {
   await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
 }
 
-export async function initStartupApplication(): Promise<void> {
+export async function initIcons() {
+  const settings = await getSettings();
+
+  await chrome.action.setPopup({ popup: getPopupPage(settings.common) });
+}
+
+export async function initOffScreen() {
+  const hasDocument = await chrome.offscreen.hasDocument();
+
+  if (!hasDocument && !globals.offscreen) {
+    globals.offscreen = chrome.offscreen.createDocument({
+      url: 'offscreen.html',
+      reasons: [chrome.offscreen.Reason.MATCH_MEDIA],
+      justification: 'reason for needing the MATCH_MEDIA'
+    });
+
+    return globals.offscreen;
+  }
+}
+
+export async function initApplication(): Promise<void> {
   await logger.addLine();
   await logger.info('initStartupApplication is fired');
 
@@ -35,32 +56,25 @@ export async function initStartupApplication(): Promise<void> {
     await SyncWorker.register(1);
   }
 
+  await OffScreenWorker.register();
   await DataWorker.register();
+  await initOffScreen();
 
   return initPopup();
 }
 
 export async function initInstalledApplication(): Promise<void> {
-  const hasDocument = await chrome.offscreen.hasDocument();
   const local = await chrome.storage.local.get('migrate');
 
   await logger.addLine();
   await logger.info('initInstalledApplication is fired');
-
-  if (!hasDocument) {
-    await chrome.offscreen.createDocument({
-      url: 'offscreen.html',
-      reasons: [chrome.offscreen.Reason.MATCH_MEDIA],
-      justification: 'reason for needing the MATCH_MEDIA'
-    });
-  }
 
   // if migrate needed!
   if (local.migrate) {
     chrome.tabs.create({ url: 'whats-new.html' });
   }
 
-  return initStartupApplication();
+  return initApplication();
 }
 
 export async function openPopup(): Promise<chrome.windows.Window | chrome.tabs.Tab | void> {
@@ -193,6 +207,6 @@ export async function onSyncDataRemoved(oldInfo: ISyncInfo) {
       await logger.info('data removed.');
     }
 
-    return initStartupApplication();
+    return initApplication();
   }
 }
