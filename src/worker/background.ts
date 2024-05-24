@@ -3,14 +3,14 @@ import { ISyncStorageValue, storage } from 'core/services';
 import { startServiceWorker } from './components/services';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import {
-  StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initStartupApplication, onPushInfoChanged,
+  StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initApplication, onPushInfoChanged,
   onSyncDataRemoved, initInstalledApplication
 } from './components';
 
 
 chrome.runtime.onInstalled.addListener(async () => initInstalledApplication());
 
-chrome.runtime.onStartup.addListener(async () => initStartupApplication());
+chrome.runtime.onStartup.addListener(async () => initApplication());
 
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => startServiceWorker(alarm.name));
 
