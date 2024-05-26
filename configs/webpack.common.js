@@ -26,7 +26,7 @@ const icons = {
       { from: 'icon32.png', to: 'icon32.png'},
       { from: 'icon48.png', to: 'icon48.png'},
       { from: 'icon96.png', to: 'icon96.png'},
-      { from: 'icon-128.png', to: 'icon128.png'},
+      { from: 'icon128.png', to: 'icon128.png'},
     ],
     dark: [],
   },
