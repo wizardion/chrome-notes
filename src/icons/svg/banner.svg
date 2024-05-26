@@ -233,11 +233,11 @@
 </mask>
 <use fill="none" mask="url(#StrokeMask_16)" stroke="#dfe3e5" stroke-linecap="butt" stroke-linejoin="round" stroke-width="4" xlink:href="#Fill_16"/>
 </g>
-<path d="M398.056 114.543L398.056 149.543" fill="none" opacity="1" stroke="#d3d3d3" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 1"/>
-<path d="M458.056 114.543L458.056 149.543" fill="none" opacity="1" stroke="#d3d3d3" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 2"/>
-<path d="M518.056 114.543L518.056 149.543" fill="none" opacity="1" stroke="#d3d3d3" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 3"/>
-<path d="M655.056 114.543L655.056 149.543" fill="none" opacity="1" stroke="#d3d3d3" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 4"/>
-<path d="M1031.06 114.543L1031.06 149.543" fill="none" opacity="1" stroke="#d3d3d3" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 5"/>
+<path d="M398.056 115.543L398.056 150.543" fill="none" opacity="1" stroke="#f7f7f7" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 1"/>
+<path d="M458.056 115.543L458.056 150.543" fill="none" opacity="1" stroke="#f7f7f7" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 2"/>
+<path d="M518.056 115.543L518.056 150.543" fill="none" opacity="1" stroke="#f7f7f7" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 3"/>
+<path d="M655.056 115.543L655.056 150.543" fill="none" opacity="1" stroke="#f7f7f7" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 4"/>
+<path d="M1031.06 115.543L1031.06 150.543" fill="none" opacity="1" stroke="#f7f7f7" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2" vectornator:layerName="Line 5"/>
 <g opacity="1" vectornator:layerName="Group 18">
 <path d="M188.801 189.12C188.801 185.917 191.398 183.32 194.601 183.32L318.336 183.32C321.539 183.32 324.136 185.917 324.136 189.12L324.136 191.054C324.136 194.257 321.539 196.854 318.336 196.854L194.601 196.854C191.398 196.854 188.801 194.257 188.801 191.054L188.801 189.12Z" fill="#000000" fill-rule="nonzero" opacity="1" stroke="none" vectornator:layerName="Rectangle 13"/>
 <path d="M188.801 227.79C188.801 224.586 191.398 221.99 194.601 221.99L279.669 221.99C282.872 221.99 285.469 224.586 285.469 227.79L285.469 229.723C285.469 232.926 282.872 235.523 279.669 235.523L194.601 235.523C191.398 235.523 188.801 232.926 188.801 229.723L188.801 227.79Z" fill="#000000" fill-rule="nonzero" opacity="1" stroke="none" vectornator:layerName="Rectangle 14"/>
