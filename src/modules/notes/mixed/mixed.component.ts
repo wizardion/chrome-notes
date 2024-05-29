@@ -82,7 +82,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
     this.detailsView.elements.delete.disabled = this.items.length < 2;
 
     if (!delay) {
-      await this.select(this.items[index > 0 ? index - 1 : 0]);
+      await super.select(this.items[index > 0 ? index - 1 : 0]);
     }
 
     return index;

@@ -150,8 +150,12 @@ export class DevModeElement extends BaseElement {
                                '\nThe page will be reloaded.');
 
     if (value) {
+      this.form.elements.info.hidden = true;
+
       try {
         const data = this.parseData(JSON.parse(value));
+
+        await delay(500);
 
         if (this.validateData(data)) {
           const items = this.representNotes(data.valid);
@@ -172,8 +176,11 @@ export class DevModeElement extends BaseElement {
           window.alert(`Has been restored ${data.valid.length} notes.` +
                        `\nAnd ${data.invalid.length} items have invalid DATA format.`);
           document.location.reload();
+        } else {
+          this.form.elements.info.hidden = false;
         }
       } catch (er) {
+        this.form.elements.info.hidden = false;
         window.alert('You entered incorrect DATA or not in JSON format!');
       }
     }

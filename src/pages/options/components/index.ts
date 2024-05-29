@@ -7,7 +7,33 @@ import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
 import { CachedStorageService } from 'core/services/cached';
 import { db } from 'modules/db';
 import * as core from 'core';
+import { ITabInfo } from 'modules/settings/models/settings.model';
 
+
+async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
+  const tabs = await chrome.tabs.query({});
+
+  for (let i = 0; i < tabs.length; i++) {
+    if (tabs[i].id === tabId) {
+      return tabs[i];
+    }
+  }
+
+  return null;
+}
+
+async function resetOpenedTabs() {
+  const local = await chrome.storage.local.get('tabInfo');
+
+  if (local.tabInfo) {
+    const tabInfo = local.tabInfo as ITabInfo;
+    const tab = await findTab(tabInfo.id);
+
+    if (tab) {
+      await chrome.tabs.remove(tab.id);
+    }
+  }
+}
 
 async function resetTextSelection() {
   const items = await db.dump();
@@ -39,6 +65,10 @@ export function eventOnColorChanged(settings: ISettingsArea, e?: MediaQueryListE
 export async function settingsChanged(settings: ISettingsArea, element?: CommonSettingsElement) {
   if (settings.common.editor !== element?.editor) {
     await resetTextSelection();
+  }
+
+  if (settings.common.mode !== element?.mode) {
+    await resetOpenedTabs();
   }
 
   settings.common = {

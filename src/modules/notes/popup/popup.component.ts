@@ -39,11 +39,13 @@ export class PopupNotesElement extends PopupBaseElement {
   async goBack(remove?: boolean) {
     this.listView.hidden = false;
     this.detailsView.hidden = true;
-    this.selected?.item.highlightItem();
 
     if (remove || this.selected && !this.selected.description && this.items.length > 1) {
-      await super.delete(100);
+      this.selected?.item.scrollIntoView({ behavior: 'instant', block: 'center' });
+      await super.delete(25);
     } else {
+      this.selected?.item.scrollIntoView({ behavior: 'instant', block: 'center' });
+      this.selected?.item.highlightItem();
       await this.onChanged(new Event('save'));
     }
 
