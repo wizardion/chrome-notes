@@ -68,7 +68,7 @@ export class ListItemElement extends BaseElement {
   highlightItem() {
     const element = this.form.elements.item;
 
-    element.scrollIntoView({ behavior: 'instant', block: 'center' });
+    // element.scrollIntoView({ behavior: 'instant', block: 'center' });
     element.animate({
       background: 'var(--base-highlight-color)',
       color: 'var(--base-bright-color)',
@@ -124,12 +124,12 @@ export class ListItemElement extends BaseElement {
 
     await delay(ms);
 
-    element.style.height = `0px`;
+    this.classList.add('removed');
     const animation = element.getAnimations().shift();
 
     if (animation) {
       await animation.finished;
-      super.remove();
+      setTimeout(() => super.remove(), 50);
     } else {
       super.remove();
     }
