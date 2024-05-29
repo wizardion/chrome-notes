@@ -18,4 +18,4 @@ This extension can sync with Google Drive and encrypt the data if desired... to 
 
 This extension is published to the google webstore: https://chrome.google.com/webstore/detail/work-note/ilonmfcpfefeelkojaclhipbfmodbfli
 
-© 2024 BrowseCraft. All rights reserved.
+© 2024 My-Notes. All rights reserved.
