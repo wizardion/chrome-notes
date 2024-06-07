@@ -273,3 +273,17 @@ export async function dequeue(): Promise<void> {
     logError(error);
   }
 }
+
+export async function desync(): Promise<void> {
+  const items = await dump();
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+
+    if (!item.deleted) {
+      enqueue({ ...item, synced: null }, 'update');
+    }
+  }
+
+  return dequeue();
+}

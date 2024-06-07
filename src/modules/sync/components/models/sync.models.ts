@@ -15,11 +15,6 @@ export interface IdentityInfo {
   applicationId?: number;
 }
 
-export interface IProcessInfo {
-  id: string;
-  token: string;
-}
-
 export interface IPasswordRule {
   count: number;
   modified: number;

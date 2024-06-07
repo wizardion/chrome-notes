@@ -17,7 +17,7 @@ export class CryptoService {
     }
 
     if (password) {
-      this.password = useSecret ? password : password + secretKey;
+      this.password = !useSecret ? password : password + secretKey;
     }
 
     this.encoder = new TextEncoder();

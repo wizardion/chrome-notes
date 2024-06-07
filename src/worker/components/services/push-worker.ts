@@ -5,59 +5,53 @@ import { SyncWorker } from './sync-worker';
 
 
 export class PushWorker extends BaseWorker {
+  static readonly infoKey = 'pushInfo';
   static readonly name = 'pusher-worker';
   static readonly period = 1;
 
   readonly name = PushWorker.name;
 
-  private infoKey = 'pushInfo';
-
   async process() {
-    await workerLogger.info(`${PushWorker.name} - started...`);
-
-    if (!(await this.busy()) && await SyncWorker.validate()) {
+    if (await SyncWorker.validate()) {
       const process = await chrome.alarms.get(SyncWorker.name);
 
       if (process?.name) {
-        const { pushInfo } = await chrome.storage.local.get(this.infoKey) as IPushInfo;
+        const { pushInfo } = await chrome.storage.session.get(PushWorker.infoKey) as IPushInfo;
         const worker = new SyncWorker(this.settings);
 
         await worker.process();
-        await chrome.storage.local.remove(this.infoKey);
+        await chrome.storage.session.remove(PushWorker.infoKey);
 
         if (pushInfo > 1) {
-          await workerLogger.info('register to sync.');
-
           await chrome.storage.sync.set({
             pushInfo: {
-              time: new Date().getTime(), applicationId: await getApplicationId()
+              id: await getApplicationId(),
+              time: new Date().getTime()
             } as ISyncPushInfo
           });
         }
       } else {
         await workerLogger.info(`${SyncWorker.name} is not registered.`);
       }
-    } else if (this.busyWorker && this.busyWorker !== this.name && this.busyWorker !== SyncWorker.name) {
-      await this.reRegister();
+    }
+  }
+
+  async busy(): Promise<boolean> {
+    const result = await super.busy();
+
+    if (result && this.busyWorker && ![this.name, SyncWorker.name].includes(this.busyWorker)) {
+      await workerLogger.info(`The process is taken by '${this.busyWorker}'. Re-register to sync...`);
+      await PushWorker.register();
     }
 
-    await workerLogger.info(`${PushWorker.name} - finished.`);
+    return result;
   }
 
-  static async register(): Promise<void> {
-    throw new Error('PushWorker should not be part of the scheduled services.');
-  }
-
-  private async reRegister() {
+  static async register(minutes: number = 2): Promise<void> {
     const alarm = await chrome.alarms.get(PushWorker.name);
 
     if (!alarm) {
-      const { pushInfo } = await chrome.storage.local.get(this.infoKey) as IPushInfo;
-
-      await chrome.storage.local.set({ pushInfo: pushInfo });
-      await workerLogger.info(`The process is taken by '${this.busyWorker}'. Re-register to sync...`);
-
-      return chrome.alarms.create(PushWorker.name, { delayInMinutes: 2 });
+      return chrome.alarms.create(PushWorker.name, { delayInMinutes: minutes });
     }
   }
 }

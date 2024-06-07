@@ -2,12 +2,12 @@ import { SyncInfoElement } from './sync-info/info.component';
 import { IOptionControls, IStorageChange } from './options.model';
 import { DevModeElement } from './dev-mode/dev.component';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
-import { ISettingsArea, getPopupPage, setColors } from 'modules/settings';
+import { ISettingsArea, getPopupPage, getSettings, setColors } from 'modules/settings';
 import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
 import { CachedStorageService } from 'core/services/cached';
+import { ITabInfo } from 'modules/settings/models/settings.model';
 import { db } from 'modules/db';
 import * as core from 'core';
-import { ITabInfo } from 'modules/settings/models/settings.model';
 
 
 async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
@@ -62,7 +62,9 @@ export function eventOnColorChanged(settings: ISettingsArea, e?: MediaQueryListE
   return setColors(settings, e);
 }
 
-export async function settingsChanged(settings: ISettingsArea, element?: CommonSettingsElement) {
+export async function settingsChanged(element?: CommonSettingsElement) {
+  const settings = await getSettings();
+
   if (settings.common.editor !== element?.editor) {
     await resetTextSelection();
   }
@@ -84,56 +86,32 @@ export async function settingsChanged(settings: ISettingsArea, element?: CommonS
   await storage.local.set('settings', settings);
 }
 
-export async function syncInfoChanged(element: SyncInfoElement, current: ISettingsArea) {
-  let syncInfo = current.sync;
-  let identityInfo = current.identity;
+export async function syncInfoChanged(element: SyncInfoElement) {
   const applicationId = await core.getApplicationId();
 
-  if (syncInfo) {
-    syncInfo.token = element.token;
-    syncInfo.enabled = element.enabled;
-    syncInfo.encrypted = element.encrypted;
-    syncInfo.applicationId = applicationId;
-  } else {
-    syncInfo = {
-      token: element.token,
-      enabled: element.enabled,
-      encrypted: element.encrypted,
-      applicationId: applicationId,
-    };
-  }
-
-  if (identityInfo) {
-    identityInfo.fileId = element.fileId;
-    identityInfo.enabled = syncInfo.enabled;
-    identityInfo.token = element.token;
-    identityInfo.passphrase = element.passphrase;
-    identityInfo.encrypted = syncInfo.encrypted;
-    identityInfo.applicationId = applicationId;
-    identityInfo.locked = element.locked;
-  } else {
-    identityInfo = {
-      fileId: element.fileId,
-      enabled: syncInfo.enabled,
-      token: element.token,
-      applicationId: applicationId,
-      passphrase: element.passphrase,
-      encrypted: element.encrypted,
-      locked: element.locked,
-    };
-  }
-
-  current.sync = syncInfo;
-  current.identity = identityInfo;
-
-  await storage.sync.set(syncInfo);
-  await storage.local.sensitive('identityInfo', identityInfo);
+  await storage.sync.set({
+    token: element.token,
+    fileId: element.fileId,
+    enabled: element.enabled,
+    encrypted: element.encrypted,
+    applicationId: applicationId
+  });
+  await storage.local.sensitive('identityInfo', {
+    token: element.token,
+    fileId: element.fileId,
+    enabled: element.enabled,
+    passphrase: element.passphrase,
+    encrypted: element.encrypted,
+    locked: element.locked
+  });
 }
 
-export async function devModeChanged(element: DevModeElement, current: ISettingsArea) {
-  current.devMode = element.enabled;
+export async function devModeChanged(element: DevModeElement) {
+  const settings = await getSettings();
 
-  await storage.local.set('settings', current);
+  settings.devMode = element.enabled;
+
+  await storage.local.set('settings', settings);
 }
 
 export async function onSyncStorageChanged(changes: IStorageChange, controls: IOptionControls) {

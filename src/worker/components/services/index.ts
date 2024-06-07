@@ -32,7 +32,7 @@ export async function ensureOptionPage() {
     }
   }
 
-  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') + '?develop=true' });
+  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
 }
 
 export async function startServiceWorker(name: string) {
@@ -45,7 +45,11 @@ export async function startServiceWorker(name: string) {
       const worker = new Base(settings);
 
       try {
-        await worker.process();
+        if (!await worker.busy()) {
+          await worker.start();
+          await worker.process();
+          await worker.finish();
+        }
 
         if (settings.error?.worker === worker.name) {
           settings.error = null;
@@ -54,6 +58,7 @@ export async function startServiceWorker(name: string) {
       } catch (error) {
         const message = error.message || String(error);
 
+        await worker.finish();
         await workerLogger.warn('An error occurred during the process: ', message);
         settings.error = { message: `${message}`, worker: worker.name };
 

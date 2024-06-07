@@ -5,7 +5,7 @@ import { IDBNote, db } from 'modules/db';
 import { Cloud } from 'modules/sync/cloud';
 import { IDBLogNote, IDBParsedData, IDevSettingsForm } from './models/dev.models';
 import { resetDefaults } from 'modules/settings';
-import { delay } from 'core/index';
+import { delay, getApplicationId } from 'core/index';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -197,6 +197,7 @@ export class DevModeElement extends BaseElement {
         await storage.global.clear();
         await LoggerService.clear();
         await resetDefaults();
+        await chrome.runtime.sendMessage({ data: 'removed', id: await getApplicationId() });
 
         if (!force) {
           this.form.elements.mode.nextElementSibling.innerHTML = '... Erasing data...';

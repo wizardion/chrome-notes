@@ -45,9 +45,9 @@ whenDefined().then(async () => {
   controls.alert = <AlertElement>document.querySelector('alert-message');
 
   window.matchMedia(mediaColorScheme).addEventListener('change', (e) => eventOnColorChanged(settings, e));
-  controls.syncInfo.addEventListener('sync-info:change', () => syncInfoChanged(controls.syncInfo, settings));
-  controls.devModeInfo.addEventListener('mode:change', () => devModeChanged(controls.devModeInfo, settings));
-  controls.common.addEventListener('settings:change', () => settingsChanged(settings, controls.common));
+  controls.syncInfo.addEventListener('sync-info:change', () => syncInfoChanged(controls.syncInfo));
+  controls.devModeInfo.addEventListener('mode:change', () => devModeChanged(controls.devModeInfo));
+  controls.common.addEventListener('settings:change', () => settingsChanged(controls.common));
   chrome.storage.sync.onChanged.addListener((c) => onSyncStorageChanged(c, controls));
   chrome.storage.local.onChanged.addListener((c) => onLocalStorageChanged(c, controls));
 

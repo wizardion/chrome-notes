@@ -82,6 +82,19 @@ body {
   border: 1px solid var(--validator-error-color);
 }
 
+.alert .hide-alert {
+  border: none;
+  background: none;
+  color: var(--validator-error-color);
+  fill: var(--validator-error-color);
+}
+
+.alert .hide-alert :active {
+  color: var(--validator-error-color);
+  fill: var(--validator-error-color);
+  opacity: 0.5;
+}
+
 fieldset {
   border: none;
   padding: 0;
@@ -356,11 +369,6 @@ div ul {
   margin: 20px 0 20px 0px;
 }
 
-[hidden],
-.hidden {
-  display: none;
-}
-
 .invisible {
   visibility: hidden;
 }
@@ -379,6 +387,10 @@ div ul {
 
 .margin-top {
   margin-top: 10px !important;
+}
+
+.height-25 {
+  height: 25px;
 }
 
 .margin-bottom {
@@ -443,7 +455,7 @@ span.info {
 }
 
 .error.global {
-  width: calc(100% - 231px);
+  width: calc(100% - 245px);
   position: relative;
   margin-top: 0;
   padding: 0;
@@ -524,8 +536,9 @@ span.info {
   display: inline-block;
 }
 
-.sync-progress .progress-bar {
-  width: 100%;
+.sync-progress {
+  width: calc(100% - 145px);
+  display: inline-block;
 }
 
 ul.flat {
@@ -576,4 +589,9 @@ input[type='checkbox']:disabled + span {
   vertical-align: middle;
   fill: var(--footer-link-svg-color);
   color: var(--footer-link-svg-color);
+}
+
+[hidden],
+.hidden {
+  display: none !important;
 }

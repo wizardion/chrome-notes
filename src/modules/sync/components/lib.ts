@@ -1,6 +1,6 @@
 import { db, IDBNote } from 'modules/db';
 import { ISyncPair, ISyncItemInfo, IdentityInfo } from './models/sync.models';
-import { CryptoService } from 'modules/encryption';
+import { CryptoService } from 'core/services/encryption';
 import { LoggerService } from 'modules/logger';
 import { storage } from 'core/services';
 

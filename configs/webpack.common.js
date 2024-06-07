@@ -183,7 +183,7 @@ module.exports = {
   plugins: [
     ...(
       production
-        ? [new webpack.NormalModuleReplacementPlugin(/src\/modules\/encryption\/keys.ts/, './keys.prod.ts')]
+        ? [new webpack.NormalModuleReplacementPlugin(/src\/core\/services\/encryption\/keys.ts/, './keys.prod.ts')]
         : []
     ),
     new CleanWebpackPlugin(production? { cleanAfterEveryBuildPatterns: ['**/*']} : {}),

@@ -3,9 +3,8 @@ import { BaseElement } from 'core/components';
 import { IdentityInfo, TokenSecretDenied } from 'modules/sync/components/models/sync.models';
 import { ISyncInfoForm, IResponseDetails } from './models/info.models';
 import { LoggerService } from 'modules/logger';
-import { SyncStorageService } from 'core/services/sync';
-import { LocalStorageService } from 'core/services/local';
 import { IDecorator } from 'core/models/code.models';
+import { db } from 'modules/db';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -93,7 +92,7 @@ export class SyncInfoElement extends BaseElement {
       if (value) {
         await this.submit(this.removeCloudDecorator());
       } else {
-        this.deauthorize();
+        await this.submit(this.deauthorizeDecorator());
       }
     }
 
@@ -192,7 +191,7 @@ export class SyncInfoElement extends BaseElement {
     };
   }
 
-  protected verifyIdentity(passphrase: string): IDecorator<IdentityInfo> {
+  protected verifyIdentity(passphrase: string): IDecorator<IdentityInfo | null> {
     return async () => {
       await Cloud.wait();
 
@@ -207,16 +206,31 @@ export class SyncInfoElement extends BaseElement {
     };
   }
 
+  protected authorizeDecorator(): IDecorator {
+    return async () => {
+      const verify = this.verifyIdentity(this._passphrase);
+      const sync = this.syncDecorator();
+      const info = await verify();
+
+      if (info?.fileId) {
+        await db.desync();
+        this.updateInfo(info);
+
+        return sync();
+      }
+
+      return false;
+    };
+  }
+
   protected async authorize() {
     this.promise = true;
 
     try {
       if (this.checkValidity()) {
-        console.log('authorizing...');
         this.token = await Cloud.authorize();
-        const info = await this.submit(this.verifyIdentity(this._passphrase));
 
-        if (!info?.fileId) {
+        if (!await this.submit(this.authorizeDecorator())) {
           if (!this._response.error || this._response.locked) {
             this.locked = true;
             this.form.passphrase.focus();
@@ -226,47 +240,51 @@ export class SyncInfoElement extends BaseElement {
           }
 
           this.token = null;
-
-          return;
+        } else {
+          this.dispatchEvent(this.event);
         }
-
-        this.updateInfo(info);
-        console.log('authorized!');
-        await this.submit(this.syncDecorator());
-        this.dispatchEvent(this.event);
       } else {
-        this.message = 'Form is not valid.';
+        this.message = 'Please enter all required fields.';
       }
     } catch (error) {
-      this.message = error;
+      this.message = error.message;
     } finally {
       this.promise = false;
     }
   }
 
   protected async deauthorize() {
-    this.promise = true;
+    const value = window.confirm('Would you like to remove data from cloud?\n');
 
-    try {
-      console.log('deauthorizing...');
-      await Cloud.deauthorize(this.token);
-      this.token = null;
-      console.log('deauthorized!');
-      this.dispatchEvent(this.event);
-    } catch (error) {
-      this.message = error;
-    } finally {
-      this.promise = false;
+    if (value) {
+      await this.submit(this.removeCloudDecorator());
+      this.enabled = false;
+    } else {
+      await this.submit(this.deauthorizeDecorator());
     }
+
+    this.dispatchEvent(this.event);
+  }
+
+  protected deauthorizeDecorator(): IDecorator {
+    return async () => {
+      await Cloud.deauthorize(this.token);
+      this.fileId = null;
+      this.token = null;
+
+      return true;
+    };
   }
 
   protected removeCloudDecorator(): IDecorator {
     return async () => {
-      console.log('removeCloudDecorator...');
       await Cloud.remove();
       await LoggerService.clear();
-      await SyncStorageService.remove();
-      await LocalStorageService.remove('identityInfo');
+
+      this.token = null;
+      this.fileId = null;
+      this.encrypted = false;
+      this.passphrase = null;
 
       return true;
     };
@@ -387,17 +405,17 @@ export class SyncInfoElement extends BaseElement {
     return !!info.fileId;
   }
 
-  private async submit<T>(decorator: IDecorator<T>): Promise<T | null> {
+  private async submit<T = boolean>(decorator: IDecorator<T>): Promise<T | null> {
+    let result: T = null;
+
     try {
       this.promise = true;
       this.form.checkboxes.sync.disabled = true;
       this.form.progressBar.spinning = true;
 
-      const result = await decorator();
+      result = await decorator();
 
       this._response = { message: null, locked: false, error: false };
-
-      return result;
     } catch (error) {
       this._response = {
         error: true,
@@ -412,6 +430,6 @@ export class SyncInfoElement extends BaseElement {
       this.form.checkboxes.sync.disabled = false;
     }
 
-    return null;
+    return result;
   }
 }

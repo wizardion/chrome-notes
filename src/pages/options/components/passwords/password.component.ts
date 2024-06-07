@@ -1,6 +1,6 @@
 import './assets/passwords.scss';
 import { BaseElement } from 'core/components';
-import { CryptoService } from 'modules/encryption';
+import { CryptoService } from 'core/services/encryption';
 
 
 const template: DocumentFragment = BaseElement.component({

@@ -10,6 +10,7 @@ import { ensureOptionPage, findTab } from './services';
 import { ISyncPushInfo } from './models/models';
 import { PushWorker } from './services/push-worker';
 import { OffScreenWorker } from './services/offscreen-worker';
+import { db } from 'modules/db';
 
 
 export { StorageChange } from './models/models';
@@ -46,7 +47,7 @@ export async function initOffScreen() {
 
 export async function initApplication(): Promise<void> {
   await logger.addLine();
-  await logger.info('initStartupApplication is fired');
+  await logger.info('initApplication is fired');
 
   await core.ensureApplicationId();
   await storage.cached.init();
@@ -121,19 +122,14 @@ export async function openPopup(): Promise<chrome.windows.Window | chrome.tabs.T
 }
 
 export async function onPushInfoChanged(oldValue: ISyncPushInfo, newValue: ISyncPushInfo) {
-  if (newValue.time !== oldValue?.time && newValue.applicationId !== await core.getApplicationId()) {
-    const alarm = await chrome.alarms.get(PushWorker.name);
+  if (newValue.time !== oldValue?.time && newValue.id !== await core.getApplicationId()) {
+    await chrome.storage.session.remove(PushWorker.infoKey);
 
-    if (!alarm) {
-      await chrome.storage.local.set({ pushInfo: -1 });
-      await logger.info('onSyncPushInfoChanged: register to sync...');
-
-      return chrome.alarms.create(PushWorker.name, { delayInMinutes: PushWorker.period });
-    }
+    return PushWorker.register();
   }
 }
 
-export async function onSyncInfoChanged(info: ISyncInfo) {
+export async function onSyncInfoChanged(newValue: ISyncInfo) {
   const identity = await storage.local.get<IdentityInfo>('identityInfo') || {
     fileId: null,
     enabled: false,
@@ -143,34 +139,36 @@ export async function onSyncInfoChanged(info: ISyncInfo) {
     applicationId: null
   };
 
-  if (identity.locked && info.enabled && info.token && !info.encrypted && identity.encrypted) {
+  if (identity.locked && newValue?.enabled && newValue.token && !newValue.encrypted && identity.encrypted) {
     identity.locked = false;
   }
 
-  if (!identity.locked && info.enabled && info.token && info.encrypted && !identity.passphrase) {
+  if (!identity.locked && newValue?.enabled && newValue.token && newValue.encrypted && !identity.passphrase) {
     identity.locked = true;
   }
 
-  if (!info.encrypted) {
+  if (!newValue.encrypted) {
     identity.passphrase = null;
   }
 
-  identity.enabled = info.enabled;
-  identity.applicationId = info.applicationId;
-  identity.encrypted = info.encrypted;
-  identity.token = info.token;
+  identity.enabled = newValue?.enabled;
+  identity.applicationId = newValue?.applicationId;
+  identity.encrypted = newValue?.encrypted;
+  identity.token = newValue?.token;
+  identity.fileId = newValue?.fileId;
 
   await storage.local.sensitive('identityInfo', identity);
 }
 
 export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
-  if (oldInfo && oldInfo.token && (!newInfo || !newInfo.token)) {
+  if (oldInfo?.token && (!newInfo || !newInfo.token || !newInfo.fileId)) {
     await SyncWorker.deregister();
+    await db.desync();
 
     return SyncWorker.removeCache(oldInfo.token);
   }
 
-  if (newInfo && newInfo.token && (await SyncWorker.validate(newInfo))) {
+  if (newInfo?.token && (await SyncWorker.validate(newInfo))) {
     if (!oldInfo?.token && newInfo.applicationId && newInfo.applicationId !== await core.getApplicationId()) {
       return SyncWorker.register(1);
     }
@@ -178,35 +176,55 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
     return SyncWorker.register();
   }
 
-  if (newInfo && newInfo.locked) {
+  if (newInfo?.locked) {
     await ensureOptionPage();
   }
 
   return await SyncWorker.deregister();
 }
 
-export async function onSyncDataRemoved(oldInfo: ISyncInfo) {
-  const bytes = await chrome.storage.sync.getBytesInUse();
+export async function onAppDisconnected() {
+  await PushWorker.deregister();
+  await chrome.storage.session.set({ pushInfo: new Date().getTime() });
 
-  if (bytes === 0 && oldInfo.applicationId > 0) {
-    const identity = await storage.local.get<IdentityInfo>('identityInfo');
-    const { db } = await import('modules/db');
-    const data = await db.dump();
+  return PushWorker.register(1);
+}
 
-    if (identity?.token) {
-      await SyncWorker.removeCache(oldInfo.token);
-    }
-
-    if (data?.find(i => i.synced) || !!identity) {
-      const { resetDefaults } = await import('modules/settings');
-
-      await db.clear();
-      await storage.global.clearLocal();
-      await LoggerService.clear();
-      await resetDefaults();
-      await logger.info('data removed.');
-    }
-
-    return initApplication();
+export async function onAppConnected(port: chrome.runtime.Port) {
+  if (port.name === PushWorker.name) {
+    port.onDisconnect.addListener(async () => onAppDisconnected());
   }
+}
+
+export async function onIdleActiveStateChanged() {
+  const alarms = ((await chrome.storage.session.get('alarms')).alarms || []) as chrome.alarms.Alarm[];
+  const time = new Date().getTime();
+
+  for (let i = 0; i < alarms.length; i++) {
+    const { name, scheduledTime, periodInMinutes } = alarms[i];
+
+    if (name !== SyncWorker.name) {
+      const scheduled = new Date(scheduledTime).getTime();
+      const delayInMinutes = scheduled > time ? Math.floor(((scheduled - time) / 1000) / 60) : (i + 1) * 2;
+
+      await chrome.alarms.create(name, { periodInMinutes, delayInMinutes: Math.max(delayInMinutes, 1) });
+    } else {
+      await chrome.alarms.create(name, { periodInMinutes });
+    }
+  }
+
+  if (await SyncWorker.validate()) {
+    await PushWorker.deregister();
+    await chrome.storage.session.remove(PushWorker.infoKey);
+
+    return PushWorker.register();
+  }
+}
+
+export async function onIdleLockedStateChanged() {
+  const alarms = await chrome.alarms.getAll();
+
+  await chrome.alarms.clearAll();
+
+  return chrome.storage.session.set({ alarms: alarms.filter(i => i.name !== PushWorker.name) });
 }

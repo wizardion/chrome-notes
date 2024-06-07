@@ -1,3 +1,4 @@
+import { delay } from 'core';
 import './assets/progress-bar.scss';
 import { BaseElement } from 'core/components';
 
@@ -12,10 +13,7 @@ export class ProgressElement extends BaseElement {
 
   protected progress: HTMLDivElement;
   protected thumb: HTMLDivElement;
-
-  protected event: Event;
-  protected animationEvent: () => void;
-
+  protected animationFrame: () => void;
 
   constructor() {
     super();
@@ -24,39 +22,43 @@ export class ProgressElement extends BaseElement {
     this.thumb = this.template.querySelector('div[name="progress-thumb"]');
   }
 
-  protected delay(milliseconds: number): Promise<void> {
-    return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
-  }
-
-  protected async eventListeners() {
-    this.animationEvent = () => this.animationIteration();
-    this.event = new Event('progress:animation-complete');
-  }
-
   protected attributeChanged(name: string, oldValue: string, newValue: string): void {
     if (name === 'autoplay' && !oldValue && newValue === 'true') {
       this.spinning = true;
     }
   }
 
-  protected animationIteration() {
-    this.thumb.classList.remove('animate');
-    this.progress.classList.remove('animating');
-    this.thumb.removeEventListener('animationiteration', this.animationEvent);
-    this.dispatchEvent(this.event);
+  protected start() {
+    this.thumb.classList.add('animate');
+    this.progress.classList.add('animating');
   }
 
-  public finish(delay?: number): Promise<void> {
-    return new Promise<void>((resolve) => {
-      const animationEvent = async () => {
-        this.animationIteration();
-        this.thumb.removeEventListener('animationiteration', animationEvent);
-        delay && await this.delay(delay);
-        resolve();
-      };
+  protected stop() {
+    this.thumb.classList.remove('animate');
+    this.progress.classList.remove('animating');
+    this.thumb.removeEventListener('animationiteration', this.animationFrame);
+  }
 
-      this.thumb.addEventListener('animationiteration', animationEvent);
-    });
+  public finish(ms?: number): Promise<void> {
+    const animations = this.thumb.getAnimations();
+
+    if (animations?.length) {
+      return new Promise<void>((resolve) => {
+        this.animationFrame = async () => {
+          this.stop();
+
+          if (ms) {
+            await delay(ms);
+          }
+
+          resolve();
+        };
+
+        this.thumb.addEventListener('animationiteration', this.animationFrame);
+      });
+    }
+
+    return Promise.resolve();
   }
 
   get spinning(): boolean {
@@ -65,10 +67,9 @@ export class ProgressElement extends BaseElement {
 
   set spinning(value: boolean) {
     if (value) {
-      this.thumb.classList.add('animate');
-      this.progress.classList.add('animating');
+      this.start();
     } else {
-      this.thumb.addEventListener('animationiteration', this.animationEvent);
+      this.stop();
     }
   }
 }

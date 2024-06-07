@@ -15,8 +15,8 @@ export interface IPushInfo {
 }
 
 export interface ISyncPushInfo {
+  id: number;
   time: number;
-  applicationId: number;
 }
 
 export type StorageChange = { [key: string]: chrome.storage.StorageChange };

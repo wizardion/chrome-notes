@@ -3,7 +3,8 @@ import { Cloud } from 'modules/sync/cloud';
 import { IdentityInfo, TokenError } from 'modules/sync/components/models/sync.models';
 import { BaseWorker, workerLogger } from './base-worker';
 import { TerminateProcess } from '../models/models';
-import { PushWorker } from './push-worker';
+import { SyncStorageService } from 'core/services/sync';
+import { getApplicationId } from 'core/index';
 
 
 export class SyncWorker extends BaseWorker {
@@ -13,28 +14,34 @@ export class SyncWorker extends BaseWorker {
   readonly name = SyncWorker.name;
 
   async process() {
-    if (!(await this.busy())) {
-      await this.start();
+    try {
+      const identity = await Cloud.sync();
 
-      try {
-        await Cloud.sync();
-        await PushWorker.deregister();
-      } catch (error) {
-        if (error instanceof TokenError) {
-          await this.finish();
-          throw new TerminateProcess(this.name, error.message);
-        }
+      if (!identity.fileId && !identity.token) {
+        await SyncStorageService.set({
+          token: null,
+          fileId: null,
+          enabled: false,
+          encrypted: false,
+          applicationId: await getApplicationId(),
+        });
+        await LocalStorageService.sensitive('identityInfo', identity);
+        await SyncWorker.deregister('Cloud data has been removed.');
       }
-
-      await this.finish();
+    } catch (error) {
+      if (error instanceof TokenError) {
+        await this.resetIdentity();
+        throw new TerminateProcess(this.name, error.message);
+      }
     }
   }
 
   static async validate(identity?: IdentityInfo): Promise<boolean> {
-    const identityInfo: IdentityInfo = identity || <IdentityInfo> await LocalStorageService.get('identityInfo');
+    const identityInfo = identity || await LocalStorageService.get<IdentityInfo>('identityInfo');
 
     return !!((identityInfo && identityInfo.enabled) &&
-      (identityInfo.token && (!identityInfo.encrypted || identityInfo.passphrase) && !identityInfo.locked));
+      (identityInfo.token && identityInfo.fileId &&
+        (!identityInfo.encrypted || identityInfo.passphrase) && !identityInfo.locked));
   }
 
   static async removeCache(token: string) {
@@ -51,5 +58,14 @@ export class SyncWorker extends BaseWorker {
 
     await chrome.alarms.create(this.name, { periodInMinutes: period, delayInMinutes: minutes });
     await workerLogger.warn(`registered '${this.name}' with period: ${period} and delay: ${minutes || 0}.`);
+  }
+
+  private async resetIdentity(info?: IdentityInfo) {
+    const identity = info || await LocalStorageService.get<IdentityInfo>('identityInfo');
+
+    identity.fileId = null;
+    identity.token = null;
+
+    return LocalStorageService.sensitive('identityInfo', identity);
   }
 }

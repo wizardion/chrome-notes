@@ -25,7 +25,8 @@
       "storage",
       "unlimitedStorage",
       "identity",
-      "offscreen"
+      "offscreen",
+      "idle"
    ],
    "oauth2": {
     "client_id": null,
