@@ -10,9 +10,9 @@ export interface IEditorView {
   get element(): HTMLElement;
 
   get hidden(): boolean;
-  set hidden(value: boolean);
-
   get scrollTop(): number;
+
+  set hidden(value: boolean);
   set scrollTop(value: number);
 
   getData(): IEditorData;
