@@ -135,7 +135,7 @@ export async function iterate(iterator: (i: IDBNote) => void) {
         if (cursor) {
           const item = <IDBNote> cursor.value;
 
-          if (!item.deleted) {
+          if (!item.deleted && !item.locked) {
             iterator(item);
           }
 
@@ -161,7 +161,7 @@ export async function load(): Promise<IDBNote[]> {
     const store = await initObjectStore('readonly');
     const index: IDBIndex = store.index('order');
 
-    return (await execute<IDBNote[]>(index.getAll())).filter(i => !i.deleted);
+    return (await execute<IDBNote[]>(index.getAll())).filter(i => !i.deleted && !i.locked);
   } catch (error) {
     logError(error);
     throw new Error(ERROR_MESSAGES.initiate);
@@ -272,18 +272,4 @@ export async function dequeue(): Promise<void> {
   } catch (error) {
     logError(error);
   }
-}
-
-export async function desync(): Promise<void> {
-  const items = await dump();
-
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-
-    if (!item.deleted) {
-      enqueue({ ...item, synced: null }, 'update');
-    }
-  }
-
-  return dequeue();
 }

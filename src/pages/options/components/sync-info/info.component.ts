@@ -4,7 +4,6 @@ import { IdentityInfo, TokenSecretDenied } from 'modules/sync/components/models/
 import { ISyncInfoForm, IResponseDetails } from './models/info.models';
 import { LoggerService } from 'modules/logger';
 import { IDecorator } from 'core/models/code.models';
-import { db } from 'modules/db';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -147,23 +146,34 @@ export class SyncInfoElement extends BaseElement {
     }
 
     if (this.locked) {
-      if (!(await this.submit(this.verifyIdentity(passphrase)))) {
-        if (!this._response.error || this._response.locked) {
-          this.locked = true;
-          this.form.passphrase.focus();
-          this.message = this._response.message || 'Invalid encryption passphrase.';
+      if (await this.submit(this.unlockDecorator(passphrase))) {
+        this.passphrase = passphrase;
+        this.locked = false;
 
-          return this.dispatchEvent(this.event);
-        }
+        this.dispatchEvent(this.event);
+      } else if (!this._response.error || this._response.locked) {
+        this.form.passphrase.focus();
+        this.message = this._response.message || 'Invalid encryption passphrase.';
+      }
+    }
+  }
 
-        return;
+  protected unlockDecorator(passphrase: string): IDecorator {
+    return async () => {
+      const verify = this.verifyIdentity(passphrase);
+      const sync = this.syncDecorator();
+      const info = await verify();
+
+      if (info?.fileId) {
+        this.updateInfo(info);
+        await sync();
+        await Cloud.unlock();
+
+        return true;
       }
 
-      this.passphrase = passphrase;
-      this.locked = false;
-      await this.submit(this.syncDecorator());
-      this.dispatchEvent(this.event);
-    }
+      return false;
+    };
   }
 
   protected syncDecorator(): IDecorator {
@@ -187,7 +197,7 @@ export class SyncInfoElement extends BaseElement {
     return async () => {
       await Cloud.wait();
 
-      return Cloud.encrypt(this._passphrase || '', passphrase);
+      return Cloud.encrypt(passphrase, this._passphrase || '');
     };
   }
 
@@ -213,7 +223,6 @@ export class SyncInfoElement extends BaseElement {
       const info = await verify();
 
       if (info?.fileId) {
-        await db.desync();
         this.updateInfo(info);
 
         return sync();

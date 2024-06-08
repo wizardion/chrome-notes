@@ -10,7 +10,6 @@ import { ensureOptionPage, findTab } from './services';
 import { ISyncPushInfo } from './models/models';
 import { PushWorker } from './services/push-worker';
 import { OffScreenWorker } from './services/offscreen-worker';
-import { db } from 'modules/db';
 
 
 export { StorageChange } from './models/models';
@@ -145,6 +144,9 @@ export async function onSyncInfoChanged(newValue: ISyncInfo) {
 
   if (!identity.locked && newValue?.enabled && newValue.token && newValue.encrypted && !identity.passphrase) {
     identity.locked = true;
+
+    await SyncWorker.lock();
+    await ensureOptionPage();
   }
 
   if (!newValue.encrypted) {
@@ -163,7 +165,6 @@ export async function onSyncInfoChanged(newValue: ISyncInfo) {
 export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: IdentityInfo) {
   if (oldInfo?.token && (!newInfo || !newInfo.token || !newInfo.fileId)) {
     await SyncWorker.deregister();
-    await db.desync();
 
     return SyncWorker.removeCache(oldInfo.token);
   }
@@ -174,10 +175,6 @@ export async function onIdentityInfoChanged(oldInfo: IdentityInfo, newInfo: Iden
     }
 
     return SyncWorker.register();
-  }
-
-  if (newInfo?.locked) {
-    await ensureOptionPage();
   }
 
   return await SyncWorker.deregister();
@@ -199,6 +196,7 @@ export async function onAppConnected(port: chrome.runtime.Port) {
 export async function onIdleActiveStateChanged() {
   const alarms = ((await chrome.storage.session.get('alarms')).alarms || []) as chrome.alarms.Alarm[];
   const time = new Date().getTime();
+  let syncWorkerEnabled = false;
 
   for (let i = 0; i < alarms.length; i++) {
     const { name, scheduledTime, periodInMinutes } = alarms[i];
@@ -208,17 +206,20 @@ export async function onIdleActiveStateChanged() {
       const delayInMinutes = scheduled > time ? Math.floor(((scheduled - time) / 1000) / 60) : (i + 1) * 2;
 
       await chrome.alarms.create(name, { periodInMinutes, delayInMinutes: Math.max(delayInMinutes, 1) });
-    } else {
+    } else if (await SyncWorker.validate()) {
+      syncWorkerEnabled = true;
       await chrome.alarms.create(name, { periodInMinutes });
     }
   }
 
-  if (await SyncWorker.validate()) {
+  if (syncWorkerEnabled) {
     await PushWorker.deregister();
     await chrome.storage.session.remove(PushWorker.infoKey);
 
     return PushWorker.register();
   }
+
+  await chrome.storage.session.remove('alarms');
 }
 
 export async function onIdleLockedStateChanged() {

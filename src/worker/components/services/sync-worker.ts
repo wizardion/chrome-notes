@@ -1,6 +1,6 @@
 import { LocalStorageService } from 'core/services/local';
 import { Cloud } from 'modules/sync/cloud';
-import { IdentityInfo, TokenError } from 'modules/sync/components/models/sync.models';
+import { IdentityInfo, TokenError, TokenSecretDenied } from 'modules/sync/components/models/sync.models';
 import { BaseWorker, workerLogger } from './base-worker';
 import { TerminateProcess } from '../models/models';
 import { SyncStorageService } from 'core/services/sync';
@@ -29,6 +29,10 @@ export class SyncWorker extends BaseWorker {
         await SyncWorker.deregister('Cloud data has been removed.');
       }
     } catch (error) {
+      if (error instanceof TokenSecretDenied) {
+        throw new TerminateProcess(this.name, error.message);
+      }
+
       if (error instanceof TokenError) {
         await this.resetIdentity();
         throw new TerminateProcess(this.name, error.message);
@@ -39,9 +43,11 @@ export class SyncWorker extends BaseWorker {
   static async validate(identity?: IdentityInfo): Promise<boolean> {
     const identityInfo = identity || await LocalStorageService.get<IdentityInfo>('identityInfo');
 
-    return !!((identityInfo && identityInfo.enabled) &&
+    const valid = !!((identityInfo && identityInfo.enabled) &&
       (identityInfo.token && identityInfo.fileId &&
         (!identityInfo.encrypted || identityInfo.passphrase) && !identityInfo.locked));
+
+    return valid;
   }
 
   static async removeCache(token: string) {
@@ -58,6 +64,10 @@ export class SyncWorker extends BaseWorker {
 
     await chrome.alarms.create(this.name, { periodInMinutes: period, delayInMinutes: minutes });
     await workerLogger.warn(`registered '${this.name}' with period: ${period} and delay: ${minutes || 0}.`);
+  }
+
+  static async lock(info?: IdentityInfo, reason?: string): Promise<void> {
+    return Cloud.lock(info, reason);
   }
 
   private async resetIdentity(info?: IdentityInfo) {

@@ -88,6 +88,7 @@ export async function settingsChanged(element?: CommonSettingsElement) {
 
 export async function syncInfoChanged(element: SyncInfoElement) {
   const applicationId = await core.getApplicationId();
+  const settings = await getSettings();
 
   await storage.sync.set({
     token: element.token,
@@ -104,6 +105,11 @@ export async function syncInfoChanged(element: SyncInfoElement) {
     encrypted: element.encrypted,
     locked: element.locked
   });
+
+  if (settings.error) {
+    settings.error = null;
+    await storage.local.set('settings', settings);
+  }
 }
 
 export async function devModeChanged(element: DevModeElement) {

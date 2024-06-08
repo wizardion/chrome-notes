@@ -27,6 +27,11 @@ export interface ISyncPair {
   cloud: ISyncItemInfo;
 }
 
+export interface ILockInfo {
+  title?: string;
+  description?: string;
+}
+
 export interface ISyncItemInfo {
   /**
    * @field id
@@ -80,6 +85,10 @@ export interface IFileInfo {
   trashed: boolean;
   isNew?: boolean;
   data?: ICloudInfo;
+}
+
+export interface IMemInfo {
+  file: IFileInfo
 }
 
 export enum DriveSettings {

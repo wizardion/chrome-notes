@@ -1,13 +1,11 @@
 import * as core from 'core';
 import { GoogleDrive } from './components/drive';
 import { CryptoService } from 'core/services/encryption';
-import { IdentityInfo, IFileInfo, IPasswordRule, TokenError } from './components/models/sync.models';
+import { IdentityInfo, IPasswordRule, TokenError } from './components/models/sync.models';
 import * as process from './components/process';
 
 
 export class Cloud {
-  public static file?: IFileInfo;
-
   static async authorize() {
     return GoogleDrive.authorize();
   }
@@ -36,63 +34,69 @@ export class Cloud {
 
       identity.token = await GoogleDrive.renewToken();
 
-      const newIdentity = await process.sync(identity, cryptor, null, this.file);
+      const newIdentity = await process.sync(identity, cryptor);
 
       await core.delay();
-      this.file = null;
 
       return newIdentity;
     });
   }
 
-  static async encrypt(oldSecret: string, newSecret: string): Promise<boolean> {
+  static async encrypt(newSecret: string, oldSecret: string): Promise<boolean> {
     return process.exec<boolean>(async () => {
       const identity = await process.validate(await process.getIdentity());
 
       identity.token = await GoogleDrive.renewToken();
-      await process.sync(identity, new CryptoService(oldSecret), new CryptoService(newSecret));
+      await process.reEncrypt(identity, new CryptoService(newSecret), new CryptoService(oldSecret));
       await core.delay();
 
       return true;
-    }, false);
+    });
   }
 
   static async verifyIdentity(info: IdentityInfo): Promise<IdentityInfo | null> {
     const identity = await process.validate(info);
-    const rules = { minHours: 1, maxAttempts: 3, modified: new Date().getTime(), valid: false };
+    const rules = { minHours: 1, maxAttempts: 30, modified: new Date().getTime(), valid: false };
 
     identity.token = await GoogleDrive.renewToken();
 
     return await process.exec<IdentityInfo | null>(async () => {
-      const file = await process.ensureFile(identity);
-      const rule = <IPasswordRule> await core.decrypt(file.data.rules);
-      const hours = Math.abs(rules.modified - rule.modified) / 36e5;
+      const file = await process.lookUpFile(identity);
 
-      if (hours > rules.minHours) {
-        rule.count = 0;
+      if (file && !file.isNew) {
+        const rule = <IPasswordRule> await core.decrypt(file.data.rules);
+        const hours = Math.abs(rules.modified - rule.modified) / 36e5;
+
+        if (hours > rules.minHours) {
+          rule.count = 0;
+        }
+
+        if (rule.count < rules.maxAttempts) {
+          const encryptor = identity.passphrase && new CryptoService(identity.passphrase);
+
+          rules.valid = encryptor ? await process.checkFileSecret(file, encryptor) : true;
+          rule.modified = rules.modified;
+          rule.count = !rules.valid ? rule.count + 1 : 0;
+          identity.fileId = rules.valid ? file.id : null;
+          file.data.rules = await core.encrypt(rule);
+
+          await GoogleDrive.update(identity.token, file.id, file.data);
+          await core.delay();
+
+          if (!rules.valid) {
+            return null;
+          }
+
+          process.setFile(file);
+        } else {
+          const plural = rules.minHours > 1 ? 's' : '';
+
+          throw new TokenError(`Please wait for at least ${rules.minHours} hour${plural} before trying again.`);
+        }
       }
 
-      if (rule.count < rules.maxAttempts) {
-        rules.valid = await process.checkFileSecret(
-          file, identity.passphrase && new CryptoService(identity.passphrase)
-        );
-
-        rule.modified = rules.modified;
-        rule.count = !rules.valid ? rule.count + 1 : rule.count;
-        identity.fileId = rules.valid ? file.id : null;
-        file.data.rules = await core.encrypt(rule);
-
-        this.file = rules.valid ? file : null;
-        await GoogleDrive.update(identity.token, file.id, file.data);
-        await core.delay();
-
-        return rules.valid ? identity : null;
-      } else {
-        const plural = rules.minHours > 1 ? 's' : '';
-
-        throw new TokenError(`Please wait for at least ${rules.minHours} hour${plural} before trying again.`);
-      }
-    }, false);
+      return identity;
+    });
   }
 
   static async remove() {
@@ -116,5 +120,16 @@ export class Cloud {
 
       await core.delay();
     });
+  }
+
+  static async unlock() {
+    process.unlock();
+  }
+
+  static async lock(info?: IdentityInfo, reason?: string) {
+    const identity = info || await process.getIdentity();
+    const file = process.lookUpFile(identity);
+
+    process.lock(reason, (await file).data.items.map(i => i.i));
   }
 }
