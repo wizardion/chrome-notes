@@ -8,6 +8,7 @@ import { CachedStorageService } from 'core/services/cached';
 import { ITabInfo } from 'modules/settings/models/settings.model';
 import { db } from 'modules/db';
 import * as core from 'core';
+import { AlertElement } from './alert/alert.component';
 
 
 async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
@@ -86,7 +87,7 @@ export async function settingsChanged(element?: CommonSettingsElement) {
   await storage.local.set('settings', settings);
 }
 
-export async function syncInfoChanged(element: SyncInfoElement) {
+export async function syncInfoChanged(element: SyncInfoElement, alert: AlertElement) {
   const applicationId = await core.getApplicationId();
   const settings = await getSettings();
 
@@ -108,7 +109,9 @@ export async function syncInfoChanged(element: SyncInfoElement) {
 
   if (settings.error) {
     settings.error = null;
-    await storage.local.set('settings', settings);
+    alert.hideMessage();
+
+    return storage.local.set('settings', settings);
   }
 }
 
