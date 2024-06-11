@@ -43,8 +43,8 @@ chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {
 
 chrome.storage.local.onChanged.addListener(async (changes: StorageChange) => {
   if (changes.identityInfo?.newValue) {
-    const newInfo: IdentityInfo = <IdentityInfo> await decrypt(changes.identityInfo.newValue?.value);
-    const oldInfo: IdentityInfo = <IdentityInfo> await decrypt(changes.identityInfo.oldValue?.value);
+    const newInfo = <IdentityInfo> await decrypt(changes.identityInfo.newValue?.value);
+    const oldInfo = <IdentityInfo> await decrypt(changes.identityInfo.oldValue?.value);
 
     return onIdentityInfoChanged(oldInfo, newInfo);
   }

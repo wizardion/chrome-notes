@@ -19,6 +19,16 @@ export function setFile(file: IFileInfo) {
   memInfo.file = file;
 }
 
+function updateIdentity(info: IdentityInfo, file: IFileInfo): IdentityInfo {
+  return {
+    ...info,
+
+    fileId: file.id,
+    encrypted: file.data.secret && info.encrypted,
+    passphrase: file.data.secret && info.passphrase,
+  };
+}
+
 export async function getIdentity(): Promise<IdentityInfo | null> {
   return storage.local.get<IdentityInfo>('identityInfo');
 }
@@ -63,8 +73,8 @@ export async function validate(identityInfo: IdentityInfo): Promise<IdentityInfo
   return identityInfo;
 }
 
-export async function checkFileSecret(file: IFileInfo, cryptor?: CryptoService): Promise<boolean> {
-  return await cryptor.verify(file.data.secret);
+export async function checkFileSecret(file: IFileInfo, encryptor?: CryptoService): Promise<boolean> {
+  return await encryptor.verify(file.data.secret);
 }
 
 export async function lookUpFile(identity: IdentityInfo): Promise<IFileInfo> {
@@ -83,9 +93,6 @@ export async function lookUpFile(identity: IdentityInfo): Promise<IFileInfo> {
     const rules: IPasswordRule = { count: 0, modified: 0 };
     const cloud: ICloudInfo = { modified: new Date().getTime(), items: [], rules: await encrypt(rules) };
 
-    file = await GoogleDrive.create(identity.token, cloud);
-    file.isNew = true;
-
     return {
       id: null,
       modifiedTime: null,
@@ -98,10 +105,17 @@ export async function lookUpFile(identity: IdentityInfo): Promise<IFileInfo> {
   return file;
 }
 
-export async function ensureFile(identity: IdentityInfo, cryptor?: CryptoService): Promise<IFileInfo> {
-  let file: IFileInfo = await lookUpFile(identity);
+export async function ensureFile(identity: IdentityInfo, encryptor?: CryptoService): Promise<IFileInfo> {
+  let file: IFileInfo =  memInfo.file || await lookUpFile(identity);
 
-  if (!identity.fileId && !file || file.isNew) {
+  if (file && !file.id) {
+    file = await GoogleDrive.create(identity.token, file.data);
+    file.isNew = true;
+
+    await delay();
+  }
+
+  if (!identity.fileId && !file || !file.id) {
     const rules: IPasswordRule = { count: 0, modified: 0 };
     const cloud: ICloudInfo = { modified: new Date().getTime(), items: [], rules: await encrypt(rules) };
 
@@ -119,12 +133,15 @@ export async function ensureFile(identity: IdentityInfo, cryptor?: CryptoService
     throw new IntegrityError('Cloud data Integrity is corrupted.');
   }
 
-  if ((file.data?.secret && !cryptor) || file.data?.secret && cryptor && !(await checkFileSecret(file, cryptor))) {
+  if ((file.data?.secret && !encryptor) ||
+    file.data?.secret && encryptor && !(await checkFileSecret(file, encryptor))) {
     const error = new TokenSecretDenied();
 
     await lock(error.message, file.data.items.map(i => i.i));
     throw error;
   }
+
+  memInfo.file = null;
 
   return file;
 }
@@ -139,7 +156,7 @@ async function syncItems(file: IFileInfo, encryptor?: CryptoService, decryptor?:
 
     // remove deleted
     if (info.db && (info.db.deleted || !info.db.description) && !info.cloud) {
-      logger.info(i, ' - continue ...');
+      logger.info(i, ' - already removed, continue ...');
       continue;
     }
 
@@ -192,41 +209,54 @@ async function syncItems(file: IFileInfo, encryptor?: CryptoService, decryptor?:
 }
 
 export async function sync(identity: IdentityInfo, encryptor?: CryptoService): Promise<IdentityInfo> {
-  const file = memInfo.file || await ensureFile(identity, encryptor);
-  const { changed, ...cloud } = await syncItems(file, encryptor);
+  const file = await ensureFile(identity, encryptor);
+  const { changed, ...cloud } = await syncItems(file, file.data.secret ? encryptor : null);
+  const newIdentity = updateIdentity(identity, file);
 
-  if (cloud.modified !== file.data.modified || !file.data.secret && encryptor && !encryptor.transparent) {
+  if (cloud.modified !== file.data.modified) {
     await logger.info(' - new version will be updated.');
 
-    cloud.secret = encryptor ? await encryptor.generateSecret() : null;
-    await logger.info(' - generated new secret:', cloud.secret);
+    if (newIdentity.encrypted && file.data.secret && encryptor && !encryptor.transparent) {
+      cloud.secret = await encryptor.generateSecret();
+      await logger.info(' - generated new secret:', cloud.secret);
+    }
 
     cloud.rules = cloud.rules ? await encrypt(await decrypt(cloud.rules)) : cloud.rules;
-    await GoogleDrive.update(identity.token, identity.fileId, cloud);
+    await GoogleDrive.update(identity.token, newIdentity.fileId, cloud);
   }
 
   if (changed) {
     await updateCache();
   }
 
-  memInfo.file = null;
-
-  return { ...identity, fileId: file.id };
+  return newIdentity;
 }
 
-export async function reEncrypt(identity: IdentityInfo, encryptor: CryptoService, decryptor: CryptoService) {
+export async function encode(
+  identity: IdentityInfo, encryptor: CryptoService, decryptor: CryptoService
+): Promise<boolean> {
   const file = await ensureFile(identity, decryptor);
   const { changed, ...cloud } = await syncItems(file, encryptor, decryptor);
 
-  await logger.info(' - new version will be updated.');
+  await logger.info('reEncrypt: - new version will be updated.');
 
-  cloud.secret = await encryptor.generateSecret();
-  await logger.info(' - generated new secret:', cloud.secret);
+  if (identity.encrypted && !encryptor.transparent) {
+    cloud.secret = await encryptor.generateSecret();
+    await logger.info('reEncrypt: - generated new secret:', cloud.secret);
+  }
+
+  if (!identity.fileId) {
+    throw new IntegrityError('Cannot encode since no file ID is provided.');
+  }
 
   cloud.rules = cloud.rules ? await encrypt(await decrypt(cloud.rules)) : cloud.rules;
   await GoogleDrive.update(identity.token, identity.fileId, cloud);
 
-  return changed;
+  if (changed) {
+    await updateCache();
+  }
+
+  return true;
 }
 
 export async function exec<T>(request: ISyncRequest<T>): Promise<T> {

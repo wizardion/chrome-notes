@@ -57,7 +57,7 @@ whenDefined().then(async () => {
 
   if (settings.identity) {
     controls.syncInfo.fileId = settings.identity.fileId;
-    controls.syncInfo.passphrase = settings.identity.passphrase;
+    controls.syncInfo.passphrase = !settings.identity.locked ? settings.identity.passphrase : null;
     controls.syncInfo.locked = settings.identity.locked;
     controls.syncInfo.encrypted = settings.identity.encrypted;
     controls.syncInfo.token = settings.identity.token;
@@ -84,6 +84,10 @@ whenDefined().then(async () => {
   if (settings.common?.appearance === 2 || settings.common?.appearance === 0 &&
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.body.classList.add('theme-dark');
+  }
+
+  if (controls.syncInfo.locked) {
+    controls.syncInfo.focusPassphrase();
   }
 
   await chrome.storage.session.set({ optionPageId: (await chrome.tabs.getCurrent()).id });

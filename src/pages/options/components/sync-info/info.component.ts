@@ -67,7 +67,7 @@ export class SyncInfoElement extends BaseElement {
 
     this.form.checkboxes.encrypt.parentElement.onmousedown = (e) => e.preventDefault();
 
-    this.form.buttons.submit.onclick = () => this.submit(this.syncDecorator());
+    this.form.buttons.submit.onclick = () => this.synchronize();
     this.form.buttons.authorize.onclick = () => this.authorize();
     this.form.checkboxes.sync.onchange = () => this.enabledChanged();
     this.form.buttons.deauthorize.onclick = () => this.deauthorize();
@@ -113,7 +113,7 @@ export class SyncInfoElement extends BaseElement {
 
       this.form.checkboxes.encrypt.checked = true;
 
-      if (!(await this.submit(this.encryptDecorator('')))) {
+      if (!(await this.submit(this.encodeDecorator('')))) {
         return;
       }
 
@@ -137,7 +137,7 @@ export class SyncInfoElement extends BaseElement {
     const passphrase = this.form.passphrase.value;
 
     if (!this.locked && this._enabled && this._encrypted) {
-      if (await this.submit(this.encryptDecorator(passphrase))) {
+      if (await this.submit(this.encodeDecorator(passphrase))) {
         this.passphrase = passphrase;
         this.dispatchEvent(this.event);
       }
@@ -160,12 +160,12 @@ export class SyncInfoElement extends BaseElement {
 
   protected unlockDecorator(passphrase: string): IDecorator {
     return async () => {
-      const verify = this.verifyIdentity(passphrase);
-      const sync = this.syncDecorator();
+      const verify = this.verifyIdentityDecorator(passphrase);
       const info = await verify();
 
       if (info?.fileId) {
-        this.updateInfo(info);
+        const sync = this.syncDecorator(info);
+
         await sync();
         await Cloud.unlock();
 
@@ -176,11 +176,11 @@ export class SyncInfoElement extends BaseElement {
     };
   }
 
-  protected syncDecorator(): IDecorator {
+  protected syncDecorator(identity?: IdentityInfo): IDecorator {
     return async () => {
       await Cloud.wait();
 
-      const info = await Cloud.sync({
+      const info = await Cloud.sync(identity || {
         fileId: this._fileId,
         token: this._token,
         enabled: this._enabled,
@@ -193,15 +193,22 @@ export class SyncInfoElement extends BaseElement {
     };
   }
 
-  protected encryptDecorator(passphrase: string): IDecorator {
+  protected encodeDecorator(passphrase: string): IDecorator {
     return async () => {
       await Cloud.wait();
 
-      return Cloud.encrypt(passphrase, this._passphrase || '');
+      return Cloud.encode({
+        fileId: this._fileId,
+        token: this._token,
+        passphrase: passphrase,
+        enabled: this._enabled,
+        encrypted: this._encrypted,
+        locked: this._locked,
+      }, this._passphrase || '');
     };
   }
 
-  protected verifyIdentity(passphrase: string): IDecorator<IdentityInfo | null> {
+  protected verifyIdentityDecorator(passphrase: string): IDecorator<IdentityInfo | null> {
     return async () => {
       await Cloud.wait();
 
@@ -218,17 +225,42 @@ export class SyncInfoElement extends BaseElement {
 
   protected authorizeDecorator(): IDecorator {
     return async () => {
-      const verify = this.verifyIdentity(this._passphrase);
-      const sync = this.syncDecorator();
+      const verify = this.verifyIdentityDecorator(this._passphrase);
       const info = await verify();
 
-      if (info?.fileId) {
-        this.updateInfo(info);
+      if (info?.token) {
+        const sync = this.syncDecorator(info);
 
-        return sync();
+        await sync();
+
+        return true;
       }
 
       return false;
+    };
+  }
+
+  protected deauthorizeDecorator(): IDecorator {
+    return async () => {
+      await Cloud.deauthorize(this.token);
+      this.fileId = null;
+      this.token = null;
+
+      return true;
+    };
+  }
+
+  protected removeCloudDecorator(): IDecorator {
+    return async () => {
+      await Cloud.remove();
+      await LoggerService.clear();
+
+      this.token = null;
+      this.fileId = null;
+      this.encrypted = false;
+      this.passphrase = null;
+
+      return true;
     };
   }
 
@@ -240,6 +272,8 @@ export class SyncInfoElement extends BaseElement {
         this.token = await Cloud.authorize();
 
         if (!await this.submit(this.authorizeDecorator())) {
+          this.token = null;
+
           if (!this._response.error || this._response.locked) {
             this.locked = true;
             this.form.passphrase.focus();
@@ -247,8 +281,6 @@ export class SyncInfoElement extends BaseElement {
 
             return this.dispatchEvent(this.event);
           }
-
-          this.token = null;
         } else {
           this.dispatchEvent(this.event);
         }
@@ -275,28 +307,12 @@ export class SyncInfoElement extends BaseElement {
     this.dispatchEvent(this.event);
   }
 
-  protected deauthorizeDecorator(): IDecorator {
-    return async () => {
-      await Cloud.deauthorize(this.token);
-      this.fileId = null;
-      this.token = null;
+  protected async synchronize() {
+    const identityChanged = await this.submit(this.syncDecorator());
 
-      return true;
-    };
-  }
-
-  protected removeCloudDecorator(): IDecorator {
-    return async () => {
-      await Cloud.remove();
-      await LoggerService.clear();
-
-      this.token = null;
-      this.fileId = null;
-      this.encrypted = false;
-      this.passphrase = null;
-
-      return true;
-    };
+    if (identityChanged) {
+      this.dispatchEvent(this.event);
+    }
   }
 
   public get promise(): boolean {
@@ -387,6 +403,10 @@ export class SyncInfoElement extends BaseElement {
     );
   }
 
+  public focusPassphrase() {
+    this.form.passphrase.focus();
+  }
+
   private validateControls() {
     this._encrypted = this._locked || this._encrypted;
     this.form.checkboxes.encrypt.checked = this._locked || this.form.checkboxes.encrypt.checked;
@@ -404,6 +424,8 @@ export class SyncInfoElement extends BaseElement {
   }
 
   private updateInfo(info: IdentityInfo): boolean {
+    const changed = this.isIdentityChanged(info);
+
     this.fileId = info.fileId;
     this.token = info.token;
     this.passphrase = info.passphrase;
@@ -411,7 +433,14 @@ export class SyncInfoElement extends BaseElement {
     this.encrypted = info.encrypted;
     this.locked = info.locked;
 
-    return !!info.fileId;
+    return changed;
+  }
+
+  private isIdentityChanged(identity?: IdentityInfo): boolean {
+    return (!this._response.error && !this._response.locked)
+      && (this._enabled !== identity.enabled || this._encrypted !== identity.encrypted
+      || this._fileId !== identity.fileId || this._locked !== identity.locked
+      || this._passphrase !== identity.passphrase);
   }
 
   private async submit<T = boolean>(decorator: IDecorator<T>): Promise<T | null> {

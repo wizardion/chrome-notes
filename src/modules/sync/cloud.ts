@@ -27,30 +27,27 @@ export class Cloud {
     }
   }
 
-  static async sync(info?: IdentityInfo): Promise<IdentityInfo> {
+  static async sync(identity: IdentityInfo): Promise<IdentityInfo> {
     return process.exec<IdentityInfo>(async () => {
-      const identity = info || await process.validate(await process.getIdentity());
       const cryptor = identity.passphrase && new CryptoService(identity.passphrase);
 
       identity.token = await GoogleDrive.renewToken();
-
-      const newIdentity = await process.sync(identity, cryptor);
-
       await core.delay();
 
-      return newIdentity;
+      return process.sync(identity, cryptor);
     });
   }
 
-  static async encrypt(newSecret: string, oldSecret: string): Promise<boolean> {
+  static async encode(info: IdentityInfo, oldSecret: string): Promise<boolean> {
     return process.exec<boolean>(async () => {
-      const identity = await process.validate(await process.getIdentity());
+      const identity = await process.validate(info);
 
       identity.token = await GoogleDrive.renewToken();
-      await process.reEncrypt(identity, new CryptoService(newSecret), new CryptoService(oldSecret));
       await core.delay();
 
-      return true;
+      return await process.encode(
+        identity, new CryptoService(info.passphrase), new CryptoService(oldSecret)
+      );
     });
   }
 
@@ -106,19 +103,21 @@ export class Cloud {
       const identity = await process.getIdentity();
       let token: string;
 
-      try {
-        token = await GoogleDrive.renewToken();
-      } catch {
-        return;
+      if (identity) {
+        try {
+          token = await GoogleDrive.renewToken();
+
+          await GoogleDrive.remove(token, identity?.fileId);
+          await this.deauthorize(token);
+
+          delete identity.token;
+          delete identity.fileId;
+
+          await core.delay();
+        } catch {
+          return;
+        }
       }
-
-      await GoogleDrive.remove(token, identity?.fileId);
-      await this.deauthorize(token);
-
-      delete identity.token;
-      delete identity.fileId;
-
-      await core.delay();
     });
   }
 

@@ -3,12 +3,13 @@ import { IOptionControls, IStorageChange } from './options.model';
 import { DevModeElement } from './dev-mode/dev.component';
 import { CommonSettingsElement } from './common-settings/common-settings.component';
 import { ISettingsArea, getPopupPage, getSettings, setColors } from 'modules/settings';
+import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import { ISyncInfo, ISyncStorageValue, storage } from 'core/services';
 import { CachedStorageService } from 'core/services/cached';
 import { ITabInfo } from 'modules/settings/models/settings.model';
+import { AlertElement } from './alert/alert.component';
 import { db } from 'modules/db';
 import * as core from 'core';
-import { AlertElement } from './alert/alert.component';
 
 
 async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
@@ -155,6 +156,16 @@ export async function onLocalStorageChanged(changes: IStorageChange, controls: I
 
     if (settings.error) {
       controls.alert.error = settings.error.message;
+    }
+  }
+
+  if (changes.identityInfo?.newValue) {
+    const newInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.newValue?.value);
+    const oldInfo = <IdentityInfo> await core.decrypt(changes.identityInfo.oldValue?.value);
+
+    if (newInfo.locked && !oldInfo.locked && !controls.syncInfo.locked) {
+      controls.syncInfo.locked = true;
+      controls.syncInfo.passphrase = null;
     }
   }
 }

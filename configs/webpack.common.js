@@ -181,10 +181,9 @@ module.exports = {
     }
   },
   plugins: [
-    ...(
-      production
-        ? [new webpack.NormalModuleReplacementPlugin(/src\/core\/services\/encryption\/keys.ts/, './keys.prod.ts')]
-        : []
+    new webpack.NormalModuleReplacementPlugin(
+      /src\/core\/services\/encryption\/keys.ts/,
+      production? './keys.prod.ts': './keys.dev.ts'
     ),
     new CleanWebpackPlugin(production? { cleanAfterEveryBuildPatterns: ['**/*']} : {}),
     new CopyWebpackPlugin({

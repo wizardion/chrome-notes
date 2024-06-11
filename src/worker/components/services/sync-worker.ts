@@ -15,7 +15,8 @@ export class SyncWorker extends BaseWorker {
 
   async process() {
     try {
-      const identity = await Cloud.sync();
+      const info = await LocalStorageService.get<IdentityInfo>('identityInfo');
+      const identity = await Cloud.sync(info);
 
       if (!identity.fileId && !identity.token) {
         await SyncStorageService.set({
@@ -25,8 +26,12 @@ export class SyncWorker extends BaseWorker {
           encrypted: false,
           applicationId: await getApplicationId(),
         });
-        await LocalStorageService.sensitive('identityInfo', identity);
+
         await SyncWorker.deregister('Cloud data has been removed.');
+      }
+
+      if (this.isIdentityChanged(info, identity)) {
+        await LocalStorageService.sensitive('identityInfo', identity);
       }
     } catch (error) {
       if (error instanceof TokenSecretDenied) {
@@ -77,5 +82,11 @@ export class SyncWorker extends BaseWorker {
     identity.token = null;
 
     return LocalStorageService.sensitive('identityInfo', identity);
+  }
+
+  private isIdentityChanged(oldInfo?: IdentityInfo, newInfo?: IdentityInfo): boolean {
+    return oldInfo.enabled !== newInfo.enabled || oldInfo.encrypted !== newInfo.encrypted
+      || oldInfo.fileId !== newInfo.fileId || oldInfo.locked !== newInfo.locked
+      || oldInfo.passphrase !== newInfo.passphrase;
   }
 }

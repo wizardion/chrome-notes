@@ -8,3 +8,4 @@ node_modules/
 package-lock.json
 .manifest/
 src/core/services/encryption/keys.prod.ts
+src/core/services/encryption/keys.dev.ts

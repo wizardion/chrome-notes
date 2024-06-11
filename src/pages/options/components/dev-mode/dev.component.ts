@@ -50,7 +50,7 @@ export class DevModeElement extends BaseElement {
     this.form.elements.workersPrint.addEventListener('click',  (e) => { e.preventDefault(); this.printWorkers(); });
     this.form.elements.dataPrint.addEventListener('click',  (e) => { e.preventDefault(); this.printData(); });
     this.form.elements.dataRestore.addEventListener('click',  (e) => { e.preventDefault(); this.restoreData(); });
-    this.form.elements.dataEmpty.addEventListener('click',  (e) => { e.preventDefault(); this.clearData(); });
+    this.form.elements.dataEmpty.addEventListener('click',  (e) => { e.preventDefault(); this.eraseAllData(); });
   }
 
   protected attributeChanged(name: string) {
@@ -133,7 +133,8 @@ export class DevModeElement extends BaseElement {
       }, {});
 
       console.table(table, [
-        'title', 'description', 'order', 'created', 'updated', 'preview', 'pState', 'pState', 'deleted', 'synced'
+        'title', 'description', 'order', 'created', 'updated', 'preview', 'pState', 'pState', 'deleted', 'synced',
+        'locked'
       ]);
       console.log('Data in JSON:', data || 'None');
       console.log('');
@@ -150,7 +151,9 @@ export class DevModeElement extends BaseElement {
                                '\nThe page will be reloaded.');
 
     if (value) {
-      this.form.elements.info.hidden = true;
+      document.write(
+        '<div style="margin: 20px auto; text-align: center; font-size: larger;">... Processing data ...</div>'
+      );
 
       try {
         const data = this.parseData(JSON.parse(value));
@@ -160,7 +163,7 @@ export class DevModeElement extends BaseElement {
         if (this.validateData(data)) {
           const items = this.representNotes(data.valid);
 
-          await this.clearData(true);
+          await this.clearData();
           await delay(2000);
 
           for (let i = 0; i < items.length; i++) {
@@ -176,41 +179,40 @@ export class DevModeElement extends BaseElement {
           window.alert(`Has been restored ${data.valid.length} notes.` +
                        `\nAnd ${data.invalid.length} items have invalid DATA format.`);
           document.location.reload();
-        } else {
-          this.form.elements.info.hidden = false;
         }
       } catch (er) {
-        this.form.elements.info.hidden = false;
         window.alert('You entered incorrect DATA or not in JSON format!');
       }
     }
   }
 
-  protected async clearData(force?: boolean) {
-    if (force || window.confirm(
+  protected async clearData() {
+    try {
+      await Cloud.remove();
+      await db.clear();
+      await storage.global.clear();
+      await LoggerService.clear();
+      await resetDefaults();
+      await chrome.runtime.sendMessage({ data: 'removed', id: await getApplicationId() });
+    } catch (error) {
+      window.alert('Oops! Something is wrong!\n' + error.message + '\n\nPlease see logs for more details.');
+      console.log(error);
+    }
+  }
+
+  protected async eraseAllData() {
+    if (window.confirm(
       'Please confirm the certainty of clearing all data.\nAttention! This action is irreversible!' +
       '\nThe page will be reloaded.'
     )) {
-      try {
-        await Cloud.remove();
-        await db.clear();
-        await storage.global.clear();
-        await LoggerService.clear();
-        await resetDefaults();
-        await chrome.runtime.sendMessage({ data: 'removed', id: await getApplicationId() });
+      document.write(
+        '<div style="margin: 20px auto; text-align: center; font-size: larger;">... Erasing data ...</div>'
+      );
 
-        if (!force) {
-          this.form.elements.mode.nextElementSibling.innerHTML = '... Erasing data...';
-          this.form.elements.mode.hidden = true;
-          this.form.elements.info.hidden = true;
-          await delay(4000);
+      await this.clearData();
+      await delay(2000);
 
-          document.location.reload();
-        }
-      } catch (error) {
-        window.alert('Oops! Something is wrong!\n' + error.message + '\n\nPlease see logs for more details.');
-        console.log(error);
-      }
+      document.location.reload();
     }
   }
 
