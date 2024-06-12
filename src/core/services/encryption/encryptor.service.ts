@@ -1,4 +1,4 @@
-import { secretKey } from './keys';
+import { secretKey } from './encryption-keys';
 
 
 export class CryptoService {

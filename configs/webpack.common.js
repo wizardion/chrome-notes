@@ -182,8 +182,17 @@ module.exports = {
   },
   plugins: [
     new webpack.NormalModuleReplacementPlugin(
-      /src\/core\/services\/encryption\/keys.ts/,
-      production? './keys.prod.ts': './keys.dev.ts'
+      /^\.\/encryption-keys(\.ts)?$/,
+      function replacePlugin(resource) {
+        const request = resource.request.replace(
+          /encryption-keys(\.ts)?/,
+          `encryption-keys.${production ? 'prod' : 'dev'}.ts`
+        );
+
+        if (fs.existsSync(path.resolve(resource.context, request)) || !production) {
+          resource.request = request;
+        }
+      }
     ),
     new CleanWebpackPlugin(production? { cleanAfterEveryBuildPatterns: ['**/*']} : {}),
     new CopyWebpackPlugin({
