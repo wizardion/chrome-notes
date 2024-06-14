@@ -225,7 +225,7 @@ export async function onIdleActiveStateChanged() {
 export async function onIdleLockedStateChanged() {
   const alarms = await chrome.alarms.getAll();
 
-  await chrome.alarms.clearAll();
+  await chrome.storage.session.set({ alarms: alarms.filter(i => i.name !== PushWorker.name) });
 
-  return chrome.storage.session.set({ alarms: alarms.filter(i => i.name !== PushWorker.name) });
+  return chrome.alarms.clearAll();
 }

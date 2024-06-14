@@ -38,6 +38,8 @@ export async function ensureOptionPage() {
 export async function startServiceWorker(name: string) {
   const settings = await getSettings();
 
+  await workerLogger.addLine();
+
   for (let i = 0; i < serviceWorkers.length; i++) {
     const Base = serviceWorkers[i];
 

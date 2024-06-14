@@ -53,7 +53,7 @@ export class Cloud {
 
   static async verifyIdentity(info: IdentityInfo): Promise<IdentityInfo | null> {
     const identity = await process.validate(info);
-    const rules = { minHours: 1, maxAttempts: 30, modified: new Date().getTime(), valid: false };
+    const configs = { minHours: 1, maxAttempts: 30, modified: new Date().getTime() };
 
     identity.token = await GoogleDrive.renewToken();
 
@@ -62,33 +62,34 @@ export class Cloud {
 
       if (file && !file.isNew) {
         const rule = <IPasswordRule> await core.decrypt(file.data.rules);
-        const hours = Math.abs(rules.modified - rule.modified) / 36e5;
+        const hours = Math.abs(configs.modified - rule.modified) / 36e5;
 
-        if (hours > rules.minHours) {
+        if (hours > configs.minHours) {
           rule.count = 0;
         }
 
-        if (rule.count < rules.maxAttempts) {
-          const encryptor = identity.passphrase && new CryptoService(identity.passphrase);
+        if (rule.count < configs.maxAttempts) {
+          const valid = file.data.secret
+            ? await process.checkFileSecret(file, new CryptoService(identity.passphrase))
+            : true;
 
-          rules.valid = encryptor ? await process.checkFileSecret(file, encryptor) : true;
-          rule.modified = rules.modified;
-          rule.count = !rules.valid ? rule.count + 1 : 0;
-          identity.fileId = rules.valid ? file.id : null;
-          file.data.rules = await core.encrypt(rule);
+          file.data.rules = await core.encrypt({
+            ...rule, modified: configs.modified, count: valid ? 0 : rule.count + 1
+          });
 
           await GoogleDrive.update(identity.token, file.id, file.data);
           await core.delay();
 
-          if (!rules.valid) {
+          if (!valid) {
             return null;
           }
 
+          identity.fileId = file.id;
           process.setFile(file);
         } else {
-          const plural = rules.minHours > 1 ? 's' : '';
+          const plural = configs.minHours > 1 ? 's' : '';
 
-          throw new TokenError(`Please wait for at least ${rules.minHours} hour${plural} before trying again.`);
+          throw new TokenError(`Please wait for at least ${configs.minHours} hour${plural} before trying again.`);
         }
       }
 

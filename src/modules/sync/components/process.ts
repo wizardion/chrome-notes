@@ -238,11 +238,11 @@ export async function encode(
   const file = await ensureFile(identity, decryptor);
   const { changed, ...cloud } = await syncItems(file, encryptor, decryptor);
 
-  await logger.info('reEncrypt: - new version will be updated.');
+  await logger.info('encode: - new version will be updated.');
 
   if (identity.encrypted && !encryptor.transparent) {
     cloud.secret = await encryptor.generateSecret();
-    await logger.info('reEncrypt: - generated new secret:', cloud.secret);
+    await logger.info('encode: - generated new secret:', cloud.secret);
   }
 
   if (!identity.fileId) {

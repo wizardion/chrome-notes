@@ -1,9 +1,10 @@
 import { Cloud } from 'modules/sync/cloud';
 import { BaseElement } from 'core/components';
 import { IdentityInfo, TokenSecretDenied } from 'modules/sync/components/models/sync.models';
-import { ISyncInfoForm, IResponseDetails } from './models/info.models';
-import { LoggerService } from 'modules/logger';
+import { ISyncInfoForm, ISyncErrorDetails } from './models/info.models';
 import { IDecorator } from 'core/models/code.models';
+import { LoggerService } from 'modules/logger';
+import { getApplicationId } from 'core/index';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -23,7 +24,7 @@ export class SyncInfoElement extends BaseElement {
   private _encrypted: boolean;
   private _passphrase: string;
   private _locked: boolean;
-  private _response: IResponseDetails;
+  private _error: ISyncErrorDetails;
 
   constructor() {
     super();
@@ -58,7 +59,7 @@ export class SyncInfoElement extends BaseElement {
     this.form.sections.encryption.disabled = true;
 
     this.form.buttons.submit.disabled = true;
-    this._response = { message: null, locked: false, error: false };
+    this._error = { message: null, locked: false };
     this.promise = false;
   }
 
@@ -151,9 +152,9 @@ export class SyncInfoElement extends BaseElement {
         this.locked = false;
 
         this.dispatchEvent(this.event);
-      } else if (!this._response.error || this._response.locked) {
+      } else {
         this.form.passphrase.focus();
-        this.message = this._response.message || 'Invalid encryption passphrase.';
+        this.message = this._error?.message || 'Invalid encryption passphrase.';
       }
     }
   }
@@ -166,8 +167,8 @@ export class SyncInfoElement extends BaseElement {
       if (info?.fileId) {
         const sync = this.syncDecorator(info);
 
-        await sync();
         await Cloud.unlock();
+        await sync();
 
         return true;
       }
@@ -272,18 +273,12 @@ export class SyncInfoElement extends BaseElement {
         this.token = await Cloud.authorize();
 
         if (!await this.submit(this.authorizeDecorator())) {
-          this.token = null;
-
-          if (!this._response.error || this._response.locked) {
-            this.locked = true;
-            this.form.passphrase.focus();
-            this.message = this._response.message || 'Invalid encryption passphrase.';
-
-            return this.dispatchEvent(this.event);
-          }
-        } else {
-          this.dispatchEvent(this.event);
+          this.locked = true;
+          this.form.passphrase.focus();
+          this.message = this._error?.message || 'Invalid encryption passphrase.';
         }
+
+        this.dispatchEvent(this.event);
       } else {
         this.message = 'Please enter all required fields.';
       }
@@ -309,6 +304,20 @@ export class SyncInfoElement extends BaseElement {
 
   protected async synchronize() {
     const identityChanged = await this.submit(this.syncDecorator());
+
+    if (!this._error) {
+      const pushWorker = await chrome.alarms.get('pusher-worker');
+
+      if (pushWorker) {
+        const { pushInfo } = await chrome.storage.session.get('pushInfo') as { pushInfo: number };
+
+        chrome.alarms.clear(pushWorker.name);
+
+        if (pushInfo > 1) {
+          await chrome.storage.sync.set({ pushInfo: { id: await getApplicationId(), time: new Date().getTime() } });
+        }
+      }
+    }
 
     if (identityChanged) {
       this.dispatchEvent(this.event);
@@ -415,9 +424,9 @@ export class SyncInfoElement extends BaseElement {
     this.form.buttons.deauthorize.disabled = !this._token;
     this.form.checkboxes.encrypt.disabled = !this._token || this._locked;
 
-    this.form.sections.encryption.disabled = !this._token || (!this._locked && !this._encrypted);
+    this.form.sections.encryption.disabled = !this._encrypted || !this._locked && !this._token;
     this.form.passphrase.required = this._locked || (this._token && this._encrypted);
-    this.form.passphrase.disabled = !this._token || (!this._locked && !this._encrypted);
+    this.form.passphrase.disabled = !this._encrypted || !this._locked && !this._token;
 
     this.form.passphrase.locked = this._locked;
     this.form.buttons.submit.disabled = this._locked || !this._token || (this._encrypted && !this._passphrase);
@@ -437,7 +446,7 @@ export class SyncInfoElement extends BaseElement {
   }
 
   private isIdentityChanged(identity?: IdentityInfo): boolean {
-    return (!this._response.error && !this._response.locked)
+    return (!this._error?.locked)
       && (this._enabled !== identity.enabled || this._encrypted !== identity.encrypted
       || this._fileId !== identity.fileId || this._locked !== identity.locked
       || this._passphrase !== identity.passphrase);
@@ -453,18 +462,17 @@ export class SyncInfoElement extends BaseElement {
 
       result = await decorator();
 
-      this._response = { message: null, locked: false, error: false };
+      this._error = null;
     } catch (error) {
-      this._response = {
-        error: true,
+      this._error = {
         message: error.message || error,
         locked: error instanceof TokenSecretDenied,
       };
     } finally {
       await this.form.progressBar.finish(100);
       this.promise = false;
-      this.message = this._response.message;
-      this.locked = this._response.locked || this.locked;
+      this.message = this._error?.message;
+      this.locked = this._error?.locked || this.locked;
       this.form.checkboxes.sync.disabled = false;
     }
 
