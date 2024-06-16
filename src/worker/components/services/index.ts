@@ -22,17 +22,7 @@ export async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
 }
 
 export async function ensureOptionPage() {
-  const data = await chrome.storage.session.get('optionPageId');
-
-  if (data && data.optionPageId) {
-    const tab = await findTab(<number>data.optionPageId);
-
-    if (tab) {
-      return chrome.tabs.update(tab.id, { active: true });
-    }
-  }
-
-  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+  return chrome.runtime.openOptionsPage();
 }
 
 export async function startServiceWorker(name: string) {

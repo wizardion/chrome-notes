@@ -194,38 +194,22 @@ export async function onAppConnected(port: chrome.runtime.Port) {
 }
 
 export async function onIdleActiveStateChanged() {
-  const alarms = ((await chrome.storage.session.get('alarms')).alarms || []) as chrome.alarms.Alarm[];
-  const time = new Date().getTime();
-  let syncWorkerEnabled = false;
+  const alarms = await chrome.alarms.getAll();
+  const pushAlarm = alarms?.find(i => i.name === PushWorker.name);
+  const syncAlarm = alarms?.find(i => i.name === SyncWorker.name);
 
-  for (let i = 0; i < alarms.length; i++) {
-    const { name, scheduledTime, periodInMinutes } = alarms[i];
+  if (!pushAlarm && syncAlarm && await SyncWorker.validate()) {
+    const now = new Date().getTime();
+    const period = ((PushWorker.period * 2) * 6e+4);
+    const scheduled = new Date(syncAlarm.scheduledTime);
+    const start = new Date(now - period);
+    const end = new Date(now + period);
 
-    if (name !== SyncWorker.name) {
-      const scheduled = new Date(scheduledTime).getTime();
-      const delayInMinutes = scheduled > time ? Math.floor(((scheduled - time) / 1000) / 60) : (i + 1) * 2;
+    if (scheduled < start || scheduled > end) {
+      await PushWorker.deregister();
+      await chrome.storage.session.remove(PushWorker.infoKey);
 
-      await chrome.alarms.create(name, { periodInMinutes, delayInMinutes: Math.max(delayInMinutes, 1) });
-    } else if (await SyncWorker.validate()) {
-      syncWorkerEnabled = true;
-      await chrome.alarms.create(name, { periodInMinutes });
+      return PushWorker.register();
     }
   }
-
-  if (syncWorkerEnabled) {
-    await PushWorker.deregister();
-    await chrome.storage.session.remove(PushWorker.infoKey);
-
-    return PushWorker.register();
-  }
-
-  await chrome.storage.session.remove('alarms');
-}
-
-export async function onIdleLockedStateChanged() {
-  const alarms = await chrome.alarms.getAll();
-
-  await chrome.storage.session.set({ alarms: alarms.filter(i => i.name !== PushWorker.name) });
-
-  return chrome.alarms.clearAll();
 }

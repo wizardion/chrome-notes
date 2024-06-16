@@ -4,8 +4,7 @@ import { startServiceWorker } from './components/services';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import {
   StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initApplication, onPushInfoChanged,
-  initInstalledApplication, onAppConnected, onIdleActiveStateChanged,
-  onIdleLockedStateChanged
+  initInstalledApplication, onAppConnected, onIdleActiveStateChanged
 } from './components';
 
 
@@ -24,7 +23,7 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => startSer
 chrome.action.onClicked.addListener(async () => openPopup());
 
 chrome.idle.onStateChanged.addListener(async (newState: chrome.idle.IdleState) => {
-  return (newState === 'active') ? onIdleActiveStateChanged() : onIdleLockedStateChanged();
+  return newState === 'active' && onIdleActiveStateChanged();
 });
 
 chrome.storage.sync.onChanged.addListener(async (changes: StorageChange) => {

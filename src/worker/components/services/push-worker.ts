@@ -7,7 +7,7 @@ import { SyncWorker } from './sync-worker';
 export class PushWorker extends BaseWorker {
   static readonly infoKey = 'pushInfo';
   static readonly name = 'pusher-worker';
-  static readonly period = 1;
+  static readonly period = 2;
 
   readonly name = PushWorker.name;
 
@@ -47,11 +47,11 @@ export class PushWorker extends BaseWorker {
     return result;
   }
 
-  static async register(minutes: number = 2): Promise<void> {
+  static async register(minutes?: number): Promise<void> {
     const alarm = await chrome.alarms.get(PushWorker.name);
 
     if (!alarm) {
-      return chrome.alarms.create(PushWorker.name, { delayInMinutes: minutes });
+      return chrome.alarms.create(PushWorker.name, { delayInMinutes: minutes || this.period });
     }
   }
 }
