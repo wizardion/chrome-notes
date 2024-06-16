@@ -1,0 +1,43 @@
+html,
+body {
+  background: var(--body-background);
+
+  width: 600px;
+  height: 270px;
+  border: 0;
+  margin: 0px;
+  padding: 0px;
+
+  overflow: hidden;
+  // font: 15px 'Roboto', 'Ubuntu', Sans-Serif;
+  font-size: 15px;
+  font-family: "Google Sans Text", 'Roboto', 'Ubuntu', Sans-Serif;
+  font-weight: 400;
+}
+
+.list-view .list-content,
+.details-view .content-preview,
+.details-view .visual-editor,
+.details-view .cm-editor {
+  height: 244px;
+}
+
+.middle,
+.middle .details-view {
+  height: 450px;
+}
+
+.middle .details-view .content {
+  height: 425px;
+}
+
+.middle .list-view .list-content,
+.middle .details-view .content-preview,
+.middle .details-view .visual-editor,
+.middle .details-view .cm-editor {
+  height: 424px;
+}
+
+.middle .list-view .list-scroll {
+  max-height: 417px;
+}

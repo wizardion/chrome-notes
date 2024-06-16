@@ -1,0 +1,171 @@
+.list-toggle {
+  position: absolute;
+  left: 5px;
+}
+
+popup-notes.collapsed-animating list-view,
+popup-notes.collapsed-animating .details-view .content,
+popup-notes.collapsed-animating .list-controls .list-toggle,
+popup-notes.collapsed-animating .details-view .head .button.add,
+popup-notes.collapsed-animating .details-view .head .controls-group {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.notes-title {
+  font-size: small;
+  line-height: 26px !important;
+}
+
+popup-notes.collapsed .notes-title,
+popup-notes.collapsed .list-content .list-item .sort,
+popup-notes.collapsed .list-content .list-item .date-time,
+popup-notes.collapsed .list-content .list-item .to-note,
+popup-notes.collapsed .list-content .list-item .list-index + div,
+popup-notes.collapsed .list-content .list-item .list-title {
+  display: none;
+}
+
+popup-notes.collapsed .list-content .list-item .list-index {
+  display: initial;
+  font-size: small;
+  color: var(--base-inactive-color);
+}
+
+popup-notes.collapsed .list-items .selected .list-item .list-index {
+  color: var(--base-bright-color);
+}
+
+popup-notes.collapsed list-view {
+  transform: translateX(-216px);
+}
+
+popup-notes.collapsed .details-view .content {
+  width: calc(100% + 216px);
+  transform: translateX(-216px);
+}
+
+popup-notes.collapsed .list-controls .list-toggle {
+  transform: translateX(216px);
+}
+
+popup-notes.collapsed .details-view .head .button.add {
+  transform: translateX(-215px);
+}
+
+popup-notes.collapsed .details-view .head .controls-group {
+  transform: translateX(-100px);
+}
+
+popup-notes.collapsed-extended .details-view .content {
+  width: calc(100% + 216px);
+}
+
+popup-notes.collapsed-extended .details-view .content > * {
+  width: calc(100% - 216px);
+}
+
+popup-notes.collapsed .list-view .list-content {
+  width: 30px;
+  float: inline-end;
+}
+
+popup-notes.collapsed .list-content .list-item {
+  padding-left: 0px;
+  width: 24px;
+  margin: auto;
+  justify-content: center;
+}
+
+@media(max-width: 805px) {
+  .details-view .head .controls-group {
+    transform: translateX(30px);
+  }
+}
+
+@media(max-width: 785px) {
+  .details-view .head .controls-group {
+    transform: translateX(0px);
+  }
+}
+
+@media(max-width: 750px) {
+  popup-notes.collapsed-animating list-view,
+  popup-notes.collapsed-animating .details-view .content,
+  popup-notes.collapsed-animating .list-controls .list-toggle,
+  popup-notes.collapsed-animating .details-view .head .button.add,
+  popup-notes.collapsed-animating .details-view .head .controls-group {
+    transition: none;
+  }
+
+  popup-notes .notes-title,
+  popup-notes .list-content .list-item .sort,
+  popup-notes .list-content .list-item .date-time,
+  popup-notes .list-content .list-item .to-note,
+  popup-notes .list-content .list-item .list-index + div,
+  popup-notes .list-content .list-item .list-title {
+    display: none;
+  }
+
+  popup-notes .list-content .list-item .list-index {
+    display: initial;
+    font-size: small;
+    color: var(--base-inactive-color);
+  }
+
+  popup-notes .list-items .selected .list-item .list-index {
+    color: var(--base-bright-color);
+  }
+
+  popup-notes list-view {
+    transform: translateX(-216px);
+  }
+
+  popup-notes .details-view .content {
+    width: calc(100% + 216px);
+    transform: translateX(-216px);
+  }
+
+  popup-notes .details-view .head .button.add, 
+  popup-notes.collapsed .details-view .head .button.add {
+    transform: translateX(-250px);
+  }
+
+  popup-notes .details-view .head .controls-group, 
+  popup-notes.collapsed .details-view .head .controls-group {
+    transform: translateX(-130px);
+  }
+
+  popup-notes-extended .details-view .content {
+    width: calc(100% + 216px);
+  }
+
+  popup-notes .list-view .list-content {
+    width: 30px;
+    float: inline-end;
+  }
+
+  popup-notes .list-content .list-item {
+    padding-left: 0px;
+    width: 24px;
+    margin: auto;
+    justify-content: center;
+  }
+
+  .list-toggle {
+    display: none;
+  }
+}
+
+@media(max-width: 670px) {
+  popup-notes .details-view .head .controls-group, 
+  popup-notes.collapsed .details-view .head .controls-group {
+    transform: translateX(-216px);
+  }
+}
+
+@media(max-width: 570px) {
+  popup-notes .details-view .head .controls-group, 
+  popup-notes.collapsed .details-view .head .controls-group {
+    transform: translateX(-245px);
+  }
+}

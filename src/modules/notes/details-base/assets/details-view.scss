@@ -1,0 +1,122 @@
+details-view[data-scroll='true'] {
+  .head {
+    box-shadow: 0 0 4px var(--base-shadow);
+    // border-bottom: 1px solid var(--editor-menu-stroke-scrolled);
+    border-color: var(--editor-menu-stroke-scrolled);
+  }
+
+  .head:before {
+    // border-bottom: 1px solid var(--editor-menu-stroke) !important;
+    border-bottom: none;
+  }
+
+  .content {
+    border-top-color: transparent;
+  }
+}
+
+.details-view {
+  background: var(--base-background);
+}
+
+.details-view .head {
+  height: 25px;
+  text-align: center;
+  color: var(--base-color);
+  position: relative;
+  line-height: 23px;
+  z-index: 101;
+  
+  box-shadow: 0;
+  border-bottom: 1px solid;
+  border-color: var(--base-background);
+  transition: box-shadow .25s linear, border-color .25s linear;
+  // transition: box-shadow .25s linear;
+}
+
+.details-view .head:before {
+  content: "";
+  position: absolute;
+  background-color: var(--base-background);
+  width: 100%;
+  height: 25px;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  border-bottom: 1px solid;
+  border-color: var(--base-background);
+}
+
+.description-note {
+  display: none;
+}
+
+.content {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  outline: none;
+  resize: none;
+  border: 1px solid transparent;
+  background: transparent;
+
+  padding: 0px;
+  height: 245px;
+  position: relative;
+  border-radius: 6px;
+  margin: 0 0px 0 0px;
+  box-sizing: border-box;
+  border-top-color: var(--base-background-stroke);
+  transition: border-top-color .25s linear;
+  background: var(--editor-background);
+}
+
+.back {
+  width: fit-content !important;
+  background-position: left;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  line-height: 26px;
+  font-size: 13px;
+}
+
+.back svg {
+  margin-top: 4px;
+  margin-bottom: -4px;
+  margin-left: 0px;
+}
+
+.button.delete {
+  position: absolute;
+  width: 28px;
+  right: 5px;
+}
+
+.button.delete svg {
+  margin-top: 4px;
+}
+
+.details-view .button.save {
+  width: 25px;
+  float: right;
+  cursor: pointer;
+  position: absolute;
+  z-index: 1;
+  right: 5px;
+}
+
+.details-view .button.save svg {
+  margin-top: 4px;
+}
+
+.details-view .cancel {
+  left: 4px;
+}
+
+.head > fieldset {
+  border: none;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  height: 25px;
+}

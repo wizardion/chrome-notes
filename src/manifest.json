@@ -1,0 +1,38 @@
+{
+   "background": {
+      "service_worker": null
+   },
+   "action": {
+      "default_popup": "popup.html",
+      "default_title": "My-Notes"
+   },
+   "options_page": "options.html",
+   "icons": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "96": "icon96.png",
+      "128": "icon128.png"
+   },
+   "description": "My-Notes - Put your story into notes...",
+   "key": null,
+   "manifest_version": 3,
+   "minimum_chrome_version": "109",
+   "name": "My-Notes",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "permissions": [
+      "alarms",
+      "storage",
+      "unlimitedStorage",
+      "identity",
+      "offscreen",
+      "idle"
+   ],
+   "oauth2": {
+    "client_id": null,
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.file"
+    ]
+   },
+   "version": 0
+}

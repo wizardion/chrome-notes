@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Notes' settings</title>
+</head>
+
+<body class="theme-light">
+  <div class="content">
+    <div id="message" , name="message" class="hidden"></div>
+    <h4 class="title">Notes' settings</h4>
+
+    <div id="content" hidden>
+      <alert-message hidden></alert-message>
+
+      <div class="row sm-padding-bottom">
+        <div class="left">Common:</div>
+        <div class="right">
+          <common-settings></common-settings>
+        </div>
+      </div>
+
+      <div class="row sm-padding-bottom">
+        <div class="left">Synchronize:</div>
+        <div class="right">
+          <sync-info></sync-info>
+        </div>
+      </div>
+
+      <div id="develop" class="row sm-padding-bottom" hidden>
+        <div>
+          <div class="left">Development:</div>
+          <div class="right">
+            <dev-mode-info></dev-mode-info>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer align-right">
+    <a class="text-link" href="./whats-new.html" target="_blank">
+      <include src="./images/check.svg"></include>
+      <span>&nbsp; What's new</span>
+    </a>
+    <a class="text-link" href="https://github.com/wizardion/chrome-notes" target="_blank">
+      <include src="./images/github.svg"></include>
+      <span>&nbsp; Source code</span>
+    </a>
+    <a class="text-link" href="https://github.com/wizardion/chrome-notes/issues" target="_blank">
+      <include src="./images/issue.svg"></include>
+      <span>&nbsp; In case of any issue</span>
+    </a>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+[hidden],
+.hidden {
+  display: none;
+}
+
+.transparent {
+  opacity: 0;
+}
+
+.notes {
+  background: var(--body-background);
+  box-sizing: border-box;
+}
+
+input, button {
+  font-size: 12px;
+  outline: none;
+}
+
+.disable-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.button, 
+.link {
+  padding: 0px;
+  margin: 0px;
+  height:24px;
+  width:24px;
+  line-height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: var(--base-color);
+  fill: var(--base-color);
+  outline: none;
+  // display: inline-block;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-family: 'Roboto', 'Ubuntu', Sans-Serif;
+}
+
+.button:hover,
+.link:hover {
+  color: var(--base-color-hover);
+  fill: var(--base-color-hover);
+}
+
+.button:active,
+.link:active {
+  color: var(--base-color-active);
+  fill: var(--base-color-active);
+}
+
+.button:disabled,
+.link:disabled {
+  color: var(--control-disabled-color);
+  fill: var(--control-disabled-color);
+  cursor: default;
+  pointer-events: none;
+}
+
+@import 'list-view';

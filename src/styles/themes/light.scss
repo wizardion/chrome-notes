@@ -1,0 +1,11 @@
+@use 'colors';
+
+@each $name, $map in colors.$themes {
+  @if $name == 'light' {
+    :root {
+      @each $key, $value in $map {
+        --#{$key}: #{$value};
+      }
+    }
+  }
+}

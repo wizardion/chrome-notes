@@ -1,0 +1,233 @@
+.notes {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+list-view {
+  width: 250px;
+  height: 100vh;
+}
+
+.list-view {
+  height: 100%;
+}
+
+details-view {
+  flex: 1 1 250px;
+  height: 100vh;
+}
+
+
+.details-view {
+  height: 100%;
+}
+
+.list-view .list-items {
+  background: transparent;
+}
+
+.list-view .list-item,
+.list-view .hold .list-item:hover {
+  line-height: 28px;
+  height: 28px;
+  border-radius: 4px;
+  // border-left-width: 2px;
+}
+
+.list-view .list-item .button {
+  height:27px;
+}
+
+.list-view .drag {
+  height:28px;
+}
+
+.list-view .drag .list-item {
+  line-height: 26px !important;
+  height: 28px !important;
+}
+
+.list-view .drag .list-item .sort {
+  margin-top: 0px;
+}
+
+.list-item .list-index,
+.list-item .list-index + div,
+.list-item .date-time,
+.details-view .head .link.back:not(.cancel) {
+  display: none;
+}
+
+.list-items .list-item:active {
+  opacity: 1 !important;
+}
+
+.list-items list-item:has(+ .selected:not(.drag)),
+.list-items .selected:not(.drag) {
+  border-color: transparent;
+}
+
+.list-items .selected .list-item,
+.list-items .selected .list-item:hover,
+.list-items .selected .list-item:active {
+  color: var(--base-bright-color);
+  background: var(--control-selected-background);
+  cursor: default !important;
+}
+
+.list-view .drag.selected .list-item {
+  background: var(--control-selected-background) !important;
+  border-left-color: var(--control-selected-background);
+  border-right-color: var(--control-selected-background);
+}
+
+.list-view .list-content {
+  margin-left: 4px;
+  margin-right: 1px;
+  height: calc(100% - 25px);
+}
+
+.list-view .list-scroll {
+  box-shadow: none;
+  border-width: 1px;
+  // border-color: var(--base-background-stroke);
+  max-height: calc(100% - 8px);
+  border-radius: 6px;
+}
+
+.list-scroll::-webkit-scrollbar {
+  border-radius: 8px !important;
+}
+
+.list-scroll::-webkit-scrollbar-track {
+  border-radius: 8px !important;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  background: transparent;
+}
+
+// .list-view .list-scroll .list-items {
+//   border: 1px solid var(--base-tile-background);
+// }
+
+.details-view .head {
+  text-align: left;
+  padding-left: 5px;
+}
+
+.details-view .head .cancel {
+  margin-left: 0px;
+  position: relative;
+  left: 0 !important;
+  margin-right: 4px;
+}
+
+.details-view .head .button.add svg,
+.details-view .head .cancel svg {
+  margin-top: 4px;
+}
+
+.details-view .head .button.save {
+  position: relative;
+  float: none;
+  right: 0;
+}
+
+
+.details-view .head .checkbox.edit {
+  right: 43px;
+}
+
+.details-view .head .button.delete {
+  right: 15px;
+}
+
+.details-view .content {
+  border-left-color: var(--base-background-stroke);
+  height: calc(100% - 26px);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom: none;
+  border-right: none;
+}
+
+.details-view ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.details-view ::-webkit-scrollbar-thumb {
+  border-width: 4px;
+}
+
+.cm-editor,
+.content-preview,
+.visual-editor {
+  height: 100% !important;
+  font-size: 15px !important;
+}
+
+.content-preview :not(pre) > code,
+.visual-editor :not(pre) > code {
+  font-size: 14px;
+}
+
+.visual-editor pre,
+.visual-editor pre code {
+  font-family: 'Courier', 'Roboto Mono', monospace, sans-serif !important;
+}
+
+.dropdown-menu > * {
+  font-size: 14px;
+  padding: 2px 10px 2px 6px !important;
+}
+
+.notes-placeholder {
+  display: none !important;
+}
+
+.changed-indicator {
+  position: absolute;
+  top: 5px;
+  right: 50px;
+  width: 16px;
+  height: 16px;
+  border: 0px;
+  color: var(--editor-text-url-hover);
+  fill: var(--editor-text-url-hover);
+}
+
+.markdown-mode .changed-indicator {
+  right: 80px;
+}
+
+.details-view .head .controls-group {
+  position: absolute;
+  min-width: 385px;
+  transform: translateX(50px);
+}
+
+.list-view .drag .list-item {
+  line-height: 28px !important;
+}
+
+details-view[data-scroll='true'] {
+  .head {
+    box-shadow: none;
+  }
+
+  .details-view .head:before {
+    height: 26px;
+  }
+
+  .content {
+    border-top-color: var(--base-background-stroke);
+  }
+
+  .dropdown-menu {
+    border-left: 1px solid var(--editor-menu-stroke) !important;
+    border-bottom: 1px solid var(--editor-menu-stroke-dimmed) !important;
+    border-right: 1px solid var(--editor-menu-stroke-dimmed) !important;
+  }
+}
+
+@import 'list-toggle';

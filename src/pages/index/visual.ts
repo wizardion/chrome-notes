@@ -1,0 +1,54 @@
+import 'styles/style.scss';
+import { CachedStorageService } from 'core/services/cached';
+import { WindowNotesElement } from 'modules/notes/window/window.component';
+import { ListViewElement } from 'modules/notes/list-view/list-view.component';
+import { ListItemElement } from 'modules/notes/list-item/list-item.component';
+import { VisualViewElement } from 'modules/notes/visual-view/visual-view.component';
+import { EditorControlsElement } from 'modules/notes/editor-controls/editor-controls.component';
+import { DropdownMenuElement } from 'components/dropdown-menu';
+
+
+export function whenDefined(): Promise<CustomElementConstructor[]> {
+  customElements.define(DropdownMenuElement.selector, DropdownMenuElement);
+  customElements.define(EditorControlsElement.selector, EditorControlsElement);
+  customElements.define(ListViewElement.selector, ListViewElement);
+  customElements.define(ListItemElement.selector, ListItemElement);
+  customElements.define(VisualViewElement.selector, VisualViewElement);
+  customElements.define(WindowNotesElement.selector, WindowNotesElement);
+
+  return Promise.all([
+    customElements.whenDefined(DropdownMenuElement.selector),
+    customElements.whenDefined(EditorControlsElement.selector),
+    customElements.whenDefined(ListViewElement.selector),
+    customElements.whenDefined(ListItemElement.selector),
+    customElements.whenDefined(VisualViewElement.selector),
+    customElements.whenDefined(WindowNotesElement.selector),
+  ]);
+}
+
+async function loadDBNotes(notes: WindowNotesElement, selected?: boolean) {
+  const { db } = await import('modules/db');
+
+  db.iterate(item => {
+    if (!selected) {
+      notes.select(item);
+      selected = true;
+    }
+
+    notes.addItem(item);
+  }).then(() => notes.init());
+}
+
+export async function init() {
+  const notes = document.getElementById('simple-popup-notes') as WindowNotesElement;
+  const configs = await CachedStorageService.get();
+
+  notes.collapsed = configs.settings?.collapsed || false;
+  notes.hidden = false;
+
+  if (configs.selected) {
+    notes.select(configs.selected);
+  }
+
+  loadDBNotes(notes, !!configs.selected);
+}
