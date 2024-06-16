@@ -10,26 +10,20 @@ export class OffScreenWorker extends BaseWorker {
   readonly name = OffScreenWorker.name;
 
   async process() {
-    if (!(await this.busy())) {
-      await this.start();
+    const hasDocument = await chrome.offscreen.hasDocument();
 
-      const hasDocument = await chrome.offscreen.hasDocument();
+    try {
+      if (!hasDocument && !globals.offscreen) {
+        globals.offscreen = chrome.offscreen.createDocument({
+          url: 'offscreen.html',
+          reasons: [chrome.offscreen.Reason.MATCH_MEDIA],
+          justification: 'reason for needing the MATCH_MEDIA'
+        });
 
-      try {
-        if (!hasDocument && !globals.offscreen) {
-          globals.offscreen = chrome.offscreen.createDocument({
-            url: 'offscreen.html',
-            reasons: [chrome.offscreen.Reason.MATCH_MEDIA],
-            justification: 'reason for needing the MATCH_MEDIA'
-          });
-
-          await globals.offscreen;
-        }
-      } catch (error) {
-        workerLogger.info('offscreen document seems exists:', error.toString());
+        await globals.offscreen;
       }
-
-      await this.finish();
+    } catch (error) {
+      workerLogger.info('offscreen document seems exists:', error.toString());
     }
   }
 }

@@ -11,6 +11,7 @@ export class SyncStorageService {
     return (
       (data && this.decrypt(data)) || {
         token: null,
+        fileId: null,
         enabled: false,
         encrypted: false,
         applicationId: null,
@@ -24,13 +25,14 @@ export class SyncStorageService {
 
       return {
         token: value.token,
+        fileId: value.fileId,
         enabled: value.enabled,
         encrypted: value.encrypted,
         applicationId: data.id,
       };
     }
 
-    return { applicationId: null, enabled: false, token: null, encrypted: false };
+    return { applicationId: null, enabled: false, token: null, fileId: null, encrypted: false };
   }
 
   public static async set(value: ISyncInfo): Promise<void> {
@@ -38,8 +40,9 @@ export class SyncStorageService {
       [this.key]: {
         id: value.applicationId,
         value: await encrypt({
-          enabled: value.enabled,
           token: value.token,
+          fileId: value.fileId,
+          enabled: value.enabled,
           encrypted: value.encrypted,
         }),
       },

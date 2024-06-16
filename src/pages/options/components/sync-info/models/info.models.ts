@@ -24,8 +24,7 @@ export interface ISyncInfoForm {
   };
 }
 
-export interface IResponseDetails {
+export interface ISyncErrorDetails {
   message: string;
   locked: boolean;
-  error: boolean;
 }

@@ -2,7 +2,6 @@ import { LoggerService } from 'modules/logger';
 import { DriveSettings, IFileInfo, TokenError, TokenExpired, ICloudInfo } from './models/sync.models';
 
 
-// const __delay = 1100;
 const logger = new LoggerService('drive.ts', 'blue');
 
 function getCurrentTime(): string {
@@ -74,7 +73,7 @@ async function getFileMetadata(token: string, id: string): Promise<IFileInfo> {
   const response = await request(token, `${DriveSettings.FILE_GET_API}/${id}?fields=${DriveSettings.FILE_FIELDS}`);
 
   if (response.ok) {
-    return await response.json();
+    return response.json();
   } else if (response.status === 401) {
     throw new TokenExpired('Token expired');
   } else {
@@ -159,28 +158,30 @@ export class GoogleDrive {
   }
 
   public static async renewToken(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      chrome.identity.getAuthToken({ 'interactive': false }, async (token: string) => {
-        if (!token && chrome.runtime.lastError && chrome.runtime.lastError.message) {
-          return reject(chrome.runtime.lastError.message);
-        }
+    try {
+      const scope = await chrome.identity.getAuthToken({ 'interactive': false });
 
-        resolve(token);
-      });
-    });
+      if (!scope || !scope.token) {
+        throw new TokenExpired();
+      }
+
+      return scope.token;
+    } catch (error) {
+      throw new TokenExpired();
+    }
   }
 
   public static async authorize(): Promise<string> {
     try {
-      const tokenResult = await chrome.identity.getAuthToken({ 'interactive': true });
+      const tokenResult = await chrome.identity.getAuthToken({ interactive: true });
 
-      if (tokenResult && tokenResult.token) {
+      if (tokenResult?.token) {
         return tokenResult.token;
       } else {
-        throw new Error(chrome.runtime.lastError.message);
+        throw new TokenError(chrome.runtime.lastError.message);
       }
     } catch (error) {
-      throw new Error(error);
+      throw new TokenError(error.message);
     }
   }
 
@@ -189,7 +190,6 @@ export class GoogleDrive {
       await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`);
       await this.removeCachedAuthToken(token);
     } catch (error) {
-      console.log('error', error);
       throw new Error(error);
     }
   }

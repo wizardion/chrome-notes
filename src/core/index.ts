@@ -1,4 +1,4 @@
-import { CryptoService } from 'modules/encryption';
+import { CryptoService } from 'core/services/encryption';
 import { IAppConfig } from './models/code.models';
 
 

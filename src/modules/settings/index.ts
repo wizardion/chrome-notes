@@ -4,6 +4,9 @@ import { ICommonSettings, IPageMode, ISettingsArea, ISettingsOptions } from './m
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 
 
+export { ISettingsArea };
+
+
 const settingsOptions: ISettingsOptions = {
   sync: false,
   identity: false
@@ -11,7 +14,6 @@ const settingsOptions: ISettingsOptions = {
 
 export const DEFAULT_SETTINGS: ISettingsArea = {
   devMode: false,
-  sync: null,
   common: {
     mode: 0,
     editor: 0,
@@ -55,18 +57,23 @@ export const PAGE_MODES: Record<number, IPageMode> = {
   4: { popup: null, page: 'index.html' },
 };
 
-export { ISettingsArea };
-
 export async function getSettings(options: ISettingsOptions = settingsOptions): Promise<ISettingsArea> {
   const settings = await LocalStorageService.get<ISettingsArea>('settings', DEFAULT_SETTINGS);
-
-  return {
+  const result: ISettingsArea = {
     devMode: ('devMode' in settings) ? settings.devMode : DEFAULT_SETTINGS.devMode,
     common: { ...DEFAULT_SETTINGS.common, ...settings.common },
-    sync: options.sync ? await SyncStorageService.get() : null,
-    identity: options.identity ? await LocalStorageService.get<IdentityInfo>('identityInfo') : null,
     error: settings.error
   };
+
+  if (options.sync) {
+    result.sync = await SyncStorageService.get();
+  }
+
+  if (options.identity) {
+    result.identity = await LocalStorageService.get<IdentityInfo>('identityInfo');
+  }
+
+  return result;
 }
 
 export function getPopupPage(settings: ICommonSettings) {

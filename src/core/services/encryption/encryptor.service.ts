@@ -1,4 +1,4 @@
-import { secretKey } from './keys';
+import { secretKey } from './encryption-keys';
 
 
 export class CryptoService {
@@ -12,12 +12,8 @@ export class CryptoService {
       throw Error('The Crypto is not supported by this browser.');
     }
 
-    if (password === null || password === undefined) {
-      throw Error('The encryption passphrase is not set properly.');
-    }
-
     if (password) {
-      this.password = useSecret ? password : password + secretKey;
+      this.password = !useSecret ? password : password + secretKey;
     }
 
     this.encoder = new TextEncoder();
@@ -106,11 +102,17 @@ export class CryptoService {
   }
 
   async generateSecret(): Promise<string> {
-    return this.password && this.password.length ? await this.encrypt(secretKey) : null;
+    return this.password?.length ? await this.encrypt(secretKey) : null;
   }
 
   get transparent(): boolean {
     return !this.password || !this.password.length;
+  }
+
+  set transparent(value: boolean) {
+    if (value) {
+      this.password = null;
+    }
   }
 
   static async generateKey(): Promise<string> {

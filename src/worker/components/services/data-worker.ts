@@ -10,32 +10,27 @@ export class DataWorker extends BaseWorker {
   readonly name = DataWorker.name;
 
   async process() {
-    if (!(await this.busy())) {
-      await this.start();
-      const items = await db.deleted();
-      const today = new Date().getTime();
+    const items = await db.deleted();
+    const today = new Date().getTime();
 
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
 
-        if (item.deleted && !item.synced && (!item.description || this.isOutdated(item.updated, today))) {
-          workerLogger.info('remove.item', item.title, item.created, item.updated);
-          db.enqueue(item, 'remove');
-        }
+      if (item.deleted && !item.synced && (!item.description || this.isOutdated(item.updated, today))) {
+        workerLogger.info('remove.item', item.title, item.created, item.updated);
+        db.enqueue(item, 'remove');
       }
+    }
 
-      await db.dequeue();
-      const logs = await LoggerService.getAll();
+    await db.dequeue();
+    const logs = await LoggerService.getAll();
 
-      for (let i = 0; i < logs.length; i++) {
-        const log = logs[i];
+    for (let i = 0; i < logs.length; i++) {
+      const log = logs[i];
 
-        if (this.isOutdated(log.time, today)) {
-          await LoggerService.delete(log.id);
-        }
+      if (this.isOutdated(log.time, today)) {
+        await LoggerService.delete(log.id);
       }
-
-      await this.finish();
     }
   }
 

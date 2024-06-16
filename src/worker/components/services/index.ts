@@ -22,21 +22,13 @@ export async function findTab(tabId: number): Promise<chrome.tabs.Tab | null> {
 }
 
 export async function ensureOptionPage() {
-  const data = await chrome.storage.session.get('optionPageId');
-
-  if (data && data.optionPageId) {
-    const tab = await findTab(<number>data.optionPageId);
-
-    if (tab) {
-      return chrome.tabs.update(tab.id, { active: true });
-    }
-  }
-
-  return chrome.tabs.create({ url: chrome.runtime.getURL('options.html') + '?develop=true' });
+  return chrome.runtime.openOptionsPage();
 }
 
 export async function startServiceWorker(name: string) {
   const settings = await getSettings();
+
+  await workerLogger.addLine();
 
   for (let i = 0; i < serviceWorkers.length; i++) {
     const Base = serviceWorkers[i];
@@ -45,7 +37,11 @@ export async function startServiceWorker(name: string) {
       const worker = new Base(settings);
 
       try {
-        await worker.process();
+        if (!await worker.busy()) {
+          await worker.start();
+          await worker.process();
+          await worker.finish();
+        }
 
         if (settings.error?.worker === worker.name) {
           settings.error = null;
@@ -54,6 +50,7 @@ export async function startServiceWorker(name: string) {
       } catch (error) {
         const message = error.message || String(error);
 
+        await worker.finish();
         await workerLogger.warn('An error occurred during the process: ', message);
         settings.error = { message: `${message}`, worker: worker.name };
 

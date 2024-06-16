@@ -19,3 +19,5 @@ import('./popup').then(({ init, whenDefined }) => whenDefined().then(() => {
     init();
   }, 1);
 }));
+
+// setTimeout(() => import('./popup').then(({ init, whenDefined }) => whenDefined().then(() => init())), 1);

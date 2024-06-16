@@ -1,6 +1,6 @@
 import * as core from 'core';
 import { GoogleDrive } from './components/drive';
-import { CryptoService } from 'modules/encryption';
+import { CryptoService } from 'core/services/encryption';
 import { IdentityInfo, IPasswordRule, TokenError } from './components/models/sync.models';
 import * as process from './components/process';
 
@@ -11,14 +11,10 @@ export class Cloud {
   }
 
   static async deauthorize(token: string) {
-    console.log('Cloud.deauthorize', [token]);
-
     return GoogleDrive.deauthorize(token);
   }
 
   static async removeCache(token: string) {
-    console.log('Cloud.removeCache', [token]);
-
     return GoogleDrive.removeCachedAuthToken(token);
   }
 
@@ -27,76 +23,78 @@ export class Cloud {
 
     while (busy) {
       await core.delay();
-      busy = !!(await chrome.storage.session.get('syncProcessing')).syncProcessing;
+      busy = !!(await chrome.storage.session.get('workerProcessing')).workerProcessing;
     }
   }
 
-  static async sync(info?: IdentityInfo): Promise<IdentityInfo> {
-    console.log('Cloud.sync...');
-
+  static async sync(identity: IdentityInfo): Promise<IdentityInfo> {
     return process.exec<IdentityInfo>(async () => {
-      const identity = info || await process.validate(await process.getIdentity());
+      const cryptor = identity.passphrase && new CryptoService(identity.passphrase);
 
       identity.token = await GoogleDrive.renewToken();
-      await process.sync(identity, identity.passphrase && new CryptoService(identity.passphrase));
-      await process.setProcessInfo(identity);
-
       await core.delay();
-      console.log('Cloud.sync.finished!');
 
-      return identity;
+      return process.sync(identity, cryptor);
     });
   }
 
-  static async encrypt(oldSecret: string, newSecret: string): Promise<boolean> {
+  static async encode(info: IdentityInfo, oldSecret: string): Promise<boolean> {
     return process.exec<boolean>(async () => {
-      const identity = await process.validate(await process.getIdentity());
+      const identity = await process.validate(info);
 
       identity.token = await GoogleDrive.renewToken();
-      await process.sync(identity, new CryptoService(oldSecret), new CryptoService(newSecret));
-      await process.setProcessInfo(identity);
       await core.delay();
 
-      return true;
-    }, false);
+      return await process.encode(
+        identity, new CryptoService(info.passphrase), new CryptoService(oldSecret)
+      );
+    });
   }
 
-  static async verifyIdentity(info: IdentityInfo): Promise<IdentityInfo> {
+  static async verifyIdentity(info: IdentityInfo): Promise<IdentityInfo | null> {
     const identity = await process.validate(info);
-    const rules = { minHours: 1, maxAttempts: 3, modified: new Date().getTime(), valid: false };
+    const configs = { minHours: 1, maxAttempts: 30, modified: new Date().getTime() };
 
     identity.token = await GoogleDrive.renewToken();
 
-    return await process.exec<IdentityInfo>(async () => {
-      const file = await process.ensureFile(identity);
-      const rule = <IPasswordRule> await core.decrypt(file.data.rules);
-      const hours = Math.abs(rules.modified - rule.modified) / 36e5;
+    return await process.exec<IdentityInfo | null>(async () => {
+      const file = await process.lookUpFile(identity);
 
-      if (hours > rules.minHours) {
-        rule.count = 0;
+      if (file && !file.isNew) {
+        const rule = <IPasswordRule> await core.decrypt(file.data.rules);
+        const hours = Math.abs(configs.modified - rule.modified) / 36e5;
+
+        if (hours > configs.minHours) {
+          rule.count = 0;
+        }
+
+        if (rule.count < configs.maxAttempts) {
+          const valid = file.data.secret
+            ? await process.checkFileSecret(file, new CryptoService(identity.passphrase))
+            : true;
+
+          file.data.rules = await core.encrypt({
+            ...rule, modified: configs.modified, count: valid ? 0 : rule.count + 1
+          });
+
+          await GoogleDrive.update(identity.token, file.id, file.data);
+          await core.delay();
+
+          if (!valid) {
+            return null;
+          }
+
+          identity.fileId = file.id;
+          process.setFile(file);
+        } else {
+          const plural = configs.minHours > 1 ? 's' : '';
+
+          throw new TokenError(`Please wait for at least ${configs.minHours} hour${plural} before trying again.`);
+        }
       }
 
-      if (rule.count < rules.maxAttempts) {
-        rules.valid = await process.checkFileSecret(
-          file, identity.passphrase && new CryptoService(identity.passphrase)
-        );
-
-        rule.modified = rules.modified;
-        rule.count = !rules.valid ? rule.count + 1 : rule.count;
-        identity.fileId = rules.valid ? file.id : null;
-        file.data.rules = await core.encrypt(rule);
-
-        await GoogleDrive.update(identity.token, file.id, file.data);
-        await process.setProcessInfo(identity);
-        await core.delay();
-
-        return rules.valid ? identity : null;
-      } else {
-        const plural = rules.minHours > 1 ? 's' : '';
-
-        throw new TokenError(`Please wait for at least ${rules.minHours} hour${plural} before trying again.`);
-      }
-    }, false);
+      return identity;
+    });
   }
 
   static async remove() {
@@ -106,26 +104,32 @@ export class Cloud {
       const identity = await process.getIdentity();
       let token: string;
 
-      console.log('Cloud.remove....identity', [identity]);
+      if (identity) {
+        try {
+          token = await GoogleDrive.renewToken();
 
-      try {
-        token = await GoogleDrive.renewToken();
-      } catch {
-        console.log('Cloud.return!');
+          await GoogleDrive.remove(token, identity?.fileId);
+          await this.deauthorize(token);
 
-        return;
+          delete identity.token;
+          delete identity.fileId;
+
+          await core.delay();
+        } catch {
+          return;
+        }
       }
-
-      console.log('Cloud.remove.token', [token]);
-
-      await GoogleDrive.remove(token, identity?.fileId);
-      await this.deauthorize(token);
-
-      delete identity.token;
-      delete identity.fileId;
-
-      await process.setProcessInfo(identity);
-      await core.delay();
     });
+  }
+
+  static async unlock() {
+    process.unlock();
+  }
+
+  static async lock(info?: IdentityInfo, reason?: string) {
+    const identity = info || await process.getIdentity();
+    const file = process.lookUpFile(identity);
+
+    process.lock(reason, (await file).data.items.map(i => i.i));
   }
 }
