@@ -1,7 +1,8 @@
 import { db, IDBNote } from 'modules/db';
-import { ISyncPair, ISyncItemInfo, IdentityInfo } from './models/sync.models';
-import { CryptoService } from 'modules/encryption';
+import { ISyncPair, ISyncItemInfo, IdentityInfo, ILockInfo } from './models/sync.models';
+import { CryptoService } from 'core/services/encryption';
 import { LoggerService } from 'modules/logger';
+import { encrypt, decrypt } from 'core';
 import { storage } from 'core/services';
 
 
@@ -82,12 +83,46 @@ export async function getDBPair(data: ISyncItemInfo[]): Promise<ISyncPair[]> {
   return map(await db.dump(), data);
 }
 
-export async function lock(reason: string) {
+export async function unlock() {
+  const data = await db.dump();
+
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+
+    if (item.locked) {
+      const title = await decrypt(item.title) as ILockInfo;
+      const description = await decrypt(item.description) as ILockInfo;
+
+      item.locked = false;
+      item.title = title.title;
+      item.description = description.description;
+      db.enqueue(item, 'update');
+    }
+  }
+
+  return db.dequeue();
+}
+
+export async function lock(reason: string, ids: number[]) {
   const identityInfo: IdentityInfo = <IdentityInfo> await storage.local.get('identityInfo');
 
   if (!identityInfo.locked) {
+    const data = await db.dump();
+
     identityInfo.locked = true;
 
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+
+      if (ids.includes(item.id)) {
+        item.locked = true;
+        item.title = await encrypt({ title: item.title } as ILockInfo);
+        item.description = await encrypt({ description: item.description } as ILockInfo);
+        db.enqueue(item, 'update');
+      }
+    }
+
+    await db.dequeue();
     await storage.local.sensitive('identityInfo', identityInfo);
     await logger.warn(`locking notes, the reason: ${reason}`);
   }

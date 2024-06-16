@@ -1,6 +1,7 @@
 
 export interface ISyncInfo {
   token: string;
+  fileId: string;
   enabled: boolean;
   encrypted: boolean;
   applicationId: number;

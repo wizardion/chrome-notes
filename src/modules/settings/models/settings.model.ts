@@ -27,7 +27,7 @@ export interface ISettingsError {
 
 export interface ISettingsArea {
   devMode: boolean;
-  sync: ISyncInfo | null;
+  sync?: ISyncInfo | null;
   common: ICommonSettings;
   identity?: IdentityInfo | null;
   error?: ISettingsError | null;

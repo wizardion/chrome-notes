@@ -15,11 +15,6 @@ export interface IdentityInfo {
   applicationId?: number;
 }
 
-export interface IProcessInfo {
-  id: string;
-  token: string;
-}
-
 export interface IPasswordRule {
   count: number;
   modified: number;
@@ -30,6 +25,11 @@ export interface IPasswordRule {
 export interface ISyncPair {
   db: IDBNote;
   cloud: ISyncItemInfo;
+}
+
+export interface ILockInfo {
+  title?: string;
+  description?: string;
 }
 
 export interface ISyncItemInfo {
@@ -85,6 +85,10 @@ export interface IFileInfo {
   trashed: boolean;
   isNew?: boolean;
   data?: ICloudInfo;
+}
+
+export interface IMemInfo {
+  file: IFileInfo
 }
 
 export enum DriveSettings {

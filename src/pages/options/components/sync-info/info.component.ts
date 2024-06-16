@@ -1,11 +1,10 @@
 import { Cloud } from 'modules/sync/cloud';
 import { BaseElement } from 'core/components';
 import { IdentityInfo, TokenSecretDenied } from 'modules/sync/components/models/sync.models';
-import { ISyncInfoForm, IResponseDetails } from './models/info.models';
-import { LoggerService } from 'modules/logger';
-import { SyncStorageService } from 'core/services/sync';
-import { LocalStorageService } from 'core/services/local';
+import { ISyncInfoForm, ISyncErrorDetails } from './models/info.models';
 import { IDecorator } from 'core/models/code.models';
+import { LoggerService } from 'modules/logger';
+import { getApplicationId } from 'core/index';
 
 
 const template: DocumentFragment = BaseElement.component({
@@ -25,7 +24,7 @@ export class SyncInfoElement extends BaseElement {
   private _encrypted: boolean;
   private _passphrase: string;
   private _locked: boolean;
-  private _response: IResponseDetails;
+  private _error: ISyncErrorDetails;
 
   constructor() {
     super();
@@ -60,7 +59,7 @@ export class SyncInfoElement extends BaseElement {
     this.form.sections.encryption.disabled = true;
 
     this.form.buttons.submit.disabled = true;
-    this._response = { message: null, locked: false, error: false };
+    this._error = { message: null, locked: false };
     this.promise = false;
   }
 
@@ -69,7 +68,7 @@ export class SyncInfoElement extends BaseElement {
 
     this.form.checkboxes.encrypt.parentElement.onmousedown = (e) => e.preventDefault();
 
-    this.form.buttons.submit.onclick = () => this.submit(this.syncDecorator());
+    this.form.buttons.submit.onclick = () => this.synchronize();
     this.form.buttons.authorize.onclick = () => this.authorize();
     this.form.checkboxes.sync.onchange = () => this.enabledChanged();
     this.form.buttons.deauthorize.onclick = () => this.deauthorize();
@@ -93,7 +92,7 @@ export class SyncInfoElement extends BaseElement {
       if (value) {
         await this.submit(this.removeCloudDecorator());
       } else {
-        this.deauthorize();
+        await this.submit(this.deauthorizeDecorator());
       }
     }
 
@@ -115,7 +114,7 @@ export class SyncInfoElement extends BaseElement {
 
       this.form.checkboxes.encrypt.checked = true;
 
-      if (!(await this.submit(this.encryptDecorator('')))) {
+      if (!(await this.submit(this.encodeDecorator('')))) {
         return;
       }
 
@@ -139,7 +138,7 @@ export class SyncInfoElement extends BaseElement {
     const passphrase = this.form.passphrase.value;
 
     if (!this.locked && this._enabled && this._encrypted) {
-      if (await this.submit(this.encryptDecorator(passphrase))) {
+      if (await this.submit(this.encodeDecorator(passphrase))) {
         this.passphrase = passphrase;
         this.dispatchEvent(this.event);
       }
@@ -148,30 +147,41 @@ export class SyncInfoElement extends BaseElement {
     }
 
     if (this.locked) {
-      if (!(await this.submit(this.verifyIdentity(passphrase)))) {
-        if (!this._response.error || this._response.locked) {
-          this.locked = true;
-          this.form.passphrase.focus();
-          this.message = this._response.message || 'Invalid encryption passphrase.';
+      if (await this.submit(this.unlockDecorator(passphrase))) {
+        this.passphrase = passphrase;
+        this.locked = false;
 
-          return this.dispatchEvent(this.event);
-        }
-
-        return;
+        this.dispatchEvent(this.event);
+      } else {
+        this.form.passphrase.focus();
+        this.message = this._error?.message || 'Invalid encryption passphrase.';
       }
-
-      this.passphrase = passphrase;
-      this.locked = false;
-      await this.submit(this.syncDecorator());
-      this.dispatchEvent(this.event);
     }
   }
 
-  protected syncDecorator(): IDecorator {
+  protected unlockDecorator(passphrase: string): IDecorator {
+    return async () => {
+      const verify = this.verifyIdentityDecorator(passphrase);
+      const info = await verify();
+
+      if (info?.fileId) {
+        const sync = this.syncDecorator(info);
+
+        await Cloud.unlock();
+        await sync();
+
+        return true;
+      }
+
+      return false;
+    };
+  }
+
+  protected syncDecorator(identity?: IdentityInfo): IDecorator {
     return async () => {
       await Cloud.wait();
 
-      const info = await Cloud.sync({
+      const info = await Cloud.sync(identity || {
         fileId: this._fileId,
         token: this._token,
         enabled: this._enabled,
@@ -184,15 +194,22 @@ export class SyncInfoElement extends BaseElement {
     };
   }
 
-  protected encryptDecorator(passphrase: string): IDecorator {
+  protected encodeDecorator(passphrase: string): IDecorator {
     return async () => {
       await Cloud.wait();
 
-      return Cloud.encrypt(this._passphrase || '', passphrase);
+      return Cloud.encode({
+        fileId: this._fileId,
+        token: this._token,
+        passphrase: passphrase,
+        enabled: this._enabled,
+        encrypted: this._encrypted,
+        locked: this._locked,
+      }, this._passphrase || '');
     };
   }
 
-  protected verifyIdentity(passphrase: string): IDecorator<IdentityInfo> {
+  protected verifyIdentityDecorator(passphrase: string): IDecorator<IdentityInfo | null> {
     return async () => {
       await Cloud.wait();
 
@@ -207,69 +224,104 @@ export class SyncInfoElement extends BaseElement {
     };
   }
 
+  protected authorizeDecorator(): IDecorator {
+    return async () => {
+      const verify = this.verifyIdentityDecorator(this._passphrase);
+      const info = await verify();
+
+      if (info?.token) {
+        const sync = this.syncDecorator(info);
+
+        await sync();
+
+        return true;
+      }
+
+      return false;
+    };
+  }
+
+  protected deauthorizeDecorator(): IDecorator {
+    return async () => {
+      await Cloud.deauthorize(this.token);
+      this.fileId = null;
+      this.token = null;
+
+      return true;
+    };
+  }
+
+  protected removeCloudDecorator(): IDecorator {
+    return async () => {
+      await Cloud.remove();
+      await LoggerService.clear();
+
+      this.token = null;
+      this.fileId = null;
+      this.encrypted = false;
+      this.passphrase = null;
+
+      return true;
+    };
+  }
+
   protected async authorize() {
     this.promise = true;
 
     try {
       if (this.checkValidity()) {
-        console.log('authorizing...');
         this.token = await Cloud.authorize();
-        const info = await this.submit(this.verifyIdentity(this._passphrase));
 
-        if (!info?.fileId) {
-          if (!this._response.error || this._response.locked) {
-            this.locked = true;
-            this.form.passphrase.focus();
-            this.message = this._response.message || 'Invalid encryption passphrase.';
-
-            return this.dispatchEvent(this.event);
-          }
-
-          this.token = null;
-
-          return;
+        if (!await this.submit(this.authorizeDecorator())) {
+          this.locked = true;
+          this.form.passphrase.focus();
+          this.message = this._error?.message || 'Invalid encryption passphrase.';
         }
 
-        this.updateInfo(info);
-        console.log('authorized!');
-        await this.submit(this.syncDecorator());
         this.dispatchEvent(this.event);
       } else {
-        this.message = 'Form is not valid.';
+        this.message = 'Please enter all required fields.';
       }
     } catch (error) {
-      this.message = error;
+      this.message = error.message;
     } finally {
       this.promise = false;
     }
   }
 
   protected async deauthorize() {
-    this.promise = true;
+    const value = window.confirm('Would you like to remove data from cloud?\n');
 
-    try {
-      console.log('deauthorizing...');
-      await Cloud.deauthorize(this.token);
-      this.token = null;
-      console.log('deauthorized!');
-      this.dispatchEvent(this.event);
-    } catch (error) {
-      this.message = error;
-    } finally {
-      this.promise = false;
+    if (value) {
+      await this.submit(this.removeCloudDecorator());
+      this.enabled = false;
+    } else {
+      await this.submit(this.deauthorizeDecorator());
     }
+
+    this.dispatchEvent(this.event);
   }
 
-  protected removeCloudDecorator(): IDecorator {
-    return async () => {
-      console.log('removeCloudDecorator...');
-      await Cloud.remove();
-      await LoggerService.clear();
-      await SyncStorageService.remove();
-      await LocalStorageService.remove('identityInfo');
+  protected async synchronize() {
+    const identityChanged = await this.submit(this.syncDecorator());
 
-      return true;
-    };
+    if (!this._error) {
+      const pushWorker = await chrome.alarms.get('pusher-worker');
+
+      if (pushWorker) {
+        const { pushInfo } = await chrome.storage.session.get('pushInfo') as { pushInfo: number };
+
+        chrome.alarms.clear(pushWorker.name);
+
+        if (pushInfo > 1) {
+          await chrome.storage.sync.set({ pushInfo: { id: await getApplicationId(), time: new Date().getTime() } });
+        }
+      }
+    }
+
+    if (identityChanged) {
+      this.dispatchEvent(this.event);
+    }
   }
 
   public get promise(): boolean {
@@ -360,6 +412,10 @@ export class SyncInfoElement extends BaseElement {
     );
   }
 
+  public focusPassphrase() {
+    this.form.passphrase.focus();
+  }
+
   private validateControls() {
     this._encrypted = this._locked || this._encrypted;
     this.form.checkboxes.encrypt.checked = this._locked || this.form.checkboxes.encrypt.checked;
@@ -368,15 +424,17 @@ export class SyncInfoElement extends BaseElement {
     this.form.buttons.deauthorize.disabled = !this._token;
     this.form.checkboxes.encrypt.disabled = !this._token || this._locked;
 
-    this.form.sections.encryption.disabled = !this._token || (!this._locked && !this._encrypted);
+    this.form.sections.encryption.disabled = !this._encrypted || !this._locked && !this._token;
     this.form.passphrase.required = this._locked || (this._token && this._encrypted);
-    this.form.passphrase.disabled = !this._token || (!this._locked && !this._encrypted);
+    this.form.passphrase.disabled = !this._encrypted || !this._locked && !this._token;
 
     this.form.passphrase.locked = this._locked;
     this.form.buttons.submit.disabled = this._locked || !this._token || (this._encrypted && !this._passphrase);
   }
 
   private updateInfo(info: IdentityInfo): boolean {
+    const changed = this.isIdentityChanged(info);
+
     this.fileId = info.fileId;
     this.token = info.token;
     this.passphrase = info.passphrase;
@@ -384,34 +442,40 @@ export class SyncInfoElement extends BaseElement {
     this.encrypted = info.encrypted;
     this.locked = info.locked;
 
-    return !!info.fileId;
+    return changed;
   }
 
-  private async submit<T>(decorator: IDecorator<T>): Promise<T | null> {
+  private isIdentityChanged(identity?: IdentityInfo): boolean {
+    return (!this._error?.locked)
+      && (this._enabled !== identity.enabled || this._encrypted !== identity.encrypted
+      || this._fileId !== identity.fileId || this._locked !== identity.locked
+      || this._passphrase !== identity.passphrase);
+  }
+
+  private async submit<T = boolean>(decorator: IDecorator<T>): Promise<T | null> {
+    let result: T = null;
+
     try {
       this.promise = true;
       this.form.checkboxes.sync.disabled = true;
       this.form.progressBar.spinning = true;
 
-      const result = await decorator();
+      result = await decorator();
 
-      this._response = { message: null, locked: false, error: false };
-
-      return result;
+      this._error = null;
     } catch (error) {
-      this._response = {
-        error: true,
+      this._error = {
         message: error.message || error,
         locked: error instanceof TokenSecretDenied,
       };
     } finally {
       await this.form.progressBar.finish(100);
       this.promise = false;
-      this.message = this._response.message;
-      this.locked = this._response.locked || this.locked;
+      this.message = this._error?.message;
+      this.locked = this._error?.locked || this.locked;
       this.form.checkboxes.sync.disabled = false;
     }
 
-    return null;
+    return result;
   }
 }

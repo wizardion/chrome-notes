@@ -75,9 +75,7 @@ export class WindowNotesElement extends PopupBaseElement {
   }
 
   init(): void {
-    this.disabled = false;
-    this.initialized = true;
-    DbProviderService.init(true);
+    super.init();
 
     if (!this.items.length) {
       this.create();

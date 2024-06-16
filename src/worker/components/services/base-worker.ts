@@ -19,22 +19,22 @@ export class BaseWorker {
     this.settings = settings;
   }
 
-  protected async start(): Promise<void> {
+  async start(): Promise<void> {
     const processId: number = new Date().getTime();
 
     await workerLogger.info(`${this.name} process started...`);
 
-    return chrome.storage.session.set({ syncProcessing: { id: processId, worker: this.name } });
+    return chrome.storage.session.set({ workerProcessing: { id: processId, worker: this.name } });
   }
 
-  protected async finish(): Promise<void> {
+  async finish(): Promise<void> {
     await workerLogger.info(`${this.name} process finished.`);
 
-    return chrome.storage.session.set({ syncProcessing: null });
+    return chrome.storage.session.set({ workerProcessing: null });
   }
 
-  protected async busy(): Promise<boolean> {
-    const process: IWorkerInfo = (await chrome.storage.session.get('syncProcessing')).syncProcessing;
+  async busy(): Promise<boolean> {
+    const process: IWorkerInfo = (await chrome.storage.session.get('workerProcessing')).workerProcessing;
 
     if (process) {
       const hours = Math.abs(new Date().getTime() - process.id) / 36e5;
@@ -56,7 +56,7 @@ export class BaseWorker {
   }
 
   async process(): Promise<void> {
-    console.warn('Not Implemented');
+    throw new Error('Not Implemented');
   }
 
   static async register(): Promise<void> {
@@ -71,12 +71,12 @@ export class BaseWorker {
     workerLogger.warn(`registered '${this.name}' with period: ${period}`);
   }
 
-  static async deregister(): Promise<void> {
+  static async deregister(reason: string = '...'): Promise<void> {
     const process = await chrome.alarms.get(this.name);
 
     if (process) {
       await chrome.alarms.clear(this.name);
-      workerLogger.warn(`terminated '${this.name}'`);
+      await workerLogger.warn(`terminated '${this.name}', reason: ${reason}`);
     }
   }
 }
