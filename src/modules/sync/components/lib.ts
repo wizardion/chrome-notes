@@ -38,7 +38,7 @@ export async function zip(item: IDBNote, cryptor?: CryptoService): Promise<ISync
     t: title,
     d: description,
     o: item.order,
-    s: item.cState.join(','),
+    s: item.cState?.join(','),
     u: item.updated,
     c: item.created,
     p: item.preview,

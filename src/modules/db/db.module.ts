@@ -203,9 +203,9 @@ export async function get(id: number): Promise<IDBNote> {
   }
 }
 
-export async function add(item: IDBNote): Promise<number> {
+export async function add(item: IDBNote, objectStore?: IDBObjectStore): Promise<number> {
   try {
-    const store = await initObjectStore('readwrite');
+    const store = objectStore || await initObjectStore('readwrite');
 
     return execute<number>(store.add(copyItem(item)));
   } catch (error) {
@@ -260,6 +260,10 @@ export async function dequeue(): Promise<void> {
 
     while (__queueList.length) {
       const { item, type } = __queueList.shift();
+
+      if (type === 'add') {
+        await add(item, store);
+      }
 
       if (type === 'update') {
         await update(item, store);
