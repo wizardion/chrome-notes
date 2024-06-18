@@ -19,7 +19,7 @@ export async function unzip(item: ISyncItemInfo, cryptor?: CryptoService): Promi
     description: description,
     order: item.o,
     preview: item.p,
-    cState: item.s.split(',').map(v => Number(v)),
+    cState: item.s?.split(',').map(v => Number(v)),
     pState: item.e,
     updated: item.u,
     created: item.c,
