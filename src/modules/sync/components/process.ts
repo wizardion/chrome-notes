@@ -163,18 +163,21 @@ async function syncItems(file: IFileInfo, encryptor?: CryptoService, decryptor?:
     // mark deleted
     if (!info.cloud && info.db?.synced && !file.isNew && !info.db.deleted) {
       cloud.changed = true;
-      await db.update({ ...info.db, deleted: 1, synced: null });
+      db.enqueue({ ...info.db, deleted: 1, synced: null }, 'update');
       logger.info(i, ' - marked deleted local item: ', info.db.id, info.db.title);
       continue;
     }
 
     // update local
     if (info.cloud && (!info.db || info.db.updated < info.cloud.u)) {
-      const decorator = info.db ? db.update : db.add;
-
       cloud.changed = true;
       cloud.items.push(info.cloud);
-      await decorator({ ...(await lib.unzip(info.cloud, (decryptor || encryptor))), synced: modified });
+
+      db.enqueue(
+        { ...(await lib.unzip(info.cloud, (decryptor || encryptor))), synced: modified },
+        info.db ? 'update' : 'add'
+      );
+
       await logger.info(i, ' - received new item: ', info.cloud.i, info.cloud.t);
       continue;
     }
@@ -183,7 +186,7 @@ async function syncItems(file: IFileInfo, encryptor?: CryptoService, decryptor?:
     if (info.db && info.cloud && (info.db.deleted || !info.db.description)) {
       cloud.changed = true;
       cloud.modified = modified;
-      await db.update({ ...info.db, synced: null });
+      db.enqueue({ ...info.db, synced: null }, 'update');
       logger.info(i, ' - marked un-sync local item: ', info.db.id, info.db.title);
       continue;
     }
@@ -192,7 +195,7 @@ async function syncItems(file: IFileInfo, encryptor?: CryptoService, decryptor?:
     if (info.db && !info.db.deleted && (!info.cloud || info.db.updated > info.cloud.u)) {
       cloud.changed = true;
       cloud.modified = modified;
-      await db.update({ ...info.db, synced: modified });
+      db.enqueue({ ...info.db, synced: modified }, 'update');
       cloud.items.push(await lib.zip(info.db, encryptor));
       await logger.info(i, ' - pushed item to cloud: ', info.db.id, info.db.title);
       continue;
@@ -200,10 +203,12 @@ async function syncItems(file: IFileInfo, encryptor?: CryptoService, decryptor?:
 
     // keep the rest
     if (!info.db.deleted) {
-      await db.update({ ...info.db, synced: modified });
+      db.enqueue({ ...info.db, synced: modified }, 'update');
       cloud.items.push(await lib.zip(info.db, encryptor));
     }
   }
+
+  await db.dequeue();
 
   return cloud;
 }
