@@ -4,7 +4,7 @@ import { EditorView } from '@codemirror/view';
 
 export class HeadingHelper {
   private static tester: RegExp;
-  private static replacer = /^(\s*((#{1,6}\s)(\[\[\s\x]\]\s)?)?)(.*)/g;
+  private static replacer = /^(\s*((#{1,6}\s)(\[\[\sx]\]\s)?)?)(.*)/g;
 
   static toggle(view: EditorView, template: string): TransactionSpec | null {
     const range = view.state.selection.main;

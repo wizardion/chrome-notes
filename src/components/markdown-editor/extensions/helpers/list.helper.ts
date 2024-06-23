@@ -3,8 +3,8 @@ import { EditorView } from '@codemirror/view';
 
 
 export class ListHelper {
-  private static tester = /^\s*(\d.\s|-\s|\*\s)(\[[\s\x]\]\s)?/g;
-  private static replacer = /^(\s*((\d.\s|-\s|\*\s)(\[[\s\x]\]\s)?)?)(.*)/g;
+  private static tester = /^\s*(\d.\s|-\s|\*\s)(\[[\sx]\]\s)?/g;
+  private static replacer = /^(\s*((\d.\s|-\s|\*\s)(\[[\sx]\]\s)?)?)(.*)/g;
 
   static toggle(view: EditorView, template: string): TransactionSpec | null {
     const range = view.state.selection.main;
