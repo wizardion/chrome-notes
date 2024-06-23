@@ -21,7 +21,7 @@ export class UrlHelper {
       return this.transformUrl(range.from, range.to, selection);
     }
 
-    if (!urlMatched) {
+    if (selection.length > 0 && !urlMatched) {
       const part = view.state.sliceDoc(range.from - 2, range.to + 1);
 
       if (part.match(this.urlPart)) {
