@@ -17,7 +17,7 @@ export interface ISerializingNode {
 }
 
 export interface ISerializingSchemaItem {
-  toString: (content: string, attrs?: ISerializingAttributes, depth?: number) => string;
+  toString: (content: string | string[], attrs?: ISerializingAttributes, depth?: number) => string;
   attrs?: ISerializingAttributes
 }
 
