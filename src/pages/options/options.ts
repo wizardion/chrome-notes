@@ -61,6 +61,7 @@ whenDefined().then(async () => {
     controls.syncInfo.locked = settings.identity.locked;
     controls.syncInfo.encrypted = settings.identity.encrypted;
     controls.syncInfo.token = settings.identity.token;
+    controls.syncInfo.offline = !navigator.onLine;
   }
 
   if (settings.error) {

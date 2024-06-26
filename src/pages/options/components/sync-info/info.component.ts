@@ -24,6 +24,8 @@ export class SyncInfoElement extends BaseElement {
   private _encrypted: boolean;
   private _passphrase: string;
   private _locked: boolean;
+
+  private _offline: boolean;
   private _error: ISyncErrorDetails;
 
   constructor() {
@@ -75,6 +77,9 @@ export class SyncInfoElement extends BaseElement {
     this.form.checkboxes.encrypt.onchange = () => this.encryptedChanged();
 
     this.form.passphrase.addEventListener('password:change', () => this.passphraseChanged());
+
+    window.addEventListener('offline', () => this.offline = true);
+    window.addEventListener('online', () => this.offline = false);
   }
 
   protected attributeChanged() {
@@ -388,6 +393,17 @@ export class SyncInfoElement extends BaseElement {
 
   get locked(): boolean {
     return this._locked;
+  }
+
+  set offline (value: boolean) {
+    this._offline = value;
+    this.form.checkboxes.sync.disabled = value;
+    this.message = value ? 'Sync cannot be performed offline.' : '';
+    this.disabled = value;
+  }
+
+  get offline (): boolean {
+    return this._offline;
   }
 
   set locked(value: boolean) {

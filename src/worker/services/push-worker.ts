@@ -12,7 +12,7 @@ export class PushWorker extends BaseWorker {
   readonly name = PushWorker.name;
 
   async process() {
-    if (await SyncWorker.validate()) {
+    if (navigator.onLine && await SyncWorker.validate()) {
       const process = await chrome.alarms.get(SyncWorker.name);
 
       if (process?.name) {

@@ -19,7 +19,8 @@ export class DbProviderService {
     const settings = await getSettings({ sync: true, identity: true });
     const alarm = await chrome.alarms.get(this.syncWorker);
 
-    this.syncEnabled = alarm && settings.sync.enabled && !!settings.sync.token && settings.identity.enabled
+    this.syncEnabled = navigator.onLine &&
+      alarm && settings.sync.enabled && !!settings.sync.token && settings.identity.enabled
       && (
         !!settings.identity.token && settings.identity.fileId
         && (!settings.identity.encrypted || settings.identity.passphrase)

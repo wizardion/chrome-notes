@@ -1,11 +1,11 @@
 import { getApplicationId, decrypt } from 'core';
 import { ISyncStorageValue, storage } from 'core/services';
-import { startServiceWorker } from './components/services';
+import { startServiceWorker } from './services';
 import { IdentityInfo } from 'modules/sync/components/models/sync.models';
 import {
   StorageChange, onSyncInfoChanged, openPopup, onIdentityInfoChanged, initApplication, onPushInfoChanged,
   initInstalledApplication, onAppConnected, onIdleActiveStateChanged
-} from './components';
+} from '.';
 
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
@@ -47,4 +47,8 @@ chrome.storage.local.onChanged.addListener(async (changes: StorageChange) => {
 
     return onIdentityInfoChanged(oldInfo, newInfo);
   }
+});
+
+chrome.runtime.onUpdateAvailable.addListener(() => {
+  chrome.runtime.reload();
 });

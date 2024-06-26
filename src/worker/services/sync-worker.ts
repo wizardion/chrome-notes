@@ -13,7 +13,11 @@ export class SyncWorker extends BaseWorker {
 
   readonly name = SyncWorker.name;
 
-  async process() {
+  async process () {
+    if (!navigator.onLine) {
+      return;
+    }
+
     try {
       const info = await LocalStorageService.get<IdentityInfo>('identityInfo');
       const identity = await Cloud.sync(info);
