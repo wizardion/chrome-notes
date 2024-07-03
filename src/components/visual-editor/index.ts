@@ -86,9 +86,6 @@ export class VisualEditor implements IEditorView {
     const value = MarkdownSerializer.serialize(this.view.state.doc.content);
     const { anchor, head } = this.view.state.selection.toJSON();
 
-    console.log('text', [text]);
-    console.log(value);
-
     return { title: this.getTitle(text), description: value, selection: [anchor, head] };
   }
 
