@@ -84,7 +84,7 @@ export function markStrike(mark: MarkType) {
 }
 
 export function markLink(mark: MarkType) {
-  return markInputRule(/\[(?<text>.*)\]\((?<url>.+)\)\s/g, mark, m => (
+  return markInputRule(/\[(?<text>.*)\]\((?<url>.+)\)\s$/g, mark, m => (
     { attrs: { href: m.groups.url }, value: m.groups.text }
   ));
 }
