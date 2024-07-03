@@ -58,9 +58,7 @@ export function bulletListRule(nodeType: NodeType) {
 
 /* taken from `prosemirror-example-setup/src/inputrules.ts` */
 export function headingRule(nodeType: NodeType) {
-  const re = new RegExp('^(#{1,6})\\s$');
-
-  return textblockTypeInputRule(re, nodeType, match => ({ level: match[1].length }));
+  return textblockTypeInputRule(/^(#{1,6})\s$/, nodeType, match => ({ level: match[1].length }));
 }
 
 export function codeBlockRule(nodeType: NodeType) {
