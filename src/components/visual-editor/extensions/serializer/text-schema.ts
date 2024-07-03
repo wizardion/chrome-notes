@@ -45,11 +45,6 @@ export const textSerializingSchema: ISerializingSchema = {
         return content.join('') + '\n';
       }
     },
-    text: {
-      toString(content: string) {
-        return content;
-      }
-    }
   },
   marks: {
     link: {

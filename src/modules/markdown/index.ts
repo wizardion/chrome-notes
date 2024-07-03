@@ -1,92 +1,44 @@
-import * as Renderer from 'markdown-it/lib/renderer';
 import MarkdownIt from 'markdown-it';
+import { emptyLines } from './plugins/empty-lines.plugin';
+import { paragraphWrapper } from './plugins/paragraph-wrap.plugin';
+import { linkify } from './plugins/linkify.plugin';
+import { codeHighlight } from './plugins/highlight.plugin';
+import { IPluginOptions } from './models/md.models';
+import { renderInlinePlainText } from './plugins/plain-text.plugin';
 // import taskLists from '@hedgedoc/markdown-it-task-lists';
 
 
-type IOptions = MarkdownIt.Options;
-type Token = MarkdownIt.Token;
-
-// TODO temporary solution
-class MarkdownRender {
+export class MarkdownRender {
   private md: MarkdownIt;
 
-  constructor() {
+  constructor(options?: IPluginOptions) {
     this.md = new MarkdownIt('commonmark', {
       html: false,
       linkify: true,
       breaks: true,
-      typographer: true,
-      highlight: (s: string) => this.highlight(s)
+      typographer: false
     });
 
+    this.md.use(linkify, { enabled: true });
     // this.md.use(taskLists, { enabled: true });
-    this.md.renderer.rules['link_open'] = this.linkOpen.bind(this);
+    this.md.use(codeHighlight, { enabled: true });
+    this.md.use(paragraphWrapper, { enabled: true });
+    this.md.use(emptyLines, { enabled: true, renderSpaces: options?.renderSpaces });
   }
 
-  public render(text: string, trailingSpaces = ''): string {
-    const lines = text.split('\n');
-    const stack: string[] = [];
-    const block = /^\s*```/gi;
-    let inside = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
-
-      if (block.test(line)) {
-        stack.push(line);
-        inside = !inside;
-        continue;
-      }
-
-      if (inside) {
-        stack.push(line);
-        continue;
-      }
-
-      if (line.match(/^\s\s/g)) {
-        line = line.replace(/^\s\s/g, '\u00a12');
-      }
-
-      if (!line.length) {
-        line += '\\';
-      }
-
-      stack.push(line + '\n');
-    }
-
-    return this.md.render(stack.join('\n'))
-      .replace(/<p>\\<\/p>/g, `<p><span>${trailingSpaces}</span></p>`)
-      .replace(/\u00a12/g, '  ');
+  public render(value: string): string {
+    return this.md.render(value);
   }
 
   public unescapeAll(text: string): string {
     return this.md.utils.unescapeAll(text);
   }
 
+  public escape(text: string): string {
+    return this.md.utils.escapeRE(text);
+  }
+
   public toString(text: string): string {
-    return this.render(text).replace(/<[^>]*>/g, '');
-  }
-
-  private tokenRender(tokens: Token[], id: number, options: IOptions, self: Renderer) {
-    return self.renderToken(tokens, id, options);
-  }
-
-  // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
-  private linkOpen(tokens: Token[], id: number, options: IOptions, env: object, self: Renderer) {
-    const aIndex = tokens[id].attrIndex('target');
-
-    if (aIndex < 0) {
-      tokens[id].attrPush(['target', '_blank']);
-    } else {
-      tokens[id].attrs[aIndex][1] = '_blank';
-    }
-
-    return this.tokenRender(tokens, id, options, self);
-  }
-
-  private highlight(text: string) {
-    return '<pre><code class="test-w">' + this.md.utils.escapeHtml(text.replace(/\n$/gi, '')) + '</code></pre>';
+    return text.split('\n').map(i => renderInlinePlainText(this.md.parse(i, {}))).join('\n');
   }
 }
-
-export const mdRender = new MarkdownRender();

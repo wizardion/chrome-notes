@@ -4,6 +4,7 @@ import { ISerializingAttributes, ISerializingSchema } from './models/serializer.
 export const serializingSchema: ISerializingSchema = {
   nodes: {
     heading: {
+      attrs: { escape: true },
       toString(content: string[], attrs?: ISerializingAttributes) {
         const level = attrs.level as number;
         const levels: Record<number, string> = {
@@ -34,11 +35,13 @@ export const serializingSchema: ISerializingSchema = {
       toString(content: string[], attrs: ISerializingAttributes) {
         const { index, listType } = attrs;
         const mark = (listType as string).replace(/^\d/, `${(index + 1)}`) + ' ';
+        const lines = content.flatMap(line => line.split('\n'));
 
-        return mark + content.join('\n' + ' '.repeat(mark.length));
+        return mark + lines.join('\n' + ' '.repeat(mark.length));
       }
     },
     paragraph: {
+      attrs: { escape: true },
       toString(content: string[]) {
         return content.join('');
       }
@@ -58,11 +61,6 @@ export const serializingSchema: ISerializingSchema = {
         return '> ' + content.join('') + '\n';
       }
     },
-    text: {
-      toString(content: string) {
-        return content.replace(/[~*`()[\]>#-]/g, '\\$&').replace(/^(\d+)(\.\s)/g, '$1\\$2');
-      }
-    }
   },
   marks: {
     link: {

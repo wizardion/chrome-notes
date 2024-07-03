@@ -1,20 +1,20 @@
-import { EditorState } from 'prosemirror-state';
 import { ISerializingAttributes, ISerializingNode } from './models/serializer.models';
 import { serializingSchema } from './md-schema';
 import { Fragment } from 'prosemirror-model';
+import { MarkdownRender } from 'modules/markdown';
 
 
 export class MarkdownSerializer {
+  public static md = new MarkdownRender();
   protected static schema = serializingSchema;
 
-  static serialize(state: EditorState, content?: Fragment): string {
-    const { schema } = state;
+  static serialize(content: Fragment): string {
     const blocks: string[] = [];
 
-    (content || state.doc).forEach(block => {
+    content.forEach(block => {
       const node = block.toJSON() as ISerializingNode;
 
-      if (schema.nodes[node.type] && this.schema.nodes[node.type]) {
+      if (this.schema.nodes[node.type]) {
         blocks.push(this.renderBlock(node));
       }
     });
@@ -40,16 +40,15 @@ export class MarkdownSerializer {
       }
 
       if (node.type === 'text') {
-        result.push(this.toString(node));
+        result.push(this.toString(node, attrs.escape));
       }
     });
 
     return result;
   }
 
-  protected static toString(node: ISerializingNode): string {
-    const block = this.schema.nodes[node.type];
-    let text = block.toString(node.text);
+  protected static toString(node: ISerializingNode, escape: boolean = false): string {
+    let text = escape ? this.md.escape(node.text) : node.text;
 
     node.marks?.forEach(item => {
       const mark = this.schema.marks[item.type];

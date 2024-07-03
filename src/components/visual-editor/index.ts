@@ -13,7 +13,6 @@ import { gapCursor } from 'prosemirror-gapcursor';
 import { dropCursor } from 'prosemirror-dropcursor';
 
 import { IEditorData, IEditorView } from 'components/models/editor.models';
-import { mdRender } from 'modules/markdown';
 
 import { menu } from './extensions/menu';
 import { schema } from './extensions/schema';
@@ -82,17 +81,19 @@ export class VisualEditor implements IEditorView {
   }
 
   getData(): IEditorData {
-    const text = TextSerializer.serialize(this.view.state) || '';
-    const value = MarkdownSerializer.serialize(this.view.state);
-    const shorten = ((/\n/g).test(text) ? text.split(/\n/g).shift() : text).split(' ').splice(0, 6).join(' ');
-    const title = mdRender.toString(shorten).replace(/\n/g, '');
+    console.clear();
+    const text = TextSerializer.serializeInline(this.view.state.doc.content) || '';
+    const value = MarkdownSerializer.serialize(this.view.state.doc.content);
     const { anchor, head } = this.view.state.selection.toJSON();
 
-    return { title: title, description: value, selection: [anchor, head] };
+    console.log('text', [text]);
+    console.log(value);
+
+    return { title: this.getTitle(text), description: value, selection: [anchor, head] };
   }
 
   setData(data: IEditorData) {
-    this.html.innerHTML = mdRender.render(data.description);
+    this.html.innerHTML = MarkdownSerializer.md.render(data.description);
 
     this.view.updateState(
       EditorState.create({
@@ -130,7 +131,6 @@ export class VisualEditor implements IEditorView {
         this.view.dispatch(transaction);
       }
     } catch (error) {
-      console.log('set selection error', error);
       this.setSelection([0, 0]);
     }
   }
@@ -161,5 +161,9 @@ export class VisualEditor implements IEditorView {
     if (handler) {
       handler(new Event('change'));
     }
+  }
+
+  private getTitle(value: string): string {
+    return value ? value.trim().split(' ').slice(0, 10).join(' ') : '';
   }
 }

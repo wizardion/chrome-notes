@@ -1,6 +1,7 @@
 export interface ISerializingAttributes {
-  [key: string]: (number | string);
+  [key: string]: (number | string | boolean);
   index?: number | null;
+  escape?: boolean | null;
 }
 
 export interface ISerializingMark {
