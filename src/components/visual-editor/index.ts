@@ -53,7 +53,7 @@ export class VisualEditor implements IEditorView {
       virtualCursor(),
       clipboard(),
       cursorLink(),
-      trackerChanges(() => this.updateEventHandler())
+      trackerChanges((e) => this.updateEventHandler(e))
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });
@@ -81,12 +81,10 @@ export class VisualEditor implements IEditorView {
   }
 
   getData(): IEditorData {
-    console.clear();
     const text = TextSerializer.serializeInline(this.view.state.doc.content) || '';
     const value = MarkdownSerializer.serialize(this.view.state.doc.content);
-    const { anchor, head } = this.view.state.selection.toJSON();
 
-    return { title: this.getTitle(text), description: value, selection: [anchor, head] };
+    return { title: this.getTitle(text), description: value, selection: this.getSelection() };
   }
 
   setData(data: IEditorData) {
@@ -132,6 +130,12 @@ export class VisualEditor implements IEditorView {
     }
   }
 
+  getSelection(): number[] {
+    const { anchor, head } = this.view.state.selection.toJSON();
+
+    return [anchor, head];
+  }
+
   addEventListener(type: 'change' | 'save', listener: EventListener): void {
     if (type === 'change' && !this.listeners.has('change')) {
       this.listeners.set(type, listener);
@@ -152,11 +156,11 @@ export class VisualEditor implements IEditorView {
     return true;
   }
 
-  private updateEventHandler() {
+  private updateEventHandler(e: Event) {
     const handler = this.listeners.get('change');
 
     if (handler) {
-      handler(new Event('change'));
+      handler(e);
     }
   }
 

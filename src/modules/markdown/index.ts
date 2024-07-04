@@ -19,6 +19,7 @@ export class MarkdownRender {
       typographer: false
     });
 
+    this.md.enable(['strikethrough']);
     this.md.use(linkify, { enabled: true });
     // this.md.use(taskLists, { enabled: true });
     this.md.use(codeHighlight, { enabled: true });

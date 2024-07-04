@@ -11,13 +11,11 @@ import { ICachedSettings } from 'core/services/cached/models/cached.models';
 const template: DocumentFragment = BaseElement.component({
   templateUrl: './window.component.html'
 });
-const INTERVALS: IEventIntervals = {
-  delay: null, intervals: { changed: null, locked: null, collapsed: null, saving: null, indicator: null }
-};
+const INTERVALS: IEventIntervals = { delay: null, intervals: { changed: null, collapsed: null, window: null } };
 
 export class WindowNotesElement extends PopupBaseElement {
   static readonly selector = 'popup-notes';
-  protected triggerDelay = 1400;
+  protected triggerDelay = 2400;
   protected tabInfo: ITabInfo;
   protected indicator: HTMLElement;
 
@@ -53,7 +51,7 @@ export class WindowNotesElement extends PopupBaseElement {
     const settings = await getSettings();
 
     this.listView.addEventListener('create', () => !this.disabled && this.create());
-    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChange(e));
     this.detailsView.addEventListener('delete', async () => !this.disabled && await this.delete());
     this.listToggler.addEventListener('mousedown', async (e) => {
       e.preventDefault();
@@ -85,6 +83,8 @@ export class WindowNotesElement extends PopupBaseElement {
   }
 
   async select(item: INote) {
+    await this.onChange(new Event('save'));
+
     if (this.selected && !this.selected.description) {
       await super.delete(100);
       this.detailsView.elements.delete.disabled = this.items.length < 2;
@@ -127,11 +127,10 @@ export class WindowNotesElement extends PopupBaseElement {
     await DbProviderService.cache.set<ICachedSettings>('settings', { collapsed: this.collapsedList });
   }
 
-  async onChanged(e: Event) {
+  async onChange(e: Event) {
     if (this.selected) {
-      const data = this.detailsView.getData();
-
-      if (data.description !== this.selected.description || data.preview !== this.selected.preview) {
+      if (e.type !== 'selection') {
+        const data = this.detailsView.getData();
         const date = new Date();
         const time = date.getTime();
 
@@ -140,35 +139,37 @@ export class WindowNotesElement extends PopupBaseElement {
         this.selected.item.date = date;
 
         this.indicator.hidden = false;
-        clearInterval(INTERVALS.intervals.indicator);
+
+        this.selected.title = data.title;
+        this.selected.description = data.description;
+        this.selected.cState = data.selection;
+        this.selected.pState = data.previewSelection;
+        this.selected.item.title = data.title;
+        this.selected.preview = data.preview;
+        this.listView.elements.create.disabled = !data.description;
+      } else {
+        this.selected.cState = this.detailsView.getSelection();
+        this.selected.pState = this.detailsView.getPreviewState();
       }
 
-      this.selected.title = data.title;
-      this.selected.description = data.description;
-      this.selected.cState = data.selection;
-      this.selected.pState = data.previewSelection;
-      this.selected.item.title = data.title;
-      this.selected.preview = data.preview;
-      this.listView.elements.create.disabled = !data.description;
+      clearInterval(INTERVALS.intervals.changed);
 
-      clearInterval(INTERVALS.intervals.saving);
-
-      if (e.type === 'change') {
-        INTERVALS.intervals.saving = setTimeout(async () => await this.save(this.selected), this.triggerDelay);
-      } else {
+      if (e.type === 'save') {
         await this.save(this.selected);
+      } else {
+        INTERVALS.intervals.changed = setTimeout(async () => await this.save(this.selected), this.triggerDelay);
       }
     }
   }
 
   async save(item: INote) {
     await super.save(item);
-    INTERVALS.intervals.indicator = setTimeout(() => this.indicator.hidden = true, this.triggerDelay);
+    this.indicator.hidden = true;
   }
 
   onWindowChange(id: number, windowId?: number) {
-    clearInterval(INTERVALS.intervals.changed);
-    INTERVALS.intervals.changed = setTimeout(async () => this.saveWindowInfo(id, windowId), this.triggerDelay);
+    clearInterval(INTERVALS.intervals.window);
+    INTERVALS.intervals.window = setTimeout(async () => this.saveWindowInfo(id, windowId), this.triggerDelay);
   }
 
   set collapsed(value: boolean) {

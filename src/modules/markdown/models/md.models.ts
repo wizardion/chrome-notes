@@ -1,4 +1,4 @@
-export interface IPluginOptions{
+export interface IPluginOptions {
   enabled?: boolean;
   renderSpaces?: boolean
 }

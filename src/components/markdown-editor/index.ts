@@ -1,7 +1,7 @@
 import './assets/preview.scss';
 import './assets/codemirror.scss';
 
-import { Compartment, EditorState, SelectionRange } from '@codemirror/state';
+import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView, ViewUpdate, drawSelection, highlightSpecialChars, keymap } from '@codemirror/view';
 import { history } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
@@ -22,7 +22,7 @@ const mdRender = new MarkdownRender({ renderSpaces: true });
 
 export class MarkdownEditor implements IEditorView {
   view: EditorView;
-  range: SelectionRange;
+  range: number[];
 
   private extensions: IExtension[];
   private _hidden: boolean;
@@ -91,8 +91,6 @@ export class MarkdownEditor implements IEditorView {
     if (data.selection) {
       this.setSelection(data.selection);
     }
-
-    this.range = this.view.state.selection.main;
   }
 
   focus() {
@@ -121,6 +119,16 @@ export class MarkdownEditor implements IEditorView {
         effects: EditorView.scrollIntoView(from, { y: 'center' })
       });
     }
+
+    const range = this.view.state.selection.main;
+
+    this.range = [range.from, range.to];
+  }
+
+  getSelection(): number[] {
+    const range = this.view.state.selection.main;
+
+    return [range.from, range.to];
   }
 
   addEventListener(type: 'change' | 'save', listener: IEventListener): void {
@@ -148,16 +156,11 @@ export class MarkdownEditor implements IEditorView {
     });
   }
 
-  private getSelection(): number[] {
-    const range = this.view.state.selection.main;
+  private isDocSelectionChanged(view: ViewUpdate): boolean {
+    const range = view.state.selection.main;
+    const [from, to] = this.range;
 
-    return [range.from, range.to];
-  }
-
-  private isDocChanged(view: ViewUpdate): boolean {
-    const range = this.view.state.selection.main;
-
-    return view.docChanged || (view.selectionSet && (range.from !== this.range.from || range.to !== this.range.to));
+    return (range.from !== from || range.to !== to);
   }
 
   private saveEventHandler() {
@@ -171,8 +174,12 @@ export class MarkdownEditor implements IEditorView {
   private updateEventHandler(view: ViewUpdate) {
     const handler = this.listeners.get('change');
 
-    if (handler && this.isDocChanged(view)) {
-      handler(new Event('change'));
+    if (handler && view.docChanged) {
+      return handler(new Event('change'));
+    }
+
+    if (handler && view.selectionSet && this.isDocSelectionChanged(view)) {
+      handler(new Event('selection'));
     }
   }
 
