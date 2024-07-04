@@ -9,7 +9,7 @@ import { undoInputRule } from 'prosemirror-inputrules';
 import { Command } from 'prosemirror-state';
 import { Schema } from 'prosemirror-model';
 import { redo, undo } from 'prosemirror-history';
-import { indent, toggleLink, unindent } from './commands';
+import { copyToClipboard, indent, toggleLink, unindent } from './commands';
 
 
 const mac = typeof navigator !== 'undefined' ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false;
@@ -138,6 +138,7 @@ export function buildKeymap(schema: Schema, presets: Record<string, Command>) {
     'Mod-i': toggleMark(italic),
     'Mod-I': toggleMark(italic),
     'Mod-l': toggleLink,
+    'Shift-Mod-c': copyToClipboard(),
     ...presets
   };
 

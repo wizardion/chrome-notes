@@ -111,3 +111,15 @@ export function toggleList(listType: NodeType): Command {
 
   return command;
 }
+
+export function copyToClipboard(): Command {
+  const command = (state: EditorState): boolean => {
+    if (!state.selection.empty) {
+      navigator.clipboard.writeText(MarkdownSerializer.serialize(state.selection.content().content));
+    }
+
+    return true;
+  };
+
+  return window.navigator ? command : null;
+}
