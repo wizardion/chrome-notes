@@ -139,6 +139,7 @@ export function buildKeymap(schema: Schema, presets: Record<string, Command>) {
     'Mod-I': toggleMark(italic),
     'Mod-l': toggleLink,
     'Shift-Mod-c': copyToClipboard(),
+    'Alt-Mod-c': copyToClipboard(),
     ...presets
   };
 

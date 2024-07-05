@@ -8,7 +8,7 @@ import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import { history } from 'prosemirror-history';
-import { DOMParser } from 'prosemirror-model';
+import { DOMParser as EditorDOMParser } from 'prosemirror-model';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { dropCursor } from 'prosemirror-dropcursor';
 
@@ -31,7 +31,7 @@ export class VisualEditor implements IEditorView {
   view: EditorView;
 
   private plugins: Plugin[];
-  private html: HTMLPreElement;
+  private parser: DOMParser;
   private content: HTMLElement;
   private listeners = new Map<'change' | 'save', IEventListener>();
 
@@ -51,13 +51,13 @@ export class VisualEditor implements IEditorView {
       gapCursor(),
       history(),
       virtualCursor(),
-      clipboard(),
+      clipboard(schema),
       cursorLink(),
       trackerChanges((e) => this.updateEventHandler(e))
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });
-    this.html = <HTMLPreElement>document.createElement('pre');
+    this.parser = new DOMParser();
   }
 
   get element(): HTMLElement {
@@ -88,12 +88,12 @@ export class VisualEditor implements IEditorView {
   }
 
   setData(data: IEditorData) {
-    this.html.innerHTML = MarkdownSerializer.md.render(data.description);
+    const dom = this.parser.parseFromString(MarkdownSerializer.md.render(data.description), 'text/html');
 
     this.view.updateState(
       EditorState.create({
         schema: schema,
-        doc: DOMParser.fromSchema(schema).parse(this.html),
+        doc: EditorDOMParser.fromSchema(schema).parse(dom),
         plugins: this.plugins,
         storedMarks: this.view.state.storedMarks
       })
