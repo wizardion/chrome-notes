@@ -16,6 +16,7 @@ This extension can sync with Google Drive and encrypt the data if desired... to 
 - Drag & drop to reorder the notes in a desired order.
 - Dark and Light themes. 
 - No data is collected from a user.
+- Offline mode.
 
 This extension is published to the google webstore: https://chrome.google.com/webstore/detail/work-note/ilonmfcpfefeelkojaclhipbfmodbfli
 

@@ -14,8 +14,14 @@ export class UrlHelper {
     return this.processUrl(view, range, selection);
   }
 
-  static processUrl(view: EditorView, range: SelectionRange, selection: string): TransactionSpec | null {
-    if (selection.length > 0 && !selection.match(this.tester)) {
+  static processUrl (view: EditorView, range: SelectionRange, selection: string): TransactionSpec | null {
+    const urlMatched = selection.length > 0 && !!selection.match(this.tester);
+
+    if (urlMatched) {
+      return this.transformUrl(range.from, range.to, selection);
+    }
+
+    if (selection.length > 0 && !urlMatched) {
       const part = view.state.sliceDoc(range.from - 2, range.to + 1);
 
       if (part.match(this.urlPart)) {

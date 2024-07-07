@@ -3,8 +3,8 @@ import { EditorView } from '@codemirror/view';
 
 
 export class ListHelper {
-  private static tester = /^\s*(\d.\s|-\s|\*\s)(\[[\s\x]\]\s)?/g;
-  private static replacer = /^(\s*((\d.\s|-\s|\*\s)(\[[\s\x]\]\s)?)?)(.*)/g;
+  private static tester = /^\s*(\d.\s|-\s|\*\s)(\[[\sx]\]\s)?/g;
+  private static replacer = /^(\s*((\d.\s|-\s|\*\s)(\[[\sx]\]\s)?)?)(.*)/g;
 
   static toggle(view: EditorView, template: string): TransactionSpec | null {
     const range = view.state.selection.main;
@@ -16,16 +16,16 @@ export class ListHelper {
     return {
       changes: { from: fist.from, to: second.to, insert: value },
       selection: {
-        anchor: range.from + (lines[0].length - fist.text.length),
+        anchor: Math.max(range.from + (lines[0].length - fist.text.length), fist.from),
         head: range.to + value.length - (second.to - fist.from)
       }
     };
   }
 
   private static processLines(view: EditorView, fist: Line, second: Line, template: string): string[] {
-    let prev = view.state.doc.line(fist.number > 1 ? fist.number - 1 : 1).text;
     const tab = ' '.repeat(view.state.tabSize);
     const lines: string[] = [];
+    let prev = view.state.doc.line(fist.number > 1 ? fist.number - 1 : 1).text;
     let toList = null;
 
     for (let i = fist.number; i <= second.number; i++) {

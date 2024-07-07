@@ -65,7 +65,7 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
 
   addEventListener(type: IDetailsListenerType, listener: IEventListener, options?: boolean | AddEventListenerOptions) {
     if (type === 'changed') {
-      this.listeners.set('selectionEvent', (e) => this.onChange(e));
+      this.listeners.set('selectionEvent', () => this.onChange(new Event('selection')));
     }
 
     return super.addEventListener(type, listener, options);
@@ -85,6 +85,14 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
   setData(item: INote) {
     this.editor.setData({ title: item.title, description: item.description });
     this.setSelection(item);
+  }
+
+  getPreviewState(): string | null {
+    if (this._preview) {
+      return NodeHelper.getSelection(this.form.elements.htmlViewer);
+    }
+
+    return null;
   }
 
   set hidden(value: boolean) {
@@ -126,14 +134,6 @@ export class MarkdownViewElement extends DetailsBaseElement<IMarkdownViewForm> {
     }
 
     this.unlock().then(() => this.onChange(new Event('preview')));
-  }
-
-  private getPreviewState(): string | null {
-    if (this._preview) {
-      return NodeHelper.getSelection(this.form.elements.htmlViewer);
-    }
-
-    return null;
   }
 
   private setSelection(item: INote) {

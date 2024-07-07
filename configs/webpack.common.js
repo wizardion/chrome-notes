@@ -177,7 +177,7 @@ module.exports = {
       components: path.resolve(__root__, 'src/components'),
       pages: path.resolve(__root__, 'src/pages'),
       styles: path.resolve(__root__, 'src/styles'),
-      images: path.resolve(__root__, 'src/images'),
+      images: path.resolve(__root__, 'src/images')
     }
   },
   plugins: [
