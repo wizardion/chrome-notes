@@ -1,6 +1,7 @@
 export interface ISerializingAttributes {
-  [key: string]: (number | string);
+  [key: string]: (number | string | boolean);
   index?: number | null;
+  escape?: boolean | null;
 }
 
 export interface ISerializingMark {
@@ -17,7 +18,7 @@ export interface ISerializingNode {
 }
 
 export interface ISerializingSchemaItem {
-  toString: (content: string, attrs?: ISerializingAttributes, depth?: number) => string;
+  toString: (content: string | string[], attrs?: ISerializingAttributes, depth?: number) => string;
   attrs?: ISerializingAttributes
 }
 

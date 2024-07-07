@@ -23,7 +23,7 @@ export class PopupNotesElement extends PopupBaseElement {
   protected async eventListeners() {
     this.listView.addEventListener('create', () => !this.disabled && this.create());
     this.detailsView.addEventListener('cancel', () => !this.disabled && this.goBack());
-    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChange(e));
     this.detailsView.addEventListener('delete', () => !this.disabled && this.goBack(true));
 
     super.eventListeners();
@@ -46,7 +46,7 @@ export class PopupNotesElement extends PopupBaseElement {
     } else {
       this.selected?.item.scrollIntoView({ behavior: 'instant', block: 'center' });
       this.selected?.item.highlightItem();
-      await this.onChanged(new Event('save'));
+      await this.onChange(new Event('save'));
     }
 
     this.selected = null;

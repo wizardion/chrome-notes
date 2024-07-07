@@ -35,7 +35,7 @@ export function removeFormat(state: EditorState, dispatch: (tr: Transaction) => 
 export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
   if (dispatch) {
     // console.clear();
-    const content = MarkdownSerializer.serialize(state);
+    const content = MarkdownSerializer.serialize(state.doc.content);
 
     console.log('');
     console.log(content);
@@ -48,7 +48,7 @@ export function toMarkdown(state: EditorState, dispatch: (tr: Transaction) => vo
 export function toString(state: EditorState, dispatch: (tr: Transaction) => void): boolean {
   if (dispatch) {
     // console.clear();
-    const content = TextSerializer.serialize(state);
+    const content = TextSerializer.serialize(state.doc.content);
 
     console.log('');
     console.log(content);
@@ -110,4 +110,16 @@ export function toggleList(listType: NodeType): Command {
   };
 
   return command;
+}
+
+export function copyToClipboard(): Command {
+  const command = (state: EditorState): boolean => {
+    if (!state.selection.empty) {
+      navigator.clipboard.writeText(MarkdownSerializer.serialize(state.selection.content().content));
+    }
+
+    return true;
+  };
+
+  return window.navigator ? command : null;
 }

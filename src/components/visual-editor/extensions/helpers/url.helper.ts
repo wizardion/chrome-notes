@@ -4,7 +4,7 @@ import { BaseHelper } from './base.helper';
 
 
 export class UrlHelper extends BaseHelper {
-  private static tester = /^\s*\[(?<text>.*)\]\((?<url>.+)\)\s*/g;
+  private static tester = /^\s*\[(?<text>[^\]]+)\]\((?<url>[^)]+)\)\s*$/g;
   private static template = '[${text}](url)';
 
   static toggle(state: EditorState): Transaction | null {

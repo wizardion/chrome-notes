@@ -1,5 +1,4 @@
-import * as MarkdownIt from 'markdown-it';
-import * as Token from 'markdown-it/lib/token';
+import MarkdownIt from 'markdown-it';
 
 
 export class MarkdownMDRender {
@@ -10,7 +9,7 @@ export class MarkdownMDRender {
   }
 
   public static parse(text: string) {
-    const tokens = this.md.parse(text, {}) as Token[];
+    const tokens = this.md.parse(text, {});
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];

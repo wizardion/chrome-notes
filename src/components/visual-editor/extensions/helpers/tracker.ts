@@ -12,13 +12,13 @@ export class TrackerView {
 
   update(view: EditorView, previous: EditorState) {
     const state = view.state;
-    const selection = state.selection;
 
-    // Don't do anything if the document/selection didn't change
-    if (!previous || previous.doc.eq(state.doc) && previous.selection.eq(selection)) {
-      return;
+    if (previous && !previous.doc.eq(state.doc)) {
+      return this.listener(new Event('change'));
     }
 
-    this.listener(new Event('change'));
+    if (previous && !previous.selection.eq(state.selection)) {
+      return this.listener(new Event('selection'));
+    }
   }
 }
