@@ -9,7 +9,7 @@ const lineBreaks: Record<string, boolean> = {
 };
 
 
-function parseTokens(tokens: Token[], level = 0): boolean {
+function parseTokens(tokens: Token[]): boolean {
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
 
@@ -19,7 +19,7 @@ function parseTokens(tokens: Token[], level = 0): boolean {
     }
 
     if (token.children) {
-      parseTokens(token.children, level + 1);
+      parseTokens(token.children);
     }
 
     if (paragraph.inside && lineBreaks[token.type]) {
