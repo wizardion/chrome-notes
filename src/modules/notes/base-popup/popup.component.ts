@@ -149,33 +149,35 @@ export abstract class PopupBaseElement extends BaseElement {
     ListItemElement.locked = false;
   }
 
-  async onChanged(e: Event) {
+  async onChange(e: Event) {
     if (this.selected) {
-      const data = this.detailsView.getData();
-
-      if (data.description !== this.selected.description || data.preview !== this.selected.preview) {
+      if (e.type !== 'selection') {
+        const data = this.detailsView.getData();
         const date = new Date();
         const time = date.getTime();
 
         this.selected.push = true;
         this.selected.updated = time;
         this.selected.item.date = date;
-      }
 
-      this.selected.title = data.title;
-      this.selected.description = data.description;
-      this.selected.cState = data.selection;
-      this.selected.pState = data.previewSelection;
-      this.selected.item.title = data.title;
-      this.selected.preview = data.preview;
-      this.listView.elements.create.disabled = !data.description;
+        this.selected.title = data.title;
+        this.selected.description = data.description;
+        this.selected.cState = data.selection;
+        this.selected.pState = data.previewSelection;
+        this.selected.item.title = data.title;
+        this.selected.preview = data.preview;
+        this.listView.elements.create.disabled = !data.description;
+      } else {
+        this.selected.cState = this.detailsView.getSelection();
+        this.selected.pState = this.detailsView.getPreviewState();
+      }
 
       clearInterval(INTERVALS.intervals.changed);
 
-      if (e.type === 'change') {
-        INTERVALS.intervals.changed = setTimeout(async () => await this.save(this.selected), this.triggerDelay);
-      } else {
+      if (e.type === 'save') {
         await this.save(this.selected);
+      } else {
+        INTERVALS.intervals.changed = setTimeout(async () => await this.save(this.selected), this.triggerDelay);
       }
     }
   }

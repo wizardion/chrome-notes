@@ -21,6 +21,7 @@ export interface IEditorView {
   focus(): void;
   render(): string;
   setSelection(selection: number[]): void;
+  getSelection(): number[];
 
   addEventListener(type: 'change' | 'save', listener: EventListener): void;
 }

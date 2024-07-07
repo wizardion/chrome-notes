@@ -8,12 +8,11 @@ import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import { history } from 'prosemirror-history';
-import { DOMParser } from 'prosemirror-model';
+import { DOMParser as EditorDOMParser } from 'prosemirror-model';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { dropCursor } from 'prosemirror-dropcursor';
 
 import { IEditorData, IEditorView } from 'components/models/editor.models';
-import { mdRender } from 'modules/markdown';
 
 import { menu } from './extensions/menu';
 import { schema } from './extensions/schema';
@@ -32,7 +31,7 @@ export class VisualEditor implements IEditorView {
   view: EditorView;
 
   private plugins: Plugin[];
-  private html: HTMLPreElement;
+  private parser: DOMParser;
   private content: HTMLElement;
   private listeners = new Map<'change' | 'save', IEventListener>();
 
@@ -52,13 +51,13 @@ export class VisualEditor implements IEditorView {
       gapCursor(),
       history(),
       virtualCursor(),
-      clipboard(),
+      clipboard(schema),
       cursorLink(),
-      trackerChanges(() => this.updateEventHandler())
+      trackerChanges((e) => this.updateEventHandler(e))
     ];
 
     this.view = new EditorView(this.content, { state: EditorState.create({ schema: schema }) });
-    this.html = <HTMLPreElement>document.createElement('pre');
+    this.parser = new DOMParser();
   }
 
   get element(): HTMLElement {
@@ -82,22 +81,19 @@ export class VisualEditor implements IEditorView {
   }
 
   getData(): IEditorData {
-    const text = TextSerializer.serialize(this.view.state) || '';
-    const value = MarkdownSerializer.serialize(this.view.state);
-    const shorten = ((/\n/g).test(text) ? text.split(/\n/g).shift() : text).split(' ').splice(0, 6).join(' ');
-    const title = mdRender.toString(shorten).replace(/\n/g, '');
-    const { anchor, head } = this.view.state.selection.toJSON();
+    const text = TextSerializer.serializeInline(this.view.state.doc.content) || '';
+    const value = MarkdownSerializer.serialize(this.view.state.doc.content);
 
-    return { title: title, description: value, selection: [anchor, head] };
+    return { title: this.getTitle(text), description: value, selection: this.getSelection() };
   }
 
   setData(data: IEditorData) {
-    this.html.innerHTML = mdRender.render(data.description);
+    const dom = this.parser.parseFromString(MarkdownSerializer.md.render(data.description), 'text/html');
 
     this.view.updateState(
       EditorState.create({
         schema: schema,
-        doc: DOMParser.fromSchema(schema).parse(this.html),
+        doc: EditorDOMParser.fromSchema(schema).parse(dom),
         plugins: this.plugins,
         storedMarks: this.view.state.storedMarks
       })
@@ -130,9 +126,14 @@ export class VisualEditor implements IEditorView {
         this.view.dispatch(transaction);
       }
     } catch (error) {
-      console.log('set selection error', error);
       this.setSelection([0, 0]);
     }
+  }
+
+  getSelection(): number[] {
+    const { anchor, head } = this.view.state.selection.toJSON();
+
+    return [anchor, head];
   }
 
   addEventListener(type: 'change' | 'save', listener: EventListener): void {
@@ -155,11 +156,15 @@ export class VisualEditor implements IEditorView {
     return true;
   }
 
-  private updateEventHandler() {
+  private updateEventHandler(e: Event) {
     const handler = this.listeners.get('change');
 
     if (handler) {
-      handler(new Event('change'));
+      handler(e);
     }
+  }
+
+  private getTitle(value: string): string {
+    return value ? value.trim().split(' ').slice(0, 10).join(' ') : '';
   }
 }

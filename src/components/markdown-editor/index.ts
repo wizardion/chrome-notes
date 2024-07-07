@@ -1,14 +1,14 @@
 import './assets/preview.scss';
 import './assets/codemirror.scss';
 
-import { Compartment, EditorState, SelectionRange } from '@codemirror/state';
+import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView, ViewUpdate, drawSelection, highlightSpecialChars, keymap } from '@codemirror/view';
 import { history } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 
-import { mdRender } from 'modules/markdown';
+import { MarkdownRender } from 'modules/markdown';
 import { IExtension } from 'components/models/extensions.model';
 import { IEditorData, IEditorView } from 'components/models/editor.models';
 
@@ -18,9 +18,11 @@ import { CODE_ACTIONS, editorKeymap } from './extensions/keymap';
 import { IEventListener } from 'core/components';
 
 
+const mdRender = new MarkdownRender({ renderSpaces: true });
+
 export class MarkdownEditor implements IEditorView {
   view: EditorView;
-  range: SelectionRange;
+  range: number[];
 
   private extensions: IExtension[];
   private _hidden: boolean;
@@ -79,10 +81,8 @@ export class MarkdownEditor implements IEditorView {
 
   getData(): IEditorData {
     const value = this.view.state.doc.toString() || '';
-    const head = ((/\n/g).test(value) ? value.split(/\n/g).shift() : value).split(' ').splice(0, 6).join(' ');
-    const title = mdRender.toString(head).replace(/\n/g, '');
 
-    return { title: title, description: value, selection: this.getSelection() };
+    return { title: this.getTitle(value), description: value, selection: this.getSelection() };
   }
 
   setData(data: IEditorData) {
@@ -91,8 +91,6 @@ export class MarkdownEditor implements IEditorView {
     if (data.selection) {
       this.setSelection(data.selection);
     }
-
-    this.range = this.view.state.selection.main;
   }
 
   focus() {
@@ -100,7 +98,7 @@ export class MarkdownEditor implements IEditorView {
   }
 
   render() {
-    const html = mdRender.render(this.view.state.doc.toString(), '&nbsp;');
+    const html = mdRender.render(this.view.state.doc.toString());
 
     return `<div>${html}</div>`;
   }
@@ -109,10 +107,28 @@ export class MarkdownEditor implements IEditorView {
     const [from, to] = selection;
 
     this.view.focus();
-    this.view.dispatch({
-      selection: { anchor: from, head: to },
-      effects: EditorView.scrollIntoView(from, { y: 'center' })
-    });
+
+    try {
+      this.view.dispatch({
+        selection: { anchor: from, head: to },
+        effects: EditorView.scrollIntoView(from, { y: 'center' })
+      });
+    } catch (e) {
+      this.view.dispatch({
+        selection: { anchor: 0, head: 0 },
+        effects: EditorView.scrollIntoView(from, { y: 'center' })
+      });
+    }
+
+    const range = this.view.state.selection.main;
+
+    this.range = [range.from, range.to];
+  }
+
+  getSelection(): number[] {
+    const range = this.view.state.selection.main;
+
+    return [range.from, range.to];
   }
 
   addEventListener(type: 'change' | 'save', listener: IEventListener): void {
@@ -140,16 +156,11 @@ export class MarkdownEditor implements IEditorView {
     });
   }
 
-  private getSelection(): number[] {
-    const range = this.view.state.selection.main;
+  private isDocSelectionChanged(view: ViewUpdate): boolean {
+    const range = view.state.selection.main;
+    const [from, to] = this.range;
 
-    return [range.from, range.to];
-  }
-
-  private isDocChanged(view: ViewUpdate): boolean {
-    const range = this.view.state.selection.main;
-
-    return view.docChanged || (view.selectionSet && (range.from !== this.range.from || range.to !== this.range.to));
+    return (range.from !== from || range.to !== to);
   }
 
   private saveEventHandler() {
@@ -163,8 +174,18 @@ export class MarkdownEditor implements IEditorView {
   private updateEventHandler(view: ViewUpdate) {
     const handler = this.listeners.get('change');
 
-    if (handler && this.isDocChanged(view)) {
-      handler(new Event('change'));
+    if (handler && view.docChanged) {
+      return handler(new Event('change'));
     }
+
+    if (handler && view.selectionSet && this.isDocSelectionChanged(view)) {
+      handler(new Event('selection'));
+    }
+  }
+
+  private getTitle(value: string): string {
+    const first = value.split('\n').find(i => i.trim().length > 0);
+
+    return first ? mdRender.toString(first).trim().split(' ').slice(0, 10).join(' ') : '';
   }
 }

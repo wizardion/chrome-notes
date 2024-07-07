@@ -1,52 +1,54 @@
-import { EditorState } from 'prosemirror-state';
 import { ISerializingAttributes, ISerializingNode } from './models/serializer.models';
 import { serializingSchema } from './md-schema';
 import { Fragment } from 'prosemirror-model';
+import { MarkdownRender } from 'modules/markdown';
 
 
 export class MarkdownSerializer {
+  public static md = new MarkdownRender();
   protected static schema = serializingSchema;
 
-  static serialize(state: EditorState, content?: Fragment): string {
-    const { schema } = state;
+  static serialize(content: Fragment): string {
     const blocks: string[] = [];
 
-    (content || state.doc).forEach(block => {
+    content.forEach(block => {
       const node = block.toJSON() as ISerializingNode;
 
-      if (schema.nodes[node.type] && this.schema.nodes[node.type]) {
+      if (this.schema.nodes[node.type]) {
         blocks.push(this.renderBlock(node));
       }
     });
 
-    // TODO Temporary solution until the scheme fixes.
-    return blocks.join('').replace(/\n\n$/g, '\n');
+    return blocks.join('\n');
   }
 
   protected static renderBlock(node: ISerializingNode, depth = 0): string {
     const block = this.schema.nodes[node.type];
-    const content = this.gerContent(node.content || [], block.attrs, depth + 1);
+    const content = this.gerContent(node.content, { ...node.attrs, ...block.attrs }, depth + 1);
 
     return block.toString(content, node.attrs, depth);
   }
 
-  protected static gerContent(content: ISerializingNode[], attrs: ISerializingAttributes, depth: number): string {
+  protected static gerContent(content: ISerializingNode[], attrs: ISerializingAttributes, depth: number): string[] {
     const result: string[] = [];
 
-    content.forEach((node, index) => {
-      if (node.type !== 'text') {
-        node.attrs = Object.assign({}, attrs, node.attrs, { index: index });
+    content?.forEach((node, index) => {
+      if (node.type !== 'text' && this.schema.nodes[node.type]) {
+        node.attrs = { ...attrs, ...node.attrs, index: index } as ISerializingAttributes;
+
         result.push(this.renderBlock(node, depth));
       }
 
-      result.push(this.toString(node));
+      if (node.type === 'text') {
+        result.push(this.toString(node, attrs.escape));
+      }
     });
 
-    return result.join('');
+    return result;
   }
 
-  protected static toString(node: ISerializingNode): string {
-    let text = node.text;
+  protected static toString(node: ISerializingNode, escape: boolean = false): string {
+    let text = escape ? this.md.escape(node.text) : node.text;
 
     node.marks?.forEach(item => {
       const mark = this.schema.marks[item.type];

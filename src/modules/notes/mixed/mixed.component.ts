@@ -43,7 +43,7 @@ export class PopupMixedNotesElement extends PopupBaseElement {
 
   protected async eventListeners() {
     this.listView.addEventListener('create', () => !this.disabled && this.create());
-    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChanged(e));
+    this.detailsView.addEventListener('changed', (e) => !this.disabled && this.onChange(e));
     this.detailsView.addEventListener('delete', async () => !this.disabled && await this.delete());
     this.listToggler.addEventListener('mousedown', async (e) => {
       e.preventDefault();
@@ -68,6 +68,8 @@ export class PopupMixedNotesElement extends PopupBaseElement {
   }
 
   async select(item: INote) {
+    await this.onChange(new Event('save'));
+
     if (this.selected && !this.selected.description) {
       await super.delete(100);
       this.detailsView.elements.delete.disabled = this.items.length < 2;

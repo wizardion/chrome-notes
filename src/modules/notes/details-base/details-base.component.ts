@@ -95,6 +95,14 @@ export abstract class DetailsBaseElement<T extends IDetailsViewForm = IDetailsVi
     this.unlock();
   }
 
+  getSelection(): number[] {
+    return this.editor.getSelection();
+  }
+
+  getPreviewState(): string | null {
+    return null;
+  }
+
   focus() {
     this.editor.focus();
   }
