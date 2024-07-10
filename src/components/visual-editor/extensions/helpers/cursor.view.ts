@@ -46,7 +46,6 @@ export class CursorView {
     return this.updateSelection(view);
   }
 
-  // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L59`
   handleKeyDown(view: EditorView, event: KeyboardEvent): boolean {
     const { selection } = view.state;
 
@@ -214,9 +213,9 @@ export class CursorView {
       return null;
     }
 
+    const collapsed = range.collapsed;
     const clientRects = range.getClientRects();
     const editorBoundaries = this.copyRect(view.dom.getBoundingClientRect());
-    const collapsed = range.collapsed;
     const forward = range.collapsed || this.getDirection(selection) === IDirection.right;
 
     const rects: IRect[] = !collapsed && clientRects.length
@@ -268,10 +267,6 @@ export class CursorView {
       first.bottom += gap;
       second.top -= gap;
     }
-
-    // if (first) {
-    // second.left = 1;
-    // }
 
     if (root) {
       second.right = Math.min(second.right + minimum, (root.right - root.left) - 1);
@@ -346,31 +341,27 @@ export class CursorView {
   // -> removing the class
     element.classList.remove(className);
 
-    // -> triggering reflow /* The actual magic */
-    // eslint-disable-next-line no-void
+    // -> triggering reflow
     void element.offsetWidth;
 
     // -> and re-adding the class
     element.classList.add(className);
   }
 
-  // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L176`
   private isTextSelection(selection: ISelection, event: KeyboardEvent): boolean {
-    // return selection && typeof selection === 'object' && '$cursor' in selection;
     return event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing ||
     !['ArrowLeft', 'ArrowRight'].includes(event.key) || !selection.empty;
   }
 
-  // taken from: `https://github.com/ocavue/prosemirror-virtual-cursor/blob/master/src/index.ts#L164`
-  private getMarksAround($pos: ResolvedPos) {
-    const index = $pos.index();
-    const after = $pos.parent.maybeChild(index);
+  private getMarksAround(pos: ResolvedPos) {
+    const index = pos.index();
+    const after = pos.parent.maybeChild(index);
 
-    // When inside a text node, just return the text node's marks
-    let before = $pos.textOffset ? after : null;
+    // When inside a text node, return the text node's marks
+    let before = pos.textOffset ? after : null;
 
     if (!before && index > 0) {
-      before = $pos.parent.maybeChild(index - 1);
+      before = pos.parent.maybeChild(index - 1);
     }
 
     return [before?.marks, after?.marks] as const;
@@ -393,54 +384,4 @@ export class CursorView {
 
     this.cursor.className = className;
   }
-
-  /* private polygons: SVGPathElement[];
-  private drawTracing(clientRects: DOMRect[], root: DOMRect | IRect, boundingRect?:  DOMRect | IRect) {
-    for (let i = 0; i < this.polygons?.length; i++) {
-      this.polygons[i].remove();
-    }
-
-    this.polygons = [];
-
-    const toRect = (rect: IRect) => {
-      const result = {
-        left: rect.left - root.left,
-        top: rect.top - root.top,
-        right: rect.right - root.left,
-        bottom: rect.bottom - root.top,
-      };
-
-      if (result.right - result.left < 1) {
-        result.right = result.left + minimum;
-      }
-
-      if (result.bottom - result.top < 1) {
-        result.bottom = result.top + minimum;
-      }
-
-      return result;
-    };
-
-    if (boundingRect) {
-      setTimeout(() => {
-        this.selection.style.display = '';
-        this.selection.setAttribute('width', `${boundingRect.right - boundingRect.left}`);
-        this.selection.setAttribute('height', `${boundingRect.bottom - boundingRect.top}`);
-        this.selection.style.left = `${boundingRect.left}px`;
-        this.selection.style.top = `${boundingRect.top}px`;
-      });
-    }
-
-    for (let i = 0; i < clientRects.length; i++) {
-      const polygon = this.doc.createElementNS('http://www.w3.org/2000/svg', 'path');
-      const rect = toRect(clientRects[i]);
-      const path = this.drawPath([rect]);
-
-      polygon.setAttribute('d', path);
-      polygon.style.stroke = '#ff00004f';
-
-      this.polygons.push(polygon);
-      this.selection.appendChild(polygon);
-    }
-  } */
 }
